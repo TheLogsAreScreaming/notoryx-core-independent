@@ -13,6 +13,7 @@ class _FakeBle extends UniversalBlePlatform {
   _FakeBle({this.hasMeshCoreService = true});
 
   final bool hasMeshCoreService;
+  AvailabilityState availability = AvailabilityState.poweredOn;
   List<List<int>> Function(Uint8List frame) respond = (_) => [];
   final writes = <Uint8List>[];
   final subscribed = <String>[];
@@ -109,7 +110,7 @@ class _FakeBle extends UniversalBlePlatform {
 
   @override
   Future<AvailabilityState> getBluetoothAvailabilityState() async =>
-      AvailabilityState.poweredOn;
+      availability;
 
   @override
   Future<bool> enableBluetooth() async => true;
@@ -279,5 +280,32 @@ void main() {
     expect(isMeshCoreAdvert('MeshCore-Base', const []), isTrue);
     expect(isMeshCoreAdvert('Headphones', const ['180f']), isFalse);
     expect(isMeshCoreAdvert(null, const []), isFalse);
+  });
+
+  test(
+    'a scan with Bluetooth permission off says so instead of finding nothing',
+    () async {
+      ble.availability = AvailabilityState.unauthorized;
+      final errors = <Object>[];
+      var done = false;
+      BleRadioScanner.scan().listen(
+        (_) {},
+        onError: errors.add,
+        onDone: () => done = true,
+      );
+      await pumpEventQueue();
+      expect(errors.single, isA<BluetoothUnavailable>());
+      expect('${errors.single}', contains('Privacy & Security'));
+      expect(done, isTrue);
+      expect(ble.lastScanFilter, isNull, reason: 'no scan was started');
+    },
+  );
+
+  test('Bluetooth turned off is reported', () async {
+    ble.availability = AvailabilityState.poweredOff;
+    final errors = <Object>[];
+    BleRadioScanner.scan().listen((_) {}, onError: errors.add);
+    await pumpEventQueue();
+    expect('${errors.single}', 'Bluetooth is turned off.');
   });
 }

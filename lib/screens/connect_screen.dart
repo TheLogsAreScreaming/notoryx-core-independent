@@ -60,7 +60,12 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
             });
           },
           onError: (Object error) {
-            if (mounted) setState(() => _scanError = '$error');
+            if (mounted) {
+              setState(() {
+                _scanError = '$error';
+                _scanning = false;
+              });
+            }
           },
           onDone: () {
             if (mounted) setState(() => _scanning = false);
@@ -123,7 +128,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
           if (_scanError case final error?)
             ListTile(
               leading: const Icon(Icons.bluetooth_disabled),
-              title: const Text('Bluetooth scan failed'),
+              title: const Text('Can\u2019t scan for radios'),
               subtitle: Text(error),
             )
           else if (_ble.isEmpty)

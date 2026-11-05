@@ -16,6 +16,28 @@ abstract final class MeshCoreBle {
   static const tx = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
 }
 
+/// Bluetooth can't scan right now, and why.
+final class BluetoothUnavailable implements Exception {
+  const BluetoothUnavailable(this.state);
+
+  final AvailabilityState state;
+
+  /// What the person can do about it.
+  String get message => switch (state) {
+    AvailabilityState.unauthorized =>
+      'NOTORYX Independent isn\u2019t allowed to use Bluetooth. Turn it on in '
+          'System Settings \u2192 Privacy & Security \u2192 Bluetooth (on a '
+          'phone: Settings \u2192 Apps \u2192 NOTORYX Independent \u2192 '
+          'Permissions), then scan again.',
+    AvailabilityState.poweredOff => 'Bluetooth is turned off.',
+    AvailabilityState.unsupported => 'This device has no Bluetooth LE.',
+    _ => 'Bluetooth isn\u2019t ready yet. Scan again in a moment.',
+  };
+
+  @override
+  String toString() => message;
+}
+
 /// A device seen while scanning. [isMeshCore] is true when it advertises the
 /// MeshCore service or a MeshCore name.
 typedef BleRadioCandidate = ({
@@ -71,8 +93,14 @@ abstract final class BleRadioScanner {
             isMeshCore: isMeshCore,
           ));
         });
-        stopTimer = Timer(duration, stop);
         try {
+          final state = await _readyState();
+          if (state != AvailabilityState.poweredOn) {
+            out.addError(BluetoothUnavailable(state));
+            await stop();
+            return;
+          }
+          stopTimer = Timer(duration, stop);
           await UniversalBle.startScan(
             scanFilter: all
                 ? null
@@ -94,6 +122,29 @@ abstract final class BleRadioScanner {
     );
     return out.stream;
   }
+}
+
+/// Bluetooth's state once it has settled. Right after launch it reads
+/// unknown until the system has asked for permission, so wait a little.
+Future<AvailabilityState> _readyState() async {
+  var state = await UniversalBle.getBluetoothAvailabilityState();
+  if (state != AvailabilityState.unknown &&
+      state != AvailabilityState.resetting) {
+    return state;
+  }
+  await UniversalBle.requestPermissions();
+  try {
+    state = await UniversalBle.availabilityStream
+        .firstWhere(
+          (s) =>
+              s != AvailabilityState.unknown &&
+              s != AvailabilityState.resetting,
+        )
+        .timeout(const Duration(seconds: 30));
+  } on TimeoutException {
+    state = await UniversalBle.getBluetoothAvailabilityState();
+  }
+  return state;
 }
 
 /// Whether an advert with [name] and [services] looks like a MeshCore radio.
