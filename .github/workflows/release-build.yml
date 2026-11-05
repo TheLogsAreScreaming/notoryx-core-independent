@@ -1,0 +1,104 @@
+name: Release build
+
+# Builds the files for a release: an Android APK and a macOS zip, with
+# SHA-256 checksums. Publishing to notoryx-core-independent-releases is done
+# from those artifacts.
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+  pull_request:
+    paths:
+      - .github/workflows/release-build.yml
+      - android/app/build.gradle.kts
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Release signing key (if configured)
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "No signing secrets; the APK is signed with a throwaway debug key."
+            exit 0
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > android/release.jks
+          {
+            echo "storeFile=release.jks"
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "keyPassword=$KEY_PASSWORD"
+          } > android/key.properties
+
+      - run: flutter pub get
+      - run: flutter build apk --release
+
+      - name: Check the APK signer
+        env:
+          SIGNED: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+          # Public fingerprint of the NOTORYX Independent release certificate.
+          EXPECTED: 2a3e26c01231a764fb398ef4fd844f8a0b782228013b1aba5a10c41ac3500924
+        run: |
+          apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          "$apksigner" verify --print-certs build/app/outputs/flutter-apk/app-release.apk | tee signer.txt
+          if [ "$SIGNED" = "true" ] && ! grep -qi "SHA-256 digest: $EXPECTED" signer.txt; then
+            echo "::error::APK is not signed with the NOTORYX Independent release key"
+            exit 1
+          fi
+
+      - name: Name and checksum the APK
+        run: |
+          version=$(grep '^version:' pubspec.yaml | cut -d' ' -f2 | cut -d+ -f1)
+          mkdir dist
+          cp build/app/outputs/flutter-apk/app-release.apk "dist/NOTORYX-Independent-$version-android.apk"
+          cd dist && sha256sum *.apk > SHA256SUMS-android.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: dist/
+
+  macos:
+    # Apple-silicon runners were out of capacity for hours; the Intel image
+    # still builds a universal (Intel and Apple silicon) app.
+    runs-on: macos-15-intel
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter build macos --release
+
+      - name: Zip and checksum the app
+        run: |
+          version=$(grep '^version:' pubspec.yaml | cut -d' ' -f2 | cut -d+ -f1)
+          mkdir dist
+          ditto -c -k --keepParent "build/macos/Build/Products/Release/NOTORYX Independent.app" \
+            "dist/NOTORYX-Independent-$version-macos.zip"
+          cd dist && shasum -a 256 *.zip > SHA256SUMS-macos.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: dist/
