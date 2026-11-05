@@ -259,14 +259,21 @@ class MeshStore {
     int? ackCode,
     bool? flooded,
     int attempts = 1,
-  }) => (_db.update(_db.messages)..where((m) => m.id.equals(id))).write(
-    MessagesCompanion(
-      status: const Value(MessageStatus.sent),
-      ackCode: Value(ackCode),
-      flooded: Value(flooded),
-      attempts: Value(attempts),
-    ),
-  );
+  }) =>
+      (_db.update(_db.messages)..where(
+            // An ack can land before this write; never undo a delivery.
+            (m) =>
+                m.id.equals(id) &
+                m.status.equalsValue(MessageStatus.delivered).not(),
+          ))
+          .write(
+            MessagesCompanion(
+              status: const Value(MessageStatus.sent),
+              ackCode: Value(ackCode),
+              flooded: Value(flooded),
+              attempts: Value(attempts),
+            ),
+          );
 
   /// Marks message [id] delivered, if it was still waiting.
   Future<void> markDeliveredById(int id) =>
