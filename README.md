@@ -8,6 +8,9 @@ scratch for this repository.
 In development. The current NOTORYX Core releases keep shipping from the
 existing app; this one replaces it once it matches its features.
 
+Builds are published to
+[notoryx-core-independent-releases](https://github.com/TheLogsAreScreaming/notoryx-core-independent-releases).
+
 Build order:
 
 1. Radio core: frame codec and BLE, USB and TCP links, written from

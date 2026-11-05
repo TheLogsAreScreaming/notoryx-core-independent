@@ -31,3 +31,22 @@ jobs:
 
       - name: Check for meshcore-open code
         run: python3 -I tools/check_independence.py "$RUNNER_TEMP/meshcore-open" .
+
+  android-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+      - name: Build debug APK (checks native plugins compile)
+        run: flutter build apk --debug

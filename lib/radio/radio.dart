@@ -2,6 +2,7 @@
 /// that carry it, and the session that runs commands over a link.
 library;
 
+export 'link/ble_radio_link.dart';
 export 'link/radio_link.dart';
 export 'link/tcp_radio_link.dart';
 export 'radio_protocol.dart';
