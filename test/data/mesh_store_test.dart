@@ -208,6 +208,14 @@ void main() {
     expect(bodies, ['one', 'two']);
   });
 
+  test('conversations list each thread once, newest first', () async {
+    await store.saveIncoming(radio, _channel('A: old', ts: 1));
+    await store.saveIncoming(radio, _direct('hello', ts: 2));
+    await store.saveIncoming(radio, _channel('A: newest', ts: 3));
+    final latest = await store.watchConversations(radio).first;
+    expect(latest.map((m) => m.body), ['newest', 'hello']);
+  });
+
   test('data from different radios stays apart', () async {
     final other = decodeFrame(
       selfInfoFrame(name: 'Car')..replaceRange(4, 36, List.filled(32, 0xEE)),
