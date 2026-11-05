@@ -1433,6 +1433,18 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
         type: DriftSqlType.int,
         requiredDuringInsert: true,
       ).withConverter<MessageStatus>($MessagesTable.$converterstatus);
+  static const VerificationMeta _attemptsMeta = const VerificationMeta(
+    'attempts',
+  );
+  @override
+  late final GeneratedColumn<int> attempts = GeneratedColumn<int>(
+    'attempts',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   static const VerificationMeta _ackCodeMeta = const VerificationMeta(
     'ackCode',
   );
@@ -1502,6 +1514,7 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
     sentAt,
     storedAt,
     status,
+    attempts,
     ackCode,
     flooded,
     pathLength,
@@ -1576,6 +1589,12 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
       );
     } else if (isInserting) {
       context.missing(_storedAtMeta);
+    }
+    if (data.containsKey('attempts')) {
+      context.handle(
+        _attemptsMeta,
+        attempts.isAcceptableOrUnknown(data['attempts']!, _attemptsMeta),
+      );
     }
     if (data.containsKey('ack_code')) {
       context.handle(
@@ -1660,6 +1679,10 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
           data['${effectivePrefix}status'],
         )!,
       ),
+      attempts: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}attempts'],
+      )!,
       ackCode: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}ack_code'],
@@ -1715,6 +1738,9 @@ class Message extends DataClass implements Insertable<Message> {
   final int storedAt;
   final MessageStatus status;
 
+  /// Outgoing direct messages: how many times it has been sent so far.
+  final int attempts;
+
   /// Outgoing direct messages: the code the delivery ack will carry.
   final int? ackCode;
   final bool? flooded;
@@ -1734,6 +1760,7 @@ class Message extends DataClass implements Insertable<Message> {
     required this.sentAt,
     required this.storedAt,
     required this.status,
+    required this.attempts,
     this.ackCode,
     this.flooded,
     this.pathLength,
@@ -1761,6 +1788,7 @@ class Message extends DataClass implements Insertable<Message> {
         $MessagesTable.$converterstatus.toSql(status),
       );
     }
+    map['attempts'] = Variable<int>(attempts);
     if (!nullToAbsent || ackCode != null) {
       map['ack_code'] = Variable<int>(ackCode);
     }
@@ -1793,6 +1821,7 @@ class Message extends DataClass implements Insertable<Message> {
       sentAt: Value(sentAt),
       storedAt: Value(storedAt),
       status: Value(status),
+      attempts: Value(attempts),
       ackCode: ackCode == null && nullToAbsent
           ? const Value.absent()
           : Value(ackCode),
@@ -1829,6 +1858,7 @@ class Message extends DataClass implements Insertable<Message> {
       status: $MessagesTable.$converterstatus.fromJson(
         serializer.fromJson<int>(json['status']),
       ),
+      attempts: serializer.fromJson<int>(json['attempts']),
       ackCode: serializer.fromJson<int?>(json['ackCode']),
       flooded: serializer.fromJson<bool?>(json['flooded']),
       pathLength: serializer.fromJson<int?>(json['pathLength']),
@@ -1854,6 +1884,7 @@ class Message extends DataClass implements Insertable<Message> {
       'status': serializer.toJson<int>(
         $MessagesTable.$converterstatus.toJson(status),
       ),
+      'attempts': serializer.toJson<int>(attempts),
       'ackCode': serializer.toJson<int?>(ackCode),
       'flooded': serializer.toJson<bool?>(flooded),
       'pathLength': serializer.toJson<int?>(pathLength),
@@ -1873,6 +1904,7 @@ class Message extends DataClass implements Insertable<Message> {
     int? sentAt,
     int? storedAt,
     MessageStatus? status,
+    int? attempts,
     Value<int?> ackCode = const Value.absent(),
     Value<bool?> flooded = const Value.absent(),
     Value<int?> pathLength = const Value.absent(),
@@ -1889,6 +1921,7 @@ class Message extends DataClass implements Insertable<Message> {
     sentAt: sentAt ?? this.sentAt,
     storedAt: storedAt ?? this.storedAt,
     status: status ?? this.status,
+    attempts: attempts ?? this.attempts,
     ackCode: ackCode.present ? ackCode.value : this.ackCode,
     flooded: flooded.present ? flooded.value : this.flooded,
     pathLength: pathLength.present ? pathLength.value : this.pathLength,
@@ -1909,6 +1942,7 @@ class Message extends DataClass implements Insertable<Message> {
       sentAt: data.sentAt.present ? data.sentAt.value : this.sentAt,
       storedAt: data.storedAt.present ? data.storedAt.value : this.storedAt,
       status: data.status.present ? data.status.value : this.status,
+      attempts: data.attempts.present ? data.attempts.value : this.attempts,
       ackCode: data.ackCode.present ? data.ackCode.value : this.ackCode,
       flooded: data.flooded.present ? data.flooded.value : this.flooded,
       pathLength: data.pathLength.present
@@ -1932,6 +1966,7 @@ class Message extends DataClass implements Insertable<Message> {
           ..write('sentAt: $sentAt, ')
           ..write('storedAt: $storedAt, ')
           ..write('status: $status, ')
+          ..write('attempts: $attempts, ')
           ..write('ackCode: $ackCode, ')
           ..write('flooded: $flooded, ')
           ..write('pathLength: $pathLength, ')
@@ -1953,6 +1988,7 @@ class Message extends DataClass implements Insertable<Message> {
     sentAt,
     storedAt,
     status,
+    attempts,
     ackCode,
     flooded,
     pathLength,
@@ -1973,6 +2009,7 @@ class Message extends DataClass implements Insertable<Message> {
           other.sentAt == this.sentAt &&
           other.storedAt == this.storedAt &&
           other.status == this.status &&
+          other.attempts == this.attempts &&
           other.ackCode == this.ackCode &&
           other.flooded == this.flooded &&
           other.pathLength == this.pathLength &&
@@ -1991,6 +2028,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
   final Value<int> sentAt;
   final Value<int> storedAt;
   final Value<MessageStatus> status;
+  final Value<int> attempts;
   final Value<int?> ackCode;
   final Value<bool?> flooded;
   final Value<int?> pathLength;
@@ -2007,6 +2045,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     this.sentAt = const Value.absent(),
     this.storedAt = const Value.absent(),
     this.status = const Value.absent(),
+    this.attempts = const Value.absent(),
     this.ackCode = const Value.absent(),
     this.flooded = const Value.absent(),
     this.pathLength = const Value.absent(),
@@ -2024,6 +2063,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     required int sentAt,
     required int storedAt,
     required MessageStatus status,
+    this.attempts = const Value.absent(),
     this.ackCode = const Value.absent(),
     this.flooded = const Value.absent(),
     this.pathLength = const Value.absent(),
@@ -2048,6 +2088,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     Expression<int>? sentAt,
     Expression<int>? storedAt,
     Expression<int>? status,
+    Expression<int>? attempts,
     Expression<int>? ackCode,
     Expression<bool>? flooded,
     Expression<int>? pathLength,
@@ -2065,6 +2106,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
       if (sentAt != null) 'sent_at': sentAt,
       if (storedAt != null) 'stored_at': storedAt,
       if (status != null) 'status': status,
+      if (attempts != null) 'attempts': attempts,
       if (ackCode != null) 'ack_code': ackCode,
       if (flooded != null) 'flooded': flooded,
       if (pathLength != null) 'path_length': pathLength,
@@ -2084,6 +2126,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     Value<int>? sentAt,
     Value<int>? storedAt,
     Value<MessageStatus>? status,
+    Value<int>? attempts,
     Value<int?>? ackCode,
     Value<bool?>? flooded,
     Value<int?>? pathLength,
@@ -2101,6 +2144,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
       sentAt: sentAt ?? this.sentAt,
       storedAt: storedAt ?? this.storedAt,
       status: status ?? this.status,
+      attempts: attempts ?? this.attempts,
       ackCode: ackCode ?? this.ackCode,
       flooded: flooded ?? this.flooded,
       pathLength: pathLength ?? this.pathLength,
@@ -2146,6 +2190,9 @@ class MessagesCompanion extends UpdateCompanion<Message> {
         $MessagesTable.$converterstatus.toSql(status.value),
       );
     }
+    if (attempts.present) {
+      map['attempts'] = Variable<int>(attempts.value);
+    }
     if (ackCode.present) {
       map['ack_code'] = Variable<int>(ackCode.value);
     }
@@ -2177,6 +2224,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
           ..write('sentAt: $sentAt, ')
           ..write('storedAt: $storedAt, ')
           ..write('status: $status, ')
+          ..write('attempts: $attempts, ')
           ..write('ackCode: $ackCode, ')
           ..write('flooded: $flooded, ')
           ..write('pathLength: $pathLength, ')
@@ -3435,6 +3483,7 @@ typedef $$MessagesTableCreateCompanionBuilder = MessagesCompanion Function({
   required int sentAt,
   required int storedAt,
   required MessageStatus status,
+  Value<int> attempts,
   Value<int?> ackCode,
   Value<bool?> flooded,
   Value<int?> pathLength,
@@ -3452,6 +3501,7 @@ typedef $$MessagesTableUpdateCompanionBuilder = MessagesCompanion Function({
   Value<int> sentAt,
   Value<int> storedAt,
   Value<MessageStatus> status,
+  Value<int> attempts,
   Value<int?> ackCode,
   Value<bool?> flooded,
   Value<int?> pathLength,
@@ -3535,6 +3585,11 @@ class $$MessagesTableFilterComposer
   get status => $composableBuilder(
     column: $table.status,
     builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<int> get attempts => $composableBuilder(
+    column: $table.attempts,
+    builder: (column) => ColumnFilters(column),
   );
 
   ColumnFilters<int> get ackCode => $composableBuilder(
@@ -3640,6 +3695,11 @@ class $$MessagesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get attempts => $composableBuilder(
+    column: $table.attempts,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get ackCode => $composableBuilder(
     column: $table.ackCode,
     builder: (column) => ColumnOrderings(column),
@@ -3727,6 +3787,9 @@ class $$MessagesTableAnnotationComposer
   GeneratedColumnWithTypeConverter<MessageStatus, int> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
+  GeneratedColumn<int> get attempts =>
+      $composableBuilder(column: $table.attempts, builder: (column) => column);
+
   GeneratedColumn<int> get ackCode =>
       $composableBuilder(column: $table.ackCode, builder: (column) => column);
 
@@ -3806,6 +3869,7 @@ class $$MessagesTableTableManager
                 Value<int> sentAt = const Value.absent(),
                 Value<int> storedAt = const Value.absent(),
                 Value<MessageStatus> status = const Value.absent(),
+                Value<int> attempts = const Value.absent(),
                 Value<int?> ackCode = const Value.absent(),
                 Value<bool?> flooded = const Value.absent(),
                 Value<int?> pathLength = const Value.absent(),
@@ -3822,6 +3886,7 @@ class $$MessagesTableTableManager
                 sentAt: sentAt,
                 storedAt: storedAt,
                 status: status,
+                attempts: attempts,
                 ackCode: ackCode,
                 flooded: flooded,
                 pathLength: pathLength,
@@ -3840,6 +3905,7 @@ class $$MessagesTableTableManager
                 required int sentAt,
                 required int storedAt,
                 required MessageStatus status,
+                Value<int> attempts = const Value.absent(),
                 Value<int?> ackCode = const Value.absent(),
                 Value<bool?> flooded = const Value.absent(),
                 Value<int?> pathLength = const Value.absent(),
@@ -3856,6 +3922,7 @@ class $$MessagesTableTableManager
                 sentAt: sentAt,
                 storedAt: storedAt,
                 status: status,
+                attempts: attempts,
                 ackCode: ackCode,
                 flooded: flooded,
                 pathLength: pathLength,

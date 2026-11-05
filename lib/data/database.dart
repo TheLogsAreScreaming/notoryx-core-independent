@@ -30,10 +30,15 @@ class MeshDatabase extends _$MeshDatabase {
   factory MeshDatabase.inMemory() => MeshDatabase(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (m) => m.createAll(),
+    onUpgrade: (m, from, to) async {
+      // 2: messages remember how many times they were sent.
+      if (from < 2) await m.addColumn(messages, messages.attempts);
+    },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
     },
