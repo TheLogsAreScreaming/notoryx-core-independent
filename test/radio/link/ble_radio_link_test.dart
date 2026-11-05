@@ -13,6 +13,7 @@ class _FakeBle extends UniversalBlePlatform {
   _FakeBle({this.hasMeshCoreService = true});
 
   final bool hasMeshCoreService;
+  AvailabilityState availability = AvailabilityState.poweredOn;
   List<List<int>> Function(Uint8List frame) respond = (_) => [];
   final writes = <Uint8List>[];
   final subscribed = <String>[];
@@ -109,7 +110,7 @@ class _FakeBle extends UniversalBlePlatform {
 
   @override
   Future<AvailabilityState> getBluetoothAvailabilityState() async =>
-      AvailabilityState.poweredOn;
+      availability;
 
   @override
   Future<bool> enableBluetooth() async => true;
@@ -249,8 +250,62 @@ void main() {
       await sub.cancel();
 
       expect(ble.lastScanFilter?.withServices, [MeshCoreBle.service]);
+      expect(ble.lastScanFilter?.withNamePrefix, ['MeshCore']);
       expect(found.map((r) => r.name), ['MeshCore-Base', 'MeshCore-Car']);
       expect(found.first.rssi, -70);
     },
   );
+
+  test('show-all scans without a filter and marks non-radios', () async {
+    final found = <BleRadioCandidate>[];
+    final sub = BleRadioScanner.scan(
+      duration: const Duration(seconds: 1),
+      all: true,
+    ).listen(found.add);
+    await pumpEventQueue();
+    ble.advertise('11:11:11:11:11:11', 'Headphones', -40);
+    ble.advertise(_id, 'MeshCore-Base', -70);
+    await pumpEventQueue();
+    await sub.cancel();
+
+    expect(ble.lastScanFilter, isNull);
+    expect(found.map((r) => (r.name, r.isMeshCore)), [
+      ('Headphones', false),
+      ('MeshCore-Base', true),
+    ]);
+  });
+
+  test('a MeshCore advert is recognised by service or by name', () {
+    expect(isMeshCoreAdvert('Trail', [MeshCoreBle.service]), isTrue);
+    expect(isMeshCoreAdvert('MeshCore-Base', const []), isTrue);
+    expect(isMeshCoreAdvert('Headphones', const ['180f']), isFalse);
+    expect(isMeshCoreAdvert(null, const []), isFalse);
+  });
+
+  test(
+    'a scan with Bluetooth permission off says so instead of finding nothing',
+    () async {
+      ble.availability = AvailabilityState.unauthorized;
+      final errors = <Object>[];
+      var done = false;
+      BleRadioScanner.scan().listen(
+        (_) {},
+        onError: errors.add,
+        onDone: () => done = true,
+      );
+      await pumpEventQueue();
+      expect(errors.single, isA<BluetoothUnavailable>());
+      expect('${errors.single}', contains('Privacy & Security'));
+      expect(done, isTrue);
+      expect(ble.lastScanFilter, isNull, reason: 'no scan was started');
+    },
+  );
+
+  test('Bluetooth turned off is reported', () async {
+    ble.availability = AvailabilityState.poweredOff;
+    final errors = <Object>[];
+    BleRadioScanner.scan().listen((_) {}, onError: errors.add);
+    await pumpEventQueue();
+    expect('${errors.single}', 'Bluetooth is turned off.');
+  });
 }

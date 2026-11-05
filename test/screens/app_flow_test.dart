@@ -21,10 +21,22 @@ class _FakeConnector implements RadioConnector {
   @override
   bool get supportsUsb => false;
 
+  bool? lastScanAll;
+
   @override
-  Stream<BleTarget> scanBluetooth() => Stream.fromIterable(const [
-    BleTarget(deviceId: 'aa', label: 'MeshCore-Base', rssi: -60),
-  ]);
+  Stream<BleTarget> scanBluetooth({bool all = false}) {
+    lastScanAll = all;
+    return Stream.fromIterable([
+      const BleTarget(deviceId: 'aa', label: 'MeshCore-Base', rssi: -60),
+      if (all)
+        const BleTarget(
+          deviceId: 'bb',
+          label: 'Headphones',
+          rssi: -40,
+          isMeshCore: false,
+        ),
+    ]);
+  }
 
   @override
   Future<List<UsbTarget>> listUsb() async => const [];
@@ -119,6 +131,24 @@ void main() {
     expect(find.text('heading down'), findsOneWidget);
     expect(find.byIcon(Icons.check), findsOneWidget, reason: 'sent tick');
     expect(link.sent.last[0], CommandCode.sendChannelText);
+    await cleanUp(tester);
+  });
+
+  testWidgets('show all lists other devices after MeshCore radios', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    expect(find.text('Headphones'), findsNothing);
+    await tester.tap(find.text('Show all Bluetooth devices'));
+    await settle(tester);
+    expect(connector.lastScanAll, isTrue);
+    final radio = tester.getTopLeft(find.text('MeshCore-Base')).dy;
+    final other = tester.getTopLeft(find.text('Headphones')).dy;
+    expect(
+      radio,
+      lessThan(other),
+      reason: 'radios first despite weaker signal',
+    );
     await cleanUp(tester);
   });
 
