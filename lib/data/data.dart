@@ -4,3 +4,4 @@ library;
 
 export 'database.dart';
 export 'mesh_store.dart';
+export 'mesh_sync.dart';
