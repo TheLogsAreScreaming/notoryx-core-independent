@@ -168,6 +168,36 @@ void main() {
     await cleanUp(tester);
   });
 
+  testWidgets('a refused direct message can be sent again', (tester) async {
+    await connect(tester);
+    await tester.tap(find.text('Contacts'));
+    await settle(tester);
+    await tester.tap(find.text('Alice'));
+    await settle(tester);
+    expect(
+      find.text(
+        'Direct messages only arrive if Alice has added you as a contact.',
+      ),
+      findsOneWidget,
+    );
+
+    radio.refuseText = true;
+    await tester.enterText(find.byType(TextField), 'ping');
+    await tester.tap(find.byTooltip('Send'));
+    await settle(tester);
+    expect(find.byIcon(Icons.error_outline), findsOneWidget);
+
+    radio.refuseText = false;
+    await tester.longPress(find.text('ping'));
+    await settle(tester);
+    await tester.tap(find.text('Send again'));
+    await settle(tester);
+    expect(find.byIcon(Icons.error_outline), findsNothing);
+    expect(find.byIcon(Icons.check), findsOneWidget);
+    expect(radio.textAttempts, [0]);
+    await cleanUp(tester);
+  });
+
   testWidgets('a failed connection shows why and stays on the connect screen', (
     tester,
   ) async {

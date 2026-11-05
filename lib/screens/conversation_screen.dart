@@ -51,8 +51,13 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
         const SnackBar(content: Text('That message is too long to send.')),
       );
     } on RadioRequestException {
+      // The message is stored as failed with a resend option, so don't
+      // leave a second copy in the box.
+      _text.clear();
       messenger.showSnackBar(
-        const SnackBar(content: Text('The radio could not send it.')),
+        const SnackBar(
+          content: Text('The radio could not send it. Hold it to try again.'),
+        ),
       );
     } finally {
       if (mounted) setState(() => _sending = false);

@@ -345,6 +345,15 @@ class MeshStore {
         .watch();
   }
 
+  /// A conversation as it is now, oldest first.
+  Future<List<Message>> threadSnapshot(String radioKey, String thread) =>
+      (_db.select(_db.messages)
+            ..where(
+              (m) => m.radioKey.equals(radioKey) & m.thread.equals(thread),
+            )
+            ..orderBy([(m) => OrderingTerm.asc(m.id)]))
+          .get();
+
   /// A conversation, oldest first.
   Stream<List<Message>> watchThread(String radioKey, String thread) =>
       (_db.select(_db.messages)
