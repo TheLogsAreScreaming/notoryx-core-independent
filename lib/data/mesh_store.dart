@@ -283,6 +283,19 @@ class MeshStore {
         const MessagesCompanion(status: Value(MessageStatus.failed)),
       );
 
+  /// The newest message in each conversation, newest conversation first.
+  Stream<List<Message>> watchConversations(String radioKey) {
+    final latest = _db.messages.id.max();
+    final newestIds = _db.selectOnly(_db.messages)
+      ..addColumns([latest])
+      ..where(_db.messages.radioKey.equals(radioKey))
+      ..groupBy([_db.messages.thread]);
+    return (_db.select(_db.messages)
+          ..where((m) => m.id.isInQuery(newestIds))
+          ..orderBy([(m) => OrderingTerm.desc(m.id)]))
+        .watch();
+  }
+
   /// A conversation, oldest first.
   Stream<List<Message>> watchThread(String radioKey, String thread) =>
       (_db.select(_db.messages)
