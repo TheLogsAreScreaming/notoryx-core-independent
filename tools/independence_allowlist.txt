@@ -1,0 +1,1 @@
+# path:line entries the copy check should ignore (false positives only).
