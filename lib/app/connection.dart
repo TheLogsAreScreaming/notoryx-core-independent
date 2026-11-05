@@ -131,3 +131,14 @@ final threadProvider =
     StreamProvider.family<List<Message>, ({String radioKey, String thread})>(
       (ref, id) => ref.watch(storeProvider).watchThread(id.radioKey, id.thread),
     );
+
+/// Ids of direct messages still being resent.
+final retryingProvider = StreamProvider<Set<int>>((ref) async* {
+  final state = ref.watch(connectionProvider);
+  if (state is! Connected) {
+    yield const {};
+    return;
+  }
+  yield state.sync.retrying;
+  yield* state.sync.retryingChanges;
+});
