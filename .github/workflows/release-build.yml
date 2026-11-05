@@ -76,7 +76,9 @@ jobs:
           path: dist/
 
   macos:
-    runs-on: macos-latest
+    # Apple-silicon runners were out of capacity for hours; the Intel image
+    # still builds a universal (Intel and Apple silicon) app.
+    runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v4
 
