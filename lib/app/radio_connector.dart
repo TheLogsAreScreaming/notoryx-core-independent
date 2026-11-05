@@ -8,12 +8,18 @@ sealed class RadioTarget {
 }
 
 final class BleTarget extends RadioTarget {
-  const BleTarget({required this.deviceId, required this.label, this.rssi});
+  const BleTarget({
+    required this.deviceId,
+    required this.label,
+    this.rssi,
+    this.isMeshCore = true,
+  });
 
   final String deviceId;
   @override
   final String label;
   final int? rssi;
+  final bool isMeshCore;
 }
 
 final class UsbTarget extends RadioTarget {
@@ -40,7 +46,8 @@ final class TcpTarget extends RadioTarget {
 abstract interface class RadioConnector {
   bool get supportsUsb;
 
-  Stream<BleTarget> scanBluetooth();
+  /// With [all], every Bluetooth device nearby, not just MeshCore radios.
+  Stream<BleTarget> scanBluetooth({bool all = false});
 
   Future<List<UsbTarget>> listUsb();
 
@@ -54,9 +61,15 @@ final class DeviceRadioConnector implements RadioConnector {
   bool get supportsUsb => UsbRadioPorts.isSupported;
 
   @override
-  Stream<BleTarget> scanBluetooth() => BleRadioScanner.scan().map(
-    (r) => BleTarget(deviceId: r.deviceId, label: r.name, rssi: r.rssi),
-  );
+  Stream<BleTarget> scanBluetooth({bool all = false}) =>
+      BleRadioScanner.scan(all: all).map(
+        (r) => BleTarget(
+          deviceId: r.deviceId,
+          label: r.name,
+          rssi: r.rssi,
+          isMeshCore: r.isMeshCore,
+        ),
+      );
 
   @override
   Future<List<UsbTarget>> listUsb() async => [

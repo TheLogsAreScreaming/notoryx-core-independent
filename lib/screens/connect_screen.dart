@@ -19,6 +19,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
   List<UsbTarget> _usb = const [];
   StreamSubscription<BleTarget>? _scan;
   bool _scanning = false;
+  bool _showAll = false;
   String? _scanError;
   final _host = TextEditingController();
 
@@ -45,10 +46,18 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
     });
     _scan = ref
         .read(radioConnectorProvider)
-        .scanBluetooth()
+        .scanBluetooth(all: _showAll)
         .listen(
           (radio) {
-            if (mounted) setState(() => _ble.add(radio));
+            if (!mounted) return;
+            setState(() {
+              _ble.add(radio);
+              // Radios first, then the strongest signal.
+              _ble.sort((a, b) {
+                if (a.isMeshCore != b.isMeshCore) return a.isMeshCore ? -1 : 1;
+                return (b.rssi ?? -999).compareTo(a.rssi ?? -999);
+              });
+            });
           },
           onError: (Object error) {
             if (mounted) setState(() => _scanError = '$error');
@@ -123,15 +132,35 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               title: Text(
                 _scanning ? 'Looking for radios…' : 'No radios found',
               ),
+              subtitle: _scanning
+                  ? null
+                  : const Text(
+                      'Check the radio is on and in Bluetooth mode, and not '
+                      'connected to another app or phone: a radio stops '
+                      'advertising while something is connected to it.',
+                    ),
             ),
           for (final radio in _ble)
             ListTile(
-              leading: const Icon(Icons.bluetooth),
+              leading: Icon(
+                radio.isMeshCore ? Icons.bluetooth : Icons.device_unknown,
+              ),
               title: Text(radio.label),
               subtitle: radio.rssi == null ? null : Text('${radio.rssi} dBm'),
               enabled: !connecting,
               onTap: () => _connect(radio),
             ),
+          SwitchListTile(
+            title: const Text('Show all Bluetooth devices'),
+            subtitle: const Text('For a radio that doesn\u2019t show up'),
+            value: _showAll,
+            onChanged: connecting
+                ? null
+                : (value) {
+                    setState(() => _showAll = value);
+                    _startScan();
+                  },
+          ),
           if (ref.read(radioConnectorProvider).supportsUsb) ...[
             _Header(
               'USB',

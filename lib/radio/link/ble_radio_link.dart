@@ -16,15 +16,30 @@ abstract final class MeshCoreBle {
   static const tx = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
 }
 
-/// A MeshCore radio seen while scanning.
-typedef BleRadioCandidate = ({String deviceId, String name, int? rssi});
+/// A device seen while scanning. [isMeshCore] is true when it advertises the
+/// MeshCore service or a MeshCore name.
+typedef BleRadioCandidate = ({
+  String deviceId,
+  String name,
+  int? rssi,
+  bool isMeshCore,
+});
 
-/// Finds radios advertising the MeshCore companion service.
+/// Finds MeshCore radios over Bluetooth.
 abstract final class BleRadioScanner {
-  /// Scans for [duration] and emits each radio the first time it's seen.
+  /// Names MeshCore companion firmware gives its Bluetooth radio.
+  static const namePrefixes = ['MeshCore'];
+
+  /// Scans for [duration] and emits each device the first time it's seen.
   /// Asks for Bluetooth permission if needed.
+  ///
+  /// By default only MeshCore radios are reported: those advertising the
+  /// companion service, or named like one (some boards leave the service out
+  /// of their advert when the name is long). With [all], every device is
+  /// reported, for finding a radio with an unusual name.
   static Stream<BleRadioCandidate> scan({
-    Duration duration = const Duration(seconds: 10),
+    Duration duration = const Duration(seconds: 15),
+    bool all = false,
   }) {
     late final StreamController<BleRadioCandidate> out;
     StreamSubscription<BleDevice>? results;
@@ -45,17 +60,26 @@ abstract final class BleRadioScanner {
     out = StreamController<BleRadioCandidate>(
       onListen: () async {
         results = UniversalBle.scanStream.listen((device) {
+          final isMeshCore = isMeshCoreAdvert(device.name, device.services);
+          if (!all && !isMeshCore) return;
           if (!seen.add(device.deviceId)) return;
+          final name = device.name;
           out.add((
             deviceId: device.deviceId,
-            name: device.name ?? device.deviceId,
+            name: name == null || name.isEmpty ? device.deviceId : name,
             rssi: device.rssi,
+            isMeshCore: isMeshCore,
           ));
         });
         stopTimer = Timer(duration, stop);
         try {
           await UniversalBle.startScan(
-            scanFilter: ScanFilter(withServices: [MeshCoreBle.service]),
+            scanFilter: all
+                ? null
+                : ScanFilter(
+                    withServices: [MeshCoreBle.service],
+                    withNamePrefix: namePrefixes,
+                  ),
             // MeshCore radios send legacy (BLE 4) adverts.
             platformConfig: PlatformConfig(
               android: AndroidOptions(legacy: true),
@@ -71,6 +95,11 @@ abstract final class BleRadioScanner {
     return out.stream;
   }
 }
+
+/// Whether an advert with [name] and [services] looks like a MeshCore radio.
+bool isMeshCoreAdvert(String? name, List<String> services) =>
+    services.any((s) => BleUuidParser.compareStrings(s, MeshCoreBle.service)) ||
+    BleRadioScanner.namePrefixes.any((p) => name?.startsWith(p) ?? false);
 
 /// A radio connected over Bluetooth LE. Each notification on the TX
 /// characteristic is one frame, and each write to RX is one frame, so no

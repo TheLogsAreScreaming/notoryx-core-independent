@@ -249,8 +249,35 @@ void main() {
       await sub.cancel();
 
       expect(ble.lastScanFilter?.withServices, [MeshCoreBle.service]);
+      expect(ble.lastScanFilter?.withNamePrefix, ['MeshCore']);
       expect(found.map((r) => r.name), ['MeshCore-Base', 'MeshCore-Car']);
       expect(found.first.rssi, -70);
     },
   );
+
+  test('show-all scans without a filter and marks non-radios', () async {
+    final found = <BleRadioCandidate>[];
+    final sub = BleRadioScanner.scan(
+      duration: const Duration(seconds: 1),
+      all: true,
+    ).listen(found.add);
+    await pumpEventQueue();
+    ble.advertise('11:11:11:11:11:11', 'Headphones', -40);
+    ble.advertise(_id, 'MeshCore-Base', -70);
+    await pumpEventQueue();
+    await sub.cancel();
+
+    expect(ble.lastScanFilter, isNull);
+    expect(found.map((r) => (r.name, r.isMeshCore)), [
+      ('Headphones', false),
+      ('MeshCore-Base', true),
+    ]);
+  });
+
+  test('a MeshCore advert is recognised by service or by name', () {
+    expect(isMeshCoreAdvert('Trail', [MeshCoreBle.service]), isTrue);
+    expect(isMeshCoreAdvert('MeshCore-Base', const []), isTrue);
+    expect(isMeshCoreAdvert('Headphones', const ['180f']), isFalse);
+    expect(isMeshCoreAdvert(null, const []), isFalse);
+  });
 }
