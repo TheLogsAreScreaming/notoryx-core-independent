@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:notoryx_core/radio/radio_protocol.dart';
+import 'package:notoryx_core/radio/radio.dart';
 
 void main() {
   test('wrap adds the to-radio marker and little-endian length', () {

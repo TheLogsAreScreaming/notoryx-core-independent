@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:notoryx_core/radio/radio_protocol.dart';
+import 'package:notoryx_core/radio/radio.dart';
 
 final _key = PublicKey(List.generate(32, (i) => i + 1));
 

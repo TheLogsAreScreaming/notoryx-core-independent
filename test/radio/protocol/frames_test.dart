@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:notoryx_core/radio/radio_protocol.dart';
+import 'package:notoryx_core/radio/radio.dart';
 
 /// Builds frames the way the firmware lays them out, field by field.
 class _Frame {
