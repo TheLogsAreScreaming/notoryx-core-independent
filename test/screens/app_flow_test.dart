@@ -82,9 +82,14 @@ void main() {
     await settle(tester);
   }
 
+  // Unmounting tears the connection down; let that finish on both clocks
+  // before closing the database, or the close waits on work that can't run.
   Future<void> cleanUp(WidgetTester tester) async {
     await tester.pumpWidget(const SizedBox());
-    await tester.runAsync(db.close);
+    await settle(tester);
+    await tester.runAsync(
+      () => db.close().timeout(const Duration(seconds: 2), onTimeout: () {}),
+    );
     await tester.pump(const Duration(seconds: 1));
   }
 
