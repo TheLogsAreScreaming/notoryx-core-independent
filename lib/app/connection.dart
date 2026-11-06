@@ -414,6 +414,6 @@ class OpenThread extends Notifier<String?> {
 
   /// Clears [thread] if it is still the open one.
   void close(String thread) {
-    if (state == thread) state = null;
+    if (ref.mounted && state == thread) state = null;
   }
 }
