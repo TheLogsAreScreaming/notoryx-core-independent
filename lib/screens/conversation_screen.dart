@@ -261,9 +261,12 @@ class _Bubble extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      details,
-                      style: Theme.of(context).textTheme.labelSmall,
+                    // Wraps rather than overflowing a narrow bubble.
+                    Flexible(
+                      child: Text(
+                        details,
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
                     ),
                     if (mine) ...[
                       const SizedBox(width: 4),
