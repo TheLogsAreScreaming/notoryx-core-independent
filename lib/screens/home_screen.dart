@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/connection.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
+import 'connection_log_screen.dart';
 import 'conversation_screen.dart';
 
 /// A radio's chats and contacts. While the radio is being reconnected a
@@ -33,6 +34,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         title: Text(widget.radioName),
         actions: [
+          const ConnectionLogButton(),
           IconButton(
             tooltip: 'Disconnect',
             icon: const Icon(Icons.link_off),

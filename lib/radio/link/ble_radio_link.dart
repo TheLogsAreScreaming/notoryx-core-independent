@@ -156,15 +156,16 @@ bool isMeshCoreAdvert(String? name, List<String> services) =>
 /// characteristic is one frame, and each write to RX is one frame, so no
 /// extra framing is needed.
 final class BleRadioLink implements RadioLink {
-  BleRadioLink._(this.deviceId);
+  BleRadioLink._(this.deviceId, [this._log]);
 
   /// Connects, finds the MeshCore service, raises the MTU so full frames fit
   /// in one write, and subscribes to the radio's notifications.
   static Future<BleRadioLink> connect(
     String deviceId, {
     Duration timeout = const Duration(seconds: 15),
+    void Function(String message)? log,
   }) async {
-    final link = BleRadioLink._(deviceId);
+    final link = BleRadioLink._(deviceId, log);
     try {
       await link._open(timeout);
     } on Object {
@@ -175,10 +176,11 @@ final class BleRadioLink implements RadioLink {
   }
 
   final String deviceId;
+  final void Function(String message)? _log;
   final _frames = StreamController<Uint8List>();
   final _done = Completer<void>();
   StreamSubscription<Uint8List>? _values;
-  StreamSubscription<bool>? _connection;
+  StreamSubscription<BleConnectionChange>? _connection;
 
   @override
   Stream<Uint8List> get frames => _frames.stream;
@@ -187,10 +189,17 @@ final class BleRadioLink implements RadioLink {
   Future<void> get done => _done.future;
 
   Future<void> _open(Duration timeout) async {
+    _log?.call('BLE connecting to $deviceId');
     await UniversalBle.connect(deviceId, timeout: timeout);
-    _connection = UniversalBle.connectionStream(deviceId).listen((connected) {
-      if (!connected) _shutDown();
-    });
+    _log?.call('BLE connected');
+    _connection = UniversalBle.connectionChangeStream(deviceId)
+        .listen((change) {
+          _log?.call(
+            'BLE ${change.isConnected ? 'connected' : 'disconnected'}'
+            '${change.error == null ? '' : ': ${change.error}'}',
+          );
+          if (!change.isConnected) _shutDown();
+        });
 
     final services = await UniversalBle.discoverServices(deviceId);
     final service = services.where(
@@ -201,7 +210,8 @@ final class BleRadioLink implements RadioLink {
     }
 
     try {
-      await UniversalBle.requestMtu(deviceId, 512);
+      final mtu = await UniversalBle.requestMtu(deviceId, 512);
+      _log?.call('BLE MTU $mtu');
     } on Object {
       // iOS and macOS pick the MTU themselves; a failed request is harmless.
     }
@@ -215,6 +225,7 @@ final class BleRadioLink implements RadioLink {
       MeshCoreBle.service,
       MeshCoreBle.tx,
     );
+    _log?.call('BLE notifications on');
   }
 
   @override

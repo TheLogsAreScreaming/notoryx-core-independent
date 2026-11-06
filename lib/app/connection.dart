@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/data.dart';
 import '../radio/radio.dart';
+import 'connection_log.dart';
 import 'radio_connector.dart';
 
 /// Where the app is with its radio.
@@ -70,8 +71,14 @@ final storeProvider = Provider<MeshStore>(
   (ref) => MeshStore(ref.watch(databaseProvider)),
 );
 
+final connectionLogProvider = Provider<ConnectionLog>((ref) {
+  final log = ConnectionLog(ref.watch(storeProvider));
+  ref.onDispose(log.dispose);
+  return log;
+});
+
 final radioConnectorProvider = Provider<RadioConnector>(
-  (ref) => const DeviceRadioConnector(),
+  (ref) => DeviceRadioConnector(log: ref.watch(connectionLogProvider).add),
 );
 
 /// Waits between reconnect tries; the last one repeats until it works.
@@ -110,6 +117,8 @@ class ConnectionController extends Notifier<RadioConnectionState> {
   /// its result is no longer wanted.
   int _generation = 0;
 
+  ConnectionLog get _log => ref.read(connectionLogProvider);
+
   @override
   RadioConnectionState build() {
     ref.onDispose(() {
@@ -121,8 +130,25 @@ class ConnectionController extends Notifier<RadioConnectionState> {
     return const Disconnected();
   }
 
+  @override
+  set state(RadioConnectionState value) {
+    if (value.runtimeType != super.state.runtimeType) {
+      _log.add('state: ${_describeState(value)}');
+    }
+    super.state = value;
+  }
+
+  static String _describeState(RadioConnectionState s) => switch (s) {
+    Disconnected(:final error) =>
+      'disconnected${error == null ? '' : ' ($error)'}',
+    Connecting(:final target) => 'connecting to ${target.label}',
+    Connected(:final radio) => 'connected to ${radio.self.name}',
+    Reconnecting(:final target) => 'reconnecting to ${target.label}',
+  };
+
   Future<void> connect(RadioTarget target) async {
     if (state is Connecting || state is Connected) return;
+    _log.add('connect tapped: ${target.label}');
     _retry?.cancel();
     final generation = ++_generation;
     await _teardown();
@@ -130,6 +156,7 @@ class ConnectionController extends Notifier<RadioConnectionState> {
     try {
       await _open(target, generation);
     } on Object catch (error) {
+      _log.add('connect failed: $error');
       await _teardown();
       if (ref.mounted && generation == _generation) {
         state = Disconnected(error: _describe(error));
@@ -139,6 +166,7 @@ class ConnectionController extends Notifier<RadioConnectionState> {
 
   /// Disconnects and stays disconnected, including after a restart.
   Future<void> disconnect() async {
+    _log.add('disconnect tapped');
     _retry?.cancel();
     _generation++;
     await _teardown();
@@ -150,14 +178,30 @@ class ConnectionController extends Notifier<RadioConnectionState> {
   void retryNow() {
     final current = state;
     if (current is! Reconnecting) return;
+    _log.add('try now tapped');
     _retry?.cancel();
     _tryReconnect(current, _generation);
   }
 
   Future<void> _resumeLastRadio() async {
-    final saved = await _loadLast();
-    if (saved == null || !saved.autoConnect || !ref.mounted) return;
-    if (state is! Disconnected) return;
+    _SavedRadio? saved;
+    try {
+      await _log.load();
+      _log.add('app started');
+      saved = await _loadLast();
+    } on Object catch (error) {
+      _log.add('could not read the last radio: $error');
+      return;
+    }
+    if (saved == null) {
+      _log.add('no last radio saved');
+      return;
+    }
+    if (!saved.autoConnect) {
+      _log.add('last radio ${saved.target.label}: auto-connect is off');
+      return;
+    }
+    if (!ref.mounted || state is! Disconnected) return;
     final reconnecting = Reconnecting(
       target: saved.target,
       radioKey: saved.radioKey,
@@ -168,26 +212,34 @@ class ConnectionController extends Notifier<RadioConnectionState> {
   }
 
   Future<void> _open(RadioTarget target, int generation) async {
+    _log.add('opening ${target.label}');
     final link = _link = await ref.read(radioConnectorProvider).open(target);
+    // Watch for the drop straight away, so one during setup isn't missed.
+    unawaited(link.done.then((_) => _onLinkDropped(link, target)));
     final session = _session = RadioSession(link);
     final sync = _sync = MeshSync(session, ref.read(storeProvider));
     final radio = await sync.start();
     if (!ref.mounted || generation != _generation) {
+      _log.add('connected, but no longer wanted; closing');
       await _teardown();
       return;
     }
-    state = Connected(radio: radio, sync: sync, target: target);
     _lastName = radio.self.name;
     _lastKey = radio.key;
-    await _saveLast(autoConnect: true, target: target);
-    unawaited(link.done.then((_) => _onLinkDropped(link, target)));
+    state = Connected(radio: radio, sync: sync, target: target);
+    try {
+      await _saveLast(autoConnect: true, target: target);
+    } on Object catch (error) {
+      _log.add('could not save the last radio: $error');
+    }
   }
 
   Future<void> _onLinkDropped(RadioLink link, RadioTarget target) async {
     if (!ref.mounted || link != _link) return; // already replaced or closed
     final current = state;
-    if (current is! Connected) return;
-    await _teardown();
+    _log.add('link dropped while ${_describeState(current)}');
+    if (current is! Connected) return; // setup fails and retries on its own
+    // Show it straight away; closing the old link can take a while.
     final reconnecting = Reconnecting(
       target: target,
       radioKey: current.radio.key,
@@ -195,12 +247,20 @@ class ConnectionController extends Notifier<RadioConnectionState> {
       error: 'The radio disconnected.',
     );
     state = reconnecting;
-    _schedule(reconnecting, _generation);
+    final generation = _generation;
+    try {
+      await _teardown();
+    } on Object catch (error) {
+      _log.add('closing the old link failed: $error');
+    }
+    if (!ref.mounted || generation != _generation) return;
+    _schedule(reconnecting, generation);
   }
 
   void _schedule(Reconnecting from, int generation) {
     final delays = ref.read(reconnectDelaysProvider);
     final wait = delays[from.attempt.clamp(0, delays.length - 1)];
+    _log.add('next try in ${wait.inSeconds} s');
     _retry?.cancel();
     _retry = Timer(wait, () => _tryReconnect(from, generation));
   }
@@ -210,6 +270,7 @@ class ConnectionController extends Notifier<RadioConnectionState> {
     try {
       await _open(from.target, generation);
     } on Object catch (error) {
+      _log.add('reconnect failed: $error');
       await _teardown();
       if (!ref.mounted || generation != _generation) return;
       final next = Reconnecting(
