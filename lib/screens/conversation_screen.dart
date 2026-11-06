@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/connection.dart';
+import '../app/notifications.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
 
@@ -61,8 +62,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
 
   void _markRead() {
     final radioKey = ref.read(radioKeyProvider);
-    final lifecycle = WidgetsBinding.instance.lifecycleState;
-    if (radioKey == null || lifecycle != AppLifecycleState.resumed) return;
+    if (radioKey == null || !ref.read(foregroundCheckProvider)()) return;
     ref.read(storeProvider).markRead(radioKey, widget.thread);
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:notoryx_core/app/connection.dart';
+import 'package:notoryx_core/app/notifications.dart';
 import 'package:notoryx_core/app/radio_connector.dart';
 import 'package:notoryx_core/data/data.dart';
 import 'package:notoryx_core/main.dart';
@@ -51,6 +52,25 @@ class _FakeConnector implements RadioConnector {
   }
 }
 
+class _FakeNotifier implements MessageNotifier {
+  final shown = <({String title, String body, ChatLink chat})>[];
+  void Function(ChatLink chat)? onOpen;
+
+  @override
+  Future<ChatLink?> init(void Function(ChatLink chat) onOpen) async {
+    this.onOpen = onOpen;
+    return null;
+  }
+
+  @override
+  Future<void> show({
+    required int id,
+    required String title,
+    required String body,
+    required ChatLink chat,
+  }) async => shown.add((title: title, body: body, chat: chat));
+}
+
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
 
@@ -58,6 +78,8 @@ void main() {
   late ScriptedRadio radio;
   late _FakeConnector connector;
   late MeshDatabase db;
+  late _FakeNotifier notifier;
+  var inFront = true;
 
   setUp(() {
     connector = _FakeConnector(() {
@@ -66,6 +88,8 @@ void main() {
       return link;
     });
     db = MeshDatabase.inMemory();
+    notifier = _FakeNotifier();
+    inFront = true;
   });
 
   // Database and fake-radio work runs on real async, outside the test's fake
@@ -86,6 +110,8 @@ void main() {
         overrides: [
           databaseProvider.overrideWithValue(db),
           radioConnectorProvider.overrideWithValue(connector),
+          messageNotifierProvider.overrideWithValue(notifier),
+          foregroundCheckProvider.overrideWithValue(() => inFront),
           reconnectDelaysProvider.overrideWithValue(const [
             Duration(milliseconds: 100),
           ]),
@@ -203,6 +229,105 @@ void main() {
     expect(find.byIcon(Icons.error_outline), findsNothing);
     expect(find.byIcon(Icons.check), findsOneWidget);
     expect(radio.textAttempts, [0]);
+    await cleanUp(tester);
+  });
+
+  testWidgets('new messages show unread badges until the chat is opened', (
+    tester,
+  ) async {
+    await connect(tester);
+    radio.queue.addAll([
+      channelMessageFrame('Ridge: one', channel: 1),
+      channelMessageFrame('Ridge: two', channel: 1),
+    ]);
+    link.emit([PushCode.messagesWaiting]);
+    await settle(tester);
+
+    final trail = find.ancestor(
+      of: find.text('#trail'),
+      matching: find.byType(ListTile),
+    );
+    expect(
+      find.descendant(of: trail, matching: find.text('2')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: find.byType(NavigationBar), matching: find.text('2')),
+      findsOneWidget,
+      reason: 'total on the Chats tab',
+    );
+
+    await tester.tap(find.text('#trail'));
+    await settle(tester);
+    await tester.pageBack();
+    await settle(tester);
+    expect(find.descendant(of: trail, matching: find.text('2')), findsNothing);
+    await cleanUp(tester);
+  });
+
+  testWidgets('a message notifies unless its chat is open or muted', (
+    tester,
+  ) async {
+    await connect(tester);
+    radio.queue.add(channelMessageFrame('Ridge: summit at noon', channel: 1));
+    link.emit([PushCode.messagesWaiting]);
+    await settle(tester);
+    expect(notifier.shown.single.title, '#trail');
+    expect(notifier.shown.single.body, 'Ridge: summit at noon');
+
+    // Open the chat: messages there don't notify while it's in front.
+    await tester.tap(find.text('#trail'));
+    await settle(tester);
+    radio.queue.add(channelMessageFrame('Ridge: on my way', channel: 1));
+    link.emit([PushCode.messagesWaiting]);
+    await settle(tester);
+    expect(notifier.shown, hasLength(1));
+
+    // Mute it, go back: still no notification.
+    await tester.tap(find.byTooltip('Mute notifications'));
+    await settle(tester);
+    await tester.pageBack();
+    await settle(tester);
+    radio.queue.add(channelMessageFrame('Ridge: muted', channel: 1));
+    link.emit([PushCode.messagesWaiting]);
+    await settle(tester);
+    expect(notifier.shown, hasLength(1));
+    expect(
+      find.descendant(
+        of: find.ancestor(
+          of: find.text('#trail'),
+          matching: find.byType(ListTile),
+        ),
+        matching: find.byIcon(Icons.notifications_off_outlined),
+      ),
+      findsOneWidget,
+    );
+    await cleanUp(tester);
+  });
+
+  testWidgets('the open chat notifies when the app is in the background', (
+    tester,
+  ) async {
+    await connect(tester);
+    await tester.tap(find.text('#trail'));
+    await settle(tester);
+    inFront = false;
+    radio.queue.add(channelMessageFrame('Ridge: ping', channel: 1));
+    link.emit([PushCode.messagesWaiting]);
+    await settle(tester);
+    expect(notifier.shown.single.body, 'Ridge: ping');
+    await cleanUp(tester);
+  });
+
+  testWidgets('tapping a notification opens its chat', (tester) async {
+    await connect(tester);
+    notifier.onOpen!((
+      thread: Threads.channel(1),
+      title: '#trail',
+      isChannel: true,
+    ));
+    await settle(tester);
+    expect(find.widgetWithText(AppBar, '#trail'), findsOneWidget);
     await cleanUp(tester);
   });
 
