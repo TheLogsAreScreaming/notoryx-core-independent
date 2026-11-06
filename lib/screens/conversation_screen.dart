@@ -22,14 +22,46 @@ class ConversationScreen extends ConsumerStatefulWidget {
   ConsumerState<ConversationScreen> createState() => _ConversationScreenState();
 }
 
-class _ConversationScreenState extends ConsumerState<ConversationScreen> {
+class _ConversationScreenState extends ConsumerState<ConversationScreen>
+    with WidgetsBindingObserver {
   final _text = TextEditingController();
   bool _sending = false;
+  late final OpenThread _openThread;
+
+  /// Newest message id already marked read.
+  int? _readUpTo;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _openThread = ref.read(openThreadProvider.notifier);
+    // After this frame: providers can't change while the tree builds.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _openThread.open(widget.thread);
+    });
+  }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _openThread.close(widget.thread);
     _text.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Messages that arrived while the app was in the background are read
+    // once it's back in front with this chat open.
+    if (state == AppLifecycleState.resumed) _markRead();
+  }
+
+  void _markRead() {
+    final radioKey = ref.read(radioKeyProvider);
+    final lifecycle = WidgetsBinding.instance.lifecycleState;
+    if (radioKey == null || lifecycle != AppLifecycleState.resumed) return;
+    ref.read(storeProvider).markRead(radioKey, widget.thread);
   }
 
   Future<void> _send() async {
@@ -119,13 +151,43 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                   .value ??
               const <Message>[];
     final retrying = ref.watch(retryingProvider).value ?? const <int>{};
+    final muted =
+        radioKey != null &&
+        (ref.watch(mutedThreadsProvider(radioKey)).value ?? const {}).contains(
+          widget.thread,
+        );
+    // Everything on screen is read, including messages that land while the
+    // chat is open.
+    final newest = messages.isEmpty ? null : messages.last.id;
+    if (newest != null && newest != _readUpTo) {
+      _readUpTo = newest;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _markRead();
+      });
+    }
     // A direct thread keyed by prefix means the sender isn't a contact yet,
     // so there is no full key to reply to.
     final canReply =
         connected && (widget.isChannel || widget.thread.length == 2 + 64);
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(
+        title: Text(widget.title),
+        actions: [
+          if (radioKey != null)
+            IconButton(
+              tooltip: muted ? 'Unmute' : 'Mute notifications',
+              icon: Icon(
+                muted
+                    ? Icons.notifications_off_outlined
+                    : Icons.notifications_active_outlined,
+              ),
+              onPressed: () => ref
+                  .read(storeProvider)
+                  .setMuted(radioKey, widget.thread, !muted),
+            ),
+        ],
+      ),
       body: Column(
         children: [
           if (!widget.isChannel)

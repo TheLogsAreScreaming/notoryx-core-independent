@@ -389,3 +389,31 @@ final retryingProvider = StreamProvider<Set<int>>((ref) async* {
   yield state.sync.retrying;
   yield* state.sync.retryingChanges;
 });
+
+/// Unread incoming messages per thread.
+final unreadCountsProvider = StreamProvider.family<Map<String, int>, String>(
+  (ref, radioKey) => ref.watch(storeProvider).watchUnreadCounts(radioKey),
+);
+
+/// Threads that don't notify or count toward the Chats total.
+final mutedThreadsProvider = StreamProvider.family<Set<String>, String>(
+  (ref, radioKey) => ref.watch(storeProvider).watchMuted(radioKey),
+);
+
+/// The conversation on screen right now, if any. New messages there are
+/// read as they arrive and don't notify.
+final openThreadProvider = NotifierProvider<OpenThread, String?>(
+  OpenThread.new,
+);
+
+class OpenThread extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void open(String thread) => state = thread;
+
+  /// Clears [thread] if it is still the open one.
+  void close(String thread) {
+    if (state == thread) state = null;
+  }
+}

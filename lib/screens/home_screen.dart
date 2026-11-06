@@ -26,6 +26,17 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _tab = 0;
 
+  /// Unread messages outside muted threads.
+  int _unreadTotal() {
+    final unread =
+        ref.watch(unreadCountsProvider(widget.radioKey)).value ?? const {};
+    final muted =
+        ref.watch(mutedThreadsProvider(widget.radioKey)).value ?? const {};
+    return unread.entries
+        .where((e) => !muted.contains(e.key))
+        .fold(0, (sum, e) => sum + e.value);
+  }
+
   @override
   Widget build(BuildContext context) {
     final key = widget.radioKey;
@@ -57,13 +68,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tab,
         onDestinationSelected: (i) => setState(() => _tab = i),
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.chat_bubble_outline),
-            selectedIcon: Icon(Icons.chat_bubble),
+            icon: _UnreadBadge(
+              count: _unreadTotal(),
+              child: const Icon(Icons.chat_bubble_outline),
+            ),
+            selectedIcon: _UnreadBadge(
+              count: _unreadTotal(),
+              child: const Icon(Icons.chat_bubble),
+            ),
             label: 'Chats',
           ),
-          NavigationDestination(
+          const NavigationDestination(
             icon: Icon(Icons.people_outline),
             selectedIcon: Icon(Icons.people),
             label: 'Contacts',
@@ -104,6 +121,8 @@ class _ChatsTab extends ConsumerWidget {
     final contacts = ref.watch(contactsProvider(radioKey)).value ?? const [];
     final byThread = {for (final m in latest) m.thread: m};
     final names = {for (final c in contacts) c.publicKey: c.name};
+    final unread = ref.watch(unreadCountsProvider(radioKey)).value ?? const {};
+    final muted = ref.watch(mutedThreadsProvider(radioKey)).value ?? const {};
     final direct = latest.where((m) => m.kind == MessageKind.direct).toList();
 
     if (channels.isEmpty && direct.isEmpty) {
@@ -116,6 +135,10 @@ class _ChatsTab extends ConsumerWidget {
             icon: Icons.tag,
             title: channel.name,
             latest: byThread[Threads.channel(channel.slot)],
+            unread: unread[Threads.channel(channel.slot)] ?? 0,
+            muted: muted.contains(Threads.channel(channel.slot)),
+            onLongPress: () =>
+                _toggleMute(context, ref, Threads.channel(channel.slot)),
             onTap: () => _openThread(
               context,
               thread: Threads.channel(channel.slot),
@@ -129,6 +152,9 @@ class _ChatsTab extends ConsumerWidget {
             icon: Icons.person_outline,
             title: _directTitle(message.thread, names),
             latest: message,
+            unread: unread[message.thread] ?? 0,
+            muted: muted.contains(message.thread),
+            onLongPress: () => _toggleMute(context, ref, message.thread),
             onTap: () => _openThread(
               context,
               thread: message.thread,
@@ -137,6 +163,31 @@ class _ChatsTab extends ConsumerWidget {
           ),
       ],
     );
+  }
+
+  Future<void> _toggleMute(
+    BuildContext context,
+    WidgetRef ref,
+    String thread,
+  ) async {
+    final store = ref.read(storeProvider);
+    final muted = await store.isMuted(radioKey, thread);
+    if (!context.mounted) return;
+    final change = await showModalBottomSheet<bool>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: ListTile(
+          leading: Icon(
+            muted
+                ? Icons.notifications_active_outlined
+                : Icons.notifications_off_outlined,
+          ),
+          title: Text(muted ? 'Unmute' : 'Mute notifications'),
+          onTap: () => Navigator.pop(context, true),
+        ),
+      ),
+    );
+    if (change == true) await store.setMuted(radioKey, thread, !muted);
   }
 
   static String _directTitle(String thread, Map<String, String> names) {
@@ -151,12 +202,18 @@ class _ThreadTile extends StatelessWidget {
     required this.title,
     required this.latest,
     required this.onTap,
+    this.unread = 0,
+    this.muted = false,
+    this.onLongPress,
   });
 
   final IconData icon;
   final String title;
   final Message? latest;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
+  final int unread;
+  final bool muted;
 
   @override
   Widget build(BuildContext context) {
@@ -167,13 +224,37 @@ class _ThreadTile extends StatelessWidget {
             if (message.outgoing) 'You' else ?message.senderName,
             message.body,
           ].join(': ');
+    final scheme = Theme.of(context).colorScheme;
     return ListTile(
       leading: CircleAvatar(child: Icon(icon)),
-      title: Text(title),
+      title: Text(
+        title,
+        style: unread > 0 ? const TextStyle(fontWeight: FontWeight.w700) : null,
+      ),
       subtitle: preview == null
           ? null
           : Text(preview, maxLines: 1, overflow: TextOverflow.ellipsis),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (muted)
+            Icon(
+              Icons.notifications_off_outlined,
+              size: 18,
+              semanticLabel: 'Muted',
+              color: scheme.onSurfaceVariant,
+            ),
+          if (unread > 0) ...[
+            const SizedBox(width: 8),
+            Badge(
+              label: Text(unread > 99 ? '99+' : '$unread'),
+              backgroundColor: muted ? scheme.outline : null,
+            ),
+          ],
+        ],
+      ),
       onTap: onTap,
+      onLongPress: onLongPress,
     );
   }
 }
@@ -269,6 +350,18 @@ class _ReconnectBanner extends ConsumerWidget {
       ),
     );
   }
+}
+
+class _UnreadBadge extends StatelessWidget {
+  const _UnreadBadge({required this.count, required this.child});
+
+  final int count;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => count == 0
+      ? child
+      : Badge(label: Text(count > 99 ? '99+' : '$count'), child: child);
 }
 
 class _Empty extends StatelessWidget {
