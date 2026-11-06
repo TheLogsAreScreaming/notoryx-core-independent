@@ -31,21 +31,31 @@ class NotoryxApp extends StatelessWidget {
   );
 }
 
-/// Shows the connect screen until a radio is connected and synced.
+/// Shows the chats while a radio is connected or being reconnected, and the
+/// connect screen otherwise.
 class _RadioGate extends ConsumerWidget {
   const _RadioGate();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Losing the radio closes any open conversation so the connect screen
-    // is what's showing.
+    // Disconnecting closes any open conversation so the connect screen is
+    // what's showing. While reconnecting the chats stay open.
     ref.listen(connectionProvider, (previous, next) {
-      if (previous is Connected && next is! Connected) {
+      final hadChats = previous is Connected || previous is Reconnecting;
+      final hasChats = next is Connected || next is Reconnecting;
+      if (hadChats && !hasChats) {
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
     });
     return switch (ref.watch(connectionProvider)) {
-      Connected(:final radio) => HomeScreen(radio: radio),
+      Connected(:final radio) => HomeScreen(
+        radioKey: radio.key,
+        radioName: radio.self.name,
+      ),
+      Reconnecting(:final radioKey, :final radioName) => HomeScreen(
+        radioKey: radioKey,
+        radioName: radioName,
+      ),
       _ => const ConnectScreen(),
     };
   }

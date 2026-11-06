@@ -51,6 +51,19 @@ class MeshStore {
     _db.radios,
   )..orderBy([(r) => OrderingTerm.desc(r.lastConnectedAt)])).watch();
 
+  // Settings
+
+  Future<String?> setting(String key) async => (await (_db.select(
+    _db.settings,
+  )..where((s) => s.key.equals(key))).getSingleOrNull())?.value;
+
+  Future<void> saveSetting(String key, String value) => _db
+      .into(_db.settings)
+      .insertOnConflictUpdate(SettingsCompanion.insert(key: key, value: value));
+
+  Future<void> removeSetting(String key) =>
+      (_db.delete(_db.settings)..where((s) => s.key.equals(key))).go();
+
   // Contacts
 
   /// Saves a contact download. [since] is what was passed to the download:

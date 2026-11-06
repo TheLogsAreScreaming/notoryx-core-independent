@@ -93,3 +93,12 @@ class Messages extends Table {
   /// Incoming only: identifies a message so a repeat delivery is dropped.
   TextColumn get dedupeKey => text().nullable().unique()();
 }
+
+/// Small app settings, one value per key, such as the last radio used.
+class Settings extends Table {
+  TextColumn get key => text()();
+  TextColumn get value => text()();
+
+  @override
+  Set<Column> get primaryKey => {key};
+}

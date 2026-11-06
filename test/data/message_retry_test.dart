@@ -216,6 +216,25 @@ void main() {
     });
   });
 
+  test('upgrading a version 2 database adds the settings table', () async {
+    final dir = await Directory.systemTemp.createTemp('notoryx_db');
+    final file = File('${dir.path}/v2.sqlite');
+    var db = MeshDatabase(NativeDatabase(file));
+    await db.customSelect('SELECT 1').get();
+    await db.customStatement('DROP TABLE settings');
+    await db.customStatement('PRAGMA user_version = 2');
+    await db.close();
+
+    db = MeshDatabase(NativeDatabase(file));
+    final store = MeshStore(db);
+    await store.saveSetting('k', 'v');
+    expect(await store.setting('k'), 'v');
+    await store.removeSetting('k');
+    expect(await store.setting('k'), isNull);
+    await db.close();
+    await dir.delete(recursive: true);
+  });
+
   test('upgrading a version 1 database adds the attempts column', () async {
     final dir = await Directory.systemTemp.createTemp('notoryx_db');
     final file = File('${dir.path}/v1.sqlite');

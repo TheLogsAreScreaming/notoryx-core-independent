@@ -13,10 +13,12 @@ import '../support/radio_frames.dart';
 import '../support/scripted_radio.dart';
 
 class _FakeConnector implements RadioConnector {
-  _FakeConnector(this.link);
+  _FakeConnector(this.newLink);
 
-  final FakeRadioLink link;
+  /// Makes the link each connection gets, like a radio answering again.
+  final FakeRadioLink Function() newLink;
   bool failOpen = false;
+  final opened = <RadioTarget>[];
 
   @override
   bool get supportsUsb => false;
@@ -43,8 +45,9 @@ class _FakeConnector implements RadioConnector {
 
   @override
   Future<RadioLink> open(RadioTarget target) async {
+    opened.add(target);
     if (failOpen) throw const LinkClosedException('radio out of range');
-    return link;
+    return newLink();
   }
 }
 
@@ -57,9 +60,11 @@ void main() {
   late MeshDatabase db;
 
   setUp(() {
-    link = FakeRadioLink();
-    radio = ScriptedRadio(link);
-    connector = _FakeConnector(link);
+    connector = _FakeConnector(() {
+      link = FakeRadioLink();
+      radio = ScriptedRadio(link);
+      return link;
+    });
     db = MeshDatabase.inMemory();
   });
 
@@ -81,6 +86,9 @@ void main() {
         overrides: [
           databaseProvider.overrideWithValue(db),
           radioConnectorProvider.overrideWithValue(connector),
+          reconnectDelaysProvider.overrideWithValue(const [
+            Duration(milliseconds: 100),
+          ]),
         ],
         child: const NotoryxApp(),
       ),
@@ -211,17 +219,89 @@ void main() {
     await cleanUp(tester);
   });
 
-  testWidgets('the radio dropping returns to the connect screen', (
+  testWidgets('a dropped radio reconnects while the chats stay open', (
     tester,
   ) async {
     await connect(tester);
     await tester.tap(find.text('Public'));
     await settle(tester);
+    final firstLink = link;
 
-    link.drop();
+    connector.failOpen = true;
+    firstLink.drop();
+    await settle(tester);
+    expect(
+      find.widgetWithText(AppBar, 'Public'),
+      findsOneWidget,
+      reason: 'the conversation stays open',
+    );
+    expect(find.text('Waiting for the radio to reconnect'), findsOneWidget);
+
+    await tester.pageBack();
+    await settle(tester);
+    expect(find.textContaining('Reconnecting to the radio'), findsOneWidget);
+    expect(
+      find.text('The connection closed before setup finished.'),
+      findsOneWidget,
+    );
+
+    connector.failOpen = false;
+    await tester.tap(find.text('Try now'));
+    await settle(tester);
+    expect(find.textContaining('Reconnecting'), findsNothing);
+    expect(link, isNot(same(firstLink)));
+    expect(find.text('Public'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
+  testWidgets('the app reconnects to the last radio at launch', (tester) async {
+    await connect(tester);
+    await cleanUp(tester);
+
+    // A fresh start with the same database.
+    final opensBefore = connector.opened.length;
+    db = MeshDatabase.inMemory();
+    await tester.runAsync(() async {
+      final store = MeshStore(db);
+      final self = decodeFrame(selfInfoFrame(name: 'Base')) as SelfInfo;
+      await store.rememberRadio(self);
+      await store.saveSetting(
+        ConnectionController.lastRadioSetting,
+        '{"target":{"kind":"ble","id":"aa","label":"MeshCore-Base"},'
+        '"radioKey":"${self.publicKey.hex}","radioName":"Base",'
+        '"autoConnect":true}',
+      );
+    });
+    await pumpApp(tester);
+    await settle(tester);
+
+    expect(find.text('Connect a radio'), findsNothing);
+    expect(find.text('Base'), findsOneWidget);
+    expect(connector.opened.length, opensBefore + 1);
+    expect((connector.opened.last as BleTarget).deviceId, 'aa');
+    await cleanUp(tester);
+  });
+
+  testWidgets('disconnecting on purpose stops reconnecting, even at launch', (
+    tester,
+  ) async {
+    await connect(tester);
+    await tester.tap(find.byTooltip('Disconnect'));
     await settle(tester);
     expect(find.text('Connect a radio'), findsOneWidget);
-    expect(find.text('The radio disconnected.'), findsOneWidget);
+
+    final saved = await tester.runAsync(
+      () => MeshStore(db).setting(ConnectionController.lastRadioSetting),
+    );
+    expect(saved, contains('"autoConnect":false'));
+
+    final opens = connector.opened.length;
+    await tester.pumpWidget(const SizedBox());
+    await settle(tester);
+    await pumpApp(tester);
+    await settle(tester);
+    expect(find.text('Connect a radio'), findsOneWidget);
+    expect(connector.opened.length, opens, reason: 'no automatic connect');
     await cleanUp(tester);
   });
 

@@ -6,11 +6,17 @@ import '../data/data.dart';
 import '../radio/radio.dart';
 import 'conversation_screen.dart';
 
-/// The connected radio's chats and contacts.
+/// A radio's chats and contacts. While the radio is being reconnected a
+/// banner says so and the stored chats stay readable.
 class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({required this.radio, super.key});
+  const HomeScreen({
+    required this.radioKey,
+    required this.radioName,
+    super.key,
+  });
 
-  final ConnectedRadio radio;
+  final String radioKey;
+  final String radioName;
 
   @override
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
@@ -21,10 +27,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final key = widget.radio.key;
+    final key = widget.radioKey;
+    final connection = ref.watch(connectionProvider);
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.radio.self.name),
+        title: Text(widget.radioName),
         actions: [
           IconButton(
             tooltip: 'Disconnect',
@@ -33,10 +40,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
       ),
-      body: switch (_tab) {
-        0 => _ChatsTab(radioKey: key),
-        _ => _ContactsTab(radioKey: key),
-      },
+      body: Column(
+        children: [
+          if (connection case Reconnecting(:final attempt, :final error))
+            _ReconnectBanner(attempt: attempt, error: error),
+          Expanded(
+            child: switch (_tab) {
+              0 => _ChatsTab(radioKey: key),
+              _ => _ContactsTab(radioKey: key),
+            },
+          ),
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tab,
         onDestinationSelected: (i) => setState(() => _tab = i),
@@ -206,6 +221,51 @@ class _ContactsTab extends ConsumerWidget {
     if (c.outPathLength == pathUnknown) return '$kind · no route yet';
     final hops = c.outPathLength & 0x3F;
     return '$kind · ${hops == 0 ? 'direct' : '$hops hops'}';
+  }
+}
+
+class _ReconnectBanner extends ConsumerWidget {
+  const _ReconnectBanner({required this.attempt, this.error});
+
+  final int attempt;
+  final String? error;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final scheme = Theme.of(context).colorScheme;
+    return Material(
+      color: scheme.secondaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
+        child: Row(
+          children: [
+            const SizedBox.square(
+              dimension: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    attempt == 0
+                        ? 'Reconnecting to the radio\u2026'
+                        : 'Reconnecting to the radio (try ${attempt + 1})\u2026',
+                  ),
+                  if (error case final error?)
+                    Text(error, style: Theme.of(context).textTheme.bodySmall),
+                ],
+              ),
+            ),
+            TextButton(
+              onPressed: () => ref.read(connectionProvider.notifier).retryNow(),
+              child: const Text('Try now'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
