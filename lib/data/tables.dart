@@ -81,6 +81,9 @@ class Messages extends Table {
 
   IntColumn get status => intEnum<MessageStatus>()();
 
+  /// Outgoing direct messages: how many times it has been sent so far.
+  IntColumn get attempts => integer().withDefault(const Constant(0))();
+
   /// Outgoing direct messages: the code the delivery ack will carry.
   IntColumn get ackCode => integer().nullable()();
   BoolColumn get flooded => boolean().nullable()();

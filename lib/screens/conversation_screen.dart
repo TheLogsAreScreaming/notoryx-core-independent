@@ -51,11 +51,58 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
         const SnackBar(content: Text('That message is too long to send.')),
       );
     } on RadioRequestException {
+      // The message is stored as failed with a resend option, so don't
+      // leave a second copy in the box.
+      _text.clear();
       messenger.showSnackBar(
-        const SnackBar(content: Text('The radio could not send it.')),
+        const SnackBar(
+          content: Text('The radio could not send it. Hold it to try again.'),
+        ),
       );
     } finally {
       if (mounted) setState(() => _sending = false);
+    }
+  }
+
+  Future<void> _showActions(Message message, bool retrying) async {
+    final state = ref.read(connectionProvider);
+    if (state is! Connected) return;
+    final failed = message.status == MessageStatus.failed;
+    if (!failed && !retrying) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (failed)
+              ListTile(
+                leading: const Icon(Icons.refresh),
+                title: const Text('Send again'),
+                onTap: () => Navigator.pop(context, 'resend'),
+              ),
+            if (retrying)
+              ListTile(
+                leading: const Icon(Icons.stop_circle_outlined),
+                title: const Text('Stop trying'),
+                onTap: () => Navigator.pop(context, 'stop'),
+              ),
+          ],
+        ),
+      ),
+    );
+    try {
+      switch (action) {
+        case 'resend':
+          await state.sync.resend(message.id);
+        case 'stop':
+          await state.sync.stopTrying(message.id);
+      }
+    } on RadioRequestException {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('The radio could not send it.')),
+      );
     }
   }
 
@@ -71,6 +118,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                   )
                   .value ??
               const <Message>[];
+    final retrying = ref.watch(retryingProvider).value ?? const <int>{};
     // A direct thread keyed by prefix means the sender isn't a contact yet,
     // so there is no full key to reply to.
     final canReply =
@@ -80,6 +128,16 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
       appBar: AppBar(title: Text(widget.title)),
       body: Column(
         children: [
+          if (!widget.isChannel)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Text(
+                'Direct messages only arrive if ${widget.title} has added you '
+                'as a contact.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
           Expanded(
             child: messages.isEmpty
                 ? const Center(child: Text('No messages yet'))
@@ -87,10 +145,20 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                     reverse: true,
                     padding: const EdgeInsets.all(12),
                     itemCount: messages.length,
-                    itemBuilder: (context, i) => _Bubble(
-                      message: messages[messages.length - 1 - i],
-                      showSender: widget.isChannel,
-                    ),
+                    itemBuilder: (context, i) {
+                      final message = messages[messages.length - 1 - i];
+                      return _Bubble(
+                        message: message,
+                        showSender: widget.isChannel,
+                        retrying: retrying.contains(message.id),
+                        onLongPress: message.outgoing
+                            ? () => _showActions(
+                                message,
+                                retrying.contains(message.id),
+                              )
+                            : null,
+                      );
+                    },
                   ),
           ),
           SafeArea(
@@ -134,10 +202,17 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
 }
 
 class _Bubble extends StatelessWidget {
-  const _Bubble({required this.message, required this.showSender});
+  const _Bubble({
+    required this.message,
+    required this.showSender,
+    this.retrying = false,
+    this.onLongPress,
+  });
 
   final Message message;
   final bool showSender;
+  final bool retrying;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -147,45 +222,76 @@ class _Bubble extends StatelessWidget {
       DateTime.fromMillisecondsSinceEpoch(message.sentAt * 1000),
     ).format(context);
 
+    final details = [
+      time,
+      if (!mine && message.kind == MessageKind.channel)
+        ?_hops(message.pathLength),
+      if (mine && retrying) 'try ${message.attempts}',
+      if (mine && message.status == MessageStatus.failed) 'hold to resend',
+    ].join(' · ');
+
     return Align(
       alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 320),
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 3),
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
-          decoration: BoxDecoration(
-            color: mine ? scheme.primaryContainer : scheme.surfaceContainerHigh,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (showSender && !mine && message.senderName != null)
-                Text(
-                  message.senderName!,
-                  style: TextStyle(
-                    color: scheme.primary,
-                    fontWeight: FontWeight.w600,
+      child: GestureDetector(
+        onLongPress: onLongPress,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 320),
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 3),
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
+            decoration: BoxDecoration(
+              color: mine
+                  ? scheme.primaryContainer
+                  : scheme.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (showSender && !mine && message.senderName != null)
+                  Text(
+                    message.senderName!,
+                    style: TextStyle(
+                      color: scheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-              Text(message.body),
-              const SizedBox(height: 2),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(time, style: Theme.of(context).textTheme.labelSmall),
-                  if (mine) ...[
-                    const SizedBox(width: 4),
-                    _StatusIcon(message.status),
+                Text(message.body),
+                const SizedBox(height: 2),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Wraps rather than overflowing a narrow bubble.
+                    Flexible(
+                      child: Text(
+                        details,
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
+                    ),
+                    if (mine) ...[
+                      const SizedBox(width: 4),
+                      _StatusIcon(message.status),
+                    ],
                   ],
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  /// "direct", "1 hop", "3 hops" for a channel message's path.
+  static String? _hops(int? pathLength) {
+    if (pathLength == null) return null;
+    if (pathLength == 0xFF) return 'direct';
+    final hops = pathLength & 0x3F;
+    return switch (hops) {
+      0 => 'direct',
+      1 => '1 hop',
+      _ => '$hops hops',
+    };
   }
 }
 

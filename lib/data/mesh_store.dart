@@ -252,15 +252,64 @@ class MeshStore {
       );
 
   /// The radio accepted the message. Direct messages carry the [ackCode]
-  /// their delivery confirmation will match.
-  Future<void> markSent(int id, {int? ackCode, bool? flooded}) =>
+  /// their delivery confirmation will match, and how many [attempts] have
+  /// been sent so far.
+  Future<void> markSent(
+    int id, {
+    int? ackCode,
+    bool? flooded,
+    int attempts = 1,
+  }) =>
+      (_db.update(_db.messages)..where(
+            // An ack can land before this write; never undo a delivery.
+            (m) =>
+                m.id.equals(id) &
+                m.status.equalsValue(MessageStatus.delivered).not(),
+          ))
+          .write(
+            MessagesCompanion(
+              status: const Value(MessageStatus.sent),
+              ackCode: Value(ackCode),
+              flooded: Value(flooded),
+              attempts: Value(attempts),
+            ),
+          );
+
+  /// Marks message [id] delivered, if it was still waiting.
+  Future<void> markDeliveredById(int id) =>
+      (_db.update(_db.messages)..where(
+            (m) =>
+                m.id.equals(id) &
+                m.status.isIn([
+                  MessageStatus.pending.index,
+                  MessageStatus.sent.index,
+                  MessageStatus.failed.index,
+                ]),
+          ))
+          .write(
+            const MessagesCompanion(status: Value(MessageStatus.delivered)),
+          );
+
+  /// Puts a failed message back to pending for a resend.
+  Future<void> markPending(int id) =>
       (_db.update(_db.messages)..where((m) => m.id.equals(id))).write(
-        MessagesCompanion(
-          status: const Value(MessageStatus.sent),
-          ackCode: Value(ackCode),
-          flooded: Value(flooded),
-        ),
+        const MessagesCompanion(status: Value(MessageStatus.pending)),
       );
+
+  Future<Message?> message(int id) => (_db.select(
+    _db.messages,
+  )..where((m) => m.id.equals(id))).getSingleOrNull();
+
+  /// Outgoing messages still pending from an earlier run (the app closed
+  /// mid-send) become failed, so they can be resent.
+  Future<void> failStalePending(String radioKey) =>
+      (_db.update(_db.messages)..where(
+            (m) =>
+                m.radioKey.equals(radioKey) &
+                m.outgoing.equals(true) &
+                m.status.equalsValue(MessageStatus.pending),
+          ))
+          .write(const MessagesCompanion(status: Value(MessageStatus.failed)));
 
   /// Marks the sent message with [ackCode] as delivered. Returns whether one
   /// matched; acks can arrive more than once.
@@ -295,6 +344,15 @@ class MeshStore {
           ..orderBy([(m) => OrderingTerm.desc(m.id)]))
         .watch();
   }
+
+  /// A conversation as it is now, oldest first.
+  Future<List<Message>> threadSnapshot(String radioKey, String thread) =>
+      (_db.select(_db.messages)
+            ..where(
+              (m) => m.radioKey.equals(radioKey) & m.thread.equals(thread),
+            )
+            ..orderBy([(m) => OrderingTerm.asc(m.id)]))
+          .get();
 
   /// A conversation, oldest first.
   Stream<List<Message>> watchThread(String radioKey, String thread) =>
