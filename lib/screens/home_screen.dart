@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/connection.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
+import 'area_screen.dart';
 import 'conversation_screen.dart';
 
 /// A radio's chats and contacts. While the radio is being reconnected a
@@ -34,6 +35,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         title: Text(widget.radioName),
         actions: [
           IconButton(
+            tooltip: 'Local mesh settings',
+            icon: const Icon(Icons.public),
+            onPressed: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute<void>(builder: (_) => const AreaScreen())),
+          ),
+          IconButton(
             tooltip: 'Disconnect',
             icon: const Icon(Icons.link_off),
             onPressed: () => ref.read(connectionProvider.notifier).disconnect(),
@@ -44,6 +52,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: [
           if (connection case Reconnecting(:final attempt, :final error))
             _ReconnectBanner(attempt: attempt, error: error),
+          const AreaBanner(),
           Expanded(
             child: switch (_tab) {
               0 => _ChatsTab(radioKey: key),

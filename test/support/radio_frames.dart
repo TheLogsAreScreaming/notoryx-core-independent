@@ -18,24 +18,35 @@ List<int> okFrame() => [ResponseCode.ok];
 
 List<int> errorFrame(RadioErrorCode code) => [ResponseCode.error, code.value];
 
-List<int> selfInfoFrame({String name = 'Test Node'}) => [
+List<int> selfInfoFrame({
+  String name = 'Test Node',
+  double? latitude,
+  double? longitude,
+  int frequencyKhz = 910525,
+  int bandwidthHz = 62500,
+  int spreadingFactor = 7,
+  int codingRate = 5,
+}) => [
   ResponseCode.selfInfo,
   NodeType.chat.value,
   22,
   22,
   ...testKey,
-  ...u32(0),
-  ...u32(0),
+  ...i32(((latitude ?? 0) * 1e6).round()),
+  ...i32(((longitude ?? 0) * 1e6).round()),
   0,
   0,
   0,
   0,
-  ...u32(910525),
-  ...u32(62500),
-  7,
-  5,
+  ...u32(frequencyKhz),
+  ...u32(bandwidthHz),
+  spreadingFactor,
+  codingRate,
   ...utf8.encode(name),
 ];
+
+List<int> i32(int v) =>
+    (ByteData(4)..setInt32(0, v, Endian.little)).buffer.asUint8List();
 
 List<int> deviceInfoFrame({int versionCode = 14, int maxChannels = 8}) => [
   ResponseCode.deviceInfo,

@@ -6,6 +6,7 @@ import 'package:notoryx_core/app/connection.dart';
 import 'package:notoryx_core/app/radio_connector.dart';
 import 'package:notoryx_core/data/data.dart';
 import 'package:notoryx_core/main.dart';
+import 'package:notoryx_core/presets/area_presets_provider.dart';
 import 'package:notoryx_core/radio/radio.dart';
 
 import '../support/fake_radio_link.dart';
@@ -89,6 +90,7 @@ void main() {
           reconnectDelaysProvider.overrideWithValue(const [
             Duration(milliseconds: 100),
           ]),
+          areaPresetsFetchProvider.overrideWithValue(() async => null),
         ],
         child: const NotoryxApp(),
       ),
