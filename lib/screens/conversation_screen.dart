@@ -45,7 +45,9 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _openThread.close(widget.thread);
+    // Providers can't change while the tree is being torn down.
+    final openThread = _openThread, thread = widget.thread;
+    Future(() => openThread.close(thread));
     _text.dispose();
     super.dispose();
   }
