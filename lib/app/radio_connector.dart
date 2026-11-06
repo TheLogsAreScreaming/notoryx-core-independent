@@ -98,7 +98,10 @@ abstract interface class RadioConnector {
 }
 
 final class DeviceRadioConnector implements RadioConnector {
-  const DeviceRadioConnector();
+  const DeviceRadioConnector({this.log});
+
+  /// Where link-level events go, for the connection log.
+  final void Function(String message)? log;
 
   @override
   bool get supportsUsb => UsbRadioPorts.isSupported;
@@ -134,12 +137,14 @@ final class DeviceRadioConnector implements RadioConnector {
   /// restart it may not, so scan briefly for it and try once more.
   Future<RadioLink> _openBle(String deviceId) async {
     try {
-      return await BleRadioLink.connect(deviceId);
-    } on Object {
+      return await BleRadioLink.connect(deviceId, log: log);
+    } on Object catch (error) {
+      log?.call('BLE connect failed ($error); scanning for the radio');
       await BleRadioScanner.scan(duration: const Duration(seconds: 8))
           .firstWhere((r) => r.deviceId == deviceId)
           .timeout(const Duration(seconds: 9));
-      return BleRadioLink.connect(deviceId);
+      log?.call('BLE radio seen again; retrying');
+      return BleRadioLink.connect(deviceId, log: log);
     }
   }
 
