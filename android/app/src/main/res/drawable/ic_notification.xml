@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Status-bar icon: the NOTORYX "N" with its three blocks, in one colour as
+     Android requires. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M3,4h3.2v16h-3.2z M7,4h3.2l5,16h-3.2z M16.5,4h4.5v4.3h-4.5z M16.5,9.85h4.5v4.3h-4.5z M16.5,15.7h4.5v4.3h-4.5z" />
+</vector>

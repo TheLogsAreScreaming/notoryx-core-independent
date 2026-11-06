@@ -64,6 +64,7 @@ class MeshSync {
   final _ackOwner = <int, int>{};
 
   final _retryingChanges = StreamController<Set<int>>.broadcast();
+  final _incoming = StreamController<Message>.broadcast();
 
   final _subscriptions = <StreamSubscription<Object>>[];
   final _early = <Object>[];
@@ -78,6 +79,9 @@ class MeshSync {
   /// Background sync work that failed, such as a contact refresh that timed
   /// out. Sending reports its own errors to the caller instead.
   Stream<Object> get errors => _errors.stream;
+
+  /// Messages from other people, as each one is stored for the first time.
+  Stream<Message> get incoming => _incoming.stream;
 
   /// Ids of direct messages that are still being tried.
   Set<int> get retrying => Set.unmodifiable(_outbox.keys);
@@ -310,6 +314,7 @@ class MeshSync {
       await _fail(job);
     }
     await _retryingChanges.close();
+    await _incoming.close();
     await _errors.close();
   }
 
@@ -353,7 +358,8 @@ class MeshSync {
   Future<void> _apply(String key, Object event) async {
     switch (event) {
       case ContactMessage() || ChannelMessage():
-        await _store.saveIncoming(key, event as ReplyFrame);
+        final stored = await _store.saveIncoming(key, event as ReplyFrame);
+        if (stored != null && !_incoming.isClosed) _incoming.add(stored);
       case NewAdvert(:final contact):
         await _store.saveContact(key, contact);
       case ContactDeleted(:final publicKey):

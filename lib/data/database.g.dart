@@ -2440,6 +2440,326 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
   }
 }
 
+class $ThreadStatesTable extends ThreadStates
+    with TableInfo<$ThreadStatesTable, ThreadState> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ThreadStatesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _radioKeyMeta = const VerificationMeta(
+    'radioKey',
+  );
+  @override
+  late final GeneratedColumn<String> radioKey = GeneratedColumn<String>(
+    'radio_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES radios (public_key)',
+    ),
+  );
+  static const VerificationMeta _threadMeta = const VerificationMeta('thread');
+  @override
+  late final GeneratedColumn<String> thread = GeneratedColumn<String>(
+    'thread',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lastReadIdMeta = const VerificationMeta(
+    'lastReadId',
+  );
+  @override
+  late final GeneratedColumn<int> lastReadId = GeneratedColumn<int>(
+    'last_read_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _mutedMeta = const VerificationMeta('muted');
+  @override
+  late final GeneratedColumn<bool> muted = GeneratedColumn<bool>(
+    'muted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("muted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [radioKey, thread, lastReadId, muted];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'thread_states';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ThreadState> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('radio_key')) {
+      context.handle(
+        _radioKeyMeta,
+        radioKey.isAcceptableOrUnknown(data['radio_key']!, _radioKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_radioKeyMeta);
+    }
+    if (data.containsKey('thread')) {
+      context.handle(
+        _threadMeta,
+        thread.isAcceptableOrUnknown(data['thread']!, _threadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_threadMeta);
+    }
+    if (data.containsKey('last_read_id')) {
+      context.handle(
+        _lastReadIdMeta,
+        lastReadId.isAcceptableOrUnknown(
+          data['last_read_id']!,
+          _lastReadIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('muted')) {
+      context.handle(
+        _mutedMeta,
+        muted.isAcceptableOrUnknown(data['muted']!, _mutedMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {radioKey, thread};
+  @override
+  ThreadState map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ThreadState(
+      radioKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}radio_key'],
+      )!,
+      thread: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}thread'],
+      )!,
+      lastReadId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}last_read_id'],
+      )!,
+      muted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}muted'],
+      )!,
+    );
+  }
+
+  @override
+  $ThreadStatesTable createAlias(String alias) {
+    return $ThreadStatesTable(attachedDatabase, alias);
+  }
+}
+
+class ThreadState extends DataClass implements Insertable<ThreadState> {
+  final String radioKey;
+  final String thread;
+
+  /// Newest message id seen; incoming messages above it are unread.
+  final int lastReadId;
+  final bool muted;
+  const ThreadState({
+    required this.radioKey,
+    required this.thread,
+    required this.lastReadId,
+    required this.muted,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['radio_key'] = Variable<String>(radioKey);
+    map['thread'] = Variable<String>(thread);
+    map['last_read_id'] = Variable<int>(lastReadId);
+    map['muted'] = Variable<bool>(muted);
+    return map;
+  }
+
+  ThreadStatesCompanion toCompanion(bool nullToAbsent) {
+    return ThreadStatesCompanion(
+      radioKey: Value(radioKey),
+      thread: Value(thread),
+      lastReadId: Value(lastReadId),
+      muted: Value(muted),
+    );
+  }
+
+  factory ThreadState.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ThreadState(
+      radioKey: serializer.fromJson<String>(json['radioKey']),
+      thread: serializer.fromJson<String>(json['thread']),
+      lastReadId: serializer.fromJson<int>(json['lastReadId']),
+      muted: serializer.fromJson<bool>(json['muted']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'radioKey': serializer.toJson<String>(radioKey),
+      'thread': serializer.toJson<String>(thread),
+      'lastReadId': serializer.toJson<int>(lastReadId),
+      'muted': serializer.toJson<bool>(muted),
+    };
+  }
+
+  ThreadState copyWith({
+    String? radioKey,
+    String? thread,
+    int? lastReadId,
+    bool? muted,
+  }) => ThreadState(
+    radioKey: radioKey ?? this.radioKey,
+    thread: thread ?? this.thread,
+    lastReadId: lastReadId ?? this.lastReadId,
+    muted: muted ?? this.muted,
+  );
+  ThreadState copyWithCompanion(ThreadStatesCompanion data) {
+    return ThreadState(
+      radioKey: data.radioKey.present ? data.radioKey.value : this.radioKey,
+      thread: data.thread.present ? data.thread.value : this.thread,
+      lastReadId: data.lastReadId.present
+          ? data.lastReadId.value
+          : this.lastReadId,
+      muted: data.muted.present ? data.muted.value : this.muted,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ThreadState(')
+          ..write('radioKey: $radioKey, ')
+          ..write('thread: $thread, ')
+          ..write('lastReadId: $lastReadId, ')
+          ..write('muted: $muted')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(radioKey, thread, lastReadId, muted);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ThreadState &&
+          other.radioKey == this.radioKey &&
+          other.thread == this.thread &&
+          other.lastReadId == this.lastReadId &&
+          other.muted == this.muted);
+}
+
+class ThreadStatesCompanion extends UpdateCompanion<ThreadState> {
+  final Value<String> radioKey;
+  final Value<String> thread;
+  final Value<int> lastReadId;
+  final Value<bool> muted;
+  final Value<int> rowid;
+  const ThreadStatesCompanion({
+    this.radioKey = const Value.absent(),
+    this.thread = const Value.absent(),
+    this.lastReadId = const Value.absent(),
+    this.muted = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ThreadStatesCompanion.insert({
+    required String radioKey,
+    required String thread,
+    this.lastReadId = const Value.absent(),
+    this.muted = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : radioKey = Value(radioKey),
+       thread = Value(thread);
+  static Insertable<ThreadState> custom({
+    Expression<String>? radioKey,
+    Expression<String>? thread,
+    Expression<int>? lastReadId,
+    Expression<bool>? muted,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (radioKey != null) 'radio_key': radioKey,
+      if (thread != null) 'thread': thread,
+      if (lastReadId != null) 'last_read_id': lastReadId,
+      if (muted != null) 'muted': muted,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ThreadStatesCompanion copyWith({
+    Value<String>? radioKey,
+    Value<String>? thread,
+    Value<int>? lastReadId,
+    Value<bool>? muted,
+    Value<int>? rowid,
+  }) {
+    return ThreadStatesCompanion(
+      radioKey: radioKey ?? this.radioKey,
+      thread: thread ?? this.thread,
+      lastReadId: lastReadId ?? this.lastReadId,
+      muted: muted ?? this.muted,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (radioKey.present) {
+      map['radio_key'] = Variable<String>(radioKey.value);
+    }
+    if (thread.present) {
+      map['thread'] = Variable<String>(thread.value);
+    }
+    if (lastReadId.present) {
+      map['last_read_id'] = Variable<int>(lastReadId.value);
+    }
+    if (muted.present) {
+      map['muted'] = Variable<bool>(muted.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ThreadStatesCompanion(')
+          ..write('radioKey: $radioKey, ')
+          ..write('thread: $thread, ')
+          ..write('lastReadId: $lastReadId, ')
+          ..write('muted: $muted, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$MeshDatabase extends GeneratedDatabase {
   _$MeshDatabase(QueryExecutor e) : super(e);
   $MeshDatabaseManager get managers => $MeshDatabaseManager(this);
@@ -2448,6 +2768,7 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
   late final $ChannelsTable channels = $ChannelsTable(this);
   late final $MessagesTable messages = $MessagesTable(this);
   late final $SettingsTable settings = $SettingsTable(this);
+  late final $ThreadStatesTable threadStates = $ThreadStatesTable(this);
   late final Index messagesByThread = Index(
     'messages_by_thread',
     'CREATE INDEX messages_by_thread ON messages (radio_key, thread, id)',
@@ -2466,6 +2787,7 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
     channels,
     messages,
     settings,
+    threadStates,
     messagesByThread,
     messagesByAck,
   ];
@@ -2542,6 +2864,26 @@ final class $$RadiosTableReferences
     );
 
     final cache = $_typedResult.readTableOrNull(_messagesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ThreadStatesTable, List<ThreadState>>
+  _threadStatesRefsTable(_$MeshDatabase db) => MultiTypedResultKey.fromTable(
+    db.threadStates,
+    aliasName: 'radios__public_key__thread_states__radio_key',
+  );
+
+  $$ThreadStatesTableProcessedTableManager get threadStatesRefs {
+    final manager = $$ThreadStatesTableTableManager($_db, $_db.threadStates)
+        .filter(
+          (f) => f.radioKey.publicKey.sqlEquals(
+            $_itemColumn<String>('public_key')!,
+          ),
+        );
+
+    final cache = $_typedResult.readTableOrNull(_threadStatesRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -2643,6 +2985,31 @@ class $$RadiosTableFilterComposer
           }) => $$MessagesTableFilterComposer(
             $db: $db,
             $table: $db.messages,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> threadStatesRefs(
+    Expression<bool> Function($$ThreadStatesTableFilterComposer f) f,
+  ) {
+    final $$ThreadStatesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.publicKey,
+      referencedTable: $db.threadStates,
+      getReferencedColumn: (t) => t.radioKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ThreadStatesTableFilterComposer(
+            $db: $db,
+            $table: $db.threadStates,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -2782,6 +3149,31 @@ class $$RadiosTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> threadStatesRefs<T extends Object>(
+    Expression<T> Function($$ThreadStatesTableAnnotationComposer a) f,
+  ) {
+    final $$ThreadStatesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.publicKey,
+      referencedTable: $db.threadStates,
+      getReferencedColumn: (t) => t.radioKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ThreadStatesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.threadStates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$RadiosTableTableManager
@@ -2801,6 +3193,7 @@ class $$RadiosTableTableManager
             bool contactsRefs,
             bool channelsRefs,
             bool messagesRefs,
+            bool threadStatesRefs,
           })
         > {
   $$RadiosTableTableManager(_$MeshDatabase db, $RadiosTable table)
@@ -2855,6 +3248,7 @@ class $$RadiosTableTableManager
                 contactsRefs = false,
                 channelsRefs = false,
                 messagesRefs = false,
+                threadStatesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -2862,6 +3256,7 @@ class $$RadiosTableTableManager
                     if (contactsRefs) db.contacts,
                     if (channelsRefs) db.channels,
                     if (messagesRefs) db.messages,
+                    if (threadStatesRefs) db.threadStates,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -2926,6 +3321,26 @@ class $$RadiosTableTableManager
                           referencedColumn: 'radio_key',
                           typedResults: items,
                         ),
+                      if (threadStatesRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Radio,
+                          $RadiosTable,
+                          ThreadState,
+                          $ThreadStatesTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$RadiosTableReferences
+                              ._threadStatesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$RadiosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).threadStatesRefs,
+                          currentColumn: 'public_key',
+                          referencedColumn: 'radio_key',
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -2950,6 +3365,7 @@ typedef $$RadiosTableProcessedTableManager =
         bool contactsRefs,
         bool channelsRefs,
         bool messagesRefs,
+        bool threadStatesRefs,
       })
     >;
 typedef $$ContactsTableCreateCompanionBuilder = ContactsCompanion Function({
@@ -4335,6 +4751,304 @@ typedef $$SettingsTableProcessedTableManager =
       Setting,
       PrefetchHooks Function()
     >;
+typedef $$ThreadStatesTableCreateCompanionBuilder =
+    ThreadStatesCompanion Function({
+      required String radioKey,
+      required String thread,
+      Value<int> lastReadId,
+      Value<bool> muted,
+      Value<int> rowid,
+    });
+typedef $$ThreadStatesTableUpdateCompanionBuilder =
+    ThreadStatesCompanion Function({
+      Value<String> radioKey,
+      Value<String> thread,
+      Value<int> lastReadId,
+      Value<bool> muted,
+      Value<int> rowid,
+    });
+
+final class $$ThreadStatesTableReferences
+    extends BaseReferences<_$MeshDatabase, $ThreadStatesTable, ThreadState> {
+  $$ThreadStatesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $RadiosTable _radioKeyTable(_$MeshDatabase db) =>
+      db.radios.createAlias('thread_states__radio_key__radios__public_key');
+
+  $$RadiosTableProcessedTableManager get radioKey {
+    final $_column = $_itemColumn<String>('radio_key')!;
+
+    final manager = $$RadiosTableTableManager(
+      $_db,
+      $_db.radios,
+    ).filter((f) => f.publicKey.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_radioKeyTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ThreadStatesTableFilterComposer
+    extends Composer<_$MeshDatabase, $ThreadStatesTable> {
+  $$ThreadStatesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get thread => $composableBuilder(
+    column: $table.thread,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lastReadId => $composableBuilder(
+    column: $table.lastReadId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get muted => $composableBuilder(
+    column: $table.muted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$RadiosTableFilterComposer get radioKey {
+    final $$RadiosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.radioKey,
+      referencedTable: $db.radios,
+      getReferencedColumn: (t) => t.publicKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RadiosTableFilterComposer(
+            $db: $db,
+            $table: $db.radios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ThreadStatesTableOrderingComposer
+    extends Composer<_$MeshDatabase, $ThreadStatesTable> {
+  $$ThreadStatesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get thread => $composableBuilder(
+    column: $table.thread,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lastReadId => $composableBuilder(
+    column: $table.lastReadId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get muted => $composableBuilder(
+    column: $table.muted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$RadiosTableOrderingComposer get radioKey {
+    final $$RadiosTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.radioKey,
+      referencedTable: $db.radios,
+      getReferencedColumn: (t) => t.publicKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RadiosTableOrderingComposer(
+            $db: $db,
+            $table: $db.radios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ThreadStatesTableAnnotationComposer
+    extends Composer<_$MeshDatabase, $ThreadStatesTable> {
+  $$ThreadStatesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get thread =>
+      $composableBuilder(column: $table.thread, builder: (column) => column);
+
+  GeneratedColumn<int> get lastReadId => $composableBuilder(
+    column: $table.lastReadId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get muted =>
+      $composableBuilder(column: $table.muted, builder: (column) => column);
+
+  $$RadiosTableAnnotationComposer get radioKey {
+    final $$RadiosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.radioKey,
+      referencedTable: $db.radios,
+      getReferencedColumn: (t) => t.publicKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RadiosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.radios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ThreadStatesTableTableManager
+    extends
+        RootTableManager<
+          _$MeshDatabase,
+          $ThreadStatesTable,
+          ThreadState,
+          $$ThreadStatesTableFilterComposer,
+          $$ThreadStatesTableOrderingComposer,
+          $$ThreadStatesTableAnnotationComposer,
+          $$ThreadStatesTableCreateCompanionBuilder,
+          $$ThreadStatesTableUpdateCompanionBuilder,
+          (ThreadState, $$ThreadStatesTableReferences),
+          ThreadState,
+          PrefetchHooks Function({bool radioKey})
+        > {
+  $$ThreadStatesTableTableManager(_$MeshDatabase db, $ThreadStatesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ThreadStatesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ThreadStatesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ThreadStatesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> radioKey = const Value.absent(),
+                Value<String> thread = const Value.absent(),
+                Value<int> lastReadId = const Value.absent(),
+                Value<bool> muted = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ThreadStatesCompanion(
+                radioKey: radioKey,
+                thread: thread,
+                lastReadId: lastReadId,
+                muted: muted,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String radioKey,
+                required String thread,
+                Value<int> lastReadId = const Value.absent(),
+                Value<bool> muted = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ThreadStatesCompanion.insert(
+                radioKey: radioKey,
+                thread: thread,
+                lastReadId: lastReadId,
+                muted: muted,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ThreadStatesTable, ThreadState>(table),
+                  $$ThreadStatesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({radioKey = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (radioKey) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.radioKey,
+                        referencedTable: $$ThreadStatesTableReferences
+                            ._radioKeyTable(db),
+                        referencedColumn: $$ThreadStatesTableReferences
+                            ._radioKeyTable(db)
+                            .publicKey,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ThreadStatesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$MeshDatabase,
+      $ThreadStatesTable,
+      ThreadState,
+      $$ThreadStatesTableFilterComposer,
+      $$ThreadStatesTableOrderingComposer,
+      $$ThreadStatesTableAnnotationComposer,
+      $$ThreadStatesTableCreateCompanionBuilder,
+      $$ThreadStatesTableUpdateCompanionBuilder,
+      (ThreadState, $$ThreadStatesTableReferences),
+      ThreadState,
+      PrefetchHooks Function({bool radioKey})
+    >;
 
 class $MeshDatabaseManager {
   final _$MeshDatabase _db;
@@ -4349,4 +5063,6 @@ class $MeshDatabaseManager {
       $$MessagesTableTableManager(_db, _db.messages);
   $$SettingsTableTableManager get settings =>
       $$SettingsTableTableManager(_db, _db.settings);
+  $$ThreadStatesTableTableManager get threadStates =>
+      $$ThreadStatesTableTableManager(_db, _db.threadStates);
 }

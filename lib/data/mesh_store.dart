@@ -358,6 +358,84 @@ class MeshStore {
         .watch();
   }
 
+  // Unread and muting
+
+  /// Unread incoming messages per thread; threads with none are left out.
+  Stream<Map<String, int>> watchUnreadCounts(String radioKey) => _db
+      .customSelect(
+        'SELECT m.thread AS thread, COUNT(*) AS unread FROM messages m '
+        'LEFT JOIN thread_states t '
+        'ON t.radio_key = m.radio_key AND t.thread = m.thread '
+        'WHERE m.radio_key = ? AND m.outgoing = 0 '
+        'AND m.id > COALESCE(t.last_read_id, 0) '
+        'GROUP BY m.thread',
+        variables: [Variable.withString(radioKey)],
+        readsFrom: {_db.messages, _db.threadStates},
+      )
+      .watch()
+      .map(
+        (rows) => {
+          for (final row in rows)
+            row.read<String>('thread'): row.read<int>('unread'),
+        },
+      );
+
+  /// Marks everything in [thread] up to now as read.
+  Future<void> markRead(String radioKey, String thread) async {
+    final newest = _db.messages.id.max();
+    final row =
+        await (_db.selectOnly(_db.messages)
+              ..addColumns([newest])
+              ..where(
+                _db.messages.radioKey.equals(radioKey) &
+                    _db.messages.thread.equals(thread),
+              ))
+            .getSingle();
+    final id = row.read(newest);
+    if (id == null) return;
+    await _db
+        .into(_db.threadStates)
+        .insert(
+          ThreadStatesCompanion.insert(
+            radioKey: radioKey,
+            thread: thread,
+            lastReadId: Value(id),
+          ),
+          onConflict: DoUpdate(
+            (old) => ThreadStatesCompanion.custom(lastReadId: Constant(id)),
+            where: (old) => old.lastReadId.isSmallerThanValue(id),
+          ),
+        );
+  }
+
+  Future<void> setMuted(String radioKey, String thread, bool muted) => _db
+      .into(_db.threadStates)
+      .insert(
+        ThreadStatesCompanion.insert(
+          radioKey: radioKey,
+          thread: thread,
+          muted: Value(muted),
+        ),
+        onConflict: DoUpdate(
+          (old) => ThreadStatesCompanion(muted: Value(muted)),
+        ),
+      );
+
+  /// Threads whose new messages shouldn't notify.
+  Stream<Set<String>> watchMuted(String radioKey) =>
+      (_db.select(_db.threadStates)
+            ..where((t) => t.radioKey.equals(radioKey) & t.muted.equals(true)))
+          .watch()
+          .map((rows) => {for (final r in rows) r.thread});
+
+  Future<bool> isMuted(String radioKey, String thread) async =>
+      (await (_db.select(_db.threadStates)..where(
+                (t) => t.radioKey.equals(radioKey) & t.thread.equals(thread),
+              ))
+              .getSingleOrNull())
+          ?.muted ??
+      false;
+
   /// A conversation as it is now, oldest first.
   Future<List<Message>> threadSnapshot(String radioKey, String thread) =>
       (_db.select(_db.messages)

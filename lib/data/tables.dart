@@ -102,3 +102,18 @@ class Settings extends Table {
   @override
   Set<Column> get primaryKey => {key};
 }
+
+/// Per-conversation state the person controls: what they have read, and
+/// whether new messages there notify.
+class ThreadStates extends Table {
+  TextColumn get radioKey => text().references(Radios, #publicKey)();
+  TextColumn get thread => text()();
+
+  /// Newest message id seen; incoming messages above it are unread.
+  IntColumn get lastReadId => integer().withDefault(const Constant(0))();
+
+  BoolColumn get muted => boolean().withDefault(const Constant(false))();
+
+  @override
+  Set<Column> get primaryKey => {radioKey, thread};
+}
