@@ -154,6 +154,21 @@ class ConnectionController extends Notifier<RadioConnectionState> {
     _tryReconnect(current, _generation);
   }
 
+  /// Changes the connected radio's LoRa settings. Throws when there is no
+  /// radio or it refuses the settings.
+  Future<void> setRadioParams(SetRadioParams params) async {
+    final current = state;
+    if (current is! Connected) throw StateError('No radio is connected.');
+    final radio = await current.sync.setRadioParams(params);
+    if (ref.mounted && state == current) {
+      state = Connected(
+        radio: radio,
+        sync: current.sync,
+        target: current.target,
+      );
+    }
+  }
+
   Future<void> _resumeLastRadio() async {
     final saved = await _loadLast();
     if (saved == null || !saved.autoConnect || !ref.mounted) return;

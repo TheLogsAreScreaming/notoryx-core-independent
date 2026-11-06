@@ -112,6 +112,16 @@ class MeshSync {
     return _radio!;
   }
 
+  /// Changes the radio's LoRa settings, then reads them back so [radio]
+  /// shows what the radio really uses. Throws if the radio refuses them.
+  Future<ConnectedRadio> setRadioParams(SetRadioParams params) async {
+    final current = _radio;
+    if (current == null) throw StateError('The sync has not started.');
+    await _session.run(params);
+    final self = await _session.request<SelfInfo>(AppStart(appName: appName));
+    return _radio = (key: current.key, self: self, device: current.device);
+  }
+
   /// Sends a direct message and stores it. Returns the message id once the
   /// radio has accepted the first attempt; throws if it refuses.
   ///
