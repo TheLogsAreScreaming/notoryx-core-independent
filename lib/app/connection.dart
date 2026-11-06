@@ -102,6 +102,10 @@ class ConnectionController extends Notifier<RadioConnectionState> {
   MeshSync? _sync;
   Timer? _retry;
 
+  /// The radio last connected this run, for saving the reconnect setting.
+  String? _lastKey;
+  String? _lastName;
+
   /// Bumped whenever the person takes over, so a reconnect in flight knows
   /// its result is no longer wanted.
   int _generation = 0;
@@ -178,9 +182,6 @@ class ConnectionController extends Notifier<RadioConnectionState> {
     await _saveLast(autoConnect: true, target: target);
     unawaited(link.done.then((_) => _onLinkDropped(link, target)));
   }
-
-  String? _lastKey;
-  String? _lastName;
 
   Future<void> _onLinkDropped(RadioLink link, RadioTarget target) async {
     if (!ref.mounted || link != _link) return; // already replaced or closed
