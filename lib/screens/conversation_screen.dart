@@ -109,7 +109,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   @override
   Widget build(BuildContext context) {
     final radioKey = ref.watch(radioKeyProvider);
-    final connected = radioKey != null;
+    final connected = ref.watch(connectionProvider) is Connected;
     final messages = radioKey == null
         ? const <Message>[]
         : ref
@@ -179,6 +179,8 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                             ? 'Message'
                             : connected
                             ? 'Add this sender as a contact to reply'
+                            : radioKey != null
+                            ? 'Waiting for the radio to reconnect'
                             : 'Not connected',
                         border: const OutlineInputBorder(),
                       ),
