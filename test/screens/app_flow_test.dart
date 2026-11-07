@@ -351,6 +351,46 @@ void main() {
     await cleanUp(tester);
   });
 
+  testWidgets('holding a message reacts to it or replies to it', (
+    tester,
+  ) async {
+    await connect(tester);
+    radio.queue.add(
+      channelMessageFrame('Ridge: lunch at the hut?', channel: 1),
+    );
+    link.emit([PushCode.messagesWaiting]);
+    await settle(tester);
+    await tester.tap(find.text('#trail'));
+    await settle(tester);
+
+    await tester.longPress(find.text('lunch at the hut?'));
+    await settle(tester);
+    await tester.tap(find.byTooltip('React 👍'));
+    await settle(tester);
+    expect(
+      find.text('👍 re "lunch at the hut?"'),
+      findsNothing,
+      reason: 'shown on the message, not as a bubble',
+    );
+    expect(find.bySemanticsLabel(RegExp(r'^👍 1: Base')), findsOneWidget);
+
+    await tester.longPress(find.text('lunch at the hut?'));
+    await settle(tester);
+    await tester.tap(find.text('Reply'));
+    await settle(tester);
+    expect(find.text('Replying to Ridge'), findsOneWidget);
+    await tester.enterText(find.byType(TextField), 'yes please');
+    await tester.tap(find.byTooltip('Send'));
+    await settle(tester);
+    expect(find.text('Replying to Ridge'), findsNothing);
+    expect(find.text('yes please'), findsOneWidget);
+    expect(
+      find.bySemanticsLabel('In reply to Ridge: lunch at the hut?'),
+      findsOneWidget,
+    );
+    await cleanUp(tester);
+  });
+
   testWidgets('a message notifies unless its chat is open or muted', (
     tester,
   ) async {
