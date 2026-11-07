@@ -144,6 +144,53 @@ class MeshStore {
         lastModified: c.lastModified,
       );
 
+  // Heard nearby
+
+  /// Records a node the radio heard but didn't add.
+  Future<void> saveDiscovered(String radioKey, RadioContact node) => _db
+      .into(_db.discovered)
+      .insertOnConflictUpdate(
+        DiscoveredCompanion.insert(
+          radioKey: radioKey,
+          publicKey: node.publicKey.hex,
+          name: node.name,
+          type: node.type.value,
+          latitude: Value(node.latitude),
+          longitude: Value(node.longitude),
+          lastAdvert: node.lastAdvert,
+          heardAt: _clock().millisecondsSinceEpoch,
+        ),
+      );
+
+  Future<void> removeDiscovered(String radioKey, String publicKeyHex) =>
+      (_db.delete(_db.discovered)..where(
+            (d) =>
+                d.radioKey.equals(radioKey) & d.publicKey.equals(publicKeyHex),
+          ))
+          .go();
+
+  /// Nodes heard but not added, most recently heard first. Anything that is
+  /// already a contact is left out.
+  Stream<List<DiscoveredData>> watchDiscovered(String radioKey) {
+    final known = _db.selectOnly(_db.contacts)
+      ..addColumns([_db.contacts.publicKey])
+      ..where(_db.contacts.radioKey.equals(radioKey));
+    return (_db.select(_db.discovered)
+          ..where(
+            (d) =>
+                d.radioKey.equals(radioKey) & d.publicKey.isNotInQuery(known),
+          )
+          ..orderBy([(d) => OrderingTerm.desc(d.heardAt)]))
+        .watch();
+  }
+
+  Future<Contact?> contact(String radioKey, String publicKeyHex) =>
+      (_db.select(_db.contacts)..where(
+            (c) =>
+                c.radioKey.equals(radioKey) & c.publicKey.equals(publicKeyHex),
+          ))
+          .getSingleOrNull();
+
   // Channels
 
   /// Replaces the stored slots with what the radio reported. Empty slots are

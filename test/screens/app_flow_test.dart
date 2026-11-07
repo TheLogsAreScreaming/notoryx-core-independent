@@ -1,8 +1,10 @@
 import 'package:drift/drift.dart' show driftRuntimeOptions;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:notoryx_core/app/connection.dart';
+import 'package:notoryx_core/app/mesh_links.dart';
 import 'package:notoryx_core/app/notifications.dart';
 import 'package:notoryx_core/app/radio_connector.dart';
 import 'package:notoryx_core/data/data.dart';
@@ -79,12 +81,17 @@ void main() {
   late _FakeConnector connector;
   late MeshDatabase db;
   late _FakeNotifier notifier;
+
+  /// Adjusts each scripted radio as it's created.
+  void Function(ScriptedRadio radio)? radioSetup;
   var inFront = true;
 
   setUp(() {
+    radioSetup = null;
     connector = _FakeConnector(() {
       link = FakeRadioLink();
       radio = ScriptedRadio(link);
+      radioSetup?.call(radio);
       return link;
     });
     db = MeshDatabase.inMemory();
@@ -96,9 +103,11 @@ void main() {
   // clock, so alternate real waits with frames. Spinners never settle, so
   // this pumps a fixed number of times instead of pumpAndSettle.
   Future<void> settle(WidgetTester tester) async {
-    for (var i = 0; i < 8; i++) {
+    // Channel and contact changes take several radio round trips plus a
+    // re-download, so give them enough real time even on a busy machine.
+    for (var i = 0; i < 12; i++) {
       await tester.runAsync(
-        () => Future<void>.delayed(const Duration(milliseconds: 20)),
+        () => Future<void>.delayed(const Duration(milliseconds: 30)),
       );
       await tester.pump(const Duration(milliseconds: 50));
     }
@@ -328,6 +337,110 @@ void main() {
     ));
     await settle(tester);
     expect(find.widgetWithText(AppBar, '#trail'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
+  testWidgets('join a hashtag channel from the + button', (tester) async {
+    await connect(tester);
+    await tester.tap(find.byTooltip('Add a channel'));
+    await settle(tester);
+    await tester.tap(find.text('Join a #hashtag channel'));
+    await settle(tester);
+    await tester.enterText(find.byType(TextField), 'Hiking');
+    await tester.tap(find.text('Join'));
+    await settle(tester);
+
+    expect(find.text('#hiking'), findsOneWidget);
+    expect(radio.channels[2]!.$2, hashtagSecret('#hiking'));
+    await cleanUp(tester);
+  });
+
+  testWidgets('leave a channel from its hold menu', (tester) async {
+    await connect(tester);
+    await tester.longPress(find.text('#trail'));
+    await settle(tester);
+    await tester.tap(find.text('Leave channel'));
+    await settle(tester);
+    await tester.tap(find.text('Leave'));
+    await settle(tester);
+    expect(find.text('#trail'), findsNothing);
+    expect(radio.channels.containsKey(1), isFalse);
+    await cleanUp(tester);
+  });
+
+  testWidgets('add a contact from a pasted link', (tester) async {
+    await connect(tester);
+    await tester.tap(find.text('Contacts'));
+    await settle(tester);
+    await tester.tap(find.byTooltip('Add or share contacts'));
+    await settle(tester);
+    await tester.tap(find.text('Add from a link'));
+    await settle(tester);
+    final link = ContactLink(
+      name: 'Dana',
+      publicKey: PublicKey(List.filled(32, 4)),
+      type: NodeType.chat,
+    );
+    await tester.enterText(find.byType(TextField), link.url);
+    await tester.tap(find.text('Add'));
+    await settle(tester);
+    expect(find.text('Dana'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
+  testWidgets('a node heard nearby can be added', (tester) async {
+    await connect(tester);
+    link.emit(contactFrame('Eve', keyByte: 5)..[0] = PushCode.newAdvert);
+    await settle(tester);
+    await tester.tap(find.text('Contacts'));
+    await settle(tester);
+    expect(find.text('Heard nearby, not added'), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(TextButton, 'Add'));
+    await settle(tester);
+    expect(find.text('Heard nearby, not added'), findsNothing);
+    expect(find.text('Eve'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
+  testWidgets('favourites are starred and listed first', (tester) async {
+    radioSetup = (r) =>
+        r.contacts.add(contactFrame('Zed', keyByte: 9, lastModified: 11));
+    await connect(tester);
+    await tester.tap(find.text('Contacts'));
+    await settle(tester);
+    await tester.longPress(find.text('Zed'));
+    await settle(tester);
+    await tester.tap(find.text('Add to favourites'));
+    await settle(tester);
+
+    expect(find.byIcon(Icons.star), findsOneWidget);
+    final zed = tester.getTopLeft(find.text('Zed')).dy;
+    final alice = tester.getTopLeft(find.text('Alice')).dy;
+    expect(zed, lessThan(alice));
+    await cleanUp(tester);
+  });
+
+  testWidgets('share my contact copies a link', (tester) async {
+    String? copied;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'Clipboard.setData') {
+          copied = (call.arguments as Map)['text'] as String?;
+        }
+        return null;
+      },
+    );
+    await connect(tester);
+    await tester.tap(find.text('Contacts'));
+    await settle(tester);
+    await tester.tap(find.byTooltip('Add or share contacts'));
+    await settle(tester);
+    await tester.tap(find.text('Share my contact'));
+    await settle(tester);
+    final parsed = MeshLink.parse(copied!) as ContactLink;
+    expect(parsed.name, 'Base');
     await cleanUp(tester);
   });
 

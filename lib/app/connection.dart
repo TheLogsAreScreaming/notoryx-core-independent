@@ -417,3 +417,8 @@ class OpenThread extends Notifier<String?> {
     if (ref.mounted && state == thread) state = null;
   }
 }
+
+/// Nodes the radio heard but didn't add.
+final discoveredProvider = StreamProvider.family<List<DiscoveredData>, String>(
+  (ref, radioKey) => ref.watch(storeProvider).watchDiscovered(radioKey),
+);

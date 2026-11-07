@@ -110,4 +110,30 @@ void main() {
     await db3.close();
     await dir.delete(recursive: true);
   });
+
+  test(
+    'upgrading to version 5 adds heard nearby and forces a full contact sync',
+    () async {
+      final dir = await Directory.systemTemp.createTemp('notoryx_db');
+      final file = File('${dir.path}/v4.sqlite');
+      var db4 = MeshDatabase(NativeDatabase(file));
+      final store4 = MeshStore(db4);
+      final self = decodeFrame(selfInfoFrame()) as SelfInfo;
+      await store4.rememberRadio(self);
+      await store4.saveContacts(self.publicKey.hex, (
+        contacts: [],
+        newestModified: 99,
+      ));
+      await db4.customStatement('DROP TABLE discovered');
+      await db4.customStatement('PRAGMA user_version = 4');
+      await db4.close();
+
+      db4 = MeshDatabase(NativeDatabase(file));
+      final upgraded = MeshStore(db4);
+      expect((await upgraded.radio(self.publicKey.hex))?.contactsSince, 0);
+      expect(await upgraded.watchDiscovered(self.publicKey.hex).first, isEmpty);
+      await db4.close();
+      await dir.delete(recursive: true);
+    },
+  );
 }

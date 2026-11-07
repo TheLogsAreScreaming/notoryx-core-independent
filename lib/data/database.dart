@@ -13,7 +13,15 @@ part 'database.g.dart';
 
 /// The app's on-device database.
 @DriftDatabase(
-  tables: [Radios, Contacts, Channels, Messages, Settings, ThreadStates],
+  tables: [
+    Radios,
+    Contacts,
+    Channels,
+    Messages,
+    Settings,
+    ThreadStates,
+    Discovered,
+  ],
 )
 class MeshDatabase extends _$MeshDatabase {
   MeshDatabase(super.executor);
@@ -32,7 +40,7 @@ class MeshDatabase extends _$MeshDatabase {
   factory MeshDatabase.inMemory() => MeshDatabase(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -51,6 +59,13 @@ class MeshDatabase extends _$MeshDatabase {
           'SELECT radio_key, thread, MAX(id), 0 FROM messages '
           'GROUP BY radio_key, thread',
         );
+      }
+      // 5: nodes heard but not added get their own table. Earlier builds
+      // stored them as contacts, so the next connect re-downloads the whole
+      // contact list, which drops them again.
+      if (from < 5) {
+        await m.createTable(discovered);
+        await customStatement('UPDATE radios SET contacts_since = 0');
       }
     },
     beforeOpen: (details) async {

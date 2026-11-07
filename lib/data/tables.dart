@@ -117,3 +117,24 @@ class ThreadStates extends Table {
   @override
   Set<Column> get primaryKey => {radioKey, thread};
 }
+
+/// Nodes the radio heard advertising but did not add as contacts (manual
+/// add is on, the node was too many hops away, or the contact table is
+/// full). They can be added from the Contacts tab.
+class Discovered extends Table {
+  TextColumn get radioKey => text().references(Radios, #publicKey)();
+  TextColumn get publicKey => text()();
+  TextColumn get name => text()();
+  IntColumn get type => integer()();
+  RealColumn get latitude => real().nullable()();
+  RealColumn get longitude => real().nullable()();
+
+  /// When the node last advertised, by its own clock.
+  IntColumn get lastAdvert => integer()();
+
+  /// When this phone heard it, Unix milliseconds.
+  IntColumn get heardAt => integer()();
+
+  @override
+  Set<Column> get primaryKey => {radioKey, publicKey};
+}
