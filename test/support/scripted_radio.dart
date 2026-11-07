@@ -107,6 +107,7 @@ class ScriptedRadio {
     CommandCode.sendLogin => _login(frame),
     CommandCode.sendStatusRequest => _status(frame),
     CommandCode.sendTracePath => _trace(frame),
+    CommandCode.sendTelemetryRequest => _telemetry(frame),
     _ => [],
   };
 
@@ -214,6 +215,33 @@ class ScriptedRadio {
           for (var i = 0; i < hops; i++) (-20 + 10 * i) & 0xFF,
           24,
         ],
+    ];
+  }
+
+  /// The radio's own telemetry (Cayenne LPP): 4.06 V on channel 1.
+  List<int> selfTelemetry = [1, 116, 0x01, 0x96];
+
+  /// Nodes' telemetry, by first key byte. Unlisted nodes don't answer.
+  final nodeTelemetry = <int, List<int>>{};
+  final telemetryRequests = <List<int>>[];
+
+  List<List<int>> _telemetry(List<int> frame) {
+    telemetryRequests.add(frame);
+    if (frame.length == 4) {
+      return [
+        [
+          PushCode.telemetryResponse,
+          0,
+          ...testKey.sublist(0, 6),
+          ...selfTelemetry,
+        ],
+      ];
+    }
+    final data = nodeTelemetry[frame[4]];
+    return [
+      [ResponseCode.sent, 0, ...u32(0xC0), ...u32(1000)],
+      if (data != null)
+        [PushCode.telemetryResponse, 0, ...frame.sublist(4, 10), ...data],
     ];
   }
 
