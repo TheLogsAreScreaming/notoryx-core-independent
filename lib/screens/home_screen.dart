@@ -6,6 +6,7 @@ import '../data/data.dart';
 import '../radio/radio.dart';
 import 'connection_log_screen.dart';
 import 'conversation_screen.dart';
+import 'manage_actions.dart';
 
 /// A radio's chats and contacts. While the radio is being reconnected a
 /// banner says so and the stored chats stay readable.
@@ -64,6 +65,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             },
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        tooltip: _tab == 0 ? 'Add a channel' : 'Add or share contacts',
+        onPressed: () => _tab == 0
+            ? showAddChannel(context, ref)
+            : showContactsMenu(
+                context,
+                ref,
+                radioName: widget.radioName,
+                radioKey: widget.radioKey,
+              ),
+        child: Icon(
+          _tab == 0 ? Icons.add_comment_outlined : Icons.person_add_alt,
+        ),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tab,
@@ -137,8 +152,12 @@ class _ChatsTab extends ConsumerWidget {
             latest: byThread[Threads.channel(channel.slot)],
             unread: unread[Threads.channel(channel.slot)] ?? 0,
             muted: muted.contains(Threads.channel(channel.slot)),
-            onLongPress: () =>
-                _toggleMute(context, ref, Threads.channel(channel.slot)),
+            onLongPress: () => showChannelActions(
+              context,
+              ref,
+              radioKey: radioKey,
+              channel: channel,
+            ),
             onTap: () => _openThread(
               context,
               thread: Threads.channel(channel.slot),
@@ -267,14 +286,26 @@ class _ContactsTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final contacts = ref.watch(contactsProvider(radioKey)).value ?? const [];
-    if (contacts.isEmpty) return const _Empty('No contacts on this radio');
+    final heard = ref.watch(discoveredProvider(radioKey)).value ?? const [];
+    if (contacts.isEmpty && heard.isEmpty) {
+      return const _Empty('No contacts on this radio');
+    }
+    // Favourites first, each group by name (the store already sorts by name).
+    final sorted = [
+      ...contacts.where((c) => c.flags & 1 == 1),
+      ...contacts.where((c) => c.flags & 1 == 0),
+    ];
     return ListView(
+      padding: const EdgeInsets.only(bottom: 88), // room for the + button
       children: [
-        for (final contact in contacts)
+        for (final contact in sorted)
           ListTile(
             leading: CircleAvatar(child: Icon(_icon(contact.type))),
             title: Text(contact.name),
             subtitle: Text(_describe(contact)),
+            trailing: contact.flags & 1 == 1
+                ? const Icon(Icons.star, semanticLabel: 'Favourite')
+                : null,
             onTap: NodeType.fromByte(contact.type) == NodeType.chat
                 ? () => _openThread(
                     context,
@@ -282,7 +313,28 @@ class _ContactsTab extends ConsumerWidget {
                     title: contact.name,
                   )
                 : null,
+            onLongPress: () =>
+                showContactActions(context, ref, contact: contact),
           ),
+        if (heard.isNotEmpty) ...[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
+            child: Text(
+              'Heard nearby, not added',
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+          ),
+          for (final node in heard)
+            ListTile(
+              leading: CircleAvatar(child: Icon(_icon(node.type))),
+              title: Text(node.name),
+              subtitle: Text(_kind(node.type)),
+              trailing: TextButton(
+                onPressed: () => addDiscovered(context, ref, node),
+                child: const Text('Add'),
+              ),
+            ),
+        ],
       ],
     );
   }
@@ -294,13 +346,15 @@ class _ContactsTab extends ConsumerWidget {
     _ => Icons.person_outline,
   };
 
+  static String _kind(int type) => switch (NodeType.fromByte(type)) {
+    NodeType.repeater => 'Repeater',
+    NodeType.room => 'Room',
+    NodeType.sensor => 'Sensor',
+    _ => 'Person',
+  };
+
   static String _describe(Contact c) {
-    final kind = switch (NodeType.fromByte(c.type)) {
-      NodeType.repeater => 'Repeater',
-      NodeType.room => 'Room',
-      NodeType.sensor => 'Sensor',
-      _ => 'Person',
-    };
+    final kind = _kind(c.type);
     if (c.outPathLength == pathUnknown) return '$kind · no route yet';
     final hops = c.outPathLength & 0x3F;
     return '$kind · ${hops == 0 ? 'direct' : '$hops hops'}';
