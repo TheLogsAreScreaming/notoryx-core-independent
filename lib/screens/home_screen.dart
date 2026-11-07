@@ -11,6 +11,7 @@ import 'manage_actions.dart';
 import 'map_tab.dart';
 import 'node_details.dart';
 import 'radio_settings_screen.dart';
+import 'server_screen.dart';
 
 /// A radio's chats and contacts. While the radio is being reconnected a
 /// banner says so and the stored chats stay readable.
@@ -132,6 +133,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
     );
+  }
+}
+
+/// Repeaters and rooms open their own screen; anything else shows details.
+void _openNode(BuildContext context, WidgetRef ref, NodeSummary node) {
+  if (node.type == NodeType.repeater || node.type == NodeType.room) {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (_) => ServerScreen(node: node)));
+  } else {
+    showNodeDetails(context, ref, node);
   }
 }
 
@@ -351,7 +363,7 @@ class _ContactsTab extends ConsumerWidget {
                     thread: Threads.direct(contact.publicKey),
                     title: contact.name,
                   )
-                : () => showNodeDetails(context, ref, nodeFromContact(contact)),
+                : () => _openNode(context, ref, nodeFromContact(contact)),
             onLongPress: () =>
                 showContactActions(context, ref, contact: contact),
           ),

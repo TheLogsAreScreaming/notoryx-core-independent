@@ -7,6 +7,7 @@ import '../data/data.dart';
 import '../radio/radio.dart';
 import 'conversation_screen.dart';
 import 'manage_actions.dart';
+import 'server_screen.dart';
 
 /// What the app knows about one node, whether it's a contact or only heard
 /// nearby. Built from either kind of row.
@@ -155,6 +156,21 @@ Future<void> showNodeDetails(
                             thread: Threads.direct(node.publicKey),
                             title: node.name,
                           ),
+                        ),
+                      );
+                    },
+                  ),
+                if (node.isContact &&
+                    (node.type == NodeType.repeater ||
+                        node.type == NodeType.room))
+                  FilledButton.icon(
+                    icon: const Icon(Icons.login),
+                    label: const Text('Open'),
+                    onPressed: () {
+                      Navigator.pop(sheet);
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => ServerScreen(node: node),
                         ),
                       );
                     },

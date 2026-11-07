@@ -140,6 +140,16 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     }
   }
 
+  /// A room post's writer: the contact whose key starts with [prefix], or
+  /// the prefix itself for someone not in contacts.
+  static String? _authorName(String? prefix, List<Contact> contacts) {
+    if (prefix == null) return null;
+    for (final c in contacts) {
+      if (c.publicKey.startsWith(prefix)) return c.name;
+    }
+    return 'Member $prefix';
+  }
+
   @override
   Widget build(BuildContext context) {
     final radioKey = ref.watch(radioKeyProvider);
@@ -153,6 +163,9 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                   .value ??
               const <Message>[];
     final retrying = ref.watch(retryingProvider).value ?? const <int>{};
+    final contacts = radioKey == null
+        ? const <Contact>[]
+        : ref.watch(contactsProvider(radioKey)).value ?? const <Contact>[];
     final muted =
         radioKey != null &&
         (ref.watch(mutedThreadsProvider(radioKey)).value ?? const {}).contains(
@@ -214,6 +227,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                       return _Bubble(
                         message: message,
                         showSender: widget.isChannel,
+                        author: _authorName(message.authorPrefix, contacts),
                         retrying: retrying.contains(message.id),
                         onLongPress: message.outgoing
                             ? () => _showActions(
@@ -273,12 +287,16 @@ class _Bubble extends StatelessWidget {
     required this.showSender,
     this.retrying = false,
     this.onLongPress,
+    this.author,
   });
 
   final Message message;
   final bool showSender;
   final bool retrying;
   final VoidCallback? onLongPress;
+
+  /// Room posts: who wrote it.
+  final String? author;
 
   @override
   Widget build(BuildContext context) {
@@ -314,9 +332,11 @@ class _Bubble extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (showSender && !mine && message.senderName != null)
+                if (!mine &&
+                        (author ?? (showSender ? message.senderName : null))
+                    case final name?)
                   Text(
-                    message.senderName!,
+                    name,
                     style: TextStyle(
                       color: scheme.primary,
                       fontWeight: FontWeight.w600,
