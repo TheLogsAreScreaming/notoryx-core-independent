@@ -135,4 +135,42 @@ void main() {
       await dir.delete(recursive: true);
     },
   );
+
+  test('search finds chat text and sender names, case-insensitive', () async {
+    await store.saveIncoming(radio, _channel('Ridge: Summit at noon', 1));
+    await store.saveIncoming(radio, _channel('Dana: 50% battery', 2));
+    await store.saveIncoming(radio, _direct('see you at the summit', 3));
+    await store.saveOutgoing(
+      radio,
+      thread: Threads.direct('07' * 32),
+      body: 'ver',
+      sentAt: 4,
+      textType: TextType.cliData.value,
+    );
+
+    final summit = await store.searchMessages(radio, 'SUMMIT');
+    expect(summit.map((m) => m.body), [
+      'see you at the summit',
+      'Summit at noon',
+    ]);
+    expect(
+      (await store.searchMessages(radio, 'ridge')).single.senderName,
+      'Ridge',
+    );
+    expect(
+      (await store.searchMessages(radio, '50%')).single.body,
+      '50% battery',
+    );
+    expect(
+      await store.searchMessages(radio, '5_%'),
+      isEmpty,
+      reason: 'wildcards are literal',
+    );
+    expect(
+      await store.searchMessages(radio, 'ver'),
+      isEmpty,
+      reason: 'console text left out',
+    );
+    expect(await store.searchMessages(radio, '   '), isEmpty);
+  });
 }
