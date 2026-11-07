@@ -302,6 +302,9 @@ class _Bubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final mine = message.outgoing;
+    final shownName = mine
+        ? null
+        : author ?? (showSender ? message.senderName : null);
     final time = TimeOfDay.fromDateTime(
       DateTime.fromMillisecondsSinceEpoch(message.sentAt * 1000),
     ).format(context);
@@ -332,9 +335,7 @@ class _Bubble extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (!mine &&
-                        (author ?? (showSender ? message.senderName : null))
-                    case final name?)
+                if (shownName case final name?)
                   Text(
                     name,
                     style: TextStyle(
