@@ -53,46 +53,85 @@ Future<String?> _ask(
   String initial = '',
   String action = 'OK',
   bool pasteButton = false,
-}) {
-  final controller = TextEditingController(text: initial);
-  return showDialog<String>(
+}) async {
+  final value = await showDialog<String>(
     context: context,
-    builder: (context) => AlertDialog(
-      title: Text(title),
-      content: TextField(
-        controller: controller,
-        autofocus: true,
-        decoration: InputDecoration(
-          labelText: label,
-          hintText: hint,
-          suffixIcon: pasteButton
-              ? IconButton(
-                  tooltip: 'Paste',
-                  icon: const Icon(Icons.content_paste),
-                  onPressed: () async {
-                    final data = await Clipboard.getData(Clipboard.kTextPlain);
-                    controller.text = data?.text ?? '';
-                  },
-                )
-              : null,
-        ),
-        onSubmitted: (v) => Navigator.pop(context, v.trim()),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.pop(context, controller.text.trim()),
-          child: Text(action),
-        ),
-      ],
+    builder: (context) => _TextDialog(
+      title: title,
+      label: label,
+      hint: hint,
+      initial: initial,
+      action: action,
+      pasteButton: pasteButton,
     ),
-  ).then((v) {
-    controller.dispose();
-    return v == null || v.isEmpty ? null : v;
+  );
+  return value == null || value.isEmpty ? null : value;
+}
+
+/// A one-field dialog. It owns its text controller, so the controller lives
+/// until the closing animation has finished.
+class _TextDialog extends StatefulWidget {
+  const _TextDialog({
+    required this.title,
+    required this.label,
+    required this.initial,
+    required this.action,
+    required this.pasteButton,
+    this.hint,
   });
+
+  final String title;
+  final String label;
+  final String? hint;
+  final String initial;
+  final String action;
+  final bool pasteButton;
+
+  @override
+  State<_TextDialog> createState() => _TextDialogState();
+}
+
+class _TextDialogState extends State<_TextDialog> {
+  late final _controller = TextEditingController(text: widget.initial);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _done() => Navigator.pop(context, _controller.text.trim());
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: Text(widget.title),
+    content: TextField(
+      controller: _controller,
+      autofocus: true,
+      decoration: InputDecoration(
+        labelText: widget.label,
+        hintText: widget.hint,
+        suffixIcon: widget.pasteButton
+            ? IconButton(
+                tooltip: 'Paste',
+                icon: const Icon(Icons.content_paste),
+                onPressed: () async {
+                  final data = await Clipboard.getData(Clipboard.kTextPlain);
+                  _controller.text = data?.text ?? '';
+                },
+              )
+            : null,
+      ),
+      onSubmitted: (_) => _done(),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('Cancel'),
+      ),
+      FilledButton(onPressed: _done, child: Text(widget.action)),
+    ],
+  );
 }
 
 Future<bool> _confirm(
