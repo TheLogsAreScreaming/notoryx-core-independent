@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:notoryx_core/radio/radio.dart';
 
 import 'fake_radio_link.dart';
@@ -23,6 +25,28 @@ class ScriptedRadio {
     1: ('#trail', List.filled(16, 0x11)),
   };
   final adverts = <bool>[];
+
+  /// The radio's advertised position, if any.
+  double? latitude;
+  double? longitude;
+
+  // LoRa settings, changed by setRadioParams.
+  int frequencyKhz = 910525;
+  int bandwidthHz = 62500;
+  int spreadingFactor = 7;
+  int codingRate = 5;
+  int radioParamChanges = 0;
+
+  List<List<int>> _setRadio(List<int> frame) {
+    final data = ByteData.sublistView(Uint8List.fromList(frame));
+    frequencyKhz = data.getUint32(1, Endian.little);
+    bandwidthHz = data.getUint32(5, Endian.little);
+    spreadingFactor = frame[9];
+    codingRate = frame[10];
+    radioParamChanges++;
+    return [okFrame()];
+  }
+
   final getContactsSince = <int?>[];
   bool refuseText = false;
 
@@ -37,7 +61,18 @@ class ScriptedRadio {
   final textAttempts = <int>[];
 
   List<List<int>> _answer(List<int> frame) => switch (frame[0]) {
-    CommandCode.appStart => [selfInfoFrame(name: 'Base')],
+    CommandCode.appStart => [
+      selfInfoFrame(
+        name: 'Base',
+        latitude: latitude,
+        longitude: longitude,
+        frequencyKhz: frequencyKhz,
+        bandwidthHz: bandwidthHz,
+        spreadingFactor: spreadingFactor,
+        codingRate: codingRate,
+      ),
+    ],
+    CommandCode.setRadioParams => _setRadio(frame),
     CommandCode.deviceQuery => [deviceInfoFrame(maxChannels: 3)],
     CommandCode.setDeviceTime => [okFrame()],
     CommandCode.getContacts => _contacts(frame),

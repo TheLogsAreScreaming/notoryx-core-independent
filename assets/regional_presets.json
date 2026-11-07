@@ -1,0 +1,493 @@
+{
+  "version": 2,
+  "about": "Radio settings used by local MeshCore meshes. Areas with source 'map' are worked out from the public MeshCore map (map.meshcore.io), where node owners report their settings; they are not confirmed on air. Hand-made areas have no source. To add or correct an area, open a pull request and give a source in the notes.",
+  "generated": "2026-11-06",
+  "regions": [
+    {
+      "id": "us-philadelphia",
+      "name": "Philadelphia",
+      "center": [
+        39.9526,
+        -75.1652
+      ],
+      "radiusKm": 100,
+      "frequencyMHz": 919.5,
+      "bandwidthKHz": 500,
+      "spreadingFactor": 10,
+      "codingRate": 5,
+      "pathHashBytes": 2,
+      "updated": "2026-10-17",
+      "notes": "The Philadelphia-area mesh is moving to these settings. Check with your local group before switching."
+    },
+    {
+      "id": "map-869-618-62-5-sf7-52-5",
+      "name": "Noordwijkerhout, South Holland",
+      "center": [
+        52.2412,
+        5.3667
+      ],
+      "radiusKm": 133,
+      "frequencyMHz": 869.618,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 7,
+      "codingRate": 5,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 1912,
+      "sharePct": 86,
+      "notes": "From the MeshCore map: 1912 nodes here (86%) report these settings. Most of the wider area uses 869.618 MHz / BW62.5 / SF8. Check with your local group before switching."
+    },
+    {
+      "id": "map-927-875-62-5-sf7-34--118",
+      "name": "Irvine, California",
+      "center": [
+        33.7606,
+        -117.8103
+      ],
+      "radiusKm": 157,
+      "frequencyMHz": 927.875,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 7,
+      "codingRate": 5,
+      "pathHashBytes": 3,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 918,
+      "sharePct": 99,
+      "notes": "From the MeshCore map: 918 nodes here (99%) report these settings. Most of the wider area uses 910.525 MHz / BW62.5 / SF7. Check with your local group before switching."
+    },
+    {
+      "id": "map-868-731-62-5-sf7-56-38",
+      "name": "Moscow, Moscow",
+      "center": [
+        55.7289,
+        37.6172
+      ],
+      "radiusKm": 85,
+      "frequencyMHz": 868.731,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 7,
+      "codingRate": 7,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 764,
+      "sharePct": 99,
+      "notes": "From the MeshCore map: 764 nodes here (99%) report these settings. Most of the wider area uses 869.618 MHz / BW62.5 / SF8. Check with your local group before switching."
+    },
+    {
+      "id": "map-869-432-62-5-sf7-50-15",
+      "name": "Prague, Czechia",
+      "center": [
+        49.8652,
+        15.2246
+      ],
+      "radiusKm": 156,
+      "frequencyMHz": 869.432,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 7,
+      "codingRate": 5,
+      "pathHashBytes": 2,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 762,
+      "sharePct": 98,
+      "notes": "From the MeshCore map: 762 nodes here (98%) report these settings. Most of the wider area uses 869.618 MHz / BW62.5 / SF8. Check with your local group before switching."
+    },
+    {
+      "id": "map-916-575-62-5-sf7--38-145",
+      "name": "Melbourne, Victoria",
+      "center": [
+        -37.6987,
+        145.1444
+      ],
+      "radiusKm": 162,
+      "frequencyMHz": 916.575,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 7,
+      "codingRate": 8,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 619,
+      "sharePct": 97,
+      "notes": "From the MeshCore map: 619 nodes here (97%) report these settings. Most of the wider area uses 915.075 MHz / BW125 / SF9. Check with your local group before switching."
+    },
+    {
+      "id": "map-869-618-62-5-sf7-39--9",
+      "name": "Queluz, Portugal",
+      "center": [
+        39.3263,
+        -8.8282
+      ],
+      "radiusKm": 218,
+      "frequencyMHz": 869.618,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 7,
+      "codingRate": 6,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 493,
+      "sharePct": 73,
+      "notes": "From the MeshCore map: 493 nodes here (73%) report these settings. Most of the wider area uses 869.618 MHz / BW62.5 / SF8. Check with your local group before switching."
+    },
+    {
+      "id": "map-869-618-62-5-sf7-48-19",
+      "name": "Budapest, Budapest",
+      "center": [
+        48.0955,
+        18.8297
+      ],
+      "radiusKm": 212,
+      "frequencyMHz": 869.618,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 7,
+      "codingRate": 5,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 407,
+      "sharePct": 94,
+      "notes": "From the MeshCore map: 407 nodes here (94%) report these settings. Most of the wider area uses 869.618 MHz / BW62.5 / SF8. Check with your local group before switching."
+    },
+    {
+      "id": "map-923-125-62-5-sf8--27-153",
+      "name": "Brisbane, Queensland",
+      "center": [
+        -27.4162,
+        152.9695
+      ],
+      "radiusKm": 116,
+      "frequencyMHz": 923.125,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 8,
+      "codingRate": 5,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 292,
+      "sharePct": 100,
+      "notes": "From the MeshCore map: 292 nodes here (100%) report these settings. Most of the wider area uses 915.075 MHz / BW125 / SF9. Check with your local group before switching."
+    },
+    {
+      "id": "map-869-618-62-5-sf6-50-18",
+      "name": "Przyszowice, Silesian Voivodeship",
+      "center": [
+        50.3086,
+        18.4814
+      ],
+      "radiusKm": 68,
+      "frequencyMHz": 869.618,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 6,
+      "codingRate": 8,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 235,
+      "sharePct": 90,
+      "notes": "From the MeshCore map: 235 nodes here (90%) report these settings. Most of the wider area uses 869.618 MHz / BW62.5 / SF8. Check with your local group before switching."
+    },
+    {
+      "id": "map-909-62-5-sf7-49--124",
+      "name": "Burnaby, British Columbia",
+      "center": [
+        49.3551,
+        -123.6087
+      ],
+      "radiusKm": 149,
+      "frequencyMHz": 909.0,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 7,
+      "codingRate": 5,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 235,
+      "sharePct": 80,
+      "notes": "From the MeshCore map: 235 nodes here (80%) report these settings. Most of the wider area uses 910.525 MHz / BW62.5 / SF7. Check with your local group before switching."
+    },
+    {
+      "id": "map-908-205-62-5-sf9-33--112",
+      "name": "Phoenix, Arizona",
+      "center": [
+        33.1248,
+        -111.6828
+      ],
+      "radiusKm": 146,
+      "frequencyMHz": 908.205,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 9,
+      "codingRate": 8,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 219,
+      "sharePct": 100,
+      "notes": "From the MeshCore map: 219 nodes here (100%) report these settings. Most of the wider area uses 910.525 MHz / BW62.5 / SF7. Check with your local group before switching."
+    },
+    {
+      "id": "map-868-731-62-5-sf9-47-39",
+      "name": "Rostov-on-Don, Rostov Oblast",
+      "center": [
+        47.3136,
+        39.4519
+      ],
+      "radiusKm": 90,
+      "frequencyMHz": 868.731,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 9,
+      "codingRate": 7,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 202,
+      "sharePct": 100,
+      "notes": "From the MeshCore map: 202 nodes here (100%) report these settings. Most of the wider area uses 869.618 MHz / BW62.5 / SF8. Check with your local group before switching."
+    },
+    {
+      "id": "map-923-125-62-5-sf8--35-139",
+      "name": "South Australia",
+      "center": [
+        -34.9317,
+        138.7147
+      ],
+      "radiusKm": 94,
+      "frequencyMHz": 923.125,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 8,
+      "codingRate": 8,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 177,
+      "sharePct": 100,
+      "notes": "From the MeshCore map: 177 nodes here (100%) report these settings. Most of the wider area uses 915.075 MHz / BW125 / SF9. Check with your local group before switching."
+    },
+    {
+      "id": "map-869-618-62-5-sf7-41-2",
+      "name": "Sant Fost de Campsentelles, Catalonia",
+      "center": [
+        41.4865,
+        2.1163
+      ],
+      "radiusKm": 67,
+      "frequencyMHz": 869.618,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 7,
+      "codingRate": 6,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 149,
+      "sharePct": 100,
+      "notes": "From the MeshCore map: 149 nodes here (100%) report these settings. Most of the wider area uses 869.618 MHz / BW62.5 / SF8. Check with your local group before switching."
+    },
+    {
+      "id": "map-910-525-500-sf10-41--75",
+      "name": "Forks Township, Pennsylvania",
+      "center": [
+        40.5816,
+        -75.3328
+      ],
+      "radiusKm": 67,
+      "frequencyMHz": 910.525,
+      "bandwidthKHz": 500.0,
+      "spreadingFactor": 10,
+      "codingRate": 5,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 113,
+      "sharePct": 75,
+      "notes": "From the MeshCore map: 113 nodes here (75%) report these settings. Most of the wider area uses 910.525 MHz / BW62.5 / SF7. Check with your local group before switching."
+    },
+    {
+      "id": "map-868-9-62-5-sf8-45-39",
+      "name": "\u041a\u043e\u0437\u0435\u0442\u0441\u043a\u043e\u0435 \u0441\u0435\u043b\u044c\u0441\u043a\u043e\u0435 \u043f\u043e\u0441\u0435\u043b\u0435\u043d\u0438\u0435, Republic of Adygea",
+      "center": [
+        45.0223,
+        39.04
+      ],
+      "radiusKm": 75,
+      "frequencyMHz": 868.9,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 8,
+      "codingRate": 6,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 102,
+      "sharePct": 78,
+      "notes": "From the MeshCore map: 102 nodes here (78%) report these settings. Most of the wider area uses 869.618 MHz / BW62.5 / SF8. Check with your local group before switching."
+    },
+    {
+      "id": "map-909-875-62-5-sf9-39--121",
+      "name": "Roseville, California",
+      "center": [
+        38.8578,
+        -121.3309
+      ],
+      "radiusKm": 124,
+      "frequencyMHz": 909.875,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 9,
+      "codingRate": 5,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 98,
+      "sharePct": 83,
+      "notes": "From the MeshCore map: 98 nodes here (83%) report these settings. Most of the wider area uses 910.525 MHz / BW62.5 / SF7. Check with your local group before switching."
+    },
+    {
+      "id": "map-868-731-62-5-sf8-56-44",
+      "name": "Nizhny Novgorod, Nizhny Novgorod Oblast",
+      "center": [
+        56.2997,
+        43.9057
+      ],
+      "radiusKm": 49,
+      "frequencyMHz": 868.731,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 8,
+      "codingRate": 6,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 77,
+      "sharePct": 93,
+      "notes": "From the MeshCore map: 77 nodes here (93%) report these settings. Most of the wider area uses 869.618 MHz / BW62.5 / SF8. Check with your local group before switching."
+    },
+    {
+      "id": "map-868-731-62-5-sf8-54-38",
+      "name": "\u0433\u043e\u0440\u043e\u0434\u0441\u043a\u043e\u0439 \u043e\u043a\u0440\u0443\u0433 \u0422\u0443\u043b\u0430, Tula Oblast",
+      "center": [
+        54.1806,
+        37.5892
+      ],
+      "radiusKm": 38,
+      "frequencyMHz": 868.731,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 8,
+      "codingRate": 7,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 69,
+      "sharePct": 69,
+      "notes": "From the MeshCore map: 69 nodes here (69%) report these settings. Most of the wider area uses 869.618 MHz / BW62.5 / SF8. Check with your local group before switching."
+    },
+    {
+      "id": "map-869-525-62-5-sf7-49-45",
+      "name": "Volgograd, Volgograd Oblast",
+      "center": [
+        48.7211,
+        44.5286
+      ],
+      "radiusKm": 39,
+      "frequencyMHz": 869.525,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 7,
+      "codingRate": 7,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 53,
+      "sharePct": 100,
+      "notes": "From the MeshCore map: 53 nodes here (100%) report these settings. Most of the wider area uses 869.618 MHz / BW62.5 / SF8. Check with your local group before switching."
+    },
+    {
+      "id": "map-910-525-500-sf12-43--73",
+      "name": "Springfield, Vermont",
+      "center": [
+        43.3075,
+        -72.6261
+      ],
+      "radiusKm": 40,
+      "frequencyMHz": 910.525,
+      "bandwidthKHz": 500.0,
+      "spreadingFactor": 12,
+      "codingRate": 6,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 53,
+      "sharePct": 82,
+      "notes": "From the MeshCore map: 53 nodes here (82%) report these settings. Most of the wider area uses 910.525 MHz / BW62.5 / SF7. Check with your local group before switching."
+    },
+    {
+      "id": "map-910-525-125-sf11-10--84",
+      "name": "Cascajal, San Jose Province",
+      "center": [
+        9.9086,
+        -84.1402
+      ],
+      "radiusKm": 83,
+      "frequencyMHz": 910.525,
+      "bandwidthKHz": 125.0,
+      "spreadingFactor": 11,
+      "codingRate": 5,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 39,
+      "sharePct": 100,
+      "notes": "From the MeshCore map: 39 nodes here (100%) report these settings. Most of the wider area uses 923.125 MHz / BW62.5 / SF8. Check with your local group before switching."
+    },
+    {
+      "id": "map-923-125-62-5-sf8--23-151",
+      "name": "Rockhampton, Queensland",
+      "center": [
+        -23.389,
+        150.5158
+      ],
+      "radiusKm": 58,
+      "frequencyMHz": 923.125,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 8,
+      "codingRate": 6,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 26,
+      "sharePct": 100,
+      "notes": "From the MeshCore map: 26 nodes here (100%) report these settings. Most of the wider area uses 915.075 MHz / BW125 / SF9. Check with your local group before switching."
+    },
+    {
+      "id": "map-869-617-62-5-sf8-54-20",
+      "name": "Olsztyn, Warmian-Masurian Voivodeship",
+      "center": [
+        53.6876,
+        20.4165
+      ],
+      "radiusKm": 47,
+      "frequencyMHz": 869.617,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 8,
+      "codingRate": 8,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 21,
+      "sharePct": 88,
+      "notes": "From the MeshCore map: 21 nodes here (88%) report these settings. Most of the wider area uses 869.618 MHz / BW62.5 / SF8. Check with your local group before switching."
+    },
+    {
+      "id": "map-923-125-62-5-sf8--32-116",
+      "name": "Perth, Western Australia",
+      "center": [
+        -32.0838,
+        115.8464
+      ],
+      "radiusKm": 81,
+      "frequencyMHz": 923.125,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 8,
+      "codingRate": 8,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 15,
+      "sharePct": 100,
+      "notes": "From the MeshCore map: 15 nodes here (100%) report these settings. Most of the wider area uses 915.075 MHz / BW125 / SF9. Check with your local group before switching."
+    },
+    {
+      "id": "map-916-575-62-5-sf7--34-142",
+      "name": "New South Wales",
+      "center": [
+        -34.1685,
+        142.1405
+      ],
+      "radiusKm": 32,
+      "frequencyMHz": 916.575,
+      "bandwidthKHz": 62.5,
+      "spreadingFactor": 7,
+      "codingRate": 7,
+      "updated": "2026-11-06",
+      "source": "map",
+      "nodes": 15,
+      "sharePct": 100,
+      "notes": "From the MeshCore map: 15 nodes here (100%) report these settings. Most of the wider area uses 915.075 MHz / BW125 / SF9. Check with your local group before switching."
+    }
+  ]
+}
