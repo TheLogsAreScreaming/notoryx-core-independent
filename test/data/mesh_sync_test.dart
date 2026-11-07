@@ -158,19 +158,32 @@ void main() {
     expect(message.outgoing, isTrue);
   });
 
-  test('contact pushes update the store', () async {
-    final key = (await sync.start(now: now)).key;
-    final bob = contactFrame('Bob', keyByte: 2)..[0] = PushCode.newAdvert;
-    link.emit(bob);
-    await pumpEventQueue();
-    expect((await store.watchContacts(key).first).map((c) => c.name), [
-      'Alice',
-      'Bob',
-    ]);
+  test(
+    'a node the radio did not add goes to heard nearby, not contacts',
+    () async {
+      final key = (await sync.start(now: now)).key;
+      final bob = contactFrame('Bob', keyByte: 2)..[0] = PushCode.newAdvert;
+      link.emit(bob);
+      await pumpEventQueue();
+      expect((await store.watchContacts(key).first).map((c) => c.name), [
+        'Alice',
+      ]);
+      expect((await store.watchDiscovered(key).first).map((d) => d.name), [
+        'Bob',
+      ]);
 
-    link.emit([PushCode.contactDeleted, ...List.filled(32, 1)]);
+      link.emit([PushCode.contactDeleted, ...List.filled(32, 1)]);
+      await pumpEventQueue();
+      expect(await store.watchContacts(key).first, isEmpty);
+    },
+  );
+
+  test('heard nearby leaves out nodes that are already contacts', () async {
+    final key = (await sync.start(now: now)).key;
+    final alice = contactFrame('Alice', keyByte: 1)..[0] = PushCode.newAdvert;
+    link.emit(alice);
     await pumpEventQueue();
-    expect((await store.watchContacts(key).first).map((c) => c.name), ['Bob']);
+    expect(await store.watchDiscovered(key).first, isEmpty);
   });
 
   test('a burst of adverts triggers one contact refresh', () {

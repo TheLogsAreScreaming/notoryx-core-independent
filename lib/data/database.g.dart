@@ -2760,6 +2760,530 @@ class ThreadStatesCompanion extends UpdateCompanion<ThreadState> {
   }
 }
 
+class $DiscoveredTable extends Discovered
+    with TableInfo<$DiscoveredTable, DiscoveredData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DiscoveredTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _radioKeyMeta = const VerificationMeta(
+    'radioKey',
+  );
+  @override
+  late final GeneratedColumn<String> radioKey = GeneratedColumn<String>(
+    'radio_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES radios (public_key)',
+    ),
+  );
+  static const VerificationMeta _publicKeyMeta = const VerificationMeta(
+    'publicKey',
+  );
+  @override
+  late final GeneratedColumn<String> publicKey = GeneratedColumn<String>(
+    'public_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<int> type = GeneratedColumn<int>(
+    'type',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _latitudeMeta = const VerificationMeta(
+    'latitude',
+  );
+  @override
+  late final GeneratedColumn<double> latitude = GeneratedColumn<double>(
+    'latitude',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _longitudeMeta = const VerificationMeta(
+    'longitude',
+  );
+  @override
+  late final GeneratedColumn<double> longitude = GeneratedColumn<double>(
+    'longitude',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastAdvertMeta = const VerificationMeta(
+    'lastAdvert',
+  );
+  @override
+  late final GeneratedColumn<int> lastAdvert = GeneratedColumn<int>(
+    'last_advert',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _heardAtMeta = const VerificationMeta(
+    'heardAt',
+  );
+  @override
+  late final GeneratedColumn<int> heardAt = GeneratedColumn<int>(
+    'heard_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    radioKey,
+    publicKey,
+    name,
+    type,
+    latitude,
+    longitude,
+    lastAdvert,
+    heardAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'discovered';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DiscoveredData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('radio_key')) {
+      context.handle(
+        _radioKeyMeta,
+        radioKey.isAcceptableOrUnknown(data['radio_key']!, _radioKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_radioKeyMeta);
+    }
+    if (data.containsKey('public_key')) {
+      context.handle(
+        _publicKeyMeta,
+        publicKey.isAcceptableOrUnknown(data['public_key']!, _publicKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_publicKeyMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+        _typeMeta,
+        type.isAcceptableOrUnknown(data['type']!, _typeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_typeMeta);
+    }
+    if (data.containsKey('latitude')) {
+      context.handle(
+        _latitudeMeta,
+        latitude.isAcceptableOrUnknown(data['latitude']!, _latitudeMeta),
+      );
+    }
+    if (data.containsKey('longitude')) {
+      context.handle(
+        _longitudeMeta,
+        longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta),
+      );
+    }
+    if (data.containsKey('last_advert')) {
+      context.handle(
+        _lastAdvertMeta,
+        lastAdvert.isAcceptableOrUnknown(data['last_advert']!, _lastAdvertMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lastAdvertMeta);
+    }
+    if (data.containsKey('heard_at')) {
+      context.handle(
+        _heardAtMeta,
+        heardAt.isAcceptableOrUnknown(data['heard_at']!, _heardAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_heardAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {radioKey, publicKey};
+  @override
+  DiscoveredData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DiscoveredData(
+      radioKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}radio_key'],
+      )!,
+      publicKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}public_key'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      type: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}type'],
+      )!,
+      latitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}latitude'],
+      ),
+      longitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}longitude'],
+      ),
+      lastAdvert: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}last_advert'],
+      )!,
+      heardAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}heard_at'],
+      )!,
+    );
+  }
+
+  @override
+  $DiscoveredTable createAlias(String alias) {
+    return $DiscoveredTable(attachedDatabase, alias);
+  }
+}
+
+class DiscoveredData extends DataClass implements Insertable<DiscoveredData> {
+  final String radioKey;
+  final String publicKey;
+  final String name;
+  final int type;
+  final double? latitude;
+  final double? longitude;
+
+  /// When the node last advertised, by its own clock.
+  final int lastAdvert;
+
+  /// When this phone heard it, Unix milliseconds.
+  final int heardAt;
+  const DiscoveredData({
+    required this.radioKey,
+    required this.publicKey,
+    required this.name,
+    required this.type,
+    this.latitude,
+    this.longitude,
+    required this.lastAdvert,
+    required this.heardAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['radio_key'] = Variable<String>(radioKey);
+    map['public_key'] = Variable<String>(publicKey);
+    map['name'] = Variable<String>(name);
+    map['type'] = Variable<int>(type);
+    if (!nullToAbsent || latitude != null) {
+      map['latitude'] = Variable<double>(latitude);
+    }
+    if (!nullToAbsent || longitude != null) {
+      map['longitude'] = Variable<double>(longitude);
+    }
+    map['last_advert'] = Variable<int>(lastAdvert);
+    map['heard_at'] = Variable<int>(heardAt);
+    return map;
+  }
+
+  DiscoveredCompanion toCompanion(bool nullToAbsent) {
+    return DiscoveredCompanion(
+      radioKey: Value(radioKey),
+      publicKey: Value(publicKey),
+      name: Value(name),
+      type: Value(type),
+      latitude: latitude == null && nullToAbsent
+          ? const Value.absent()
+          : Value(latitude),
+      longitude: longitude == null && nullToAbsent
+          ? const Value.absent()
+          : Value(longitude),
+      lastAdvert: Value(lastAdvert),
+      heardAt: Value(heardAt),
+    );
+  }
+
+  factory DiscoveredData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DiscoveredData(
+      radioKey: serializer.fromJson<String>(json['radioKey']),
+      publicKey: serializer.fromJson<String>(json['publicKey']),
+      name: serializer.fromJson<String>(json['name']),
+      type: serializer.fromJson<int>(json['type']),
+      latitude: serializer.fromJson<double?>(json['latitude']),
+      longitude: serializer.fromJson<double?>(json['longitude']),
+      lastAdvert: serializer.fromJson<int>(json['lastAdvert']),
+      heardAt: serializer.fromJson<int>(json['heardAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'radioKey': serializer.toJson<String>(radioKey),
+      'publicKey': serializer.toJson<String>(publicKey),
+      'name': serializer.toJson<String>(name),
+      'type': serializer.toJson<int>(type),
+      'latitude': serializer.toJson<double?>(latitude),
+      'longitude': serializer.toJson<double?>(longitude),
+      'lastAdvert': serializer.toJson<int>(lastAdvert),
+      'heardAt': serializer.toJson<int>(heardAt),
+    };
+  }
+
+  DiscoveredData copyWith({
+    String? radioKey,
+    String? publicKey,
+    String? name,
+    int? type,
+    Value<double?> latitude = const Value.absent(),
+    Value<double?> longitude = const Value.absent(),
+    int? lastAdvert,
+    int? heardAt,
+  }) => DiscoveredData(
+    radioKey: radioKey ?? this.radioKey,
+    publicKey: publicKey ?? this.publicKey,
+    name: name ?? this.name,
+    type: type ?? this.type,
+    latitude: latitude.present ? latitude.value : this.latitude,
+    longitude: longitude.present ? longitude.value : this.longitude,
+    lastAdvert: lastAdvert ?? this.lastAdvert,
+    heardAt: heardAt ?? this.heardAt,
+  );
+  DiscoveredData copyWithCompanion(DiscoveredCompanion data) {
+    return DiscoveredData(
+      radioKey: data.radioKey.present ? data.radioKey.value : this.radioKey,
+      publicKey: data.publicKey.present ? data.publicKey.value : this.publicKey,
+      name: data.name.present ? data.name.value : this.name,
+      type: data.type.present ? data.type.value : this.type,
+      latitude: data.latitude.present ? data.latitude.value : this.latitude,
+      longitude: data.longitude.present ? data.longitude.value : this.longitude,
+      lastAdvert: data.lastAdvert.present
+          ? data.lastAdvert.value
+          : this.lastAdvert,
+      heardAt: data.heardAt.present ? data.heardAt.value : this.heardAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DiscoveredData(')
+          ..write('radioKey: $radioKey, ')
+          ..write('publicKey: $publicKey, ')
+          ..write('name: $name, ')
+          ..write('type: $type, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude, ')
+          ..write('lastAdvert: $lastAdvert, ')
+          ..write('heardAt: $heardAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    radioKey,
+    publicKey,
+    name,
+    type,
+    latitude,
+    longitude,
+    lastAdvert,
+    heardAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DiscoveredData &&
+          other.radioKey == this.radioKey &&
+          other.publicKey == this.publicKey &&
+          other.name == this.name &&
+          other.type == this.type &&
+          other.latitude == this.latitude &&
+          other.longitude == this.longitude &&
+          other.lastAdvert == this.lastAdvert &&
+          other.heardAt == this.heardAt);
+}
+
+class DiscoveredCompanion extends UpdateCompanion<DiscoveredData> {
+  final Value<String> radioKey;
+  final Value<String> publicKey;
+  final Value<String> name;
+  final Value<int> type;
+  final Value<double?> latitude;
+  final Value<double?> longitude;
+  final Value<int> lastAdvert;
+  final Value<int> heardAt;
+  final Value<int> rowid;
+  const DiscoveredCompanion({
+    this.radioKey = const Value.absent(),
+    this.publicKey = const Value.absent(),
+    this.name = const Value.absent(),
+    this.type = const Value.absent(),
+    this.latitude = const Value.absent(),
+    this.longitude = const Value.absent(),
+    this.lastAdvert = const Value.absent(),
+    this.heardAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DiscoveredCompanion.insert({
+    required String radioKey,
+    required String publicKey,
+    required String name,
+    required int type,
+    this.latitude = const Value.absent(),
+    this.longitude = const Value.absent(),
+    required int lastAdvert,
+    required int heardAt,
+    this.rowid = const Value.absent(),
+  }) : radioKey = Value(radioKey),
+       publicKey = Value(publicKey),
+       name = Value(name),
+       type = Value(type),
+       lastAdvert = Value(lastAdvert),
+       heardAt = Value(heardAt);
+  static Insertable<DiscoveredData> custom({
+    Expression<String>? radioKey,
+    Expression<String>? publicKey,
+    Expression<String>? name,
+    Expression<int>? type,
+    Expression<double>? latitude,
+    Expression<double>? longitude,
+    Expression<int>? lastAdvert,
+    Expression<int>? heardAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (radioKey != null) 'radio_key': radioKey,
+      if (publicKey != null) 'public_key': publicKey,
+      if (name != null) 'name': name,
+      if (type != null) 'type': type,
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
+      if (lastAdvert != null) 'last_advert': lastAdvert,
+      if (heardAt != null) 'heard_at': heardAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DiscoveredCompanion copyWith({
+    Value<String>? radioKey,
+    Value<String>? publicKey,
+    Value<String>? name,
+    Value<int>? type,
+    Value<double?>? latitude,
+    Value<double?>? longitude,
+    Value<int>? lastAdvert,
+    Value<int>? heardAt,
+    Value<int>? rowid,
+  }) {
+    return DiscoveredCompanion(
+      radioKey: radioKey ?? this.radioKey,
+      publicKey: publicKey ?? this.publicKey,
+      name: name ?? this.name,
+      type: type ?? this.type,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      lastAdvert: lastAdvert ?? this.lastAdvert,
+      heardAt: heardAt ?? this.heardAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (radioKey.present) {
+      map['radio_key'] = Variable<String>(radioKey.value);
+    }
+    if (publicKey.present) {
+      map['public_key'] = Variable<String>(publicKey.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<int>(type.value);
+    }
+    if (latitude.present) {
+      map['latitude'] = Variable<double>(latitude.value);
+    }
+    if (longitude.present) {
+      map['longitude'] = Variable<double>(longitude.value);
+    }
+    if (lastAdvert.present) {
+      map['last_advert'] = Variable<int>(lastAdvert.value);
+    }
+    if (heardAt.present) {
+      map['heard_at'] = Variable<int>(heardAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DiscoveredCompanion(')
+          ..write('radioKey: $radioKey, ')
+          ..write('publicKey: $publicKey, ')
+          ..write('name: $name, ')
+          ..write('type: $type, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude, ')
+          ..write('lastAdvert: $lastAdvert, ')
+          ..write('heardAt: $heardAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$MeshDatabase extends GeneratedDatabase {
   _$MeshDatabase(QueryExecutor e) : super(e);
   $MeshDatabaseManager get managers => $MeshDatabaseManager(this);
@@ -2769,6 +3293,7 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
   late final $MessagesTable messages = $MessagesTable(this);
   late final $SettingsTable settings = $SettingsTable(this);
   late final $ThreadStatesTable threadStates = $ThreadStatesTable(this);
+  late final $DiscoveredTable discovered = $DiscoveredTable(this);
   late final Index messagesByThread = Index(
     'messages_by_thread',
     'CREATE INDEX messages_by_thread ON messages (radio_key, thread, id)',
@@ -2788,6 +3313,7 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
     messages,
     settings,
     threadStates,
+    discovered,
     messagesByThread,
     messagesByAck,
   ];
@@ -2884,6 +3410,24 @@ final class $$RadiosTableReferences
         );
 
     final cache = $_typedResult.readTableOrNull(_threadStatesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$DiscoveredTable, List<DiscoveredData>>
+  _discoveredRefsTable(_$MeshDatabase db) => MultiTypedResultKey.fromTable(
+    db.discovered,
+    aliasName: 'radios__public_key__discovered__radio_key',
+  );
+
+  $$DiscoveredTableProcessedTableManager get discoveredRefs {
+    final manager = $$DiscoveredTableTableManager($_db, $_db.discovered).filter(
+      (f) =>
+          f.radioKey.publicKey.sqlEquals($_itemColumn<String>('public_key')!),
+    );
+
+    final cache = $_typedResult.readTableOrNull(_discoveredRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -3010,6 +3554,31 @@ class $$RadiosTableFilterComposer
           }) => $$ThreadStatesTableFilterComposer(
             $db: $db,
             $table: $db.threadStates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> discoveredRefs(
+    Expression<bool> Function($$DiscoveredTableFilterComposer f) f,
+  ) {
+    final $$DiscoveredTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.publicKey,
+      referencedTable: $db.discovered,
+      getReferencedColumn: (t) => t.radioKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DiscoveredTableFilterComposer(
+            $db: $db,
+            $table: $db.discovered,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3174,6 +3743,31 @@ class $$RadiosTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> discoveredRefs<T extends Object>(
+    Expression<T> Function($$DiscoveredTableAnnotationComposer a) f,
+  ) {
+    final $$DiscoveredTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.publicKey,
+      referencedTable: $db.discovered,
+      getReferencedColumn: (t) => t.radioKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DiscoveredTableAnnotationComposer(
+            $db: $db,
+            $table: $db.discovered,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$RadiosTableTableManager
@@ -3194,6 +3788,7 @@ class $$RadiosTableTableManager
             bool channelsRefs,
             bool messagesRefs,
             bool threadStatesRefs,
+            bool discoveredRefs,
           })
         > {
   $$RadiosTableTableManager(_$MeshDatabase db, $RadiosTable table)
@@ -3249,6 +3844,7 @@ class $$RadiosTableTableManager
                 channelsRefs = false,
                 messagesRefs = false,
                 threadStatesRefs = false,
+                discoveredRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -3257,6 +3853,7 @@ class $$RadiosTableTableManager
                     if (channelsRefs) db.channels,
                     if (messagesRefs) db.messages,
                     if (threadStatesRefs) db.threadStates,
+                    if (discoveredRefs) db.discovered,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -3341,6 +3938,26 @@ class $$RadiosTableTableManager
                           referencedColumn: 'radio_key',
                           typedResults: items,
                         ),
+                      if (discoveredRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Radio,
+                          $RadiosTable,
+                          DiscoveredData,
+                          $DiscoveredTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$RadiosTableReferences
+                              ._discoveredRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$RadiosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).discoveredRefs,
+                          currentColumn: 'public_key',
+                          referencedColumn: 'radio_key',
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -3366,6 +3983,7 @@ typedef $$RadiosTableProcessedTableManager =
         bool channelsRefs,
         bool messagesRefs,
         bool threadStatesRefs,
+        bool discoveredRefs,
       })
     >;
 typedef $$ContactsTableCreateCompanionBuilder = ContactsCompanion Function({
@@ -5049,6 +5667,378 @@ typedef $$ThreadStatesTableProcessedTableManager =
       ThreadState,
       PrefetchHooks Function({bool radioKey})
     >;
+typedef $$DiscoveredTableCreateCompanionBuilder = DiscoveredCompanion Function({
+  required String radioKey,
+  required String publicKey,
+  required String name,
+  required int type,
+  Value<double?> latitude,
+  Value<double?> longitude,
+  required int lastAdvert,
+  required int heardAt,
+  Value<int> rowid,
+});
+typedef $$DiscoveredTableUpdateCompanionBuilder = DiscoveredCompanion Function({
+  Value<String> radioKey,
+  Value<String> publicKey,
+  Value<String> name,
+  Value<int> type,
+  Value<double?> latitude,
+  Value<double?> longitude,
+  Value<int> lastAdvert,
+  Value<int> heardAt,
+  Value<int> rowid,
+});
+
+final class $$DiscoveredTableReferences
+    extends BaseReferences<_$MeshDatabase, $DiscoveredTable, DiscoveredData> {
+  $$DiscoveredTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $RadiosTable _radioKeyTable(_$MeshDatabase db) =>
+      db.radios.createAlias('discovered__radio_key__radios__public_key');
+
+  $$RadiosTableProcessedTableManager get radioKey {
+    final $_column = $_itemColumn<String>('radio_key')!;
+
+    final manager = $$RadiosTableTableManager(
+      $_db,
+      $_db.radios,
+    ).filter((f) => f.publicKey.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_radioKeyTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$DiscoveredTableFilterComposer
+    extends Composer<_$MeshDatabase, $DiscoveredTable> {
+  $$DiscoveredTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get publicKey => $composableBuilder(
+    column: $table.publicKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get latitude => $composableBuilder(
+    column: $table.latitude,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get longitude => $composableBuilder(
+    column: $table.longitude,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lastAdvert => $composableBuilder(
+    column: $table.lastAdvert,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get heardAt => $composableBuilder(
+    column: $table.heardAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$RadiosTableFilterComposer get radioKey {
+    final $$RadiosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.radioKey,
+      referencedTable: $db.radios,
+      getReferencedColumn: (t) => t.publicKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RadiosTableFilterComposer(
+            $db: $db,
+            $table: $db.radios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DiscoveredTableOrderingComposer
+    extends Composer<_$MeshDatabase, $DiscoveredTable> {
+  $$DiscoveredTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get publicKey => $composableBuilder(
+    column: $table.publicKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get latitude => $composableBuilder(
+    column: $table.latitude,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get longitude => $composableBuilder(
+    column: $table.longitude,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lastAdvert => $composableBuilder(
+    column: $table.lastAdvert,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get heardAt => $composableBuilder(
+    column: $table.heardAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$RadiosTableOrderingComposer get radioKey {
+    final $$RadiosTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.radioKey,
+      referencedTable: $db.radios,
+      getReferencedColumn: (t) => t.publicKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RadiosTableOrderingComposer(
+            $db: $db,
+            $table: $db.radios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DiscoveredTableAnnotationComposer
+    extends Composer<_$MeshDatabase, $DiscoveredTable> {
+  $$DiscoveredTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get publicKey =>
+      $composableBuilder(column: $table.publicKey, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<double> get latitude =>
+      $composableBuilder(column: $table.latitude, builder: (column) => column);
+
+  GeneratedColumn<double> get longitude =>
+      $composableBuilder(column: $table.longitude, builder: (column) => column);
+
+  GeneratedColumn<int> get lastAdvert => $composableBuilder(
+    column: $table.lastAdvert,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get heardAt =>
+      $composableBuilder(column: $table.heardAt, builder: (column) => column);
+
+  $$RadiosTableAnnotationComposer get radioKey {
+    final $$RadiosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.radioKey,
+      referencedTable: $db.radios,
+      getReferencedColumn: (t) => t.publicKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RadiosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.radios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DiscoveredTableTableManager
+    extends
+        RootTableManager<
+          _$MeshDatabase,
+          $DiscoveredTable,
+          DiscoveredData,
+          $$DiscoveredTableFilterComposer,
+          $$DiscoveredTableOrderingComposer,
+          $$DiscoveredTableAnnotationComposer,
+          $$DiscoveredTableCreateCompanionBuilder,
+          $$DiscoveredTableUpdateCompanionBuilder,
+          (DiscoveredData, $$DiscoveredTableReferences),
+          DiscoveredData,
+          PrefetchHooks Function({bool radioKey})
+        > {
+  $$DiscoveredTableTableManager(_$MeshDatabase db, $DiscoveredTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DiscoveredTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DiscoveredTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DiscoveredTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> radioKey = const Value.absent(),
+                Value<String> publicKey = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> type = const Value.absent(),
+                Value<double?> latitude = const Value.absent(),
+                Value<double?> longitude = const Value.absent(),
+                Value<int> lastAdvert = const Value.absent(),
+                Value<int> heardAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DiscoveredCompanion(
+                radioKey: radioKey,
+                publicKey: publicKey,
+                name: name,
+                type: type,
+                latitude: latitude,
+                longitude: longitude,
+                lastAdvert: lastAdvert,
+                heardAt: heardAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String radioKey,
+                required String publicKey,
+                required String name,
+                required int type,
+                Value<double?> latitude = const Value.absent(),
+                Value<double?> longitude = const Value.absent(),
+                required int lastAdvert,
+                required int heardAt,
+                Value<int> rowid = const Value.absent(),
+              }) => DiscoveredCompanion.insert(
+                radioKey: radioKey,
+                publicKey: publicKey,
+                name: name,
+                type: type,
+                latitude: latitude,
+                longitude: longitude,
+                lastAdvert: lastAdvert,
+                heardAt: heardAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DiscoveredTable, DiscoveredData>(table),
+                  $$DiscoveredTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({radioKey = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (radioKey) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.radioKey,
+                        referencedTable: $$DiscoveredTableReferences
+                            ._radioKeyTable(db),
+                        referencedColumn: $$DiscoveredTableReferences
+                            ._radioKeyTable(db)
+                            .publicKey,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$DiscoveredTableProcessedTableManager =
+    ProcessedTableManager<
+      _$MeshDatabase,
+      $DiscoveredTable,
+      DiscoveredData,
+      $$DiscoveredTableFilterComposer,
+      $$DiscoveredTableOrderingComposer,
+      $$DiscoveredTableAnnotationComposer,
+      $$DiscoveredTableCreateCompanionBuilder,
+      $$DiscoveredTableUpdateCompanionBuilder,
+      (DiscoveredData, $$DiscoveredTableReferences),
+      DiscoveredData,
+      PrefetchHooks Function({bool radioKey})
+    >;
 
 class $MeshDatabaseManager {
   final _$MeshDatabase _db;
@@ -5065,4 +6055,6 @@ class $MeshDatabaseManager {
       $$SettingsTableTableManager(_db, _db.settings);
   $$ThreadStatesTableTableManager get threadStates =>
       $$ThreadStatesTableTableManager(_db, _db.threadStates);
+  $$DiscoveredTableTableManager get discovered =>
+      $$DiscoveredTableTableManager(_db, _db.discovered);
 }

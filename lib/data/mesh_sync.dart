@@ -361,7 +361,9 @@ class MeshSync {
         final stored = await _store.saveIncoming(key, event as ReplyFrame);
         if (stored != null && !_incoming.isClosed) _incoming.add(stored);
       case NewAdvert(:final contact):
-        await _store.saveContact(key, contact);
+        // The radio only sends this for nodes it did NOT add, so it belongs
+        // in "heard nearby", not in the contact list.
+        await _store.saveDiscovered(key, contact);
       case ContactDeleted(:final publicKey):
         await _store.removeContact(key, publicKey);
       case SendConfirmed(:final ackCode):
