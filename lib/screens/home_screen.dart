@@ -8,6 +8,8 @@ import 'connection_log_screen.dart';
 import 'area_screen.dart';
 import 'conversation_screen.dart';
 import 'manage_actions.dart';
+import 'map_tab.dart';
+import 'node_details.dart';
 import 'radio_settings_screen.dart';
 
 /// A radio's chats and contacts. While the radio is being reconnected a
@@ -80,25 +82,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Expanded(
             child: switch (_tab) {
               0 => _ChatsTab(radioKey: key),
-              _ => _ContactsTab(radioKey: key),
+              1 => _ContactsTab(radioKey: key),
+              _ => MapTab(radioKey: key),
             },
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: _tab == 0 ? 'Add a channel' : 'Add or share contacts',
-        onPressed: () => _tab == 0
-            ? showAddChannel(context, ref)
-            : showContactsMenu(
-                context,
-                ref,
-                radioName: widget.radioName,
-                radioKey: widget.radioKey,
+      floatingActionButton: _tab == 2
+          ? null
+          : FloatingActionButton(
+              tooltip: _tab == 0 ? 'Add a channel' : 'Add or share contacts',
+              onPressed: () => _tab == 0
+                  ? showAddChannel(context, ref)
+                  : showContactsMenu(
+                      context,
+                      ref,
+                      radioName: widget.radioName,
+                      radioKey: widget.radioKey,
+                    ),
+              child: Icon(
+                _tab == 0 ? Icons.add_comment_outlined : Icons.person_add_alt,
               ),
-        child: Icon(
-          _tab == 0 ? Icons.add_comment_outlined : Icons.person_add_alt,
-        ),
-      ),
+            ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tab,
         onDestinationSelected: (i) => setState(() => _tab = i),
@@ -118,6 +123,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             icon: Icon(Icons.people_outline),
             selectedIcon: Icon(Icons.people),
             label: 'Contacts',
+          ),
+          const NavigationDestination(
+            icon: Icon(Icons.map_outlined),
+            selectedIcon: Icon(Icons.map),
+            label: 'Map',
           ),
         ],
       ),
@@ -322,16 +332,26 @@ class _ContactsTab extends ConsumerWidget {
             leading: CircleAvatar(child: Icon(_icon(contact.type))),
             title: Text(contact.name),
             subtitle: Text(_describe(contact)),
-            trailing: contact.flags & 1 == 1
-                ? const Icon(Icons.star, semanticLabel: 'Favourite')
-                : null,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (contact.flags & 1 == 1)
+                  const Icon(Icons.star, semanticLabel: 'Favourite'),
+                IconButton(
+                  tooltip: 'Details for ${contact.name}',
+                  icon: const Icon(Icons.info_outline),
+                  onPressed: () =>
+                      showNodeDetails(context, ref, nodeFromContact(contact)),
+                ),
+              ],
+            ),
             onTap: NodeType.fromByte(contact.type) == NodeType.chat
                 ? () => _openThread(
                     context,
                     thread: Threads.direct(contact.publicKey),
                     title: contact.name,
                   )
-                : null,
+                : () => showNodeDetails(context, ref, nodeFromContact(contact)),
             onLongPress: () =>
                 showContactActions(context, ref, contact: contact),
           ),

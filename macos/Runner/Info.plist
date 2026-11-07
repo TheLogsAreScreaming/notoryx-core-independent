@@ -28,6 +28,8 @@
 	<string>NOTORYX Independent uses the camera to scan contact and channel QR codes.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>$(PRODUCT_COPYRIGHT)</string>
+	<key>NSLocationUsageDescription</key>
+	<string>NOTORYX Independent shows where you are on the map.</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

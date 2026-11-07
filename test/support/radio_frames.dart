@@ -69,20 +69,27 @@ List<int> deviceInfoFrame({int versionCode = 14, int maxChannels = 8}) => [
   0,
 ];
 
-List<int> contactFrame(String name, {int keyByte = 1, int lastModified = 1}) =>
-    [
-      ResponseCode.contact,
-      ...List.filled(32, keyByte),
-      NodeType.chat.value,
-      0,
-      pathUnknown,
-      ...List.filled(64, 0),
-      ...padded(name, 32),
-      ...u32(0),
-      ...u32(0),
-      ...u32(0),
-      ...u32(lastModified),
-    ];
+List<int> contactFrame(
+  String name, {
+  int keyByte = 1,
+  int lastModified = 1,
+  NodeType type = NodeType.chat,
+  double? latitude,
+  double? longitude,
+  int lastAdvert = 0,
+}) => [
+  ResponseCode.contact,
+  ...List.filled(32, keyByte),
+  type.value,
+  0,
+  pathUnknown,
+  ...List.filled(64, 0),
+  ...padded(name, 32),
+  ...u32(lastAdvert),
+  ...i32(((latitude ?? 0) * 1e6).round()),
+  ...i32(((longitude ?? 0) * 1e6).round()),
+  ...u32(lastModified),
+];
 
 List<int> channelInfoFrame(int index, String name) => [
   ResponseCode.channelInfo,
