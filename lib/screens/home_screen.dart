@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/connection.dart';
+import '../app/quick_messages.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
 import 'connection_log_screen.dart';
@@ -191,6 +192,7 @@ class _ChatsTab extends ConsumerWidget {
     final names = {for (final c in contacts) c.publicKey: c.name};
     final unread = ref.watch(unreadCountsProvider(radioKey)).value ?? const {};
     final muted = ref.watch(mutedThreadsProvider(radioKey)).value ?? const {};
+    final drafts = ref.watch(draftsProvider(radioKey)).value ?? const {};
     final direct = latest.where((m) => m.kind == MessageKind.direct).toList();
 
     if (channels.isEmpty && direct.isEmpty) {
@@ -204,6 +206,7 @@ class _ChatsTab extends ConsumerWidget {
             title: channel.name,
             latest: byThread[Threads.channel(channel.slot)],
             unread: unread[Threads.channel(channel.slot)] ?? 0,
+            draft: drafts[Threads.channel(channel.slot)],
             muted: muted.contains(Threads.channel(channel.slot)),
             onLongPress: () => showChannelActions(
               context,
@@ -225,6 +228,7 @@ class _ChatsTab extends ConsumerWidget {
             title: _directTitle(message.thread, names),
             latest: message,
             unread: unread[message.thread] ?? 0,
+            draft: drafts[message.thread],
             muted: muted.contains(message.thread),
             onLongPress: () => _toggleMute(context, ref, message.thread),
             onTap: () => _openThread(
@@ -276,8 +280,12 @@ class _ThreadTile extends StatelessWidget {
     required this.onTap,
     this.unread = 0,
     this.muted = false,
+    this.draft,
     this.onLongPress,
   });
+
+  /// Unsent text left in this chat, shown instead of the last message.
+  final String? draft;
 
   final IconData icon;
   final String title;
@@ -303,7 +311,24 @@ class _ThreadTile extends StatelessWidget {
         title,
         style: unread > 0 ? const TextStyle(fontWeight: FontWeight.w700) : null,
       ),
-      subtitle: preview == null
+      subtitle: draft != null
+          ? Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: 'Draft: ',
+                    style: TextStyle(
+                      color: scheme.error,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  TextSpan(text: draft),
+                ],
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            )
+          : preview == null
           ? null
           : Text(preview, maxLines: 1, overflow: TextOverflow.ellipsis),
       trailing: Row(
