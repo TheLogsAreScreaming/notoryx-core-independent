@@ -423,7 +423,9 @@ void main() {
     await cleanUp(tester);
   });
 
-  testWidgets('share my contact copies a link', (tester) async {
+  testWidgets('share my contact shows a QR code and copies the link', (
+    tester,
+  ) async {
     String? copied;
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
       SystemChannels.platform,
@@ -440,6 +442,9 @@ void main() {
     await tester.tap(find.byTooltip('Add or share contacts'));
     await settle(tester);
     await tester.tap(find.text('Share my contact'));
+    await settle(tester);
+    expect(find.bySemanticsLabel('QR code for My contact'), findsOneWidget);
+    await tester.tap(find.text('Copy link'));
     await settle(tester);
     final parsed = MeshLink.parse(copied!) as ContactLink;
     expect(parsed.name, 'Base');
