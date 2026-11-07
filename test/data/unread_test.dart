@@ -8,6 +8,7 @@ import 'package:notoryx_core/data/data.dart';
 import 'package:notoryx_core/radio/radio.dart';
 
 import '../support/radio_frames.dart';
+import '../support/schema_rollback.dart';
 
 ChannelMessage _channel(String text, int ts, {int slot = 0}) => decodeFrame(
   channelMessageFrame(text, channel: slot)..replaceRange(7, 11, u32(ts)),
@@ -93,8 +94,7 @@ void main() {
     final self = decodeFrame(selfInfoFrame()) as SelfInfo;
     await store3.rememberRadio(self);
     await store3.saveIncoming(self.publicKey.hex, _channel('A: old', 1));
-    await db3.customStatement('DROP TABLE thread_states');
-    await db3.customStatement('PRAGMA user_version = 3');
+    await rollBackTo(db3, 3);
     await db3.close();
 
     db3 = MeshDatabase(NativeDatabase(file));
@@ -124,8 +124,7 @@ void main() {
         contacts: [],
         newestModified: 99,
       ));
-      await db4.customStatement('DROP TABLE discovered');
-      await db4.customStatement('PRAGMA user_version = 4');
+      await rollBackTo(db4, 4);
       await db4.close();
 
       db4 = MeshDatabase(NativeDatabase(file));
