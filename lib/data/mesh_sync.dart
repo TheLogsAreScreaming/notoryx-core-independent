@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import '../radio/radio.dart';
 import 'database.dart';
@@ -26,6 +27,14 @@ final class RetryPolicy {
 
   /// Added to the radio's own estimate, for slow repeaters.
   final Duration extraWait;
+}
+
+/// Every channel slot on the radio is in use.
+final class ChannelsFull implements Exception {
+  const ChannelsFull();
+
+  @override
+  String toString() => 'Every channel slot on the radio is in use.';
 }
 
 /// Most text the firmware takes in one direct message, in UTF-8 bytes.
@@ -283,6 +292,126 @@ class MeshSync {
         'longer than $maxDirectTextBytes bytes',
       );
     }
+  }
+
+  // Channels
+
+  /// Number of channel slots on the radio.
+  int get channelSlots => _radio?.device.maxChannels ?? 8;
+
+  /// Puts a channel in the first free slot and returns the slot. If a
+  /// channel with the same key is already there, returns its slot instead.
+  /// Throws [ChannelsFull] when every slot is taken.
+  Future<int> addChannel(String name, List<int> secret) async {
+    final key = _requireKey();
+    final channels = await _store.watchChannels(key).first;
+    for (final c in channels) {
+      if (_sameBytes(c.secret, secret)) return c.slot;
+    }
+    final used = {for (final c in channels) c.slot};
+    final slot = Iterable<int>.generate(channelSlots)
+        .where((i) => !used.contains(i))
+        .firstOrNull;
+    if (slot == null) throw const ChannelsFull();
+    await _writeChannel(slot, name, secret);
+    return slot;
+  }
+
+  /// Renames the channel in [slot], keeping its key.
+  Future<void> renameChannel(int slot, String name) async {
+    final key = _requireKey();
+    final channel = (await _store.watchChannels(key).first)
+        .where((c) => c.slot == slot)
+        .firstOrNull;
+    if (channel == null) return;
+    await _writeChannel(slot, name, channel.secret);
+  }
+
+  /// Empties [slot]. Its messages stay on this device.
+  Future<void> leaveChannel(int slot) => _writeChannel(slot, '', Uint8List(16));
+
+  Future<void> _writeChannel(int slot, String name, List<int> secret) async {
+    final key = _requireKey();
+    await _session.run(SetChannel(index: slot, name: name, secret: secret));
+    await _store.saveChannels(key, await _session.fetchChannels(channelSlots));
+  }
+
+  // Contacts
+
+  /// Adds a node to the radio's contacts, for example from a shared link or
+  /// from "heard nearby".
+  Future<void> addContact({
+    required PublicKey publicKey,
+    required String name,
+    required NodeType type,
+    double? latitude,
+    double? longitude,
+    int lastAdvert = 0,
+  }) async {
+    final key = _requireKey();
+    await _session.run(
+      AddOrUpdateContact(
+        RadioContact(
+          publicKey: publicKey,
+          type: type,
+          flags: 0,
+          outPathLength: pathUnknown,
+          outPath: const [],
+          name: name,
+          lastAdvert: lastAdvert,
+          latitude: latitude,
+          longitude: longitude,
+          lastModified: _seconds(null),
+        ),
+      ),
+    );
+    await _store.removeDiscovered(key, publicKey.hex);
+    await _syncContacts();
+  }
+
+  Future<void> removeContact(PublicKey publicKey) async {
+    final key = _requireKey();
+    await _session.run(RemoveContact(publicKey));
+    await _store.removeContact(key, publicKey);
+  }
+
+  /// Marks a contact as a favourite (or not), on the radio.
+  Future<void> setFavourite(PublicKey publicKey, bool favourite) async {
+    final key = _requireKey();
+    final row = await _store.contact(key, publicKey.hex);
+    if (row == null) return;
+    final flags = favourite ? row.flags | 1 : row.flags & ~1;
+    await _session.run(
+      AddOrUpdateContact(
+        RadioContact(
+          publicKey: publicKey,
+          type: NodeType.fromByte(row.type),
+          flags: flags,
+          outPathLength: row.outPathLength,
+          outPath: row.outPath,
+          name: row.name,
+          lastAdvert: row.lastAdvert,
+          latitude: row.latitude,
+          longitude: row.longitude,
+          // A fresh time, so the next contact sync picks the change up.
+          lastModified: _seconds(null),
+        ),
+      ),
+    );
+    await _syncContacts();
+  }
+
+  /// Sends this radio's advert so others can find it: to neighbours only,
+  /// or flooded across the mesh.
+  Future<void> sendAdvert({bool flood = false}) =>
+      _session.run(SendSelfAdvert(flood: flood));
+
+  static bool _sameBytes(List<int> a, List<int> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
   }
 
   /// Sends to a channel slot and stores it. Channel messages have no ack, so
