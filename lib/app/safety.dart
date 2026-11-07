@@ -256,9 +256,9 @@ class Safety extends AsyncNotifier<SafetyState> {
   }
 }
 
-String _where(LatLng? p) => p == null
-    ? 'Position unknown.'
-    : 'Position ${p.latitude.toStringAsFixed(5)},'
+String _where(LatLng? p, {String lead = 'Position'}) => p == null
+    ? '$lead unknown.'
+    : '$lead ${p.latitude.toStringAsFixed(5)},'
           '${p.longitude.toStringAsFixed(5)}';
 
 /// The SOS message.
@@ -273,7 +273,7 @@ String missedText(LatLng? p, {DateTime? due}) {
       ? ''
       : ' (due ${due.hour.toString().padLeft(2, '0')}:'
             '${due.minute.toString().padLeft(2, '0')})';
-  return 'Missed check-in$when. No reply from me. Last ${_where(p)}';
+  return 'Missed check-in$when. No reply from me. ${_where(p, lead: 'Last known position')}';
 }
 
 /// Notification id for the check-in reminder, kept apart from message ids.
