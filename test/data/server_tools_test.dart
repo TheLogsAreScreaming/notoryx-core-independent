@@ -58,6 +58,26 @@ void main() {
     expect(await sync.login(repeater, 'nope'), isA<LoginNoReply>());
   });
 
+  test('a trace comes back with each hop\'s signal', () async {
+    final trace = await sync.trace([
+      [0x11],
+      [0x42],
+      [0x11],
+    ], hashBytes: 1);
+    expect(radio.traces.single.sublist(9), [0, 0x11, 0x42, 0x11]);
+    expect(trace?.hashes, [0x11, 0x42, 0x11]);
+    expect(trace?.snrs, [-5, -2.5, 0]);
+    expect(trace?.finalSnr, 6);
+
+    radio.traceReturns = false;
+    expect(
+      await sync.trace([
+        [0x11],
+      ], hashBytes: 1),
+      isNull,
+    );
+  });
+
   test('status comes back parsed', () async {
     final status = await sync.requestStatus(repeater);
     expect(status?.batteryMillivolts, 4100);

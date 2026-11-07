@@ -493,3 +493,44 @@ final class SetAutoAddConfig extends RadioCommand {
       ..u8(config.maxHops.clamp(0, 64));
   }
 }
+
+/// Sends a trace along [hops], a list of node hashes each [hashBytes] long
+/// (1, 2 or 4). Each node on the list records how well it heard the trace
+/// and passes it on; whoever hears the last one gets a trace data push
+/// carrying [tag].
+final class SendTracePath extends RadioCommand {
+  SendTracePath({
+    required this.tag,
+    required this.hops,
+    required this.hashBytes,
+    this.authCode = 0,
+  }) {
+    if (!const [1, 2, 4].contains(hashBytes)) {
+      throw ArgumentError.value(hashBytes, 'hashBytes', 'must be 1, 2 or 4');
+    }
+    if (hops.isEmpty || hops.any((h) => h.length != hashBytes)) {
+      throw ArgumentError.value(hops, 'hops');
+    }
+  }
+
+  final int tag;
+  final int authCode;
+  final List<List<int>> hops;
+  final int hashBytes;
+
+  @override
+  void _write(FrameWriter out) {
+    out
+      ..u8(CommandCode.sendTracePath)
+      ..u32(tag)
+      ..u32(authCode)
+      ..u8(switch (hashBytes) {
+        1 => 0,
+        2 => 1,
+        _ => 2,
+      });
+    for (final hop in hops) {
+      out.bytes(hop);
+    }
+  }
+}

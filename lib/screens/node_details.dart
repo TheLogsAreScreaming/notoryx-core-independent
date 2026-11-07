@@ -8,6 +8,7 @@ import '../radio/radio.dart';
 import 'conversation_screen.dart';
 import 'manage_actions.dart';
 import 'server_screen.dart';
+import 'trace_screen.dart';
 
 /// What the app knows about one node, whether it's a contact or only heard
 /// nearby. Built from either kind of row.
@@ -192,6 +193,31 @@ Future<void> showNodeDetails(
                           .firstOrNull;
                       if (row != null && context.mounted) {
                         await addDiscovered(context, ref, row);
+                      }
+                    },
+                  ),
+                if (node.isContact &&
+                    node.outPathLength != null &&
+                    node.outPathLength != pathUnknown &&
+                    (node.outPathLength! & 0x3F > 0 ||
+                        node.type == NodeType.repeater ||
+                        node.type == NodeType.room))
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.route),
+                    label: const Text('Trace route'),
+                    onPressed: () async {
+                      Navigator.pop(sheet);
+                      final key = ref.read(radioKeyProvider);
+                      if (key == null) return;
+                      final row = await ref
+                          .read(storeProvider)
+                          .contact(key, node.publicKey);
+                      if (row != null && context.mounted) {
+                        await Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => TraceScreen(contact: row),
+                          ),
+                        );
                       }
                     },
                   ),

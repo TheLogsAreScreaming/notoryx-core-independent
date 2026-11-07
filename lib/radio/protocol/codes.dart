@@ -28,6 +28,7 @@ abstract final class CommandCode {
   static const logout = 29;
   static const getChannel = 31;
   static const setChannel = 32;
+  static const sendTracePath = 36;
   static const setOtherParams = 38;
   static const setAutoAddConfig = 58;
   static const getAutoAddConfig = 59;
@@ -66,6 +67,7 @@ abstract final class PushCode {
   static const loginFail = 0x86;
   static const statusResponse = 0x87;
   static const rxLog = 0x88;
+  static const traceData = 0x89;
   static const newAdvert = 0x8A;
   static const contactDeleted = 0x8F;
   static const contactsFull = 0x90;
