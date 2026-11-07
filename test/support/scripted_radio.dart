@@ -106,6 +106,7 @@ class ScriptedRadio {
     CommandCode.reboot => _reboot(),
     CommandCode.sendLogin => _login(frame),
     CommandCode.sendStatusRequest => _status(frame),
+    CommandCode.sendTracePath => _trace(frame),
     _ => [],
   };
 
@@ -187,6 +188,32 @@ class ScriptedRadio {
       [ResponseCode.sent, 0, ...u32(0xB0), ...u32(1000)],
       if (server != null)
         [PushCode.statusResponse, 0, ...frame.sublist(1, 7), ...server.status],
+    ];
+  }
+
+  /// Whether traces come back. Each hop reports 2.5 dB more than the last,
+  /// starting at -5 dB, and this radio hears the last hop at 6 dB.
+  bool traceReturns = true;
+  final traces = <List<int>>[];
+
+  List<List<int>> _trace(List<int> frame) {
+    traces.add(frame);
+    final flags = frame[9];
+    final hashes = frame.sublist(10);
+    final hops = hashes.length >> (flags & 3);
+    return [
+      [ResponseCode.sent, 0, ...frame.sublist(1, 5), ...u32(500)],
+      if (traceReturns)
+        [
+          PushCode.traceData,
+          0,
+          hashes.length,
+          flags,
+          ...frame.sublist(1, 9),
+          ...hashes,
+          for (var i = 0; i < hops; i++) (-20 + 10 * i) & 0xFF,
+          24,
+        ],
     ];
   }
 

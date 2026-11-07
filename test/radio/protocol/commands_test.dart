@@ -18,6 +18,36 @@ void main() {
     );
   });
 
+  test('trace path: tag, auth, hash size, then the hops', () {
+    expect(
+      _hex(
+        SendTracePath(
+          tag: 0x01020304,
+          hashBytes: 2,
+          hops: const [
+            [0xaa, 0xbb],
+            [0xcc, 0xdd],
+          ],
+        ),
+      ),
+      '24'
+      '04030201'
+      '00000000'
+      '01'
+      'aabbccdd',
+    );
+    expect(
+      () => SendTracePath(
+        tag: 1,
+        hashBytes: 3,
+        hops: const [
+          [1, 2, 3],
+        ],
+      ),
+      throwsArgumentError,
+    );
+  });
+
   test('device query carries the protocol version', () {
     expect(_hex(const DeviceQuery()), '1603');
   });

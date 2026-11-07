@@ -535,6 +535,27 @@ class MeshSync {
     }
   }
 
+  /// Sends a trace along [hops] and waits for it to come back. Null if it
+  /// doesn't return in time, which usually means a hop is out of reach.
+  Future<TraceData?> trace(
+    List<List<int>> hops, {
+    required int hashBytes,
+  }) async {
+    final tag = math.Random().nextInt(0x7FFFFFFF) + 1;
+    final reply = _session.pushes
+        .where((p) => p is TraceData && p.tag == tag)
+        .first;
+    reply.ignore();
+    final sent = await _session.request<SentReply>(
+      SendTracePath(tag: tag, hops: hops, hashBytes: hashBytes),
+    );
+    try {
+      return await reply.timeout(_replyWait(sent)) as TraceData;
+    } on TimeoutException {
+      return null;
+    }
+  }
+
   Future<void> logout(PublicKey server) => _session.run(Logout(server));
 
   /// Asks a repeater or room server for its status. Null if it doesn't

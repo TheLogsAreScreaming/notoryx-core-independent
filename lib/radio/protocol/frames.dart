@@ -353,6 +353,28 @@ final class StatusResponse extends PushFrame {
   final Uint8List data;
 }
 
+/// A trace came back. [snrs] has one entry per hop: how well that hop
+/// heard the trace. [finalSnr] is how well this radio heard the last hop.
+final class TraceData extends PushFrame {
+  TraceData({
+    required this.tag,
+    required this.authCode,
+    required this.hashBytes,
+    required List<int> hashes,
+    required this.snrs,
+    required this.finalSnr,
+  }) : hashes = Uint8List.fromList(hashes);
+
+  final int tag;
+  final int authCode;
+
+  /// Bytes in each hop's hash.
+  final int hashBytes;
+  final Uint8List hashes;
+  final List<double> snrs;
+  final double finalSnr;
+}
+
 /// A raw packet the radio heard, for packet logs.
 final class RxLog extends PushFrame {
   RxLog({required this.snr, required this.rssi, required List<int> packet})
@@ -457,6 +479,7 @@ RadioFrame decodeFrame(List<int> frame) {
         rssi: r.i8(),
         packet: r.restBytes(),
       ),
+      PushCode.traceData => _traceData(r),
       PushCode.contactDeleted => ContactDeleted(
         PublicKey(r.bytes(publicKeySize)),
       ),
@@ -591,6 +614,25 @@ ChannelData _channelData(FrameReader r) {
     dataType: dataType,
     payload: r.bytes(length),
     snr: snr,
+  );
+}
+
+TraceData _traceData(FrameReader r) {
+  r.skip(1); // reserved
+  final pathLength = r.u8();
+  final flags = r.u8();
+  final tag = r.u32();
+  final auth = r.u32();
+  final hashes = r.bytes(pathLength);
+  final hashBytes = 1 << (flags & 0x03);
+  final snrs = [for (var i = 0; i < pathLength ~/ hashBytes; i++) r.i8() / 4];
+  return TraceData(
+    tag: tag,
+    authCode: auth,
+    hashBytes: hashBytes,
+    hashes: hashes,
+    snrs: snrs,
+    finalSnr: r.i8() / 4,
   );
 }
 

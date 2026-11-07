@@ -453,4 +453,20 @@ void main() {
     ]) as AutoAddConfigReply;
     expect((reply.flags, reply.maxHops), (0x16, 4));
   });
+
+  test('trace data: hashes, one SNR per hop, then the final SNR', () {
+    final frame = decodeFrame([
+      PushCode.traceData, 0, 4, 1, // reserved, 4 hash bytes, 2-byte hashes
+      4, 3, 2, 1, 0, 0, 0, 0, // tag, auth
+      0xaa, 0xbb, 0xcc, 0xdd,
+      0xEC, 8, // -5 dB, 2 dB
+      24, // 6 dB
+    ]);
+    final trace = frame as TraceData;
+    expect(trace.tag, 0x01020304);
+    expect(trace.hashBytes, 2);
+    expect(trace.hashes, [0xaa, 0xbb, 0xcc, 0xdd]);
+    expect(trace.snrs, [-5, 2]);
+    expect(trace.finalSnr, 6);
+  });
 }
