@@ -498,6 +498,31 @@ class MeshStore {
           ?.muted ??
       false;
 
+  /// Chat messages containing [query] (case-insensitive), newest first.
+  /// Console text is left out.
+  Future<List<Message>> searchMessages(
+    String radioKey,
+    String query, {
+    int limit = 100,
+  }) {
+    final words = query.trim();
+    if (words.isEmpty) return Future.value(const []);
+    // Escape LIKE wildcards so "50%" matches literally.
+    final pattern =
+        '%${words.replaceAll(r'\', r'\\').replaceAll('%', r'\%').replaceAll('_', r'\_')}%';
+    return (_db.select(_db.messages)
+          ..where(
+            (m) =>
+                m.radioKey.equals(radioKey) &
+                m.textType.equals(TextType.cliData.value).not() &
+                (m.body.like(pattern, escapeChar: r'\') |
+                    m.senderName.like(pattern, escapeChar: r'\')),
+          )
+          ..orderBy([(m) => OrderingTerm.desc(m.id)])
+          ..limit(limit))
+        .get();
+  }
+
   /// A conversation as it is now, oldest first.
   Future<List<Message>> threadSnapshot(
     String radioKey,

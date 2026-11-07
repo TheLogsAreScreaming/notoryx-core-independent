@@ -11,6 +11,7 @@ import 'manage_actions.dart';
 import 'map_tab.dart';
 import 'node_details.dart';
 import 'radio_settings_screen.dart';
+import 'search_screen.dart';
 import 'server_screen.dart';
 
 /// A radio's chats and contacts. While the radio is being reconnected a
@@ -51,6 +52,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         title: Text(widget.radioName),
         actions: [
+          IconButton(
+            tooltip: 'Search messages',
+            icon: const Icon(Icons.search),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => SearchScreen(radioKey: widget.radioKey),
+              ),
+            ),
+          ),
           const ConnectionLogButton(),
           IconButton(
             tooltip: 'Local mesh settings',

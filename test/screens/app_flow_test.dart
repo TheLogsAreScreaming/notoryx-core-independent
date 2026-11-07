@@ -490,6 +490,26 @@ void main() {
     await cleanUp(tester);
   });
 
+  testWidgets('search finds a message and opens its chat', (tester) async {
+    await connect(tester);
+    radio.queue.add(channelMessageFrame('Ridge: summit at noon', channel: 1));
+    link.emit([PushCode.messagesWaiting]);
+    await settle(tester);
+
+    await tester.tap(find.byTooltip('Search messages'));
+    await settle(tester);
+    await tester.enterText(find.byType(TextField), 'summit');
+    await tester.pump(const Duration(milliseconds: 300));
+    await settle(tester);
+    expect(find.text('#trail'), findsOneWidget);
+
+    await tester.tap(find.text('#trail'));
+    await settle(tester);
+    expect(find.widgetWithText(AppBar, '#trail'), findsOneWidget);
+    expect(find.text('summit at noon'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
   testWidgets('a failed connection shows why and stays on the connect screen', (
     tester,
   ) async {
