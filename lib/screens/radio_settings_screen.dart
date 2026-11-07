@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/connection.dart';
 import '../radio/radio.dart';
 import 'area_screen.dart';
+import 'telemetry_screen.dart';
 
 /// Standard LoRa bandwidths the firmware accepts, in kHz.
 const loraBandwidths = [
@@ -307,6 +308,20 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
                   '${battery.usedKb} of ${battery.totalKb} KB used',
                 ),
             ],
+            ListTile(
+              leading: const Icon(Icons.sensors),
+              title: const Text('Battery and sensor history'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => TelemetryScreen(
+                    nodeKey: self.publicKey.hex,
+                    name: self.name,
+                    isSelf: true,
+                  ),
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
               child: OutlinedButton.icon(

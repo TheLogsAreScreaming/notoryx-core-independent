@@ -145,3 +145,20 @@ class Discovered extends Table {
   @override
   Set<Column> get primaryKey => {radioKey, publicKey};
 }
+
+/// Sensor readings received from nodes, and from the connected radio
+/// itself (whose node key is the radio's own key). [data] is the raw
+/// Cayenne LPP block, decoded when shown, so readings a later version
+/// understands better aren't lost.
+@TableIndex(name: 'telemetry_by_node', columns: {#radioKey, #nodeKey, #at})
+class TelemetrySamples extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get radioKey => text().references(Radios, #publicKey)();
+
+  /// The node's public key, hex.
+  TextColumn get nodeKey => text()();
+
+  /// When it arrived, Unix milliseconds.
+  IntColumn get at => integer()();
+  BlobColumn get data => blob()();
+}
