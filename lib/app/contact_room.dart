@@ -49,5 +49,7 @@ String lastHeard(int lastAdvert, DateTime now) {
   if (ago.inDays < 1) return 'heard ${ago.inHours} h ago';
   if (ago.inDays == 1) return 'heard yesterday';
   if (ago.inDays < 60) return 'heard ${ago.inDays} days ago';
+  // A node whose clock was never set reports times near 1970.
+  if (ago.inDays > 730) return 'heard long ago';
   return 'heard ${ago.inDays ~/ 30} months ago';
 }
