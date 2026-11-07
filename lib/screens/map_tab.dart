@@ -5,18 +5,23 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../app/connection.dart';
+import '../app/map_cache.dart';
 import '../radio/radio.dart';
 import 'node_details.dart';
 
-/// The map's base tiles. Tests replace this with nothing so they don't hit
-/// the network.
-final mapTilesProvider = Provider<Widget?>(
-  (ref) => TileLayer(
+/// The map's base tiles, saved as they're viewed so they work offline
+/// later. Tests replace this with nothing so they don't hit the network.
+final mapTilesProvider = Provider<Widget?>((ref) {
+  // Wait for the saved tiles: the first tile layer fixes where they live.
+  final cache = ref.watch(mapCacheProvider).value;
+  if (cache == null) return null;
+  return TileLayer(
     urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     userAgentPackageName: 'com.bastionmesh.notoryx_core',
     maxZoom: 19,
-  ),
-);
+    tileProvider: NetworkTileProvider(cachingProvider: cache),
+  );
+});
 
 /// Finds the phone's own position. Tests replace this.
 final phonePositionProvider = Provider<Future<LatLng?> Function()>(
