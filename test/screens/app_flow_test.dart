@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:notoryx_core/app/connection.dart';
+import 'package:notoryx_core/app/keep_alive.dart';
 import 'package:notoryx_core/app/mesh_links.dart';
 import 'package:notoryx_core/app/notifications.dart';
 import 'package:notoryx_core/app/radio_connector.dart';
@@ -55,6 +56,24 @@ class _FakeConnector implements RadioConnector {
   }
 }
 
+class _FakeBackgroundKeeper implements BackgroundKeeper {
+  final calls = <String>[];
+  bool restricted = false;
+  int requests = 0;
+
+  @override
+  Future<void> start(String text) async => calls.add(text);
+
+  @override
+  Future<void> stop() async => calls.add('stop');
+
+  @override
+  Future<bool> batteryUnrestricted() async => !restricted;
+
+  @override
+  Future<void> requestBatteryUnrestricted() async => requests++;
+}
+
 class _FakeNotifier implements MessageNotifier {
   final shown = <({String title, String body, ChatLink chat})>[];
   void Function(ChatLink chat)? onOpen;
@@ -82,6 +101,7 @@ void main() {
   late _FakeConnector connector;
   late MeshDatabase db;
   late _FakeNotifier notifier;
+  late _FakeBackgroundKeeper keepAlive;
 
   /// Adjusts each scripted radio as it's created.
   void Function(ScriptedRadio radio)? radioSetup;
@@ -97,6 +117,7 @@ void main() {
     });
     db = MeshDatabase.inMemory();
     notifier = _FakeNotifier();
+    keepAlive = _FakeBackgroundKeeper();
     inFront = true;
   });
 
@@ -126,6 +147,7 @@ void main() {
             Duration(milliseconds: 100),
           ]),
           areaPresetsFetchProvider.overrideWithValue(() async => null),
+          keepAliveProvider.overrideWithValue(keepAlive),
         ],
         child: const NotoryxApp(),
       ),
@@ -615,6 +637,39 @@ void main() {
     await settle(tester);
     expect(find.text('Connect a radio'), findsOneWidget);
     expect(connector.opened.length, opens, reason: 'no automatic connect');
+    await cleanUp(tester);
+  });
+
+  testWidgets('the app stays alive in the background while connected', (
+    tester,
+  ) async {
+    await connect(tester);
+    expect(keepAlive.calls, hasLength(1));
+    expect(keepAlive.calls.single, startsWith('Connected to '));
+
+    await tester.tap(find.byTooltip('Disconnect'));
+    await settle(tester);
+    expect(keepAlive.calls.last, 'stop');
+    await cleanUp(tester);
+  });
+
+  testWidgets('asks about the battery saver until told not now', (
+    tester,
+  ) async {
+    keepAlive.restricted = true;
+    await connect(tester);
+    expect(find.textContaining('Battery saver can drop'), findsOneWidget);
+    await tester.tap(find.text('Allow'));
+    await settle(tester);
+    expect(keepAlive.requests, 1);
+
+    await tester.tap(find.text('Not now'));
+    await settle(tester);
+    expect(find.textContaining('Battery saver can drop'), findsNothing);
+    final saved = await tester.runAsync(
+      () => MeshStore(db).setting(batteryPromptDismissedSetting),
+    );
+    expect(saved, isNotNull);
     await cleanUp(tester);
   });
 

@@ -6,6 +6,7 @@ import '../data/data.dart';
 import '../radio/radio.dart';
 import 'connection_log_screen.dart';
 import 'area_screen.dart';
+import 'battery_banner.dart';
 import 'conversation_screen.dart';
 import 'manage_actions.dart';
 import 'map_tab.dart';
@@ -89,6 +90,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: [
           if (connection case Reconnecting(:final attempt, :final error))
             _ReconnectBanner(attempt: attempt, error: error),
+          const BatteryBanner(),
           const AreaBanner(),
           Expanded(
             child: switch (_tab) {

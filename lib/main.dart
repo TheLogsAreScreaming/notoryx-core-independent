@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'app/keep_alive.dart';
 import 'app/connection.dart';
 import 'app/notifications.dart';
 import 'screens/connect_screen.dart';
@@ -81,6 +82,7 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
   @override
   Widget build(BuildContext context) {
     ref.watch(messageAlertsProvider);
+    ref.watch(keepAliveWatcherProvider);
     // Disconnecting closes any open conversation so the connect screen is
     // what's showing. While reconnecting the chats stay open.
     ref.listen(connectionProvider, (previous, next) {
