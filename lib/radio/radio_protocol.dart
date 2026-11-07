@@ -8,4 +8,5 @@ export 'protocol/commands.dart';
 export 'protocol/contact.dart';
 export 'protocol/frames.dart';
 export 'protocol/public_key.dart';
+export 'protocol/server_status.dart';
 export 'protocol/stream_framing.dart';

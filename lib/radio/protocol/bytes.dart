@@ -69,6 +69,13 @@ class FrameReader {
     return value;
   }
 
+  int i16() {
+    _need(2);
+    final value = _view.getInt16(_offset, Endian.little);
+    _offset += 2;
+    return value;
+  }
+
   int u32() {
     _need(4);
     final value = _view.getUint32(_offset, Endian.little);

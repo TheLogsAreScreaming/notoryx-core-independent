@@ -90,6 +90,13 @@ class Messages extends Table {
   IntColumn get pathLength => integer().nullable()();
   RealColumn get snr => real().nullable()();
 
+  /// `TextType.value`: plain chat, or command text exchanged with a
+  /// repeater or room server's console.
+  IntColumn get textType => integer().withDefault(const Constant(0))();
+
+  /// Room posts: the first 4 bytes of the writer's key, in hex.
+  TextColumn get authorPrefix => text().nullable()();
+
   /// Incoming only: identifies a message so a repeat delivery is dropped.
   TextColumn get dedupeKey => text().nullable().unique()();
 }
