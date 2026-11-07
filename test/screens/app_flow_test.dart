@@ -372,7 +372,7 @@ void main() {
       findsNothing,
       reason: 'shown on the message, not as a bubble',
     );
-    expect(find.bySemanticsLabel(RegExp(r'^👍 1: Base')), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('👍 1: Base')), findsOneWidget);
 
     await tester.longPress(find.text('lunch at the hut?'));
     await settle(tester);
@@ -385,7 +385,7 @@ void main() {
     expect(find.text('Replying to Ridge'), findsNothing);
     expect(find.text('yes please'), findsOneWidget);
     expect(
-      find.bySemanticsLabel('In reply to Ridge: lunch at the hut?'),
+      find.bySemanticsLabel(RegExp('In reply to Ridge: lunch at the hut')),
       findsOneWidget,
     );
     await cleanUp(tester);

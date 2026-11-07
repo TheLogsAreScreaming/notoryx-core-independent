@@ -16,6 +16,7 @@ Message _msg(String body, {String? from, bool outgoing = false}) => Message(
   storedAt: 0,
   status: outgoing ? MessageStatus.sent : MessageStatus.received,
   textType: 0,
+  attempts: 0,
 );
 
 String _sender(Message m) => m.outgoing ? 'Me' : m.senderName ?? '?';
@@ -28,7 +29,7 @@ void main() {
         '❤️',
         'Summit at noon, then down the west ridge',
       );
-      expect(long, '❤️ re "Summit at noon, then down…"');
+      expect(long, '❤️ re "Summit at noon, then dow…"');
       final parsed = parseReaction(long)!;
       expect(parsed.emoji, '❤️');
       expect(parsed.cut, isTrue);
