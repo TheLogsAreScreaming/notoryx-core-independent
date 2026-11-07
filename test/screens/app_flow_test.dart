@@ -307,6 +307,50 @@ void main() {
     await cleanUp(tester);
   });
 
+  testWidgets('a quick message sends in one tap, and drafts are kept', (
+    tester,
+  ) async {
+    await connect(tester);
+    await tester.tap(find.text('#trail'));
+    await settle(tester);
+
+    await tester.tap(find.byTooltip('Quick messages'));
+    await settle(tester);
+    await tester.tap(find.text('On my way'));
+    await settle(tester);
+    expect(find.text('On my way'), findsOneWidget, reason: 'the sent bubble');
+
+    // "Change before sending" puts it in the box instead.
+    await tester.tap(find.byTooltip('Quick messages'));
+    await settle(tester);
+    await tester.tap(find.byTooltip('Change before sending').at(2));
+    await settle(tester);
+    final box = find.byType(TextField);
+    expect(tester.widget<TextField>(box).controller!.text, 'Arrived safe');
+
+    // Leaving keeps it as a draft, shown in the chat list.
+    await tester.enterText(box, 'Arrived safe at the hut');
+    await settle(tester);
+    await tester.pageBack();
+    await settle(tester);
+    expect(find.text('Draft: Arrived safe at the hut'), findsOneWidget);
+
+    await tester.tap(find.text('#trail'));
+    await settle(tester);
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller!.text,
+      'Arrived safe at the hut',
+    );
+
+    // Sending clears it.
+    await tester.tap(find.byTooltip('Send'));
+    await settle(tester);
+    await tester.pageBack();
+    await settle(tester);
+    expect(find.textContaining('Draft:'), findsNothing);
+    await cleanUp(tester);
+  });
+
   testWidgets('a message notifies unless its chat is open or muted', (
     tester,
   ) async {

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -6,6 +8,7 @@ import '../app/delivery.dart';
 import '../app/notifications.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
+import 'quick_messages_screen.dart';
 
 /// One direct or channel conversation with a box to reply.
 class ConversationScreen extends ConsumerStatefulWidget {
@@ -29,6 +32,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
   final _text = TextEditingController();
   bool _sending = false;
   late final OpenThread _openThread;
+  late final MeshStore _store;
+
+  /// The radio the draft in the box belongs to, once it has been loaded.
+  String? _draftRadio;
+  Timer? _draftSave;
 
   /// Newest message id already marked read.
   int? _readUpTo;
@@ -38,6 +46,9 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _openThread = ref.read(openThreadProvider.notifier);
+    _store = ref.read(storeProvider);
+    _text.addListener(_draftChanged);
+    unawaited(_loadDraft());
     // After this frame: providers can't change while the tree builds.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _openThread.open(widget.thread);
@@ -50,6 +61,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     // Providers can't change while the tree is being torn down.
     final openThread = _openThread, thread = widget.thread;
     Future(() => openThread.close(thread));
+    _flushDraft();
     _text.dispose();
     super.dispose();
   }
@@ -61,14 +73,58 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     if (state == AppLifecycleState.resumed) _markRead();
   }
 
+  Future<void> _loadDraft() async {
+    final radioKey = ref.read(radioKeyProvider);
+    if (radioKey == null) return;
+    final draft = await _store.draft(radioKey, widget.thread);
+    if (!mounted) return;
+    _draftRadio = radioKey;
+    if (draft != null && _text.text.isEmpty) {
+      _text.value = TextEditingValue(
+        text: draft,
+        selection: TextSelection.collapsed(offset: draft.length),
+      );
+    }
+  }
+
+  /// Saves what's in the box shortly after typing stops.
+  void _draftChanged() {
+    if (_draftRadio == null) return;
+    _draftSave?.cancel();
+    _draftSave = Timer(const Duration(milliseconds: 600), _flushDraft);
+  }
+
+  void _flushDraft() {
+    _draftSave?.cancel();
+    _draftSave = null;
+    final radioKey = _draftRadio;
+    if (radioKey == null) return;
+    unawaited(_store.saveDraft(radioKey, widget.thread, _text.text));
+  }
+
+  Future<void> _pickQuick() async {
+    final pick = await showQuickMessagePicker(context);
+    if (pick == null || !mounted) return;
+    if (pick.edit) {
+      _text.value = TextEditingValue(
+        text: pick.text,
+        selection: TextSelection.collapsed(offset: pick.text.length),
+      );
+    } else {
+      await _send(pick.text);
+    }
+  }
+
   void _markRead() {
     final radioKey = ref.read(radioKeyProvider);
     if (radioKey == null || !ref.read(foregroundCheckProvider)()) return;
     ref.read(storeProvider).markRead(radioKey, widget.thread);
   }
 
-  Future<void> _send() async {
-    final text = _text.text.trim();
+  /// Sends what's in the box, or [quick] (leaving the box as it is).
+  Future<void> _send([String? quick]) async {
+    final typed = quick == null;
+    final text = (quick ?? _text.text).trim();
     final state = ref.read(connectionProvider);
     if (text.isEmpty || state is! Connected || _sending) return;
     final messenger = ScaffoldMessenger.of(context);
@@ -80,7 +136,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
       } else {
         await state.sync.sendDirect(PublicKey.fromHex(target), text);
       }
-      _text.clear();
+      if (typed) _clearBox();
     } on ArgumentError {
       messenger.showSnackBar(
         const SnackBar(content: Text('That message is too long to send.')),
@@ -88,7 +144,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     } on RadioRequestException {
       // The message is stored as failed with a resend option, so don't
       // leave a second copy in the box.
-      _text.clear();
+      if (typed) _clearBox();
       messenger.showSnackBar(
         const SnackBar(
           content: Text('The radio could not send it. Hold it to try again.'),
@@ -97,6 +153,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     } finally {
       if (mounted) setState(() => _sending = false);
     }
+  }
+
+  void _clearBox() {
+    _text.clear();
+    _flushDraft();
   }
 
   /// The contact this direct chat is with, when the radio knows them.
@@ -336,6 +397,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
               padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
               child: Row(
                 children: [
+                  IconButton(
+                    tooltip: 'Quick messages',
+                    onPressed: canReply && !_sending ? _pickQuick : null,
+                    icon: const Icon(Icons.bolt),
+                  ),
                   Expanded(
                     child: TextField(
                       controller: _text,

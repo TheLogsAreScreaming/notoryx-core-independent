@@ -64,6 +64,35 @@ class MeshStore {
   Future<void> removeSetting(String key) =>
       (_db.delete(_db.settings)..where((s) => s.key.equals(key))).go();
 
+  /// Settings whose key starts with [prefix], keyed by the rest of the key.
+  Stream<Map<String, String>> watchSettingsWithPrefix(String prefix) =>
+      (_db.select(_db.settings)
+            ..where((s) => s.key.substr(1, prefix.length).equals(prefix)))
+          .watch()
+          .map(
+            (rows) => {
+              for (final r in rows) r.key.substring(prefix.length): r.value,
+            },
+          );
+
+  // Drafts
+
+  static String _draftPrefix(String radioKey) => 'draft:$radioKey:';
+
+  /// Text typed in [thread] but not sent, or null.
+  Future<String?> draft(String radioKey, String thread) =>
+      setting('${_draftPrefix(radioKey)}$thread');
+
+  /// Remembers unsent [text] for [thread]; blank text forgets it.
+  Future<void> saveDraft(String radioKey, String thread, String text) {
+    final key = '${_draftPrefix(radioKey)}$thread';
+    return text.trim().isEmpty ? removeSetting(key) : saveSetting(key, text);
+  }
+
+  /// Unsent text of every chat, by thread.
+  Stream<Map<String, String>> watchDrafts(String radioKey) =>
+      watchSettingsWithPrefix(_draftPrefix(radioKey));
+
   // Contacts
 
   /// Saves a contact download. [since] is what was passed to the download:
