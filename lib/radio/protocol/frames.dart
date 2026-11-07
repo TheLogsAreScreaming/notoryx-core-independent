@@ -353,6 +353,18 @@ final class StatusResponse extends PushFrame {
   final Uint8List data;
 }
 
+/// Sensor readings from a node, or from the connected radio itself.
+/// [data] is Cayenne LPP; read it with `decodeLpp`.
+final class TelemetryResponse extends PushFrame {
+  TelemetryResponse({required List<int> nodePrefix, required List<int> data})
+    : nodePrefix = Uint8List.fromList(nodePrefix),
+      data = Uint8List.fromList(data);
+
+  /// First 6 bytes of the node's key.
+  final Uint8List nodePrefix;
+  final Uint8List data;
+}
+
 /// A trace came back. [snrs] has one entry per hop: how well that hop
 /// heard the trace. [finalSnr] is how well this radio heard the last hop.
 final class TraceData extends PushFrame {
@@ -480,6 +492,10 @@ RadioFrame decodeFrame(List<int> frame) {
         packet: r.restBytes(),
       ),
       PushCode.traceData => _traceData(r),
+      PushCode.telemetryResponse => TelemetryResponse(
+        nodePrefix: (r..skip(1)).bytes(6),
+        data: r.restBytes(),
+      ),
       PushCode.contactDeleted => ContactDeleted(
         PublicKey(r.bytes(publicKeySize)),
       ),

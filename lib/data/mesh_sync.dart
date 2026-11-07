@@ -98,6 +98,7 @@ class MeshSync {
     this.contactRefreshDelay = const Duration(seconds: 2),
     this.retry = const RetryPolicy(),
     this.serverReplyFloor = const Duration(seconds: 10),
+    this.selfTelemetryWait = const Duration(seconds: 5),
   });
 
   final RadioSession _session;
@@ -111,6 +112,9 @@ class MeshSync {
 
   /// Shortest wait for a repeater or room server to answer.
   final Duration serverReplyFloor;
+
+  /// How long the connected radio gets to report its own readings.
+  final Duration selfTelemetryWait;
 
   /// Direct messages still being tried, by message id.
   final _outbox = <int, _DirectSend>{};
@@ -581,6 +585,40 @@ class MeshSync {
     try {
       final push = await reply.timeout(_replyWait(sent)) as StatusResponse;
       return ServerStatus.parse(push.data);
+    } on TimeoutException {
+      return null;
+    }
+  }
+
+  /// Asks [node] for its sensor readings, or the connected radio itself
+  /// when [node] is null, and stores the reply in the telemetry history.
+  /// Null if nothing arrives in time. Repeaters and rooms only answer after
+  /// a login.
+  Future<List<LppReading>?> requestTelemetry([PublicKey? node]) async {
+    final key = _requireKey();
+    final nodeKey = node ?? PublicKey.fromHex(key);
+    final prefix = nodeKey.prefix();
+    final reply = _session.pushes
+        .where(
+          (p) => p is TelemetryResponse && _sameBytes(p.nodePrefix, prefix),
+        )
+        .first;
+    reply.ignore();
+    final Duration wait;
+    if (node == null) {
+      // The radio answers itself with the push alone, no other reply.
+      await _session.sendOnly(const SendTelemetryRequest());
+      wait = selfTelemetryWait;
+    } else {
+      final sent = await _session.request<SentReply>(
+        SendTelemetryRequest(node),
+      );
+      wait = _replyWait(sent);
+    }
+    try {
+      final push = await reply.timeout(wait) as TelemetryResponse;
+      await _store.saveTelemetry(key, nodeKey.hex, push.data);
+      return decodeLpp(push.data);
     } on TimeoutException {
       return null;
     }

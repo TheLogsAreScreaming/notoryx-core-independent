@@ -553,4 +553,63 @@ class MeshStore {
       )
       ..orderBy([(m) => OrderingTerm.asc(m.id)]);
   }
+
+  // Telemetry
+
+  /// How many readings are kept per node. Older ones are dropped.
+  static const telemetryKept = 1000;
+
+  /// Stores a telemetry reply from [nodeKey] (hex) and drops the oldest
+  /// beyond [telemetryKept].
+  Future<void> saveTelemetry(String radioKey, String nodeKey, List<int> data) =>
+      _db.transaction(() async {
+        await _db
+            .into(_db.telemetrySamples)
+            .insert(
+              TelemetrySamplesCompanion.insert(
+                radioKey: radioKey,
+                nodeKey: nodeKey,
+                at: _clock().millisecondsSinceEpoch,
+                data: Uint8List.fromList(data),
+              ),
+            );
+        await _db.customStatement(
+          'DELETE FROM telemetry_samples WHERE radio_key = ? AND node_key = ? '
+          'AND id NOT IN (SELECT id FROM telemetry_samples '
+          'WHERE radio_key = ? AND node_key = ? ORDER BY id DESC LIMIT ?)',
+          [radioKey, nodeKey, radioKey, nodeKey, telemetryKept],
+        );
+      });
+
+  /// A node's telemetry history, oldest first.
+  Stream<List<TelemetrySample>> watchTelemetry(
+    String radioKey,
+    String nodeKey,
+  ) =>
+      (_db.select(_db.telemetrySamples)
+            ..where(
+              (t) => t.radioKey.equals(radioKey) & t.nodeKey.equals(nodeKey),
+            )
+            ..orderBy([(t) => OrderingTerm.asc(t.id)]))
+          .watch();
+
+  /// When the newest reading from [nodeKey] arrived, or null if none.
+  Future<DateTime?> lastTelemetryAt(String radioKey, String nodeKey) async {
+    final row =
+        await (_db.select(_db.telemetrySamples)
+              ..where(
+                (t) => t.radioKey.equals(radioKey) & t.nodeKey.equals(nodeKey),
+              )
+              ..orderBy([(t) => OrderingTerm.desc(t.id)])
+              ..limit(1))
+            .getSingleOrNull();
+    return row == null ? null : DateTime.fromMillisecondsSinceEpoch(row.at);
+  }
+
+  /// Forgets a node's telemetry history.
+  Future<void> clearTelemetry(String radioKey, String nodeKey) =>
+      (_db.delete(_db.telemetrySamples)..where(
+            (t) => t.radioKey.equals(radioKey) & t.nodeKey.equals(nodeKey),
+          ))
+          .go();
 }

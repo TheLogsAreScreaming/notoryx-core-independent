@@ -86,6 +86,35 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
   }
 
+  testWidgets('the radio battery is saved at connect and charted', (
+    tester,
+  ) async {
+    await openSettings(tester);
+    await tester.scrollUntilVisible(
+      find.text('Battery and sensor history'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('Battery and sensor history'));
+    await settle(tester);
+
+    expect(find.text('Radio telemetry'), findsOneWidget);
+    expect(find.text('Latest'), findsOneWidget);
+    expect(find.text('4.06 V'), findsWidgets);
+    expect(
+      find.text('The chart appears after a second reading.'),
+      findsOneWidget,
+    );
+
+    radio.selfTelemetry = [1, 116, 0x01, 0x90];
+    await tester.tap(find.text('Request readings'));
+    await settle(tester);
+    expect(find.text('4.00 V'), findsWidgets);
+    expect(find.textContaining('2 readings'), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('Battery chart')), findsOneWidget);
+    await cleanUp(tester);
+  });
+
   testWidgets('shows the radio and its details', (tester) async {
     await openSettings(tester);
     expect(find.text('Base'), findsOneWidget);

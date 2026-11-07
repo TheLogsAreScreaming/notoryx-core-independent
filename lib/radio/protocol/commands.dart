@@ -388,6 +388,24 @@ final class SendStatusRequest extends RadioCommand {
   }
 }
 
+/// Asks a node for its sensor readings, or the connected radio itself when
+/// [node] is null. A node answers later with a telemetry push; the radio
+/// answers itself straight away with the same push and no other reply.
+/// Repeaters and rooms only answer after a login (guest is enough).
+final class SendTelemetryRequest extends RadioCommand {
+  const SendTelemetryRequest([this.node]);
+
+  final PublicKey? node;
+
+  @override
+  void _write(FrameWriter out) {
+    out
+      ..u8(CommandCode.sendTelemetryRequest)
+      ..bytes(const [0, 0, 0]);
+    if (node case final key?) out.bytes(key.bytes);
+  }
+}
+
 /// Asks whether the radio still holds a logged-in session with a server.
 final class HasConnection extends RadioCommand {
   const HasConnection(this.server);

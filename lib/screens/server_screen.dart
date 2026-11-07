@@ -6,6 +6,7 @@ import '../data/data.dart';
 import '../radio/radio.dart';
 import 'conversation_screen.dart';
 import 'node_details.dart';
+import 'telemetry_screen.dart';
 
 /// A repeater or room server: log in, check its status, open the room, and
 /// (as admin) use its console.
@@ -260,6 +261,24 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
                   if (_statusNote case final note?) Text(note),
                   if (_status case final s?) ..._statusRows(s),
                 ],
+              ),
+            ),
+          ),
+
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.sensors),
+              title: const Text('Telemetry'),
+              subtitle: const Text('Battery and sensors over time'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => TelemetryScreen(
+                    nodeKey: widget.node.publicKey,
+                    name: widget.node.name,
+                    type: widget.node.type,
+                  ),
+                ),
               ),
             ),
           ),

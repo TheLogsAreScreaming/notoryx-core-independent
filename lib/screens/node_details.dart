@@ -8,6 +8,7 @@ import '../radio/radio.dart';
 import 'conversation_screen.dart';
 import 'manage_actions.dart';
 import 'server_screen.dart';
+import 'telemetry_screen.dart';
 import 'trace_screen.dart';
 
 /// What the app knows about one node, whether it's a contact or only heard
@@ -219,6 +220,23 @@ Future<void> showNodeDetails(
                           ),
                         );
                       }
+                    },
+                  ),
+                if (node.isContact)
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.sensors),
+                    label: const Text('Telemetry'),
+                    onPressed: () {
+                      Navigator.pop(sheet);
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => TelemetryScreen(
+                            nodeKey: node.publicKey,
+                            name: node.name,
+                            type: node.type,
+                          ),
+                        ),
+                      );
                     },
                   ),
                 if (node.isContact)

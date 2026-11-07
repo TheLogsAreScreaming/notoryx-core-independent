@@ -30,6 +30,7 @@ abstract final class CommandCode {
   static const setChannel = 32;
   static const sendTracePath = 36;
   static const setOtherParams = 38;
+  static const sendTelemetryRequest = 39;
   static const setAutoAddConfig = 58;
   static const getAutoAddConfig = 59;
 }
@@ -69,6 +70,7 @@ abstract final class PushCode {
   static const rxLog = 0x88;
   static const traceData = 0x89;
   static const newAdvert = 0x8A;
+  static const telemetryResponse = 0x8B;
   static const contactDeleted = 0x8F;
   static const contactsFull = 0x90;
 }

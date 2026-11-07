@@ -3389,6 +3389,353 @@ class DiscoveredCompanion extends UpdateCompanion<DiscoveredData> {
   }
 }
 
+class $TelemetrySamplesTable extends TelemetrySamples
+    with TableInfo<$TelemetrySamplesTable, TelemetrySample> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TelemetrySamplesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _radioKeyMeta = const VerificationMeta(
+    'radioKey',
+  );
+  @override
+  late final GeneratedColumn<String> radioKey = GeneratedColumn<String>(
+    'radio_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES radios (public_key)',
+    ),
+  );
+  static const VerificationMeta _nodeKeyMeta = const VerificationMeta(
+    'nodeKey',
+  );
+  @override
+  late final GeneratedColumn<String> nodeKey = GeneratedColumn<String>(
+    'node_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _atMeta = const VerificationMeta('at');
+  @override
+  late final GeneratedColumn<int> at = GeneratedColumn<int>(
+    'at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dataMeta = const VerificationMeta('data');
+  @override
+  late final GeneratedColumn<Uint8List> data = GeneratedColumn<Uint8List>(
+    'data',
+    aliasedName,
+    false,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, radioKey, nodeKey, at, data];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'telemetry_samples';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TelemetrySample> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('radio_key')) {
+      context.handle(
+        _radioKeyMeta,
+        radioKey.isAcceptableOrUnknown(data['radio_key']!, _radioKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_radioKeyMeta);
+    }
+    if (data.containsKey('node_key')) {
+      context.handle(
+        _nodeKeyMeta,
+        nodeKey.isAcceptableOrUnknown(data['node_key']!, _nodeKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nodeKeyMeta);
+    }
+    if (data.containsKey('at')) {
+      context.handle(_atMeta, at.isAcceptableOrUnknown(data['at']!, _atMeta));
+    } else if (isInserting) {
+      context.missing(_atMeta);
+    }
+    if (data.containsKey('data')) {
+      context.handle(
+        _dataMeta,
+        this.data.isAcceptableOrUnknown(data['data']!, _dataMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dataMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TelemetrySample map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TelemetrySample(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      radioKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}radio_key'],
+      )!,
+      nodeKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}node_key'],
+      )!,
+      at: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}at'],
+      )!,
+      data: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}data'],
+      )!,
+    );
+  }
+
+  @override
+  $TelemetrySamplesTable createAlias(String alias) {
+    return $TelemetrySamplesTable(attachedDatabase, alias);
+  }
+}
+
+class TelemetrySample extends DataClass implements Insertable<TelemetrySample> {
+  final int id;
+  final String radioKey;
+
+  /// The node's public key, hex.
+  final String nodeKey;
+
+  /// When it arrived, Unix milliseconds.
+  final int at;
+  final Uint8List data;
+  const TelemetrySample({
+    required this.id,
+    required this.radioKey,
+    required this.nodeKey,
+    required this.at,
+    required this.data,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['radio_key'] = Variable<String>(radioKey);
+    map['node_key'] = Variable<String>(nodeKey);
+    map['at'] = Variable<int>(at);
+    map['data'] = Variable<Uint8List>(data);
+    return map;
+  }
+
+  TelemetrySamplesCompanion toCompanion(bool nullToAbsent) {
+    return TelemetrySamplesCompanion(
+      id: Value(id),
+      radioKey: Value(radioKey),
+      nodeKey: Value(nodeKey),
+      at: Value(at),
+      data: Value(data),
+    );
+  }
+
+  factory TelemetrySample.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TelemetrySample(
+      id: serializer.fromJson<int>(json['id']),
+      radioKey: serializer.fromJson<String>(json['radioKey']),
+      nodeKey: serializer.fromJson<String>(json['nodeKey']),
+      at: serializer.fromJson<int>(json['at']),
+      data: serializer.fromJson<Uint8List>(json['data']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'radioKey': serializer.toJson<String>(radioKey),
+      'nodeKey': serializer.toJson<String>(nodeKey),
+      'at': serializer.toJson<int>(at),
+      'data': serializer.toJson<Uint8List>(data),
+    };
+  }
+
+  TelemetrySample copyWith({
+    int? id,
+    String? radioKey,
+    String? nodeKey,
+    int? at,
+    Uint8List? data,
+  }) => TelemetrySample(
+    id: id ?? this.id,
+    radioKey: radioKey ?? this.radioKey,
+    nodeKey: nodeKey ?? this.nodeKey,
+    at: at ?? this.at,
+    data: data ?? this.data,
+  );
+  TelemetrySample copyWithCompanion(TelemetrySamplesCompanion data) {
+    return TelemetrySample(
+      id: data.id.present ? data.id.value : this.id,
+      radioKey: data.radioKey.present ? data.radioKey.value : this.radioKey,
+      nodeKey: data.nodeKey.present ? data.nodeKey.value : this.nodeKey,
+      at: data.at.present ? data.at.value : this.at,
+      data: data.data.present ? data.data.value : this.data,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TelemetrySample(')
+          ..write('id: $id, ')
+          ..write('radioKey: $radioKey, ')
+          ..write('nodeKey: $nodeKey, ')
+          ..write('at: $at, ')
+          ..write('data: $data')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, radioKey, nodeKey, at, $driftBlobEquality.hash(data));
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TelemetrySample &&
+          other.id == this.id &&
+          other.radioKey == this.radioKey &&
+          other.nodeKey == this.nodeKey &&
+          other.at == this.at &&
+          $driftBlobEquality.equals(other.data, this.data));
+}
+
+class TelemetrySamplesCompanion extends UpdateCompanion<TelemetrySample> {
+  final Value<int> id;
+  final Value<String> radioKey;
+  final Value<String> nodeKey;
+  final Value<int> at;
+  final Value<Uint8List> data;
+  const TelemetrySamplesCompanion({
+    this.id = const Value.absent(),
+    this.radioKey = const Value.absent(),
+    this.nodeKey = const Value.absent(),
+    this.at = const Value.absent(),
+    this.data = const Value.absent(),
+  });
+  TelemetrySamplesCompanion.insert({
+    this.id = const Value.absent(),
+    required String radioKey,
+    required String nodeKey,
+    required int at,
+    required Uint8List data,
+  }) : radioKey = Value(radioKey),
+       nodeKey = Value(nodeKey),
+       at = Value(at),
+       data = Value(data);
+  static Insertable<TelemetrySample> custom({
+    Expression<int>? id,
+    Expression<String>? radioKey,
+    Expression<String>? nodeKey,
+    Expression<int>? at,
+    Expression<Uint8List>? data,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (radioKey != null) 'radio_key': radioKey,
+      if (nodeKey != null) 'node_key': nodeKey,
+      if (at != null) 'at': at,
+      if (data != null) 'data': data,
+    });
+  }
+
+  TelemetrySamplesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? radioKey,
+    Value<String>? nodeKey,
+    Value<int>? at,
+    Value<Uint8List>? data,
+  }) {
+    return TelemetrySamplesCompanion(
+      id: id ?? this.id,
+      radioKey: radioKey ?? this.radioKey,
+      nodeKey: nodeKey ?? this.nodeKey,
+      at: at ?? this.at,
+      data: data ?? this.data,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (radioKey.present) {
+      map['radio_key'] = Variable<String>(radioKey.value);
+    }
+    if (nodeKey.present) {
+      map['node_key'] = Variable<String>(nodeKey.value);
+    }
+    if (at.present) {
+      map['at'] = Variable<int>(at.value);
+    }
+    if (data.present) {
+      map['data'] = Variable<Uint8List>(data.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TelemetrySamplesCompanion(')
+          ..write('id: $id, ')
+          ..write('radioKey: $radioKey, ')
+          ..write('nodeKey: $nodeKey, ')
+          ..write('at: $at, ')
+          ..write('data: $data')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$MeshDatabase extends GeneratedDatabase {
   _$MeshDatabase(QueryExecutor e) : super(e);
   $MeshDatabaseManager get managers => $MeshDatabaseManager(this);
@@ -3399,6 +3746,9 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
   late final $SettingsTable settings = $SettingsTable(this);
   late final $ThreadStatesTable threadStates = $ThreadStatesTable(this);
   late final $DiscoveredTable discovered = $DiscoveredTable(this);
+  late final $TelemetrySamplesTable telemetrySamples = $TelemetrySamplesTable(
+    this,
+  );
   late final Index messagesByThread = Index(
     'messages_by_thread',
     'CREATE INDEX messages_by_thread ON messages (radio_key, thread, id)',
@@ -3406,6 +3756,10 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
   late final Index messagesByAck = Index(
     'messages_by_ack',
     'CREATE INDEX messages_by_ack ON messages (radio_key, ack_code)',
+  );
+  late final Index telemetryByNode = Index(
+    'telemetry_by_node',
+    'CREATE INDEX telemetry_by_node ON telemetry_samples (radio_key, node_key, at)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -3419,8 +3773,10 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
     settings,
     threadStates,
     discovered,
+    telemetrySamples,
     messagesByThread,
     messagesByAck,
+    telemetryByNode,
   ];
 }
 
@@ -3533,6 +3889,29 @@ final class $$RadiosTableReferences
     );
 
     final cache = $_typedResult.readTableOrNull(_discoveredRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$TelemetrySamplesTable, List<TelemetrySample>>
+  _telemetrySamplesRefsTable(_$MeshDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.telemetrySamples,
+        aliasName: 'radios__public_key__telemetry_samples__radio_key',
+      );
+
+  $$TelemetrySamplesTableProcessedTableManager get telemetrySamplesRefs {
+    final manager =
+        $$TelemetrySamplesTableTableManager($_db, $_db.telemetrySamples).filter(
+          (f) => f.radioKey.publicKey.sqlEquals(
+            $_itemColumn<String>('public_key')!,
+          ),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _telemetrySamplesRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -3684,6 +4063,31 @@ class $$RadiosTableFilterComposer
           }) => $$DiscoveredTableFilterComposer(
             $db: $db,
             $table: $db.discovered,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> telemetrySamplesRefs(
+    Expression<bool> Function($$TelemetrySamplesTableFilterComposer f) f,
+  ) {
+    final $$TelemetrySamplesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.publicKey,
+      referencedTable: $db.telemetrySamples,
+      getReferencedColumn: (t) => t.radioKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TelemetrySamplesTableFilterComposer(
+            $db: $db,
+            $table: $db.telemetrySamples,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3873,6 +4277,31 @@ class $$RadiosTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> telemetrySamplesRefs<T extends Object>(
+    Expression<T> Function($$TelemetrySamplesTableAnnotationComposer a) f,
+  ) {
+    final $$TelemetrySamplesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.publicKey,
+      referencedTable: $db.telemetrySamples,
+      getReferencedColumn: (t) => t.radioKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TelemetrySamplesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.telemetrySamples,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$RadiosTableTableManager
@@ -3894,6 +4323,7 @@ class $$RadiosTableTableManager
             bool messagesRefs,
             bool threadStatesRefs,
             bool discoveredRefs,
+            bool telemetrySamplesRefs,
           })
         > {
   $$RadiosTableTableManager(_$MeshDatabase db, $RadiosTable table)
@@ -3950,6 +4380,7 @@ class $$RadiosTableTableManager
                 messagesRefs = false,
                 threadStatesRefs = false,
                 discoveredRefs = false,
+                telemetrySamplesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -3959,6 +4390,7 @@ class $$RadiosTableTableManager
                     if (messagesRefs) db.messages,
                     if (threadStatesRefs) db.threadStates,
                     if (discoveredRefs) db.discovered,
+                    if (telemetrySamplesRefs) db.telemetrySamples,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -4063,6 +4495,26 @@ class $$RadiosTableTableManager
                           referencedColumn: 'radio_key',
                           typedResults: items,
                         ),
+                      if (telemetrySamplesRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Radio,
+                          $RadiosTable,
+                          TelemetrySample,
+                          $TelemetrySamplesTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$RadiosTableReferences
+                              ._telemetrySamplesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$RadiosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).telemetrySamplesRefs,
+                          currentColumn: 'public_key',
+                          referencedColumn: 'radio_key',
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -4089,6 +4541,7 @@ typedef $$RadiosTableProcessedTableManager =
         bool messagesRefs,
         bool threadStatesRefs,
         bool discoveredRefs,
+        bool telemetrySamplesRefs,
       })
     >;
 typedef $$ContactsTableCreateCompanionBuilder = ContactsCompanion Function({
@@ -6184,6 +6637,326 @@ typedef $$DiscoveredTableProcessedTableManager =
       DiscoveredData,
       PrefetchHooks Function({bool radioKey})
     >;
+typedef $$TelemetrySamplesTableCreateCompanionBuilder =
+    TelemetrySamplesCompanion Function({
+      Value<int> id,
+      required String radioKey,
+      required String nodeKey,
+      required int at,
+      required Uint8List data,
+    });
+typedef $$TelemetrySamplesTableUpdateCompanionBuilder =
+    TelemetrySamplesCompanion Function({
+      Value<int> id,
+      Value<String> radioKey,
+      Value<String> nodeKey,
+      Value<int> at,
+      Value<Uint8List> data,
+    });
+
+final class $$TelemetrySamplesTableReferences
+    extends
+        BaseReferences<
+          _$MeshDatabase,
+          $TelemetrySamplesTable,
+          TelemetrySample
+        > {
+  $$TelemetrySamplesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $RadiosTable _radioKeyTable(_$MeshDatabase db) =>
+      db.radios.createAlias('telemetry_samples__radio_key__radios__public_key');
+
+  $$RadiosTableProcessedTableManager get radioKey {
+    final $_column = $_itemColumn<String>('radio_key')!;
+
+    final manager = $$RadiosTableTableManager(
+      $_db,
+      $_db.radios,
+    ).filter((f) => f.publicKey.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_radioKeyTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$TelemetrySamplesTableFilterComposer
+    extends Composer<_$MeshDatabase, $TelemetrySamplesTable> {
+  $$TelemetrySamplesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nodeKey => $composableBuilder(
+    column: $table.nodeKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get at => $composableBuilder(
+    column: $table.at,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get data => $composableBuilder(
+    column: $table.data,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$RadiosTableFilterComposer get radioKey {
+    final $$RadiosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.radioKey,
+      referencedTable: $db.radios,
+      getReferencedColumn: (t) => t.publicKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RadiosTableFilterComposer(
+            $db: $db,
+            $table: $db.radios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TelemetrySamplesTableOrderingComposer
+    extends Composer<_$MeshDatabase, $TelemetrySamplesTable> {
+  $$TelemetrySamplesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nodeKey => $composableBuilder(
+    column: $table.nodeKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get at => $composableBuilder(
+    column: $table.at,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get data => $composableBuilder(
+    column: $table.data,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$RadiosTableOrderingComposer get radioKey {
+    final $$RadiosTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.radioKey,
+      referencedTable: $db.radios,
+      getReferencedColumn: (t) => t.publicKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RadiosTableOrderingComposer(
+            $db: $db,
+            $table: $db.radios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TelemetrySamplesTableAnnotationComposer
+    extends Composer<_$MeshDatabase, $TelemetrySamplesTable> {
+  $$TelemetrySamplesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get nodeKey =>
+      $composableBuilder(column: $table.nodeKey, builder: (column) => column);
+
+  GeneratedColumn<int> get at =>
+      $composableBuilder(column: $table.at, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get data =>
+      $composableBuilder(column: $table.data, builder: (column) => column);
+
+  $$RadiosTableAnnotationComposer get radioKey {
+    final $$RadiosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.radioKey,
+      referencedTable: $db.radios,
+      getReferencedColumn: (t) => t.publicKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RadiosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.radios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TelemetrySamplesTableTableManager
+    extends
+        RootTableManager<
+          _$MeshDatabase,
+          $TelemetrySamplesTable,
+          TelemetrySample,
+          $$TelemetrySamplesTableFilterComposer,
+          $$TelemetrySamplesTableOrderingComposer,
+          $$TelemetrySamplesTableAnnotationComposer,
+          $$TelemetrySamplesTableCreateCompanionBuilder,
+          $$TelemetrySamplesTableUpdateCompanionBuilder,
+          (TelemetrySample, $$TelemetrySamplesTableReferences),
+          TelemetrySample,
+          PrefetchHooks Function({bool radioKey})
+        > {
+  $$TelemetrySamplesTableTableManager(
+    _$MeshDatabase db,
+    $TelemetrySamplesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TelemetrySamplesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TelemetrySamplesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TelemetrySamplesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> radioKey = const Value.absent(),
+                Value<String> nodeKey = const Value.absent(),
+                Value<int> at = const Value.absent(),
+                Value<Uint8List> data = const Value.absent(),
+              }) => TelemetrySamplesCompanion(
+                id: id,
+                radioKey: radioKey,
+                nodeKey: nodeKey,
+                at: at,
+                data: data,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String radioKey,
+                required String nodeKey,
+                required int at,
+                required Uint8List data,
+              }) => TelemetrySamplesCompanion.insert(
+                id: id,
+                radioKey: radioKey,
+                nodeKey: nodeKey,
+                at: at,
+                data: data,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$TelemetrySamplesTable, TelemetrySample>(table),
+                  $$TelemetrySamplesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({radioKey = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (radioKey) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.radioKey,
+                        referencedTable: $$TelemetrySamplesTableReferences
+                            ._radioKeyTable(db),
+                        referencedColumn: $$TelemetrySamplesTableReferences
+                            ._radioKeyTable(db)
+                            .publicKey,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$TelemetrySamplesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$MeshDatabase,
+      $TelemetrySamplesTable,
+      TelemetrySample,
+      $$TelemetrySamplesTableFilterComposer,
+      $$TelemetrySamplesTableOrderingComposer,
+      $$TelemetrySamplesTableAnnotationComposer,
+      $$TelemetrySamplesTableCreateCompanionBuilder,
+      $$TelemetrySamplesTableUpdateCompanionBuilder,
+      (TelemetrySample, $$TelemetrySamplesTableReferences),
+      TelemetrySample,
+      PrefetchHooks Function({bool radioKey})
+    >;
 
 class $MeshDatabaseManager {
   final _$MeshDatabase _db;
@@ -6202,4 +6975,6 @@ class $MeshDatabaseManager {
       $$ThreadStatesTableTableManager(_db, _db.threadStates);
   $$DiscoveredTableTableManager get discovered =>
       $$DiscoveredTableTableManager(_db, _db.discovered);
+  $$TelemetrySamplesTableTableManager get telemetrySamples =>
+      $$TelemetrySamplesTableTableManager(_db, _db.telemetrySamples);
 }
