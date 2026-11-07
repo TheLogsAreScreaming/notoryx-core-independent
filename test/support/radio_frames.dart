@@ -109,3 +109,25 @@ List<int> channelMessageFrame(String text, {int channel = 0}) => [
   ...u32(1700000000),
   ...utf8.encode(text),
 ];
+
+/// A repeater's 56-byte status block, as in the firmware's RepeaterStats.
+List<int> repeaterStatusBlock({int battery = 4100, int upTime = 90061}) => [
+  ...u16(battery),
+  ...u16(2), // queue
+  ...u16(-110 & 0xFFFF), // noise floor
+  ...u16(-85 & 0xFFFF), // last RSSI
+  ...u32(1200), // received
+  ...u32(900), // sent
+  ...u32(300), // air time
+  ...u32(upTime),
+  ...u32(400), // sent flood
+  ...u32(500), // sent direct
+  ...u32(700), // received flood
+  ...u32(500), // received direct
+  ...u16(0), // error events
+  ...u16(26), // last SNR x4 = 6.5 dB
+  ...u16(3), // direct dups
+  ...u16(40), // flood dups
+  ...u32(800), // receive air time
+  ...u32(5), // receive errors
+];

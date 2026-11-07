@@ -97,6 +97,7 @@ class MeshSync {
     this.appName = 'NOTORYX Core',
     this.contactRefreshDelay = const Duration(seconds: 2),
     this.retry = const RetryPolicy(),
+    this.serverReplyFloor = const Duration(seconds: 10),
   });
 
   final RadioSession _session;
@@ -107,6 +108,9 @@ class MeshSync {
   final Duration contactRefreshDelay;
 
   final RetryPolicy retry;
+
+  /// Shortest wait for a repeater or room server to answer.
+  final Duration serverReplyFloor;
 
   /// Direct messages still being tried, by message id.
   final _outbox = <int, _DirectSend>{};
@@ -587,8 +591,12 @@ class MeshSync {
 
   /// How long to wait for a server's reply: the radio's own estimate plus
   /// time for the server to answer, within sensible bounds.
-  static Duration _replyWait(SentReply sent) =>
-      Duration(milliseconds: (sent.timeoutMs * 2 + 5000).clamp(10000, 60000));
+  Duration _replyWait(SentReply sent) => Duration(
+    milliseconds: (sent.timeoutMs * 2 + 5000).clamp(
+      serverReplyFloor.inMilliseconds,
+      60000,
+    ),
+  );
 
   /// Sends to a channel slot and stores it. Channel messages have no ack, so
   /// they end at sent.
