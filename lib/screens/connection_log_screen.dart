@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/connection.dart';
+import 'packet_log_screen.dart';
 
 /// What the connection has been doing, newest at the bottom, with a button
 /// to copy it all for a bug report.
@@ -28,6 +29,13 @@ class _ConnectionLogScreenState extends ConsumerState<ConnectionLogScreen> {
       appBar: AppBar(
         title: const Text('Connection log'),
         actions: [
+          IconButton(
+            tooltip: 'Packets heard',
+            icon: const Icon(Icons.podcasts),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const PacketLogScreen()),
+            ),
+          ),
           IconButton(
             tooltip: 'Copy log',
             icon: const Icon(Icons.copy),

@@ -673,6 +673,28 @@ void main() {
     await cleanUp(tester);
   });
 
+  testWidgets('packets heard show in the packet log', (tester) async {
+    await connect(tester);
+    link.emit([
+      PushCode.rxLog,
+      24, // 6 dB
+      -90 & 0xFF,
+      (PayloadKind.groupText.value << 2) | 1,
+      1, 0x11,
+      0x9c, 1, 2,
+    ]);
+    await settle(tester);
+    await tester.tap(find.byTooltip('Connection log'));
+    await settle(tester);
+    await tester.tap(find.byTooltip('Packets heard'));
+    await settle(tester);
+    expect(find.text('Packets heard (1)'), findsOneWidget);
+    expect(find.text('Channel message'), findsOneWidget);
+    expect(find.textContaining('via 11'), findsOneWidget);
+    expect(find.textContaining('SNR 6.0 dB · RSSI -90 dBm'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
   testWidgets('a message arriving shows in the chat list', (tester) async {
     await connect(tester);
     radio.queue.add(channelMessageFrame('Ridge: summit at noon'));

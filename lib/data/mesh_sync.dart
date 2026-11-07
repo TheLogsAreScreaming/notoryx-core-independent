@@ -139,6 +139,10 @@ class MeshSync {
   /// Messages from other people, as each one is stored for the first time.
   Stream<Message> get incoming => _incoming.stream;
 
+  /// Every packet the radio hears over the air, for the packet log.
+  Stream<RxLog> get heard =>
+      _session.pushes.where((p) => p is RxLog).cast<RxLog>();
+
   /// Ids of direct messages that are still being tried.
   Set<int> get retrying => Set.unmodifiable(_outbox.keys);
 
