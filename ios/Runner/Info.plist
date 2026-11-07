@@ -30,6 +30,8 @@
 	<string>NOTORYX Core uses Bluetooth to connect to your MeshCore radio.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>NOTORYX Core uses Bluetooth to connect to your MeshCore radio.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>NOTORYX Independent shows where you are on the map.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
