@@ -15,6 +15,7 @@ import 'node_details.dart';
 import 'radio_settings_screen.dart';
 import 'search_screen.dart';
 import 'server_screen.dart';
+import 'safety_screen.dart';
 
 /// A radio's chats and contacts. While the radio is being reconnected a
 /// banner says so and the stored chats stay readable.
@@ -61,6 +62,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               MaterialPageRoute<void>(
                 builder: (_) => SearchScreen(radioKey: widget.radioKey),
               ),
+            ),
+          ),
+          IconButton(
+            tooltip: 'Safety: SOS and check-ins',
+            icon: const Icon(Icons.health_and_safety_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const SafetyScreen()),
             ),
           ),
           const ConnectionLogButton(),

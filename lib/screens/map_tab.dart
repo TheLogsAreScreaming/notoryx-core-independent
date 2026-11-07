@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../app/connection.dart';
 import '../app/map_cache.dart';
 import '../radio/radio.dart';
 import 'node_details.dart';
+import '../app/position.dart';
+
+export '../app/position.dart' show phonePositionProvider;
 
 /// The map's base tiles, saved as they're viewed so they work offline
 /// later. Tests replace this with nothing so they don't hit the network.
@@ -22,23 +24,6 @@ final mapTilesProvider = Provider<Widget?>((ref) {
     tileProvider: NetworkTileProvider(cachingProvider: cache),
   );
 });
-
-/// Finds the phone's own position. Tests replace this.
-final phonePositionProvider = Provider<Future<LatLng?> Function()>(
-  (ref) => () async {
-    if (!await Geolocator.isLocationServiceEnabled()) return null;
-    var permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      return null;
-    }
-    final p = await Geolocator.getCurrentPosition();
-    return LatLng(p.latitude, p.longitude);
-  },
-);
 
 /// Contacts and nodes heard nearby that share a position, plus this radio
 /// and (on request) the phone. Tap a marker for details.
