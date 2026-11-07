@@ -24,6 +24,8 @@
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>NOTORYX Core uses Bluetooth to connect to your MeshCore radio.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>NOTORYX Independent uses the camera to scan contact and channel QR codes.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>$(PRODUCT_COPYRIGHT)</string>
 	<key>NSMainNibFile</key>

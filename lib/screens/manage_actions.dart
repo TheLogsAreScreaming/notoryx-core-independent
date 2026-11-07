@@ -6,6 +6,7 @@ import '../app/connection.dart';
 import '../app/mesh_links.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
+import 'qr_widgets.dart';
 
 /// The live sync, or null with a notice when the radio isn't connected.
 MeshSync? _syncOrNotice(BuildContext context, WidgetRef ref) {
@@ -36,12 +37,6 @@ Future<bool> _run(
     );
   }
   return false;
-}
-
-Future<void> _copy(BuildContext context, String text, String what) async {
-  final messenger = ScaffoldMessenger.of(context);
-  await Clipboard.setData(ClipboardData(text: text));
-  messenger.showSnackBar(SnackBar(content: Text('$what copied')));
 }
 
 /// Asks for one line of text. Returns null if cancelled or left empty.
@@ -183,13 +178,15 @@ Future<String?> _pick(
 
 /// The Chats tab's + button.
 Future<void> showAddChannel(BuildContext context, WidgetRef ref) async {
-  final choice = await _pick(context, const [
+  final choice = await _pick(context, [
     (Icons.tag, 'Join a #hashtag channel', 'hashtag'),
     (Icons.lock_outline, 'Create a private channel', 'private'),
     (Icons.link, 'Add from a link', 'link'),
+    if (canScanQr) (Icons.qr_code_scanner, 'Scan a QR code', 'scan'),
   ]);
   if (choice == null || !context.mounted) return;
   if (choice == 'link') return addFromLink(context, ref);
+  if (choice == 'scan') return addFromQr(context, ref);
   final sync = _syncOrNotice(context, ref);
   if (sync == null) return;
 
@@ -225,40 +222,13 @@ Future<void> showAddChannel(BuildContext context, WidgetRef ref) async {
 }
 
 Future<void> _shareChannel(BuildContext context, ChannelLink link) =>
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Share ${link.name}'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Anyone with this link can read and write in the channel. '
-              'Share it only with people you trust.',
-            ),
-            const SizedBox(height: 12),
-            SelectableText(
-              link.url,
-              style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-          FilledButton.icon(
-            icon: const Icon(Icons.copy),
-            label: const Text('Copy link'),
-            onPressed: () {
-              Navigator.pop(context);
-              _copy(context, link.url, 'Channel link');
-            },
-          ),
-        ],
-      ),
+    showLinkSheet(
+      context,
+      title: link.name,
+      link: link,
+      warning:
+          'Anyone with this code or link can read and write in the channel. '
+          'Share it only with people you trust.',
     );
 
 /// Holding a channel in the Chats tab.
@@ -332,7 +302,21 @@ Future<void> addFromLink(BuildContext context, WidgetRef ref) async {
     pasteButton: true,
   );
   if (text == null || !context.mounted) return;
-  final link = MeshLink.parse(text);
+  await _addLink(context, ref, MeshLink.parse(text));
+}
+
+/// Scans a QR code and adds the channel or contact in it.
+Future<void> addFromQr(BuildContext context, WidgetRef ref) async {
+  final link = await scanMeshLink(context);
+  if (link == null || !context.mounted) return;
+  await _addLink(context, ref, link);
+}
+
+Future<void> _addLink(
+  BuildContext context,
+  WidgetRef ref,
+  MeshLink? link,
+) async {
   if (link == null) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -368,8 +352,9 @@ Future<void> showContactsMenu(
   required String radioName,
   required String radioKey,
 }) async {
-  final choice = await _pick(context, const [
+  final choice = await _pick(context, [
     (Icons.link, 'Add from a link', 'link'),
+    if (canScanQr) (Icons.qr_code_scanner, 'Scan a QR code', 'scan'),
     (Icons.qr_code_2, 'Share my contact', 'share'),
     (Icons.campaign_outlined, 'Advertise to nearby nodes', 'advert'),
     (Icons.public, 'Advertise across the mesh', 'flood'),
@@ -378,13 +363,15 @@ Future<void> showContactsMenu(
   switch (choice) {
     case 'link':
       await addFromLink(context, ref);
+    case 'scan':
+      await addFromQr(context, ref);
     case 'share':
       final link = ContactLink(
         name: radioName,
         publicKey: PublicKey.fromHex(radioKey),
         type: NodeType.chat,
       );
-      await _copy(context, link.url, 'Your contact link');
+      await showLinkSheet(context, title: 'My contact', link: link);
     case 'advert' || 'flood':
       final sync = _syncOrNotice(context, ref);
       if (sync == null) return;
@@ -422,7 +409,7 @@ Future<void> showContactActions(
         publicKey: key,
         type: NodeType.fromByte(contact.type),
       );
-      await _copy(context, link.url, 'Contact link');
+      await showLinkSheet(context, title: contact.name, link: link);
     case 'favourite':
       final sync = _syncOrNotice(context, ref);
       if (sync == null) return;
