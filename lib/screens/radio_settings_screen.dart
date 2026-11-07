@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/connection.dart';
 import '../radio/radio.dart';
 import 'area_screen.dart';
+import 'radio_noise_screen.dart';
 import 'telemetry_screen.dart';
 
 /// Standard LoRa bandwidths the firmware accepts, in kHz.
@@ -319,6 +320,16 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
                     name: self.name,
                     isSelf: true,
                   ),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.graphic_eq),
+              title: const Text('Noise floor history'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const RadioNoiseScreen(),
                 ),
               ),
             ),

@@ -22,6 +22,7 @@ part 'database.g.dart';
     ThreadStates,
     Discovered,
     TelemetrySamples,
+    RadioStatsSamples,
   ],
 )
 class MeshDatabase extends _$MeshDatabase {
@@ -41,7 +42,7 @@ class MeshDatabase extends _$MeshDatabase {
   factory MeshDatabase.inMemory() => MeshDatabase(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -75,6 +76,10 @@ class MeshDatabase extends _$MeshDatabase {
       }
       // 7: telemetry history.
       if (from < 7) await m.createTable(telemetrySamples);
+      if (from < 8) {
+        await m.createTable(radioStatsSamples);
+        await m.createIndex(radioStatsByRadio);
+      }
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');

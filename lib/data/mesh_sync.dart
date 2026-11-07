@@ -214,6 +214,19 @@ class MeshSync {
     }
   }
 
+  /// Reads the radio's receiver figures and stores them. Null on firmware
+  /// without stats.
+  Future<RadioStats?> sampleRadioStats() async {
+    final RadioStats stats;
+    try {
+      stats = await _session.request<RadioStats>(const GetRadioStats());
+    } on RadioRequestException {
+      return null;
+    }
+    await _store.saveRadioStats(_radio!.key, stats);
+    return stats;
+  }
+
   Future<BatteryAndStorage> batteryAndStorage() =>
       _session.request<BatteryAndStorage>(const GetBatteryAndStorage());
 

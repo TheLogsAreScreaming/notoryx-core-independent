@@ -115,6 +115,31 @@ void main() {
     await cleanUp(tester);
   });
 
+  testWidgets('the noise floor is saved at connect and charted', (
+    tester,
+  ) async {
+    await openSettings(tester);
+    await tester.scrollUntilVisible(
+      find.text('Noise floor history'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('Noise floor history'));
+    await settle(tester);
+
+    expect(find.text('-112 dBm'), findsWidgets);
+    expect(find.text('Quiet. Weak signals get through.'), findsNothing);
+    expect(find.text('Normal.'), findsOneWidget);
+    expect(find.textContaining('receiving 10 min 0 s'), findsOneWidget);
+
+    radio.noiseFloor = -98;
+    await tester.tap(find.text('Read now'));
+    await settle(tester);
+    expect(find.text('-98 dBm'), findsWidgets);
+    expect(find.bySemanticsLabel(RegExp('Noise floor chart')), findsOneWidget);
+    await cleanUp(tester);
+  });
+
   testWidgets('shows the radio and its details', (tester) async {
     await openSettings(tester);
     expect(find.text('Base'), findsOneWidget);
