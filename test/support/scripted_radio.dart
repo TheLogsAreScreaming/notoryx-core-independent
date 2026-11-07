@@ -131,8 +131,9 @@ class ScriptedRadio {
 
   List<List<int>> _setPower(List<int> frame) {
     final dbm = frame[1] >= 128 ? frame[1] - 256 : frame[1];
-    if (dbm < -9 || dbm > 30)
+    if (dbm < -9 || dbm > 30) {
       return [errorFrame(RadioErrorCode.illegalArgument)];
+    }
     txPower = dbm;
     return [okFrame()];
   }
