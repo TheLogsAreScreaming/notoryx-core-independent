@@ -45,3 +45,9 @@ flutter test
 App IDs are `com.bastionmesh.notoryx_core` (Android) and
 `com.bastionmesh.notoryxCore` (iOS, macOS), so this app installs alongside
 the current NOTORYX Core.
+
+## License
+
+MIT, see [`LICENSE`](LICENSE). Vendored third-party code keeps its own
+license: `third_party/usb_serial` is BSD-3-Clause (see its `LICENSE`).
+Dependencies are listed in `pubspec.yaml` with their own licenses.
