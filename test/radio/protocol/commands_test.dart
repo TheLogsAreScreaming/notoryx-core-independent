@@ -195,4 +195,43 @@ void main() {
     final command = SendChannelText(channel: 0, text: 'x' * 200, timestamp: 0);
     expect(command.encode, throwsArgumentError);
   });
+
+  test('other params pack telemetry modes and keep every field', () {
+    const command = SetOtherParams(
+      manualAddContacts: true,
+      telemetryModes: (base: 2, location: 1, environment: 3),
+      advertLocationPolicy: 1,
+      multiAcks: 0,
+    );
+    expect(
+      _hex(command),
+      '26'
+      '01'
+      '36'
+      '01'
+      '00',
+    );
+  });
+
+  test('auto-add config get and set', () {
+    expect(_hex(const GetAutoAddConfig()), '3b');
+    const config = AutoAddConfig(flags: 0, maxHops: 3);
+    final changed = config
+        .withFlag(AutoAddConfig.repeaters, true)
+        .withFlag(AutoAddConfig.replaceOldest, true);
+    expect(changed.has(AutoAddConfig.repeaters), isTrue);
+    expect(
+      _hex(SetAutoAddConfig(changed)),
+      '3a'
+      '05'
+      '03',
+    );
+    expect(
+      _hex(const SetAutoAddConfig(AutoAddConfig(flags: 0, maxHops: 99))),
+      '3a'
+      '00'
+      '40',
+      reason: 'the firmware caps hops at 64',
+    );
+  });
 }

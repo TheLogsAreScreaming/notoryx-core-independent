@@ -444,4 +444,13 @@ void main() {
     expect(decodeFrame([PushCode.advert, 1, 2, 3]), isA<MalformedFrame>());
     expect(decodeFrame([ResponseCode.sent, 0]), isA<MalformedFrame>());
   });
+
+  test('auto-add config reply', () {
+    final reply = decodeFrame([
+      ResponseCode.autoAddConfig,
+      0x16,
+      4,
+    ]) as AutoAddConfigReply;
+    expect((reply.flags, reply.maxHops), (0x16, 4));
+  });
 }

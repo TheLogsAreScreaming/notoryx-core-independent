@@ -28,6 +28,9 @@ abstract final class CommandCode {
   static const logout = 29;
   static const getChannel = 31;
   static const setChannel = 32;
+  static const setOtherParams = 38;
+  static const setAutoAddConfig = 58;
+  static const getAutoAddConfig = 59;
 }
 
 /// First byte of a direct reply to a command.
@@ -49,6 +52,7 @@ abstract final class ResponseCode {
   static const contactMessageV3 = 16;
   static const channelMessageV3 = 17;
   static const channelInfo = 18;
+  static const autoAddConfig = 25;
   static const channelData = 27;
 }
 
