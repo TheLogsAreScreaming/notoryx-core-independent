@@ -414,3 +414,82 @@ final class Logout extends RadioCommand {
       ..bytes(server.bytes);
   }
 }
+
+/// Sets the radio's contact and advert preferences in one go. The firmware
+/// reads every field, so send the current value of anything not changing.
+final class SetOtherParams extends RadioCommand {
+  const SetOtherParams({
+    required this.manualAddContacts,
+    required this.telemetryModes,
+    required this.advertLocationPolicy,
+    required this.multiAcks,
+  });
+
+  /// When true, new nodes are only added as allowed by [SetAutoAddConfig].
+  final bool manualAddContacts;
+
+  /// Two bits each: base, location and environment telemetry sharing.
+  final ({int base, int location, int environment}) telemetryModes;
+
+  /// 0 keeps position out of adverts, 1 shares it.
+  final int advertLocationPolicy;
+
+  /// Extra ack transmissions for direct messages.
+  final int multiAcks;
+
+  @override
+  void _write(FrameWriter out) {
+    out
+      ..u8(CommandCode.setOtherParams)
+      ..u8(manualAddContacts ? 1 : 0)
+      ..u8(
+        (telemetryModes.base & 3) |
+            ((telemetryModes.location & 3) << 2) |
+            ((telemetryModes.environment & 3) << 4),
+      )
+      ..u8(advertLocationPolicy)
+      ..u8(multiAcks);
+  }
+}
+
+/// Which node types are still added automatically when manual add is on.
+final class AutoAddConfig {
+  const AutoAddConfig({required this.flags, required this.maxHops});
+
+  static const replaceOldest = 0x01;
+  static const companions = 0x02;
+  static const repeaters = 0x04;
+  static const roomServers = 0x08;
+  static const sensors = 0x10;
+
+  final int flags;
+
+  /// 0 for no limit; otherwise only nodes fewer than this many hops away.
+  final int maxHops;
+
+  bool has(int flag) => flags & flag != 0;
+
+  AutoAddConfig withFlag(int flag, bool on) =>
+      AutoAddConfig(flags: on ? flags | flag : flags & ~flag, maxHops: maxHops);
+}
+
+final class GetAutoAddConfig extends RadioCommand {
+  const GetAutoAddConfig();
+
+  @override
+  void _write(FrameWriter out) => out.u8(CommandCode.getAutoAddConfig);
+}
+
+final class SetAutoAddConfig extends RadioCommand {
+  const SetAutoAddConfig(this.config);
+
+  final AutoAddConfig config;
+
+  @override
+  void _write(FrameWriter out) {
+    out
+      ..u8(CommandCode.setAutoAddConfig)
+      ..u8(config.flags)
+      ..u8(config.maxHops.clamp(0, 64));
+  }
+}

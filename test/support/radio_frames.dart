@@ -26,24 +26,32 @@ List<int> selfInfoFrame({
   int bandwidthHz = 62500,
   int spreadingFactor = 7,
   int codingRate = 5,
+  int txPower = 22,
+  int maxTxPower = 22,
+  int multiAcks = 0,
+  int locationPolicy = 0,
+  int telemetry = 0,
+  bool manualAdd = false,
 }) => [
   ResponseCode.selfInfo,
   NodeType.chat.value,
-  22,
-  22,
+  txPower & 0xFF,
+  maxTxPower,
   ...testKey,
   ...i32(((latitude ?? 0) * 1e6).round()),
   ...i32(((longitude ?? 0) * 1e6).round()),
-  0,
-  0,
-  0,
-  0,
+  multiAcks,
+  locationPolicy,
+  telemetry,
+  manualAdd ? 1 : 0,
   ...u32(frequencyKhz),
   ...u32(bandwidthHz),
   spreadingFactor,
   codingRate,
   ...utf8.encode(name),
 ];
+
+List<int> u16(int v) => [v & 0xFF, (v >> 8) & 0xFF];
 
 List<int> i32(int v) =>
     (ByteData(4)..setInt32(0, v, Endian.little)).buffer.asUint8List();

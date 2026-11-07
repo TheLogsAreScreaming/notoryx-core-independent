@@ -127,13 +127,43 @@ class MeshSync {
 
   /// Changes the radio's LoRa settings, then reads them back so [radio]
   /// shows what the radio really uses. Throws if the radio refuses them.
-  Future<ConnectedRadio> setRadioParams(SetRadioParams params) async {
+  Future<ConnectedRadio> setRadioParams(SetRadioParams params) =>
+      changeRadio([params]);
+
+  /// Sends settings changes in order, then reads the radio's settings back
+  /// so [radio] shows what it really uses. Throws if the radio refuses one;
+  /// changes before it have still been made.
+  Future<ConnectedRadio> changeRadio(List<RadioCommand> commands) async {
     final current = _radio;
     if (current == null) throw StateError('The sync has not started.');
-    await _session.run(params);
-    final self = await _session.request<SelfInfo>(AppStart(appName: appName));
-    return _radio = (key: current.key, self: self, device: current.device);
+    try {
+      for (final command in commands) {
+        await _session.run(command);
+      }
+    } finally {
+      final self = await _session.request<SelfInfo>(AppStart(appName: appName));
+      _radio = (key: current.key, self: self, device: current.device);
+    }
+    return _radio!;
   }
+
+  /// The radio's auto-add rules, or null on firmware without them.
+  Future<AutoAddConfig?> autoAddConfig() async {
+    try {
+      final reply = await _session.request<AutoAddConfigReply>(
+        const GetAutoAddConfig(),
+      );
+      return AutoAddConfig(flags: reply.flags, maxHops: reply.maxHops);
+    } on RadioRequestException {
+      return null;
+    }
+  }
+
+  Future<BatteryAndStorage> batteryAndStorage() =>
+      _session.request<BatteryAndStorage>(const GetBatteryAndStorage());
+
+  /// Restarts the radio. The link drops and reconnecting takes over.
+  Future<void> reboot() => _session.sendOnly(const Reboot());
 
   /// Sends a direct message and stores it. Returns the message id once the
   /// radio has accepted the first attempt; throws if it refuses.

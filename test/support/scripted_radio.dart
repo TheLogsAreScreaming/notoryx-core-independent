@@ -63,7 +63,12 @@ class ScriptedRadio {
   List<List<int>> _answer(List<int> frame) => switch (frame[0]) {
     CommandCode.appStart => [
       selfInfoFrame(
-        name: 'Base',
+        name: name,
+        txPower: txPower,
+        maxTxPower: 30,
+        locationPolicy: locationPolicy,
+        telemetry: telemetry,
+        manualAdd: manualAdd,
         latitude: latitude,
         longitude: longitude,
         frequencyKhz: frequencyKhz,
@@ -87,8 +92,69 @@ class ScriptedRadio {
     CommandCode.sendTextMessage => _text(frame),
     CommandCode.resetPath => _resetPath(),
     CommandCode.sendChannelText => [okFrame()],
+    CommandCode.setAdvertName => _setName(frame),
+    CommandCode.setAdvertLatLon => _setPosition(frame),
+    CommandCode.setTxPower => _setPower(frame),
+    CommandCode.setOtherParams => _setOther(frame),
+    CommandCode.getAutoAddConfig => [
+      [ResponseCode.autoAddConfig, autoAddFlags, autoAddMaxHops],
+    ],
+    CommandCode.setAutoAddConfig => _setAutoAdd(frame),
+    CommandCode.getBatteryAndStorage => [
+      [ResponseCode.batteryAndStorage, ...u16(4012), ...u32(120), ...u32(1024)],
+    ],
+    CommandCode.reboot => _reboot(),
     _ => [],
   };
+
+  // Settings the radio settings screen changes.
+  String name = 'Base';
+  int txPower = 22;
+  int locationPolicy = 0;
+  int telemetry = 0;
+  bool manualAdd = false;
+  int autoAddFlags = 0;
+  int autoAddMaxHops = 0;
+  int reboots = 0;
+
+  List<List<int>> _setName(List<int> frame) {
+    name = String.fromCharCodes(frame.sublist(1));
+    return [okFrame()];
+  }
+
+  List<List<int>> _setPosition(List<int> frame) {
+    final data = ByteData.sublistView(Uint8List.fromList(frame));
+    latitude = data.getInt32(1, Endian.little) / 1e6;
+    longitude = data.getInt32(5, Endian.little) / 1e6;
+    return [okFrame()];
+  }
+
+  List<List<int>> _setPower(List<int> frame) {
+    final dbm = frame[1] >= 128 ? frame[1] - 256 : frame[1];
+    if (dbm < -9 || dbm > 30) {
+      return [errorFrame(RadioErrorCode.illegalArgument)];
+    }
+    txPower = dbm;
+    return [okFrame()];
+  }
+
+  List<List<int>> _setOther(List<int> frame) {
+    manualAdd = frame[1] == 1;
+    telemetry = frame[2];
+    locationPolicy = frame[3];
+    return [okFrame()];
+  }
+
+  List<List<int>> _setAutoAdd(List<int> frame) {
+    autoAddFlags = frame[1];
+    autoAddMaxHops = frame[2];
+    return [okFrame()];
+  }
+
+  List<List<int>> _reboot() {
+    reboots++;
+    return [];
+  }
 
   List<int> _channel(int slot) {
     if (slot >= 3) return errorFrame(RadioErrorCode.notFound);

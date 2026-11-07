@@ -8,6 +8,7 @@ import 'connection_log_screen.dart';
 import 'area_screen.dart';
 import 'conversation_screen.dart';
 import 'manage_actions.dart';
+import 'radio_settings_screen.dart';
 
 /// A radio's chats and contacts. While the radio is being reconnected a
 /// banner says so and the stored chats stay readable.
@@ -54,6 +55,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             onPressed: () => Navigator.of(
               context,
             ).push(MaterialPageRoute<void>(builder: (_) => const AreaScreen())),
+          ),
+          IconButton(
+            tooltip: 'Radio settings',
+            icon: const Icon(Icons.tune),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const RadioSettingsScreen(),
+              ),
+            ),
           ),
           IconButton(
             tooltip: 'Disconnect',

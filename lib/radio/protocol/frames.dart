@@ -186,6 +186,14 @@ final class ChannelInfo extends ReplyFrame {
   bool get isEmpty => name.isEmpty && secret.every((b) => b == 0);
 }
 
+/// The radio's auto-add settings, the reply to [CommandCode.getAutoAddConfig].
+final class AutoAddConfigReply extends ReplyFrame {
+  const AutoAddConfigReply({required this.flags, required this.maxHops});
+
+  final int flags;
+  final int maxHops;
+}
+
 /// A queued direct message, returned by [CommandCode.syncNextMessage].
 final class ContactMessage extends ReplyFrame {
   ContactMessage({
@@ -420,6 +428,10 @@ RadioFrame decodeFrame(List<int> frame) {
         index: r.u8(),
         name: r.fixedString(32),
         secret: r.bytes(16),
+      ),
+      ResponseCode.autoAddConfig => AutoAddConfigReply(
+        flags: r.u8(),
+        maxHops: r.remaining >= 1 ? r.u8() : 0,
       ),
       ResponseCode.contactMessage => _contactMessage(r, snr: null),
       ResponseCode.contactMessageV3 => _contactMessage(r, snr: _snr(r)),
