@@ -1490,6 +1490,29 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _textTypeMeta = const VerificationMeta(
+    'textType',
+  );
+  @override
+  late final GeneratedColumn<int> textType = GeneratedColumn<int>(
+    'text_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _authorPrefixMeta = const VerificationMeta(
+    'authorPrefix',
+  );
+  @override
+  late final GeneratedColumn<String> authorPrefix = GeneratedColumn<String>(
+    'author_prefix',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _dedupeKeyMeta = const VerificationMeta(
     'dedupeKey',
   );
@@ -1519,6 +1542,8 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
     flooded,
     pathLength,
     snr,
+    textType,
+    authorPrefix,
     dedupeKey,
   ];
   @override
@@ -1620,6 +1645,21 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
         snr.isAcceptableOrUnknown(data['snr']!, _snrMeta),
       );
     }
+    if (data.containsKey('text_type')) {
+      context.handle(
+        _textTypeMeta,
+        textType.isAcceptableOrUnknown(data['text_type']!, _textTypeMeta),
+      );
+    }
+    if (data.containsKey('author_prefix')) {
+      context.handle(
+        _authorPrefixMeta,
+        authorPrefix.isAcceptableOrUnknown(
+          data['author_prefix']!,
+          _authorPrefixMeta,
+        ),
+      );
+    }
     if (data.containsKey('dedupe_key')) {
       context.handle(
         _dedupeKeyMeta,
@@ -1699,6 +1739,14 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
         DriftSqlType.double,
         data['${effectivePrefix}snr'],
       ),
+      textType: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}text_type'],
+      )!,
+      authorPrefix: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}author_prefix'],
+      ),
       dedupeKey: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}dedupe_key'],
@@ -1747,6 +1795,13 @@ class Message extends DataClass implements Insertable<Message> {
   final int? pathLength;
   final double? snr;
 
+  /// `TextType.value`: plain chat, or command text exchanged with a
+  /// repeater or room server's console.
+  final int textType;
+
+  /// Room posts: the first 4 bytes of the writer's key, in hex.
+  final String? authorPrefix;
+
   /// Incoming only: identifies a message so a repeat delivery is dropped.
   final String? dedupeKey;
   const Message({
@@ -1765,6 +1820,8 @@ class Message extends DataClass implements Insertable<Message> {
     this.flooded,
     this.pathLength,
     this.snr,
+    required this.textType,
+    this.authorPrefix,
     this.dedupeKey,
   });
   @override
@@ -1801,6 +1858,10 @@ class Message extends DataClass implements Insertable<Message> {
     if (!nullToAbsent || snr != null) {
       map['snr'] = Variable<double>(snr);
     }
+    map['text_type'] = Variable<int>(textType);
+    if (!nullToAbsent || authorPrefix != null) {
+      map['author_prefix'] = Variable<String>(authorPrefix);
+    }
     if (!nullToAbsent || dedupeKey != null) {
       map['dedupe_key'] = Variable<String>(dedupeKey);
     }
@@ -1832,6 +1893,10 @@ class Message extends DataClass implements Insertable<Message> {
           ? const Value.absent()
           : Value(pathLength),
       snr: snr == null && nullToAbsent ? const Value.absent() : Value(snr),
+      textType: Value(textType),
+      authorPrefix: authorPrefix == null && nullToAbsent
+          ? const Value.absent()
+          : Value(authorPrefix),
       dedupeKey: dedupeKey == null && nullToAbsent
           ? const Value.absent()
           : Value(dedupeKey),
@@ -1863,6 +1928,8 @@ class Message extends DataClass implements Insertable<Message> {
       flooded: serializer.fromJson<bool?>(json['flooded']),
       pathLength: serializer.fromJson<int?>(json['pathLength']),
       snr: serializer.fromJson<double?>(json['snr']),
+      textType: serializer.fromJson<int>(json['textType']),
+      authorPrefix: serializer.fromJson<String?>(json['authorPrefix']),
       dedupeKey: serializer.fromJson<String?>(json['dedupeKey']),
     );
   }
@@ -1889,6 +1956,8 @@ class Message extends DataClass implements Insertable<Message> {
       'flooded': serializer.toJson<bool?>(flooded),
       'pathLength': serializer.toJson<int?>(pathLength),
       'snr': serializer.toJson<double?>(snr),
+      'textType': serializer.toJson<int>(textType),
+      'authorPrefix': serializer.toJson<String?>(authorPrefix),
       'dedupeKey': serializer.toJson<String?>(dedupeKey),
     };
   }
@@ -1909,6 +1978,8 @@ class Message extends DataClass implements Insertable<Message> {
     Value<bool?> flooded = const Value.absent(),
     Value<int?> pathLength = const Value.absent(),
     Value<double?> snr = const Value.absent(),
+    int? textType,
+    Value<String?> authorPrefix = const Value.absent(),
     Value<String?> dedupeKey = const Value.absent(),
   }) => Message(
     id: id ?? this.id,
@@ -1926,6 +1997,8 @@ class Message extends DataClass implements Insertable<Message> {
     flooded: flooded.present ? flooded.value : this.flooded,
     pathLength: pathLength.present ? pathLength.value : this.pathLength,
     snr: snr.present ? snr.value : this.snr,
+    textType: textType ?? this.textType,
+    authorPrefix: authorPrefix.present ? authorPrefix.value : this.authorPrefix,
     dedupeKey: dedupeKey.present ? dedupeKey.value : this.dedupeKey,
   );
   Message copyWithCompanion(MessagesCompanion data) {
@@ -1949,6 +2022,10 @@ class Message extends DataClass implements Insertable<Message> {
           ? data.pathLength.value
           : this.pathLength,
       snr: data.snr.present ? data.snr.value : this.snr,
+      textType: data.textType.present ? data.textType.value : this.textType,
+      authorPrefix: data.authorPrefix.present
+          ? data.authorPrefix.value
+          : this.authorPrefix,
       dedupeKey: data.dedupeKey.present ? data.dedupeKey.value : this.dedupeKey,
     );
   }
@@ -1971,6 +2048,8 @@ class Message extends DataClass implements Insertable<Message> {
           ..write('flooded: $flooded, ')
           ..write('pathLength: $pathLength, ')
           ..write('snr: $snr, ')
+          ..write('textType: $textType, ')
+          ..write('authorPrefix: $authorPrefix, ')
           ..write('dedupeKey: $dedupeKey')
           ..write(')'))
         .toString();
@@ -1993,6 +2072,8 @@ class Message extends DataClass implements Insertable<Message> {
     flooded,
     pathLength,
     snr,
+    textType,
+    authorPrefix,
     dedupeKey,
   );
   @override
@@ -2014,6 +2095,8 @@ class Message extends DataClass implements Insertable<Message> {
           other.flooded == this.flooded &&
           other.pathLength == this.pathLength &&
           other.snr == this.snr &&
+          other.textType == this.textType &&
+          other.authorPrefix == this.authorPrefix &&
           other.dedupeKey == this.dedupeKey);
 }
 
@@ -2033,6 +2116,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
   final Value<bool?> flooded;
   final Value<int?> pathLength;
   final Value<double?> snr;
+  final Value<int> textType;
+  final Value<String?> authorPrefix;
   final Value<String?> dedupeKey;
   const MessagesCompanion({
     this.id = const Value.absent(),
@@ -2050,6 +2135,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     this.flooded = const Value.absent(),
     this.pathLength = const Value.absent(),
     this.snr = const Value.absent(),
+    this.textType = const Value.absent(),
+    this.authorPrefix = const Value.absent(),
     this.dedupeKey = const Value.absent(),
   });
   MessagesCompanion.insert({
@@ -2068,6 +2155,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     this.flooded = const Value.absent(),
     this.pathLength = const Value.absent(),
     this.snr = const Value.absent(),
+    this.textType = const Value.absent(),
+    this.authorPrefix = const Value.absent(),
     this.dedupeKey = const Value.absent(),
   }) : radioKey = Value(radioKey),
        kind = Value(kind),
@@ -2093,6 +2182,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     Expression<bool>? flooded,
     Expression<int>? pathLength,
     Expression<double>? snr,
+    Expression<int>? textType,
+    Expression<String>? authorPrefix,
     Expression<String>? dedupeKey,
   }) {
     return RawValuesInsertable({
@@ -2111,6 +2202,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
       if (flooded != null) 'flooded': flooded,
       if (pathLength != null) 'path_length': pathLength,
       if (snr != null) 'snr': snr,
+      if (textType != null) 'text_type': textType,
+      if (authorPrefix != null) 'author_prefix': authorPrefix,
       if (dedupeKey != null) 'dedupe_key': dedupeKey,
     });
   }
@@ -2131,6 +2224,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     Value<bool?>? flooded,
     Value<int?>? pathLength,
     Value<double?>? snr,
+    Value<int>? textType,
+    Value<String?>? authorPrefix,
     Value<String?>? dedupeKey,
   }) {
     return MessagesCompanion(
@@ -2149,6 +2244,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
       flooded: flooded ?? this.flooded,
       pathLength: pathLength ?? this.pathLength,
       snr: snr ?? this.snr,
+      textType: textType ?? this.textType,
+      authorPrefix: authorPrefix ?? this.authorPrefix,
       dedupeKey: dedupeKey ?? this.dedupeKey,
     );
   }
@@ -2205,6 +2302,12 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     if (snr.present) {
       map['snr'] = Variable<double>(snr.value);
     }
+    if (textType.present) {
+      map['text_type'] = Variable<int>(textType.value);
+    }
+    if (authorPrefix.present) {
+      map['author_prefix'] = Variable<String>(authorPrefix.value);
+    }
     if (dedupeKey.present) {
       map['dedupe_key'] = Variable<String>(dedupeKey.value);
     }
@@ -2229,6 +2332,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
           ..write('flooded: $flooded, ')
           ..write('pathLength: $pathLength, ')
           ..write('snr: $snr, ')
+          ..write('textType: $textType, ')
+          ..write('authorPrefix: $authorPrefix, ')
           ..write('dedupeKey: $dedupeKey')
           ..write(')'))
         .toString();
@@ -4729,6 +4834,8 @@ typedef $$MessagesTableCreateCompanionBuilder = MessagesCompanion Function({
   Value<bool?> flooded,
   Value<int?> pathLength,
   Value<double?> snr,
+  Value<int> textType,
+  Value<String?> authorPrefix,
   Value<String?> dedupeKey,
 });
 typedef $$MessagesTableUpdateCompanionBuilder = MessagesCompanion Function({
@@ -4747,6 +4854,8 @@ typedef $$MessagesTableUpdateCompanionBuilder = MessagesCompanion Function({
   Value<bool?> flooded,
   Value<int?> pathLength,
   Value<double?> snr,
+  Value<int> textType,
+  Value<String?> authorPrefix,
   Value<String?> dedupeKey,
 });
 
@@ -4850,6 +4959,16 @@ class $$MessagesTableFilterComposer
 
   ColumnFilters<double> get snr => $composableBuilder(
     column: $table.snr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get textType => $composableBuilder(
+    column: $table.textType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get authorPrefix => $composableBuilder(
+    column: $table.authorPrefix,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4961,6 +5080,16 @@ class $$MessagesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get textType => $composableBuilder(
+    column: $table.textType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get authorPrefix => $composableBuilder(
+    column: $table.authorPrefix,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get dedupeKey => $composableBuilder(
     column: $table.dedupeKey,
     builder: (column) => ColumnOrderings(column),
@@ -5045,6 +5174,14 @@ class $$MessagesTableAnnotationComposer
   GeneratedColumn<double> get snr =>
       $composableBuilder(column: $table.snr, builder: (column) => column);
 
+  GeneratedColumn<int> get textType =>
+      $composableBuilder(column: $table.textType, builder: (column) => column);
+
+  GeneratedColumn<String> get authorPrefix => $composableBuilder(
+    column: $table.authorPrefix,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get dedupeKey =>
       $composableBuilder(column: $table.dedupeKey, builder: (column) => column);
 
@@ -5115,6 +5252,8 @@ class $$MessagesTableTableManager
                 Value<bool?> flooded = const Value.absent(),
                 Value<int?> pathLength = const Value.absent(),
                 Value<double?> snr = const Value.absent(),
+                Value<int> textType = const Value.absent(),
+                Value<String?> authorPrefix = const Value.absent(),
                 Value<String?> dedupeKey = const Value.absent(),
               }) => MessagesCompanion(
                 id: id,
@@ -5132,6 +5271,8 @@ class $$MessagesTableTableManager
                 flooded: flooded,
                 pathLength: pathLength,
                 snr: snr,
+                textType: textType,
+                authorPrefix: authorPrefix,
                 dedupeKey: dedupeKey,
               ),
           createCompanionCallback:
@@ -5151,6 +5292,8 @@ class $$MessagesTableTableManager
                 Value<bool?> flooded = const Value.absent(),
                 Value<int?> pathLength = const Value.absent(),
                 Value<double?> snr = const Value.absent(),
+                Value<int> textType = const Value.absent(),
+                Value<String?> authorPrefix = const Value.absent(),
                 Value<String?> dedupeKey = const Value.absent(),
               }) => MessagesCompanion.insert(
                 id: id,
@@ -5168,6 +5311,8 @@ class $$MessagesTableTableManager
                 flooded: flooded,
                 pathLength: pathLength,
                 snr: snr,
+                textType: textType,
+                authorPrefix: authorPrefix,
                 dedupeKey: dedupeKey,
               ),
           withReferenceMapper: (p0) => p0

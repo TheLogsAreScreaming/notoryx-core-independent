@@ -445,3 +445,30 @@ class OpenThread extends Notifier<String?> {
 final discoveredProvider = StreamProvider.family<List<DiscoveredData>, String>(
   (ref, radioKey) => ref.watch(storeProvider).watchDiscovered(radioKey),
 );
+
+/// Roles from logging in to servers during this connection, by key.
+final serverRolesProvider =
+    NotifierProvider<ServerRoles, Map<String, ServerRole>>(ServerRoles.new);
+
+class ServerRoles extends Notifier<Map<String, ServerRole>> {
+  @override
+  Map<String, ServerRole> build() {
+    // Logins end with the connection.
+    ref.watch(radioKeyProvider);
+    return const {};
+  }
+
+  void set(String key, ServerRole? role) => state = {
+    for (final e in state.entries)
+      if (e.key != key) e.key: e.value,
+    key: ?role,
+  };
+}
+
+/// Console text exchanged with a server.
+final consoleProvider =
+    StreamProvider.family<List<Message>, ({String radioKey, String thread})>(
+      (ref, id) => ref
+          .watch(storeProvider)
+          .watchThread(id.radioKey, id.thread, console: true),
+    );

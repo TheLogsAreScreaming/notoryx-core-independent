@@ -9,6 +9,7 @@ import 'package:notoryx_core/radio/radio.dart';
 
 import '../support/fake_radio_link.dart';
 import '../support/radio_frames.dart';
+import '../support/schema_rollback.dart';
 import '../support/scripted_radio.dart';
 
 final _alice = PublicKey(List.filled(32, 1));
@@ -221,8 +222,7 @@ void main() {
     final file = File('${dir.path}/v2.sqlite');
     var db = MeshDatabase(NativeDatabase(file));
     await db.customSelect('SELECT 1').get();
-    await db.customStatement('DROP TABLE settings');
-    await db.customStatement('PRAGMA user_version = 2');
+    await rollBackTo(db, 2);
     await db.close();
 
     db = MeshDatabase(NativeDatabase(file));
@@ -240,8 +240,7 @@ void main() {
     final file = File('${dir.path}/v1.sqlite');
     var db = MeshDatabase(NativeDatabase(file));
     await db.customSelect('SELECT 1').get();
-    await db.customStatement('ALTER TABLE messages DROP COLUMN attempts');
-    await db.customStatement('PRAGMA user_version = 1');
+    await rollBackTo(db, 1);
     await db.close();
 
     db = MeshDatabase(NativeDatabase(file));

@@ -232,6 +232,8 @@ class MeshStore {
       case ContactMessage():
         final contact = await contactByPrefix(radioKey, frame.senderPrefix);
         final prefix = toHex(frame.senderPrefix);
+        final signer = frame.signerPrefix;
+        final author = signer == null ? null : toHex(signer);
         row = _incoming(
           radioKey,
           kind: MessageKind.direct,
@@ -240,7 +242,11 @@ class MeshStore {
           sentAt: frame.timestamp,
           pathLength: frame.pathLength,
           snr: frame.snr,
-          dedupeKey: 'd:$prefix:${frame.timestamp}:${frame.text}',
+          textType: frame.type.value,
+          authorPrefix: author,
+          // Room posts from different members can share a time and text.
+          dedupeKey:
+              'd:$prefix:${author ?? ''}:${frame.timestamp}:${frame.text}',
         );
       case ChannelMessage():
         final parts = frame.senderAndBody;
@@ -273,6 +279,8 @@ class MeshStore {
     required double? snr,
     required String dedupeKey,
     String? senderName,
+    int textType = 0,
+    String? authorPrefix,
   }) => MessagesCompanion.insert(
     radioKey: radioKey,
     kind: kind,
@@ -286,6 +294,8 @@ class MeshStore {
     pathLength: Value(pathLength),
     snr: Value(snr),
     dedupeKey: Value(dedupeKey),
+    textType: Value(textType),
+    authorPrefix: Value(authorPrefix),
   );
 
   /// Stores a message about to be sent, as pending. Returns its id.
@@ -294,10 +304,12 @@ class MeshStore {
     required String thread,
     required String body,
     required int sentAt,
+    int textType = 0,
   }) => _db
       .into(_db.messages)
       .insert(
         MessagesCompanion.insert(
+          textType: Value(textType),
           radioKey: radioKey,
           kind: thread.startsWith('c:')
               ? MessageKind.channel
@@ -397,7 +409,10 @@ class MeshStore {
     final latest = _db.messages.id.max();
     final newestIds = _db.selectOnly(_db.messages)
       ..addColumns([latest])
-      ..where(_db.messages.radioKey.equals(radioKey))
+      ..where(
+        _db.messages.radioKey.equals(radioKey) &
+            _db.messages.textType.equals(TextType.cliData.value).not(),
+      )
       ..groupBy([_db.messages.thread]);
     return (_db.select(_db.messages)
           ..where((m) => m.id.isInQuery(newestIds))
@@ -413,7 +428,7 @@ class MeshStore {
         'SELECT m.thread AS thread, COUNT(*) AS unread FROM messages m '
         'LEFT JOIN thread_states t '
         'ON t.radio_key = m.radio_key AND t.thread = m.thread '
-        'WHERE m.radio_key = ? AND m.outgoing = 0 '
+        'WHERE m.radio_key = ? AND m.outgoing = 0 AND m.text_type != 1 '
         'AND m.id > COALESCE(t.last_read_id, 0) '
         'GROUP BY m.thread',
         variables: [Variable.withString(radioKey)],
@@ -484,20 +499,33 @@ class MeshStore {
       false;
 
   /// A conversation as it is now, oldest first.
-  Future<List<Message>> threadSnapshot(String radioKey, String thread) =>
-      (_db.select(_db.messages)
-            ..where(
-              (m) => m.radioKey.equals(radioKey) & m.thread.equals(thread),
-            )
-            ..orderBy([(m) => OrderingTerm.asc(m.id)]))
-          .get();
+  Future<List<Message>> threadSnapshot(
+    String radioKey,
+    String thread, {
+    bool console = false,
+  }) => _thread(radioKey, thread, console).get();
 
-  /// A conversation, oldest first.
-  Stream<List<Message>> watchThread(String radioKey, String thread) =>
-      (_db.select(_db.messages)
-            ..where(
-              (m) => m.radioKey.equals(radioKey) & m.thread.equals(thread),
-            )
-            ..orderBy([(m) => OrderingTerm.asc(m.id)]))
-          .watch();
+  /// A conversation, oldest first. With [console], the command text
+  /// exchanged with a server instead of chat.
+  Stream<List<Message>> watchThread(
+    String radioKey,
+    String thread, {
+    bool console = false,
+  }) => _thread(radioKey, thread, console).watch();
+
+  SimpleSelectStatement<$MessagesTable, Message> _thread(
+    String radioKey,
+    String thread,
+    bool console,
+  ) {
+    final cli = _db.messages.textType.equals(TextType.cliData.value);
+    return _db.select(_db.messages)
+      ..where(
+        (m) =>
+            m.radioKey.equals(radioKey) &
+            m.thread.equals(thread) &
+            (console ? cli : cli.not()),
+      )
+      ..orderBy([(m) => OrderingTerm.asc(m.id)]);
+  }
 }

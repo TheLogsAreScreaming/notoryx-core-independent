@@ -451,6 +451,45 @@ void main() {
     await cleanUp(tester);
   });
 
+  testWidgets('a repeater: log in, get its status, use the console', (
+    tester,
+  ) async {
+    radioSetup = (r) => r
+      ..servers[0x42] = (password: 'secret', status: repeaterStatusBlock())
+      ..contacts.add(
+        contactFrame(
+          'Hill RPT',
+          keyByte: 0x42,
+          type: NodeType.repeater,
+          lastModified: 11,
+        ),
+      );
+    await connect(tester);
+    await tester.tap(find.text('Contacts'));
+    await settle(tester);
+    await tester.tap(find.text('Hill RPT'));
+    await settle(tester);
+
+    expect(find.widgetWithText(AppBar, 'Hill RPT'), findsOneWidget);
+    await tester.enterText(find.byType(TextField), 'secret');
+    await tester.tap(find.widgetWithText(FilledButton, 'Log in'));
+    await settle(tester);
+    expect(find.text('Logged in as Admin'), findsOneWidget);
+
+    await tester.tap(find.text('Get status'));
+    await settle(tester);
+    expect(find.text('4.10 V'), findsOneWidget);
+    expect(find.text('1 d 1 h'), findsOneWidget, reason: 'up time');
+
+    await tester.scrollUntilVisible(find.byTooltip('Send command'), 200);
+    await tester.enterText(find.byType(TextField).last, 'ver');
+    await tester.tap(find.byTooltip('Send command'));
+    await settle(tester);
+    expect(find.text('> ver'), findsOneWidget);
+    expect(find.text('v1.18.0'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
   testWidgets('a failed connection shows why and stays on the connect screen', (
     tester,
   ) async {

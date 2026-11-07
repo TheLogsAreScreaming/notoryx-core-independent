@@ -104,6 +104,8 @@ class ScriptedRadio {
       [ResponseCode.batteryAndStorage, ...u16(4012), ...u32(120), ...u32(1024)],
     ],
     CommandCode.reboot => _reboot(),
+    CommandCode.sendLogin => _login(frame),
+    CommandCode.sendStatusRequest => _status(frame),
     _ => [],
   };
 
@@ -149,6 +151,43 @@ class ScriptedRadio {
     autoAddFlags = frame[1];
     autoAddMaxHops = frame[2];
     return [okFrame()];
+  }
+
+  /// Servers on this mesh, by the first key byte: password and status block.
+  final servers = <int, ({String password, List<int> status})>{};
+
+  /// What servers answer to console commands.
+  String consoleReply = 'v1.18.0';
+
+  List<List<int>> _login(List<int> frame) {
+    final server = servers[frame[1]];
+    final prefix = frame.sublist(1, 7);
+    final password = String.fromCharCodes(frame.sublist(33));
+    final replies = [
+      [ResponseCode.sent, 0, ...u32(0xA0), ...u32(1000)],
+    ];
+    if (server != null && server.password == password) {
+      // Admin, server time, ACL role admin (3), firmware level 2.
+      replies.add([
+        PushCode.loginSuccess,
+        1,
+        ...prefix,
+        ...u32(1700000000),
+        3,
+        2,
+      ]);
+    }
+    // A wrong password gets no answer, as on real servers.
+    return replies;
+  }
+
+  List<List<int>> _status(List<int> frame) {
+    final server = servers[frame[1]];
+    return [
+      [ResponseCode.sent, 0, ...u32(0xB0), ...u32(1000)],
+      if (server != null)
+        [PushCode.statusResponse, 0, ...frame.sublist(1, 7), ...server.status],
+    ];
   }
 
   List<List<int>> _reboot() {
@@ -209,6 +248,24 @@ class ScriptedRadio {
 
   List<List<int>> _text(List<int> frame) {
     if (refuseText) return [errorFrame(RadioErrorCode.tableFull)];
+    if (frame[1] == TextType.cliData.value) {
+      // Console command: no ack; the server's reply queues as console text.
+      queue.add([
+        ResponseCode.contactMessageV3,
+        0,
+        0,
+        0,
+        ...frame.sublist(7, 13),
+        0,
+        TextType.cliData.value,
+        ...u32(1700000001),
+        ...consoleReply.codeUnits,
+      ]);
+      return [
+        [ResponseCode.sent, 0, ...u32(0), ...u32(1000)],
+        [PushCode.messagesWaiting],
+      ];
+    }
     final attempt = frame[2];
     textAttempts.add(attempt);
     return [

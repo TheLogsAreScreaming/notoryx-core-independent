@@ -29,6 +29,49 @@ final class RetryPolicy {
   final Duration extraWait;
 }
 
+/// What a server lets you do after logging in (the firmware's ACL roles).
+enum ServerRole {
+  guest,
+  readOnly,
+  readWrite,
+  admin;
+
+  static ServerRole from(LoginSucceeded reply) {
+    final acl = reply.aclPermissions;
+    if (acl != null) return ServerRole.values[acl & 3];
+    // Older servers only say whether you're an admin.
+    return reply.isAdmin ? admin : readWrite;
+  }
+
+  String get label => switch (this) {
+    guest => 'Guest',
+    readOnly => 'Read only',
+    readWrite => 'Member',
+    admin => 'Admin',
+  };
+}
+
+sealed class LoginResult {
+  const LoginResult();
+}
+
+final class LoggedIn extends LoginResult {
+  const LoggedIn(this.role);
+
+  final ServerRole role;
+}
+
+/// The server answered that the login failed.
+final class LoginRefused extends LoginResult {
+  const LoginRefused();
+}
+
+/// No answer: usually a wrong password (servers stay silent then), or the
+/// server is out of range.
+final class LoginNoReply extends LoginResult {
+  const LoginNoReply();
+}
+
 /// Every channel slot on the radio is in use.
 final class ChannelsFull implements Exception {
   const ChannelsFull();
@@ -54,6 +97,7 @@ class MeshSync {
     this.appName = 'NOTORYX Core',
     this.contactRefreshDelay = const Duration(seconds: 2),
     this.retry = const RetryPolicy(),
+    this.serverReplyFloor = const Duration(seconds: 10),
   });
 
   final RadioSession _session;
@@ -64,6 +108,9 @@ class MeshSync {
   final Duration contactRefreshDelay;
 
   final RetryPolicy retry;
+
+  /// Shortest wait for a repeater or room server to answer.
+  final Duration serverReplyFloor;
 
   /// Direct messages still being tried, by message id.
   final _outbox = <int, _DirectSend>{};
@@ -453,6 +500,103 @@ class MeshSync {
     }
     return true;
   }
+
+  // Repeaters and room servers
+
+  /// Logs in to a repeater or room server. A wrong password gets no reply
+  /// at all from the firmware, so that shows up as [LoginNoReply].
+  Future<LoginResult> login(PublicKey server, String password) async {
+    final prefix = server.prefix();
+    final reply = _session.pushes
+        .where(
+          (p) => switch (p) {
+            LoginSucceeded(:final serverPrefix) ||
+            LoginFailed(
+              :final serverPrefix,
+            ) => _sameBytes(serverPrefix, prefix),
+            _ => false,
+          },
+        )
+        .first;
+    // If sending fails or the link drops, nobody awaits this; don't let
+    // its error go unhandled.
+    reply.ignore();
+    final sent = await _session.request<SentReply>(
+      SendLogin(server: server, password: password),
+    );
+    try {
+      final push = await reply.timeout(_replyWait(sent));
+      return switch (push) {
+        LoginSucceeded() => LoggedIn(ServerRole.from(push)),
+        _ => const LoginRefused(),
+      };
+    } on TimeoutException {
+      return const LoginNoReply();
+    }
+  }
+
+  Future<void> logout(PublicKey server) => _session.run(Logout(server));
+
+  /// Asks a repeater or room server for its status. Null if it doesn't
+  /// answer in time.
+  Future<ServerStatus?> requestStatus(PublicKey server) async {
+    final prefix = server.prefix();
+    final reply = _session.pushes
+        .where((p) => p is StatusResponse && _sameBytes(p.serverPrefix, prefix))
+        .first;
+    reply.ignore();
+    final sent = await _session.request<SentReply>(SendStatusRequest(server));
+    try {
+      final push = await reply.timeout(_replyWait(sent)) as StatusResponse;
+      return ServerStatus.parse(push.data);
+    } on TimeoutException {
+      return null;
+    }
+  }
+
+  /// Sends a console command to a server you're logged in to as admin. The
+  /// reply arrives as console text in the same thread. Returns the stored
+  /// command's id.
+  Future<int> sendCommand(
+    PublicKey server,
+    String command, {
+    DateTime? now,
+  }) async {
+    final key = _requireKey();
+    _checkDirectText(command);
+    final sentAt = _seconds(now);
+    final id = await _store.saveOutgoing(
+      key,
+      thread: Threads.direct(server.hex),
+      body: command,
+      sentAt: sentAt,
+      textType: TextType.cliData.value,
+    );
+    try {
+      final sent = await _session.request<SentReply>(
+        SendTextMessage(
+          recipient: server,
+          text: command,
+          timestamp: sentAt,
+          type: TextType.cliData,
+        ),
+      );
+      await _store.markSent(id, flooded: sent.flooded);
+    } on RadioRequestException {
+      await _store.markFailed(id);
+      rethrow;
+    }
+    return id;
+  }
+
+  /// How long to wait for a server's reply: the radio's own estimate plus
+  /// time for the server to answer, within sensible bounds.
+  Duration _replyWait(SentReply sent) => Duration(
+    milliseconds: (sent.timeoutMs * 2 + 5000).clamp(
+      serverReplyFloor.inMilliseconds,
+      60000,
+    ),
+  );
 
   /// Sends to a channel slot and stores it. Channel messages have no ack, so
   /// they end at sent.

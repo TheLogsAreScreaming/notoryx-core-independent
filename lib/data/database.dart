@@ -40,7 +40,7 @@ class MeshDatabase extends _$MeshDatabase {
   factory MeshDatabase.inMemory() => MeshDatabase(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -66,6 +66,11 @@ class MeshDatabase extends _$MeshDatabase {
       if (from < 5) {
         await m.createTable(discovered);
         await customStatement('UPDATE radios SET contacts_since = 0');
+      }
+      // 6: room post authors, and console text kept apart from chat.
+      if (from < 6) {
+        await m.addColumn(messages, messages.textType);
+        await m.addColumn(messages, messages.authorPrefix);
       }
     },
     beforeOpen: (details) async {
