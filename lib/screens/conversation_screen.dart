@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/connection.dart';
+import '../app/delivery.dart';
 import '../app/notifications.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
@@ -98,11 +99,24 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     }
   }
 
-  Future<void> _showActions(Message message, bool retrying) async {
+  /// The contact this direct chat is with, when the radio knows them.
+  Contact? _contact(List<Contact> contacts) {
+    if (widget.isChannel) return null;
+    final key = widget.thread.substring(2);
+    for (final c in contacts) {
+      if (c.publicKey == key) return c;
+    }
+    return null;
+  }
+
+  Future<void> _showActions(
+    Message message,
+    bool retrying,
+    Contact? contact,
+  ) async {
     final state = ref.read(connectionProvider);
-    if (state is! Connected) return;
+    final connected = state is Connected;
     final failed = message.status == MessageStatus.failed;
-    if (!failed && !retrying) return;
     final messenger = ScaffoldMessenger.of(context);
     final action = await showModalBottomSheet<String>(
       context: context,
@@ -110,13 +124,18 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (failed)
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('Delivery details'),
+              onTap: () => Navigator.pop(context, 'details'),
+            ),
+            if (failed && connected)
               ListTile(
                 leading: const Icon(Icons.refresh),
                 title: const Text('Send again'),
                 onTap: () => Navigator.pop(context, 'resend'),
               ),
-            if (retrying)
+            if (retrying && connected)
               ListTile(
                 leading: const Icon(Icons.stop_circle_outlined),
                 title: const Text('Stop trying'),
@@ -126,6 +145,12 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
         ),
       ),
     );
+    if (!mounted) return;
+    if (action == 'details') {
+      await _showDelivery(message, retrying, contact);
+      return;
+    }
+    if (state is! Connected) return;
     try {
       switch (action) {
         case 'resend':
@@ -136,6 +161,71 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     } on RadioRequestException {
       messenger.showSnackBar(
         const SnackBar(content: Text('The radio could not send it.')),
+      );
+    }
+  }
+
+  Future<void> _showDelivery(
+    Message message,
+    bool retrying,
+    Contact? contact,
+  ) async {
+    final report = deliveryReport(
+      message,
+      retrying: retrying,
+      contact: contact,
+    );
+    final sent = DateTime.fromMillisecondsSinceEpoch(message.sentAt * 1000);
+    final canReset =
+        contact != null &&
+        contact.outPathLength != pathUnknown &&
+        ref.read(connectionProvider) is Connected;
+    final messenger = ScaffoldMessenger.of(context);
+    final reset = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(report.headline),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Sent ${MaterialLocalizations.of(context).formatShortDate(sent)} '
+                '${TimeOfDay.fromDateTime(sent).format(context)}',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              for (final line in report.details)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(line),
+                ),
+            ],
+          ),
+        ),
+        actions: [
+          if (canReset)
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Reset route'),
+            ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+    final state = ref.read(connectionProvider);
+    if (reset != true || contact == null || state is! Connected) return;
+    try {
+      await state.sync.resetRoute(PublicKey.fromHex(contact.publicKey));
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Route reset. The next message floods.')),
+      );
+    } on RadioRequestException {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('The radio could not reset the route.')),
       );
     }
   }
@@ -233,6 +323,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                             ? () => _showActions(
                                 message,
                                 retrying.contains(message.id),
+                                _contact(contacts),
                               )
                             : null,
                       );
@@ -314,7 +405,7 @@ class _Bubble extends StatelessWidget {
       if (!mine && message.kind == MessageKind.channel)
         ?_hops(message.pathLength),
       if (mine && retrying) 'try ${message.attempts}',
-      if (mine && message.status == MessageStatus.failed) 'hold to resend',
+      if (mine && message.status == MessageStatus.failed) 'hold for details',
     ].join(' · ');
 
     return Align(

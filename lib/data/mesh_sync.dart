@@ -488,6 +488,13 @@ class MeshSync {
     await _syncContacts();
   }
 
+  /// Forgets the radio's route to [contact], so the next message floods and
+  /// a fresh route is learned.
+  Future<void> resetRoute(PublicKey contact) async {
+    await _session.run(ResetPath(contact));
+    await _syncContacts();
+  }
+
   /// Sends this radio's advert so others can find it: to neighbours only,
   /// or flooded across the mesh.
   Future<void> sendAdvert({bool flood = false}) =>

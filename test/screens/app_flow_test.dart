@@ -232,6 +232,15 @@ void main() {
     await settle(tester);
     expect(find.byIcon(Icons.error_outline), findsOneWidget);
 
+    await tester.longPress(find.text('ping'));
+    await settle(tester);
+    await tester.tap(find.text('Delivery details'));
+    await settle(tester);
+    expect(find.text('The radio didn\u2019t send it'), findsOneWidget);
+    expect(find.text('Reset route'), findsNothing, reason: 'no route yet');
+    await tester.tap(find.text('Close'));
+    await settle(tester);
+
     radio.refuseText = false;
     await tester.longPress(find.text('ping'));
     await settle(tester);
