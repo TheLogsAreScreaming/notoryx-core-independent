@@ -185,16 +185,24 @@ class ConnectionController extends Notifier<RadioConnectionState> {
 
   /// Changes the connected radio's LoRa settings. Throws when there is no
   /// radio or it refuses the settings.
-  Future<void> setRadioParams(SetRadioParams params) async {
+  Future<void> setRadioParams(SetRadioParams params) => changeRadio([params]);
+
+  /// Sends settings changes to the connected radio and shows its settings as
+  /// read back afterwards, also when a change is refused (which throws).
+  Future<void> changeRadio(List<RadioCommand> commands) async {
     final current = state;
     if (current is! Connected) throw StateError('No radio is connected.');
-    final radio = await current.sync.setRadioParams(params);
-    if (ref.mounted && state == current) {
-      state = Connected(
-        radio: radio,
-        sync: current.sync,
-        target: current.target,
-      );
+    try {
+      await current.sync.changeRadio(commands);
+    } finally {
+      final radio = current.sync.radio;
+      if (radio != null && ref.mounted && state == current) {
+        state = Connected(
+          radio: radio,
+          sync: current.sync,
+          target: current.target,
+        );
+      }
     }
   }
 
