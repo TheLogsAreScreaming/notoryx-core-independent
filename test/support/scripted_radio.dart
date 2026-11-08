@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:notoryx_core/radio/radio.dart';
@@ -111,6 +112,12 @@ class ScriptedRadio {
     CommandCode.sendTracePath => _trace(frame),
     CommandCode.sendTelemetryRequest => _telemetry(frame),
     CommandCode.getStats => _stats(frame),
+    CommandCode.runCliCommand => [
+      [
+        ResponseCode.cliReply,
+        ...utf8.encode('> ran ${utf8.decode(frame.sublist(1))}'),
+      ],
+    ],
     _ => [],
   };
 

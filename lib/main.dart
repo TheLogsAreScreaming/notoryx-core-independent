@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'app/appearance.dart';
 import 'app/keep_alive.dart';
 import 'app/packet_log.dart';
 import 'app/radio_stats.dart';
@@ -20,26 +21,21 @@ void main() {
 final _navigator = GlobalKey<NavigatorState>();
 
 /// Root widget for NOTORYX Core.
-class NotoryxApp extends StatelessWidget {
+class NotoryxApp extends ConsumerWidget {
   const NotoryxApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = ref.watch(appearanceProvider.select((a) => a.theme));
     return MaterialApp(
       title: 'NOTORYX Core',
       navigatorKey: _navigator,
-      theme: _theme(Brightness.light),
-      darkTheme: _theme(Brightness.dark),
+      theme: themeFor(theme, Brightness.light),
+      darkTheme: themeFor(theme, Brightness.dark),
+      themeMode: theme.mode,
       home: const _RadioGate(),
     );
   }
-
-  static ThemeData _theme(Brightness brightness) => ThemeData(
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFFE8721C),
-      brightness: brightness,
-    ),
-  );
 }
 
 /// Shows the chats while a radio is connected or being reconnected, and the

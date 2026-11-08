@@ -725,6 +725,33 @@ void main() {
     await cleanUp(tester);
   });
 
+  testWidgets('the radio command line runs commands and hides passwords', (
+    tester,
+  ) async {
+    await connect(tester);
+    await tester.tap(find.byTooltip('Radio settings'));
+    await settle(tester);
+    await tester.scrollUntilVisible(find.text('Command line'), 200);
+    await tester.ensureVisible(find.text('Command line'));
+    await settle(tester);
+    await tester.tap(find.text('Command line'));
+    await settle(tester);
+    await tester.enterText(find.byType(TextField), 'get name');
+    await tester.tap(find.byTooltip('Run command'));
+    await settle(tester);
+    expect(find.text('> ran get name'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Wi-Fi setup'));
+    await settle(tester);
+    await tester.enterText(find.byType(TextField).at(1), 'Camp');
+    await tester.enterText(find.byType(TextField).at(2), 'hunter2');
+    await tester.tap(find.text('Save'));
+    await settle(tester);
+    expect(find.text('> set wifi.pwd ••••••'), findsOneWidget);
+    expect(find.textContaining('> ran set wifi.pwd hunter2'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
   testWidgets('search finds a message and opens its chat', (tester) async {
     await connect(tester);
     radio.queue.add(channelMessageFrame('Ridge: summit at noon', channel: 1));

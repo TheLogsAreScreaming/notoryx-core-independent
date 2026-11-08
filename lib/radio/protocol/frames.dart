@@ -171,6 +171,13 @@ final class BatteryAndStorage extends ReplyFrame {
   final int? totalKb;
 }
 
+/// What the radio's command line said, the reply to [RunCliCommand].
+final class CliReply extends ReplyFrame {
+  const CliReply(this.text);
+
+  final String text;
+}
+
 /// The radio's receiver figures, the reply to [GetRadioStats].
 final class RadioStats extends ReplyFrame {
   const RadioStats({
@@ -502,6 +509,7 @@ RadioFrame decodeFrame(List<int> frame) {
       ResponseCode.channelMessage => _channelMessage(r, snr: null),
       ResponseCode.channelMessageV3 => _channelMessage(r, snr: _snr(r)),
       ResponseCode.channelData => _channelData(r),
+      ResponseCode.cliReply => CliReply(r.rest()),
       PushCode.advert => AdvertHeard(PublicKey(r.bytes(publicKeySize))),
       PushCode.newAdvert => NewAdvert(_contact(r)),
       PushCode.pathUpdated => PathUpdated(PublicKey(r.bytes(publicKeySize))),
