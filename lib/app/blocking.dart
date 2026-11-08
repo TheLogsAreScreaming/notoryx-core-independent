@@ -47,6 +47,12 @@ Set<String> _decode(String? raw) {
   }
 }
 
+/// The block list as stored now.
+Future<BlockList> readBlockList(MeshStore store) async => BlockList(
+  names: _decode(await store.setting(MeshStore.blockedNamesSetting)),
+  keys: _decode(await store.setting(MeshStore.blockedKeysSetting)),
+);
+
 final blockListProvider = StreamProvider<BlockList>(
   (ref) => ref
       .watch(storeProvider)

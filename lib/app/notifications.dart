@@ -128,7 +128,7 @@ final messageAlertsProvider = Provider<void>((ref) {
   final sub = state.sync.incoming.listen((message) async {
     final open = ref.read(openThreadProvider);
     if (inFront() && open == message.thread) return;
-    final blocked = await ref.read(blockListProvider.future);
+    final blocked = await readBlockList(store);
     if (blocked.blocks(message)) return;
     // A mention gets through even in a muted chat.
     final mentioned = mentions(message.body, state.radio.self.name);
