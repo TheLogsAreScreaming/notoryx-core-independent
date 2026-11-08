@@ -99,6 +99,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       body: Column(
         children: [
+          const SosBanner(),
           if (connection case Reconnecting(:final attempt, :final error))
             _ReconnectBanner(attempt: attempt, error: error),
           const BatteryBanner(),
