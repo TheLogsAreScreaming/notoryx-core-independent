@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:notoryx_core/app/channel_directory.dart';
 import 'package:notoryx_core/app/connection.dart';
 import 'package:notoryx_core/app/keep_alive.dart';
 import 'package:notoryx_core/app/mesh_links.dart';
@@ -847,6 +848,51 @@ void main() {
       () => MeshStore(db).setting(batteryPromptDismissedSetting),
     );
     expect(saved, isNotNull);
+    await cleanUp(tester);
+  });
+
+  testWidgets('find channels shows what is heard on air, and joins', (
+    tester,
+  ) async {
+    await connect(tester);
+    void hear(int code) => link.emit([
+      PushCode.rxLog,
+      24,
+      -90 & 0xFF,
+      (PayloadKind.groupText.value << 2) | 1,
+      0,
+      code,
+      1,
+      2,
+    ]);
+    hear(hashtagCode('#hiking'));
+    hear(hashtagCode('#hiking'));
+    // A code no listed name has.
+    var unknown = 0;
+    while ({
+      for (final g in channelDirectory) ...g.names.map(hashtagCode),
+      for (final c in radio.channels.values)
+        channelCode(Uint8List.fromList(c.$2)),
+    }.contains(unknown)) {
+      unknown++;
+    }
+    hear(unknown);
+    await settle(tester);
+
+    await tester.tap(find.byTooltip('Add a channel'));
+    await settle(tester);
+    await tester.tap(find.text('Find channels'));
+    await settle(tester);
+    expect(find.textContaining('Probably heard on air: 2×'), findsWidgets);
+    expect(
+      find.text('Unnamed channel (code ${codeLabel(unknown)})'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.bySemanticsLabel('Join #hiking').first);
+    await settle(tester);
+    expect(find.text('Joined #hiking'), findsOneWidget);
+    expect(radio.channels.values.map((c) => c.$1), contains('#hiking'));
     await cleanUp(tester);
   });
 

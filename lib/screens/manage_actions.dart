@@ -7,6 +7,7 @@ import '../app/contact_room.dart';
 import '../app/mesh_links.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
+import 'channel_directory_screen.dart';
 import 'qr_widgets.dart';
 
 /// The live sync, or null with a notice when the radio isn't connected.
@@ -180,12 +181,20 @@ Future<String?> _pick(
 /// The Chats tab's + button.
 Future<void> showAddChannel(BuildContext context, WidgetRef ref) async {
   final choice = await _pick(context, [
+    (Icons.travel_explore, 'Find channels', 'find'),
     (Icons.tag, 'Join a #hashtag channel', 'hashtag'),
     (Icons.lock_outline, 'Create a private channel', 'private'),
     (Icons.link, 'Add from a link', 'link'),
     if (canScanQr) (Icons.qr_code_scanner, 'Scan a QR code', 'scan'),
   ]);
   if (choice == null || !context.mounted) return;
+  if (choice == 'find') {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const ChannelDirectoryScreen()),
+    );
+    return;
+  }
+
   if (choice == 'link') return addFromLink(context, ref);
   if (choice == 'scan') return addFromQr(context, ref);
   final sync = _syncOrNotice(context, ref);
@@ -200,12 +209,7 @@ Future<void> showAddChannel(BuildContext context, WidgetRef ref) async {
       action: 'Join',
     );
     if (input == null || !context.mounted) return;
-    final name = hashtagName(input);
-    await _run(
-      context,
-      () => sync.addChannel(name, hashtagSecret(name)),
-      done: 'Joined $name',
-    );
+    await joinHashtag(context, ref, input);
     return;
   }
 
@@ -220,6 +224,22 @@ Future<void> showAddChannel(BuildContext context, WidgetRef ref) async {
   final ok = await _run(context, () => sync.addChannel(name, secret));
   if (!ok || !context.mounted) return;
   await _shareChannel(context, ChannelLink(name: name, secret: secret));
+}
+
+/// Joins the hashtag channel [input] (with or without the #).
+Future<bool> joinHashtag(
+  BuildContext context,
+  WidgetRef ref,
+  String input,
+) async {
+  final sync = _syncOrNotice(context, ref);
+  if (sync == null) return false;
+  final name = hashtagName(input);
+  return _run(
+    context,
+    () => sync.addChannel(name, hashtagSecret(name)),
+    done: 'Joined $name',
+  );
 }
 
 Future<void> _shareChannel(BuildContext context, ChannelLink link) =>
