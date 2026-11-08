@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:notoryx_core/app/channel_directory.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:notoryx_core/app/connection.dart';
 import 'package:notoryx_core/app/keep_alive.dart';
 import 'package:notoryx_core/app/mesh_links.dart';
@@ -11,6 +12,7 @@ import 'package:notoryx_core/app/notifications.dart';
 import 'package:notoryx_core/app/radio_connector.dart';
 import 'package:notoryx_core/data/data.dart';
 import 'package:notoryx_core/main.dart';
+import 'package:notoryx_core/screens/map_tab.dart';
 import 'package:notoryx_core/presets/area_presets_provider.dart';
 import 'package:notoryx_core/radio/radio.dart';
 
@@ -149,6 +151,10 @@ void main() {
           ]),
           areaPresetsFetchProvider.overrideWithValue(() async => null),
           keepAliveProvider.overrideWithValue(keepAlive),
+          mapTilesProvider.overrideWithValue(null),
+          phonePositionProvider.overrideWithValue(
+            () async => const LatLng(46.5, -121.25),
+          ),
         ],
         child: const NotoryxApp(),
       ),
@@ -893,6 +899,54 @@ void main() {
     await settle(tester);
     expect(find.text('Joined #hiking'), findsOneWidget);
     expect(radio.channels.values.map((c) => c.$1), contains('#hiking'));
+    await cleanUp(tester);
+  });
+
+  testWidgets('share a position or a contact, and open what others share', (
+    tester,
+  ) async {
+    radioSetup = (r) =>
+        r.contacts.add(contactFrame('Zed', keyByte: 9, lastModified: 11));
+    await connect(tester);
+    await tester.tap(find.text('#trail'));
+    await settle(tester);
+
+    await tester.tap(find.byTooltip('Share position or contact'));
+    await settle(tester);
+    await tester.tap(find.text('My position'));
+    await settle(tester);
+    final box = find.byType(TextField);
+    expect(
+      tester.widget<TextField>(box).controller!.text,
+      '📍 46.50000,-121.25000',
+      reason: 'put in the box to check before sending',
+    );
+    await tester.tap(find.byTooltip('Send'));
+    await settle(tester);
+    expect(find.text('Show on map'), findsOneWidget);
+    await tester.tap(find.text('Show on map'));
+    await settle(tester);
+    expect(find.text('46.50000, -121.25000'), findsOneWidget);
+    await tester.pageBack();
+    await settle(tester);
+
+    // A contact shared by someone else can be added in one tap.
+    final shared = ContactLink(
+      name: 'Eve',
+      publicKey: PublicKey(List.filled(32, 5)),
+      type: NodeType.chat,
+    ).url;
+    radio.queue.add(channelMessageFrame('Ridge: meet $shared', channel: 1));
+    link.emit([PushCode.messagesWaiting]);
+    await settle(tester);
+    await tester.tap(find.text('Add Eve'));
+    await settle(tester);
+    expect(find.text('Added Eve'), findsOneWidget);
+    expect(
+      radio.contacts.any((c) => c[1] == 5),
+      isTrue,
+      reason: 'the radio has Eve now',
+    );
     await cleanUp(tester);
   });
 
