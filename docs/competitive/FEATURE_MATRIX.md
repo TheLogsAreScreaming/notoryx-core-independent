@@ -1,5 +1,7 @@
 # NOTORYX Independent: master feature comparison matrix
 
+> Out of date: this is from test 10. For where Independent stands against the current NOTORYX Core now, see [PARITY.md](PARITY.md).
+
 Researched 2026-11-07 (notoryx-core-independent `main` 0d324fe, 0.1.0+10 / test.10). Machine-readable copy: [`feature_matrix.json`](feature_matrix.json).
 
 ## How to read this
