@@ -23,6 +23,8 @@ part 'database.g.dart';
     Discovered,
     TelemetrySamples,
     RadioStatsSamples,
+    Tracks,
+    TrackPoints,
   ],
 )
 class MeshDatabase extends _$MeshDatabase {
@@ -42,7 +44,7 @@ class MeshDatabase extends _$MeshDatabase {
   factory MeshDatabase.inMemory() => MeshDatabase(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -79,6 +81,12 @@ class MeshDatabase extends _$MeshDatabase {
       if (from < 8) {
         await m.createTable(radioStatsSamples);
         await m.createIndex(radioStatsByRadio);
+      }
+      // 9: track log.
+      if (from < 9) {
+        await m.createTable(tracks);
+        await m.createTable(trackPoints);
+        await m.createIndex(trackPointsByTrack);
       }
     },
     beforeOpen: (details) async {

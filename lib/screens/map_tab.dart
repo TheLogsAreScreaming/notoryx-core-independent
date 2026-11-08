@@ -5,8 +5,12 @@ import 'package:latlong2/latlong.dart';
 
 import '../app/connection.dart';
 import '../app/map_cache.dart';
+import '../app/telemetry.dart';
+import '../app/track_log.dart';
+import '../data/data.dart';
 import '../radio/radio.dart';
 import 'node_details.dart';
+import 'track_log_screen.dart';
 import '../app/position.dart';
 
 export '../app/position.dart' show phonePositionProvider;
@@ -86,6 +90,17 @@ class _MapTabState extends ConsumerState<MapTab> {
       for (final d in heard)
         if (d.latitude != null) nodeFromDiscovered(d),
     ];
+    final latest =
+        ref.watch(latestTelemetryProvider(widget.radioKey)).value ?? const {};
+    final activeTrack = ref.watch(trackRecorderProvider);
+    final trail = activeTrack == null
+        ? const <LatLng>[]
+        : [
+            for (final p
+                in ref.watch(trackPointsProvider(activeTrack)).value ??
+                    const <TrackPoint>[])
+              LatLng(p.latitude, p.longitude),
+          ];
     final radio = _radioPosition();
     final scheme = Theme.of(context).colorScheme;
     final points = [
@@ -111,15 +126,29 @@ class _MapTabState extends ConsumerState<MapTab> {
           ),
           children: [
             ?ref.watch(mapTilesProvider),
+            if (trail.length > 1)
+              PolylineLayer(
+                polylines: [
+                  Polyline(
+                    points: trail,
+                    strokeWidth: 4,
+                    color: scheme.primary,
+                  ),
+                ],
+              ),
             MarkerLayer(
               markers: [
                 for (final node in nodes)
                   Marker(
                     point: LatLng(node.latitude!, node.longitude!),
-                    width: 40,
-                    height: 40,
+                    width: 110,
+                    height: 84,
                     child: _NodeMarker(
                       node: node,
+                      badge: switch (latest[node.publicKey]) {
+                        final sample? => telemetryBadge(sample),
+                        null => null,
+                      },
                       onTap: () =>
                           showNodeDetails(context, ref, node, from: radio),
                     ),
@@ -189,6 +218,19 @@ class _MapTabState extends ConsumerState<MapTab> {
                 ),
               const SizedBox(height: 8),
               FloatingActionButton.small(
+                heroTag: 'map-track',
+                tooltip: activeTrack == null ? 'Track log' : 'Recording track',
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const TrackLogScreen(),
+                  ),
+                ),
+                child: Icon(
+                  activeTrack == null ? Icons.route : Icons.radio_button_on,
+                ),
+              ),
+              const SizedBox(height: 8),
+              FloatingActionButton.small(
                 heroTag: 'map-phone',
                 tooltip: 'Go to my location',
                 onPressed: _locating ? null : _goToPhone,
@@ -208,10 +250,13 @@ class _MapTabState extends ConsumerState<MapTab> {
 }
 
 class _NodeMarker extends StatelessWidget {
-  const _NodeMarker({required this.node, required this.onTap});
+  const _NodeMarker({required this.node, required this.onTap, this.badge});
 
   final NodeSummary node;
   final VoidCallback onTap;
+
+  /// Latest readings, when there are recent ones.
+  final String? badge;
 
   @override
   Widget build(BuildContext context) {
@@ -219,29 +264,57 @@ class _NodeMarker extends StatelessWidget {
     final color = node.isContact
         ? scheme.primaryContainer
         : scheme.surfaceContainerHighest;
-    return Semantics(
-      button: true,
-      label: node.name,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: node.isContact ? scheme.primary : scheme.outline,
-              width: 2,
+    final badgeText = badge;
+    // The circle stays centred on the node's position; the badge hangs
+    // below it.
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Semantics(
+          button: true,
+          label: badgeText == null ? node.name : '${node.name}, $badgeText',
+          child: GestureDetector(
+            onTap: onTap,
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: node.isContact ? scheme.primary : scheme.outline,
+                  width: 2,
+                ),
+              ),
+              child: Icon(
+                node.type == NodeType.chat ? Icons.person : nodeIcon(node.type),
+                size: 20,
+                color: node.isContact
+                    ? scheme.onPrimaryContainer
+                    : scheme.onSurfaceVariant,
+              ),
             ),
           ),
-          child: Icon(
-            node.type == NodeType.chat ? Icons.person : nodeIcon(node.type),
-            size: 20,
-            color: node.isContact
-                ? scheme.onPrimaryContainer
-                : scheme.onSurfaceVariant,
-          ),
         ),
-      ),
+        if (badgeText != null)
+          Positioned(
+            bottom: 2,
+            child: ExcludeSemantics(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: scheme.surface,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: scheme.outline),
+                ),
+                child: Text(
+                  badgeText,
+                  style: Theme.of(context).textTheme.labelSmall,
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

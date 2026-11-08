@@ -4253,6 +4253,706 @@ class RadioStatsSamplesCompanion extends UpdateCompanion<RadioStatsSample> {
   }
 }
 
+class $TracksTable extends Tracks with TableInfo<$TracksTable, Track> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TracksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startedAtMeta = const VerificationMeta(
+    'startedAt',
+  );
+  @override
+  late final GeneratedColumn<int> startedAt = GeneratedColumn<int>(
+    'started_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endedAtMeta = const VerificationMeta(
+    'endedAt',
+  );
+  @override
+  late final GeneratedColumn<int> endedAt = GeneratedColumn<int>(
+    'ended_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, startedAt, endedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'tracks';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Track> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(
+        _startedAtMeta,
+        startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startedAtMeta);
+    }
+    if (data.containsKey('ended_at')) {
+      context.handle(
+        _endedAtMeta,
+        endedAt.isAcceptableOrUnknown(data['ended_at']!, _endedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Track map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Track(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      startedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}started_at'],
+      )!,
+      endedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ended_at'],
+      ),
+    );
+  }
+
+  @override
+  $TracksTable createAlias(String alias) {
+    return $TracksTable(attachedDatabase, alias);
+  }
+}
+
+class Track extends DataClass implements Insertable<Track> {
+  final int id;
+  final String name;
+
+  /// Unix milliseconds.
+  final int startedAt;
+  final int? endedAt;
+  const Track({
+    required this.id,
+    required this.name,
+    required this.startedAt,
+    this.endedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['started_at'] = Variable<int>(startedAt);
+    if (!nullToAbsent || endedAt != null) {
+      map['ended_at'] = Variable<int>(endedAt);
+    }
+    return map;
+  }
+
+  TracksCompanion toCompanion(bool nullToAbsent) {
+    return TracksCompanion(
+      id: Value(id),
+      name: Value(name),
+      startedAt: Value(startedAt),
+      endedAt: endedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endedAt),
+    );
+  }
+
+  factory Track.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Track(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      startedAt: serializer.fromJson<int>(json['startedAt']),
+      endedAt: serializer.fromJson<int?>(json['endedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'startedAt': serializer.toJson<int>(startedAt),
+      'endedAt': serializer.toJson<int?>(endedAt),
+    };
+  }
+
+  Track copyWith({
+    int? id,
+    String? name,
+    int? startedAt,
+    Value<int?> endedAt = const Value.absent(),
+  }) => Track(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    startedAt: startedAt ?? this.startedAt,
+    endedAt: endedAt.present ? endedAt.value : this.endedAt,
+  );
+  Track copyWithCompanion(TracksCompanion data) {
+    return Track(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      endedAt: data.endedAt.present ? data.endedAt.value : this.endedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Track(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, startedAt, endedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Track &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.startedAt == this.startedAt &&
+          other.endedAt == this.endedAt);
+}
+
+class TracksCompanion extends UpdateCompanion<Track> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<int> startedAt;
+  final Value<int?> endedAt;
+  const TracksCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.endedAt = const Value.absent(),
+  });
+  TracksCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required int startedAt,
+    this.endedAt = const Value.absent(),
+  }) : name = Value(name),
+       startedAt = Value(startedAt);
+  static Insertable<Track> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<int>? startedAt,
+    Expression<int>? endedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (startedAt != null) 'started_at': startedAt,
+      if (endedAt != null) 'ended_at': endedAt,
+    });
+  }
+
+  TracksCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<int>? startedAt,
+    Value<int?>? endedAt,
+  }) {
+    return TracksCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<int>(startedAt.value);
+    }
+    if (endedAt.present) {
+      map['ended_at'] = Variable<int>(endedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TracksCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $TrackPointsTable extends TrackPoints
+    with TableInfo<$TrackPointsTable, TrackPoint> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TrackPointsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _trackMeta = const VerificationMeta('track');
+  @override
+  late final GeneratedColumn<int> track = GeneratedColumn<int>(
+    'track',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES tracks (id)',
+    ),
+  );
+  static const VerificationMeta _atMeta = const VerificationMeta('at');
+  @override
+  late final GeneratedColumn<int> at = GeneratedColumn<int>(
+    'at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _latitudeMeta = const VerificationMeta(
+    'latitude',
+  );
+  @override
+  late final GeneratedColumn<double> latitude = GeneratedColumn<double>(
+    'latitude',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _longitudeMeta = const VerificationMeta(
+    'longitude',
+  );
+  @override
+  late final GeneratedColumn<double> longitude = GeneratedColumn<double>(
+    'longitude',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _altitudeMeta = const VerificationMeta(
+    'altitude',
+  );
+  @override
+  late final GeneratedColumn<double> altitude = GeneratedColumn<double>(
+    'altitude',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    track,
+    at,
+    latitude,
+    longitude,
+    altitude,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'track_points';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TrackPoint> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('track')) {
+      context.handle(
+        _trackMeta,
+        track.isAcceptableOrUnknown(data['track']!, _trackMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_trackMeta);
+    }
+    if (data.containsKey('at')) {
+      context.handle(_atMeta, at.isAcceptableOrUnknown(data['at']!, _atMeta));
+    } else if (isInserting) {
+      context.missing(_atMeta);
+    }
+    if (data.containsKey('latitude')) {
+      context.handle(
+        _latitudeMeta,
+        latitude.isAcceptableOrUnknown(data['latitude']!, _latitudeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_latitudeMeta);
+    }
+    if (data.containsKey('longitude')) {
+      context.handle(
+        _longitudeMeta,
+        longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_longitudeMeta);
+    }
+    if (data.containsKey('altitude')) {
+      context.handle(
+        _altitudeMeta,
+        altitude.isAcceptableOrUnknown(data['altitude']!, _altitudeMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TrackPoint map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TrackPoint(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      track: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}track'],
+      )!,
+      at: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}at'],
+      )!,
+      latitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}latitude'],
+      )!,
+      longitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}longitude'],
+      )!,
+      altitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}altitude'],
+      ),
+    );
+  }
+
+  @override
+  $TrackPointsTable createAlias(String alias) {
+    return $TrackPointsTable(attachedDatabase, alias);
+  }
+}
+
+class TrackPoint extends DataClass implements Insertable<TrackPoint> {
+  final int id;
+  final int track;
+
+  /// Unix milliseconds.
+  final int at;
+  final double latitude;
+  final double longitude;
+
+  /// Metres above sea level, when the phone knows.
+  final double? altitude;
+  const TrackPoint({
+    required this.id,
+    required this.track,
+    required this.at,
+    required this.latitude,
+    required this.longitude,
+    this.altitude,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['track'] = Variable<int>(track);
+    map['at'] = Variable<int>(at);
+    map['latitude'] = Variable<double>(latitude);
+    map['longitude'] = Variable<double>(longitude);
+    if (!nullToAbsent || altitude != null) {
+      map['altitude'] = Variable<double>(altitude);
+    }
+    return map;
+  }
+
+  TrackPointsCompanion toCompanion(bool nullToAbsent) {
+    return TrackPointsCompanion(
+      id: Value(id),
+      track: Value(track),
+      at: Value(at),
+      latitude: Value(latitude),
+      longitude: Value(longitude),
+      altitude: altitude == null && nullToAbsent
+          ? const Value.absent()
+          : Value(altitude),
+    );
+  }
+
+  factory TrackPoint.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TrackPoint(
+      id: serializer.fromJson<int>(json['id']),
+      track: serializer.fromJson<int>(json['track']),
+      at: serializer.fromJson<int>(json['at']),
+      latitude: serializer.fromJson<double>(json['latitude']),
+      longitude: serializer.fromJson<double>(json['longitude']),
+      altitude: serializer.fromJson<double?>(json['altitude']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'track': serializer.toJson<int>(track),
+      'at': serializer.toJson<int>(at),
+      'latitude': serializer.toJson<double>(latitude),
+      'longitude': serializer.toJson<double>(longitude),
+      'altitude': serializer.toJson<double?>(altitude),
+    };
+  }
+
+  TrackPoint copyWith({
+    int? id,
+    int? track,
+    int? at,
+    double? latitude,
+    double? longitude,
+    Value<double?> altitude = const Value.absent(),
+  }) => TrackPoint(
+    id: id ?? this.id,
+    track: track ?? this.track,
+    at: at ?? this.at,
+    latitude: latitude ?? this.latitude,
+    longitude: longitude ?? this.longitude,
+    altitude: altitude.present ? altitude.value : this.altitude,
+  );
+  TrackPoint copyWithCompanion(TrackPointsCompanion data) {
+    return TrackPoint(
+      id: data.id.present ? data.id.value : this.id,
+      track: data.track.present ? data.track.value : this.track,
+      at: data.at.present ? data.at.value : this.at,
+      latitude: data.latitude.present ? data.latitude.value : this.latitude,
+      longitude: data.longitude.present ? data.longitude.value : this.longitude,
+      altitude: data.altitude.present ? data.altitude.value : this.altitude,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TrackPoint(')
+          ..write('id: $id, ')
+          ..write('track: $track, ')
+          ..write('at: $at, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude, ')
+          ..write('altitude: $altitude')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, track, at, latitude, longitude, altitude);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TrackPoint &&
+          other.id == this.id &&
+          other.track == this.track &&
+          other.at == this.at &&
+          other.latitude == this.latitude &&
+          other.longitude == this.longitude &&
+          other.altitude == this.altitude);
+}
+
+class TrackPointsCompanion extends UpdateCompanion<TrackPoint> {
+  final Value<int> id;
+  final Value<int> track;
+  final Value<int> at;
+  final Value<double> latitude;
+  final Value<double> longitude;
+  final Value<double?> altitude;
+  const TrackPointsCompanion({
+    this.id = const Value.absent(),
+    this.track = const Value.absent(),
+    this.at = const Value.absent(),
+    this.latitude = const Value.absent(),
+    this.longitude = const Value.absent(),
+    this.altitude = const Value.absent(),
+  });
+  TrackPointsCompanion.insert({
+    this.id = const Value.absent(),
+    required int track,
+    required int at,
+    required double latitude,
+    required double longitude,
+    this.altitude = const Value.absent(),
+  }) : track = Value(track),
+       at = Value(at),
+       latitude = Value(latitude),
+       longitude = Value(longitude);
+  static Insertable<TrackPoint> custom({
+    Expression<int>? id,
+    Expression<int>? track,
+    Expression<int>? at,
+    Expression<double>? latitude,
+    Expression<double>? longitude,
+    Expression<double>? altitude,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (track != null) 'track': track,
+      if (at != null) 'at': at,
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
+      if (altitude != null) 'altitude': altitude,
+    });
+  }
+
+  TrackPointsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? track,
+    Value<int>? at,
+    Value<double>? latitude,
+    Value<double>? longitude,
+    Value<double?>? altitude,
+  }) {
+    return TrackPointsCompanion(
+      id: id ?? this.id,
+      track: track ?? this.track,
+      at: at ?? this.at,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      altitude: altitude ?? this.altitude,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (track.present) {
+      map['track'] = Variable<int>(track.value);
+    }
+    if (at.present) {
+      map['at'] = Variable<int>(at.value);
+    }
+    if (latitude.present) {
+      map['latitude'] = Variable<double>(latitude.value);
+    }
+    if (longitude.present) {
+      map['longitude'] = Variable<double>(longitude.value);
+    }
+    if (altitude.present) {
+      map['altitude'] = Variable<double>(altitude.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TrackPointsCompanion(')
+          ..write('id: $id, ')
+          ..write('track: $track, ')
+          ..write('at: $at, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude, ')
+          ..write('altitude: $altitude')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$MeshDatabase extends GeneratedDatabase {
   _$MeshDatabase(QueryExecutor e) : super(e);
   $MeshDatabaseManager get managers => $MeshDatabaseManager(this);
@@ -4268,6 +4968,8 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
   );
   late final $RadioStatsSamplesTable radioStatsSamples =
       $RadioStatsSamplesTable(this);
+  late final $TracksTable tracks = $TracksTable(this);
+  late final $TrackPointsTable trackPoints = $TrackPointsTable(this);
   late final Index messagesByThread = Index(
     'messages_by_thread',
     'CREATE INDEX messages_by_thread ON messages (radio_key, thread, id)',
@@ -4284,6 +4986,10 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
     'radio_stats_by_radio',
     'CREATE INDEX radio_stats_by_radio ON radio_stats_samples (radio_key, at)',
   );
+  late final Index trackPointsByTrack = Index(
+    'track_points_by_track',
+    'CREATE INDEX track_points_by_track ON track_points (track, id)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4298,10 +5004,13 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
     discovered,
     telemetrySamples,
     radioStatsSamples,
+    tracks,
+    trackPoints,
     messagesByThread,
     messagesByAck,
     telemetryByNode,
     radioStatsByRadio,
+    trackPointsByTrack,
   ];
 }
 
@@ -7969,6 +8678,608 @@ typedef $$RadioStatsSamplesTableProcessedTableManager =
       RadioStatsSample,
       PrefetchHooks Function({bool radioKey})
     >;
+typedef $$TracksTableCreateCompanionBuilder = TracksCompanion Function({
+  Value<int> id,
+  required String name,
+  required int startedAt,
+  Value<int?> endedAt,
+});
+typedef $$TracksTableUpdateCompanionBuilder = TracksCompanion Function({
+  Value<int> id,
+  Value<String> name,
+  Value<int> startedAt,
+  Value<int?> endedAt,
+});
+
+final class $$TracksTableReferences
+    extends BaseReferences<_$MeshDatabase, $TracksTable, Track> {
+  $$TracksTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$TrackPointsTable, List<TrackPoint>>
+  _trackPointsRefsTable(_$MeshDatabase db) => MultiTypedResultKey.fromTable(
+    db.trackPoints,
+    aliasName: 'tracks__id__track_points__track',
+  );
+
+  $$TrackPointsTableProcessedTableManager get trackPointsRefs {
+    final manager = $$TrackPointsTableTableManager(
+      $_db,
+      $_db.trackPoints,
+    ).filter((f) => f.track.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_trackPointsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$TracksTableFilterComposer
+    extends Composer<_$MeshDatabase, $TracksTable> {
+  $$TracksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> trackPointsRefs(
+    Expression<bool> Function($$TrackPointsTableFilterComposer f) f,
+  ) {
+    final $$TrackPointsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.trackPoints,
+      getReferencedColumn: (t) => t.track,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TrackPointsTableFilterComposer(
+            $db: $db,
+            $table: $db.trackPoints,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$TracksTableOrderingComposer
+    extends Composer<_$MeshDatabase, $TracksTable> {
+  $$TracksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$TracksTableAnnotationComposer
+    extends Composer<_$MeshDatabase, $TracksTable> {
+  $$TracksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get endedAt =>
+      $composableBuilder(column: $table.endedAt, builder: (column) => column);
+
+  Expression<T> trackPointsRefs<T extends Object>(
+    Expression<T> Function($$TrackPointsTableAnnotationComposer a) f,
+  ) {
+    final $$TrackPointsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.trackPoints,
+      getReferencedColumn: (t) => t.track,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TrackPointsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.trackPoints,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$TracksTableTableManager
+    extends
+        RootTableManager<
+          _$MeshDatabase,
+          $TracksTable,
+          Track,
+          $$TracksTableFilterComposer,
+          $$TracksTableOrderingComposer,
+          $$TracksTableAnnotationComposer,
+          $$TracksTableCreateCompanionBuilder,
+          $$TracksTableUpdateCompanionBuilder,
+          (Track, $$TracksTableReferences),
+          Track,
+          PrefetchHooks Function({bool trackPointsRefs})
+        > {
+  $$TracksTableTableManager(_$MeshDatabase db, $TracksTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TracksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TracksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TracksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> startedAt = const Value.absent(),
+                Value<int?> endedAt = const Value.absent(),
+              }) => TracksCompanion(
+                id: id,
+                name: name,
+                startedAt: startedAt,
+                endedAt: endedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required int startedAt,
+                Value<int?> endedAt = const Value.absent(),
+              }) => TracksCompanion.insert(
+                id: id,
+                name: name,
+                startedAt: startedAt,
+                endedAt: endedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$TracksTable, Track>(table),
+                  $$TracksTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({trackPointsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (trackPointsRefs) db.trackPoints],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (trackPointsRefs)
+                    await $_getPrefetchedDataByColumns<
+                      Track,
+                      $TracksTable,
+                      TrackPoint,
+                      $TrackPointsTable
+                    >(
+                      currentTable: table,
+                      referencedTable: $$TracksTableReferences
+                          ._trackPointsRefsTable(db),
+                      managerFromTypedResult: (p0) => $$TracksTableReferences(
+                        db,
+                        table,
+                        p0,
+                      ).trackPointsRefs,
+                      currentColumn: 'id',
+                      referencedColumn: 'track',
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$TracksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$MeshDatabase,
+      $TracksTable,
+      Track,
+      $$TracksTableFilterComposer,
+      $$TracksTableOrderingComposer,
+      $$TracksTableAnnotationComposer,
+      $$TracksTableCreateCompanionBuilder,
+      $$TracksTableUpdateCompanionBuilder,
+      (Track, $$TracksTableReferences),
+      Track,
+      PrefetchHooks Function({bool trackPointsRefs})
+    >;
+typedef $$TrackPointsTableCreateCompanionBuilder =
+    TrackPointsCompanion Function({
+      Value<int> id,
+      required int track,
+      required int at,
+      required double latitude,
+      required double longitude,
+      Value<double?> altitude,
+    });
+typedef $$TrackPointsTableUpdateCompanionBuilder =
+    TrackPointsCompanion Function({
+      Value<int> id,
+      Value<int> track,
+      Value<int> at,
+      Value<double> latitude,
+      Value<double> longitude,
+      Value<double?> altitude,
+    });
+
+final class $$TrackPointsTableReferences
+    extends BaseReferences<_$MeshDatabase, $TrackPointsTable, TrackPoint> {
+  $$TrackPointsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $TracksTable _trackTable(_$MeshDatabase db) =>
+      db.tracks.createAlias('track_points__track__tracks__id');
+
+  $$TracksTableProcessedTableManager get track {
+    final $_column = $_itemColumn<int>('track')!;
+
+    final manager = $$TracksTableTableManager(
+      $_db,
+      $_db.tracks,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_trackTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$TrackPointsTableFilterComposer
+    extends Composer<_$MeshDatabase, $TrackPointsTable> {
+  $$TrackPointsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get at => $composableBuilder(
+    column: $table.at,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get latitude => $composableBuilder(
+    column: $table.latitude,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get longitude => $composableBuilder(
+    column: $table.longitude,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get altitude => $composableBuilder(
+    column: $table.altitude,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$TracksTableFilterComposer get track {
+    final $$TracksTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.track,
+      referencedTable: $db.tracks,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TracksTableFilterComposer(
+            $db: $db,
+            $table: $db.tracks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TrackPointsTableOrderingComposer
+    extends Composer<_$MeshDatabase, $TrackPointsTable> {
+  $$TrackPointsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get at => $composableBuilder(
+    column: $table.at,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get latitude => $composableBuilder(
+    column: $table.latitude,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get longitude => $composableBuilder(
+    column: $table.longitude,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get altitude => $composableBuilder(
+    column: $table.altitude,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$TracksTableOrderingComposer get track {
+    final $$TracksTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.track,
+      referencedTable: $db.tracks,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TracksTableOrderingComposer(
+            $db: $db,
+            $table: $db.tracks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TrackPointsTableAnnotationComposer
+    extends Composer<_$MeshDatabase, $TrackPointsTable> {
+  $$TrackPointsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get at =>
+      $composableBuilder(column: $table.at, builder: (column) => column);
+
+  GeneratedColumn<double> get latitude =>
+      $composableBuilder(column: $table.latitude, builder: (column) => column);
+
+  GeneratedColumn<double> get longitude =>
+      $composableBuilder(column: $table.longitude, builder: (column) => column);
+
+  GeneratedColumn<double> get altitude =>
+      $composableBuilder(column: $table.altitude, builder: (column) => column);
+
+  $$TracksTableAnnotationComposer get track {
+    final $$TracksTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.track,
+      referencedTable: $db.tracks,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TracksTableAnnotationComposer(
+            $db: $db,
+            $table: $db.tracks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TrackPointsTableTableManager
+    extends
+        RootTableManager<
+          _$MeshDatabase,
+          $TrackPointsTable,
+          TrackPoint,
+          $$TrackPointsTableFilterComposer,
+          $$TrackPointsTableOrderingComposer,
+          $$TrackPointsTableAnnotationComposer,
+          $$TrackPointsTableCreateCompanionBuilder,
+          $$TrackPointsTableUpdateCompanionBuilder,
+          (TrackPoint, $$TrackPointsTableReferences),
+          TrackPoint,
+          PrefetchHooks Function({bool track})
+        > {
+  $$TrackPointsTableTableManager(_$MeshDatabase db, $TrackPointsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TrackPointsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TrackPointsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TrackPointsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> track = const Value.absent(),
+                Value<int> at = const Value.absent(),
+                Value<double> latitude = const Value.absent(),
+                Value<double> longitude = const Value.absent(),
+                Value<double?> altitude = const Value.absent(),
+              }) => TrackPointsCompanion(
+                id: id,
+                track: track,
+                at: at,
+                latitude: latitude,
+                longitude: longitude,
+                altitude: altitude,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int track,
+                required int at,
+                required double latitude,
+                required double longitude,
+                Value<double?> altitude = const Value.absent(),
+              }) => TrackPointsCompanion.insert(
+                id: id,
+                track: track,
+                at: at,
+                latitude: latitude,
+                longitude: longitude,
+                altitude: altitude,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$TrackPointsTable, TrackPoint>(table),
+                  $$TrackPointsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({track = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (track) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.track,
+                        referencedTable: $$TrackPointsTableReferences
+                            ._trackTable(db),
+                        referencedColumn: $$TrackPointsTableReferences
+                            ._trackTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$TrackPointsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$MeshDatabase,
+      $TrackPointsTable,
+      TrackPoint,
+      $$TrackPointsTableFilterComposer,
+      $$TrackPointsTableOrderingComposer,
+      $$TrackPointsTableAnnotationComposer,
+      $$TrackPointsTableCreateCompanionBuilder,
+      $$TrackPointsTableUpdateCompanionBuilder,
+      (TrackPoint, $$TrackPointsTableReferences),
+      TrackPoint,
+      PrefetchHooks Function({bool track})
+    >;
 
 class $MeshDatabaseManager {
   final _$MeshDatabase _db;
@@ -7991,4 +9302,8 @@ class $MeshDatabaseManager {
       $$TelemetrySamplesTableTableManager(_db, _db.telemetrySamples);
   $$RadioStatsSamplesTableTableManager get radioStatsSamples =>
       $$RadioStatsSamplesTableTableManager(_db, _db.radioStatsSamples);
+  $$TracksTableTableManager get tracks =>
+      $$TracksTableTableManager(_db, _db.tracks);
+  $$TrackPointsTableTableManager get trackPoints =>
+      $$TrackPointsTableTableManager(_db, _db.trackPoints);
 }

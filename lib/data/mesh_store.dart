@@ -686,6 +686,73 @@ class MeshStore {
           ))
           .go();
 
+  /// The newest telemetry reply from each node, by node key.
+  Stream<Map<String, TelemetrySample>> watchLatestTelemetry(String radioKey) =>
+      (_db.select(_db.telemetrySamples)..where(
+            (t) => t.id.isInQuery(
+              _db.selectOnly(_db.telemetrySamples)
+                ..addColumns([_db.telemetrySamples.id.max()])
+                ..where(_db.telemetrySamples.radioKey.equals(radioKey))
+                ..groupBy([_db.telemetrySamples.nodeKey]),
+            ),
+          ))
+          .watch()
+          .map((rows) => {for (final r in rows) r.nodeKey: r});
+
+  // Track log
+
+  /// Starts a new track and returns its id.
+  Future<int> startTrack(String name) => _db
+      .into(_db.tracks)
+      .insert(
+        TracksCompanion.insert(
+          name: name,
+          startedAt: _clock().millisecondsSinceEpoch,
+        ),
+      );
+
+  /// Adds one fix to track [id].
+  Future<void> addTrackPoint(
+    int id, {
+    required double latitude,
+    required double longitude,
+    double? altitude,
+  }) => _db
+      .into(_db.trackPoints)
+      .insert(
+        TrackPointsCompanion.insert(
+          track: id,
+          at: _clock().millisecondsSinceEpoch,
+          latitude: latitude,
+          longitude: longitude,
+          altitude: Value(altitude),
+        ),
+      );
+
+  /// Ends every track still open, including one left by a closed app.
+  Future<void> endOpenTracks() =>
+      (_db.update(_db.tracks)..where((t) => t.endedAt.isNull())).write(
+        TracksCompanion(endedAt: Value(_clock().millisecondsSinceEpoch)),
+      );
+
+  /// All tracks, newest first.
+  Stream<List<Track>> watchTracks() => (_db.select(
+    _db.tracks,
+  )..orderBy([(t) => OrderingTerm.desc(t.id)])).watch();
+
+  /// A track's fixes, oldest first.
+  Stream<List<TrackPoint>> watchTrackPoints(int id) =>
+      (_db.select(_db.trackPoints)
+            ..where((t) => t.track.equals(id))
+            ..orderBy([(t) => OrderingTerm.asc(t.id)]))
+          .watch();
+
+  /// Deletes a track and its fixes.
+  Future<void> deleteTrack(int id) => _db.transaction(() async {
+    await (_db.delete(_db.trackPoints)..where((t) => t.track.equals(id))).go();
+    await (_db.delete(_db.tracks)..where((t) => t.id.equals(id))).go();
+  });
+
   // Radio stats
 
   /// How many receiver samples are kept per radio: about two weeks at one

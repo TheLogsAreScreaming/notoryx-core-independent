@@ -181,3 +181,28 @@ class RadioStatsSamples extends Table {
   IntColumn get txAirSeconds => integer()();
   IntColumn get rxAirSeconds => integer()();
 }
+
+/// A walk recorded from the phone's GPS. [endedAt] is null while recording.
+class Tracks extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text()();
+
+  /// Unix milliseconds.
+  IntColumn get startedAt => integer()();
+  IntColumn get endedAt => integer().nullable()();
+}
+
+/// One GPS fix on a [Tracks] row.
+@TableIndex(name: 'track_points_by_track', columns: {#track, #id})
+class TrackPoints extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get track => integer().references(Tracks, #id)();
+
+  /// Unix milliseconds.
+  IntColumn get at => integer()();
+  RealColumn get latitude => real()();
+  RealColumn get longitude => real()();
+
+  /// Metres above sea level, when the phone knows.
+  RealColumn get altitude => real().nullable()();
+}

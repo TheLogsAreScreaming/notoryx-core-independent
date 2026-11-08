@@ -157,3 +157,36 @@ final selfTelemetrySamplerProvider = Provider<void>((ref) {
   unawaited(follow(ref.read(connectionProvider)));
   ref.listen(connectionProvider, (_, next) => unawaited(follow(next)));
 });
+
+/// Each node's newest telemetry reply, by node key.
+final latestTelemetryProvider =
+    StreamProvider.family<Map<String, TelemetrySample>, String>(
+      (ref, radioKey) =>
+          ref.watch(storeProvider).watchLatestTelemetry(radioKey),
+    );
+
+/// How long a reading stays on the map. Older ones could mislead.
+const telemetryBadgeMaxAge = Duration(hours: 24);
+
+/// Short text for a node's map marker, like "3.91 V · 18.5°C", or null
+/// when [sample] is too old or holds nothing worth showing.
+String? telemetryBadge(TelemetrySample sample, {DateTime? now}) {
+  final at = DateTime.fromMillisecondsSinceEpoch(sample.at);
+  if ((now ?? DateTime.now()).difference(at) > telemetryBadgeMaxAge) {
+    return null;
+  }
+  String? battery;
+  String? temperature;
+  for (final r in decodeLpp(sample.data)) {
+    if (r.channel == 1 && r.kind == LppKind.voltage) {
+      battery = formatValue(r.kind, r.value);
+    } else if (r.kind == LppKind.percentage) {
+      battery ??= formatValue(r.kind, r.value);
+    } else if (r.kind == LppKind.temperature && r.channel > 1) {
+      // Channel 1 is the chip, which says little about the weather.
+      temperature ??= formatValue(r.kind, r.value);
+    }
+  }
+  final parts = [?battery, ?temperature];
+  return parts.isEmpty ? null : parts.join(' · ');
+}
