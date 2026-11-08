@@ -14,6 +14,7 @@ import 'package:notoryx_core/radio/radio.dart';
 
 import '../support/fake_notifier.dart';
 import '../support/fake_radio_link.dart';
+import '../support/radio_frames.dart';
 import '../support/scripted_radio.dart';
 
 class _Connector implements RadioConnector {
@@ -41,6 +42,8 @@ void main() {
 
   late MeshDatabase db;
   late FakeNotifier notifier;
+  late FakeRadioLink link;
+  late ScriptedRadio radio;
   var now = DateTime(2026, 11, 7, 9);
 
   Future<void> settle(WidgetTester tester) async {
@@ -69,8 +72,8 @@ void main() {
           databaseProvider.overrideWithValue(db),
           radioConnectorProvider.overrideWithValue(
             _Connector(() {
-              final link = FakeRadioLink();
-              ScriptedRadio(link);
+              link = FakeRadioLink();
+              radio = ScriptedRadio(link);
               return link;
             }),
           ),
@@ -104,23 +107,107 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
   }
 
-  testWidgets('SOS asks first, then sends with the position', (tester) async {
+  /// Holds the SOS button for [time].
+  Future<void> hold(WidgetTester tester, Duration time) async {
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.bySemanticsLabel('Hold for SOS')),
+    );
+    for (
+      var t = Duration.zero;
+      t < time;
+      t += const Duration(milliseconds: 100)
+    ) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    await gesture.up();
+    await settle(tester);
+  }
+
+  /// A channel 1 message from someone else arrives.
+  Future<void> hear(WidgetTester tester, String text) async {
+    radio.queue.add(channelMessageFrame(text, channel: 1));
+    link.emit([PushCode.messagesWaiting]);
+    await settle(tester);
+  }
+
+  /// Lets [time] pass on the SOS clock and the timers.
+  Future<void> wait(WidgetTester tester, Duration time) async {
+    now = now.add(time);
+    await tester.pump(const Duration(minutes: 1));
+    await settle(tester);
+  }
+
+  testWidgets('SOS sends only when held, and repeats until answered', (
+    tester,
+  ) async {
     await openSafety(tester);
-    await tester.tap(find.text('Send SOS'));
+    // A tap or a short hold sends nothing.
+    await tester.tap(find.bySemanticsLabel('Hold for SOS'));
     await settle(tester);
-    expect(find.text('Send SOS?'), findsOneWidget);
-    await tester.tap(find.text('Cancel'));
-    await settle(tester);
+    expect(find.textContaining('Keep holding for 2 seconds'), findsOneWidget);
+    await hold(tester, const Duration(milliseconds: 900));
     expect(await sent(tester), isEmpty);
 
-    await tester.tap(find.text('Send SOS'));
-    await settle(tester);
-    await tester.tap(find.widgetWithText(FilledButton, 'Send SOS').last);
-    await settle(tester);
+    await hold(tester, const Duration(milliseconds: 2200));
     expect(await sent(tester), [
       'SOS - I need help. Position 46.50000,-121.25000',
     ]);
-    expect(find.text('SOS sent to #trail.'), findsOneWidget);
+    expect(find.text('SOS active'), findsOneWidget);
+    expect(find.textContaining('Sent 1 time, last at'), findsOneWidget);
+
+    // Unanswered: sent again after 5 minutes. Chatter doesn't count.
+    await wait(tester, const Duration(minutes: 3));
+    expect(await sent(tester), hasLength(1));
+    await hear(tester, 'Ann: anyone for lunch?');
+    await wait(tester, const Duration(minutes: 2));
+    expect((await sent(tester)).last, startsWith('SOS (2) - I need help.'));
+
+    // A message that says SOS answers it, and repeats stop.
+    await hear(tester, 'Ridge: saw your SOS, on our way');
+    expect(
+      find.text('Answered by Ridge. It no longer repeats.'),
+      findsOneWidget,
+    );
+    await wait(tester, const Duration(minutes: 10));
+    expect(await sent(tester), hasLength(2));
+
+    // The home screen shows it too.
+    await tester.pageBack();
+    await settle(tester);
+    expect(
+      find.text("SOS answered by Ridge. Tap to send I'm safe."),
+      findsOneWidget,
+    );
+    await tester.tap(find.text("SOS answered by Ridge. Tap to send I'm safe."));
+    await settle(tester);
+
+    await tester.tap(find.text("I'm safe"));
+    await settle(tester);
+    expect(
+      (await sent(tester)).last,
+      "I'm safe now - SOS over. Position 46.50000,-121.25000",
+    );
+    expect(find.text('SOS active'), findsNothing);
+    expect(find.bySemanticsLabel('Hold for SOS'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
+  testWidgets('an SOS can be stopped without an all-clear', (tester) async {
+    await openSafety(tester);
+    await hold(tester, const Duration(milliseconds: 2200));
+    await tester.tap(find.text('Stop without all-clear'));
+    await settle(tester);
+    await tester.tap(find.text('Keep it going'));
+    await settle(tester);
+    expect(find.text('SOS active'), findsOneWidget);
+    await tester.tap(find.text('Stop without all-clear'));
+    await settle(tester);
+    await tester.tap(find.text('Stop'));
+    await settle(tester);
+    expect(find.text('SOS active'), findsNothing);
+    expect(await sent(tester), hasLength(1), reason: 'no all-clear sent');
+    await wait(tester, const Duration(minutes: 10));
+    expect(await sent(tester), hasLength(1), reason: 'no repeats');
     await cleanUp(tester);
   });
 
@@ -162,6 +249,34 @@ void main() {
     await settle(tester);
     expect(await sent(tester), hasLength(2));
     await cleanUp(tester);
+  });
+
+  test('what answers an SOS', () {
+    Message m(String body, MessageKind kind) => Message(
+      id: 1,
+      radioKey: 'r',
+      kind: kind,
+      thread: 't',
+      outgoing: false,
+      body: body,
+      sentAt: 0,
+      storedAt: 0,
+      status: MessageStatus.received,
+      attempts: 0,
+      textType: 0,
+    );
+    expect(answersSos(m('ok', MessageKind.direct)), isTrue);
+    expect(
+      answersSos(m('lunch?', MessageKind.channel), myName: 'Base'),
+      isFalse,
+    );
+    expect(answersSos(m('got your SOS', MessageKind.channel)), isTrue);
+    expect(
+      answersSos(m('@[Base] coming', MessageKind.channel), myName: 'Base'),
+      isTrue,
+    );
+    expect(answersSos(m('sosig', MessageKind.channel)), isFalse);
+    expect(sosText(null, send: 3), 'SOS (3) - I need help. Position unknown.');
   });
 
   test('message texts', () {
