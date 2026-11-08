@@ -31,11 +31,19 @@ abstract final class CommandCode {
   static const sendTracePath = 36;
   static const setOtherParams = 38;
   static const sendTelemetryRequest = 39;
+  static const getStats = 56;
   static const setAutoAddConfig = 58;
   static const getAutoAddConfig = 59;
 }
 
 /// First byte of a direct reply to a command.
+/// Groups of figures [CommandCode.getStats] can ask for.
+abstract final class StatsGroup {
+  static const core = 0;
+  static const radio = 1;
+  static const packets = 2;
+}
+
 abstract final class ResponseCode {
   static const ok = 0;
   static const error = 1;
@@ -54,6 +62,7 @@ abstract final class ResponseCode {
   static const contactMessageV3 = 16;
   static const channelMessageV3 = 17;
   static const channelInfo = 18;
+  static const stats = 24;
   static const autoAddConfig = 25;
   static const channelData = 27;
 }

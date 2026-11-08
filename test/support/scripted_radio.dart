@@ -108,6 +108,7 @@ class ScriptedRadio {
     CommandCode.sendStatusRequest => _status(frame),
     CommandCode.sendTracePath => _trace(frame),
     CommandCode.sendTelemetryRequest => _telemetry(frame),
+    CommandCode.getStats => _stats(frame),
     _ => [],
   };
 
@@ -219,6 +220,27 @@ class ScriptedRadio {
   }
 
   /// The radio's own telemetry (Cayenne LPP): 4.06 V on channel 1.
+  /// Noise floor answered to a stats request; null for firmware without.
+  int? noiseFloor = -112;
+  int statsRequests = 0;
+
+  List<List<int>> _stats(List<int> frame) {
+    statsRequests++;
+    final noise = noiseFloor;
+    if (noise == null) return [errorFrame(RadioErrorCode.unsupportedCommand)];
+    return [
+      [
+        ResponseCode.stats,
+        frame[1],
+        ...u16(noise & 0xFFFF),
+        (-80) & 0xFF,
+        24,
+        ...u32(30),
+        ...u32(600),
+      ],
+    ];
+  }
+
   List<int> selfTelemetry = [1, 116, 0x01, 0x96];
 
   /// Nodes' telemetry, by first key byte. Unlisted nodes don't answer.

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/connection.dart';
 import '../app/delivery.dart';
 import '../app/notifications.dart';
+import '../app/reactions.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
 import 'quick_messages_screen.dart';
@@ -40,6 +41,9 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
 
   /// Newest message id already marked read.
   int? _readUpTo;
+
+  /// The message being replied to, and who sent it.
+  ({Message message, String name})? _replyTo;
 
   @override
   void initState() {
@@ -121,12 +125,17 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     ref.read(storeProvider).markRead(radioKey, widget.thread);
   }
 
-  /// Sends what's in the box, or [quick] (leaving the box as it is).
+  /// Sends what's in the box (as a reply, when one is chosen), or [quick]
+  /// as it is, leaving the box alone.
   Future<void> _send([String? quick]) async {
     final typed = quick == null;
-    final text = (quick ?? _text.text).trim();
+    final typedText = (quick ?? _text.text).trim();
     final state = ref.read(connectionProvider);
-    if (text.isEmpty || state is! Connected || _sending) return;
+    if (typedText.isEmpty || state is! Connected || _sending) return;
+    final replyTo = typed ? _replyTo : null;
+    final text = replyTo == null
+        ? typedText
+        : replyText(replyTo.name, typedText);
     final messenger = ScaffoldMessenger.of(context);
     setState(() => _sending = true);
     try {
@@ -137,6 +146,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
         await state.sync.sendDirect(PublicKey.fromHex(target), text);
       }
       if (typed) _clearBox();
+      if (replyTo != null && mounted) setState(() => _replyTo = null);
     } on ArgumentError {
       messenger.showSnackBar(
         const SnackBar(content: Text('That message is too long to send.')),
@@ -145,6 +155,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
       // The message is stored as failed with a resend option, so don't
       // leave a second copy in the box.
       if (typed) _clearBox();
+      if (replyTo != null && mounted) setState(() => _replyTo = null);
       messenger.showSnackBar(
         const SnackBar(
           content: Text('The radio could not send it. Hold it to try again.'),
@@ -172,9 +183,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
 
   Future<void> _showActions(
     Message message,
-    bool retrying,
+    String sender, {
+    required bool retrying,
+    required bool canReply,
     Contact? contact,
-  ) async {
+  }) async {
     final state = ref.read(connectionProvider);
     final connected = state is Connected;
     final failed = message.status == MessageStatus.failed;
@@ -185,11 +198,34 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
-              leading: const Icon(Icons.info_outline),
-              title: const Text('Delivery details'),
-              onTap: () => Navigator.pop(context, 'details'),
-            ),
+            if (canReply) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 4,
+                  children: [
+                    for (final emoji in quickReactions)
+                      IconButton(
+                        tooltip: 'React $emoji',
+                        onPressed: () => Navigator.pop(context, 'react:$emoji'),
+                        icon: Text(emoji, style: const TextStyle(fontSize: 26)),
+                      ),
+                  ],
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.reply),
+                title: const Text('Reply'),
+                onTap: () => Navigator.pop(context, 'reply'),
+              ),
+            ],
+            if (message.outgoing)
+              ListTile(
+                leading: const Icon(Icons.info_outline),
+                title: const Text('Delivery details'),
+                onTap: () => Navigator.pop(context, 'details'),
+              ),
             if (failed && connected)
               ListTile(
                 leading: const Icon(Icons.refresh),
@@ -206,7 +242,15 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
         ),
       ),
     );
-    if (!mounted) return;
+    if (!mounted || action == null) return;
+    if (action.startsWith('react:')) {
+      await _send(reactionText(action.substring(6), message.body));
+      return;
+    }
+    if (action == 'reply') {
+      setState(() => _replyTo = (message: message, name: sender));
+      return;
+    }
     if (action == 'details') {
       await _showDelivery(message, retrying, contact);
       return;
@@ -335,6 +379,17 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     // so there is no full key to reply to.
     final canReply =
         connected && (widget.isChannel || widget.thread.length == 2 + 64);
+    final connection = ref.watch(connectionProvider);
+    final selfName = connection is Connected
+        ? connection.radio.self.name
+        : 'Me';
+    String senderOf(Message m) {
+      if (m.outgoing) return selfName;
+      return _authorName(m.authorPrefix, contacts) ??
+          (widget.isChannel ? m.senderName ?? 'Someone' : widget.title);
+    }
+
+    final items = chatItems(messages, senderOf: senderOf);
 
     return Scaffold(
       appBar: AppBar(
@@ -367,30 +422,49 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
               ),
             ),
           Expanded(
-            child: messages.isEmpty
+            child: items.isEmpty
                 ? const Center(child: Text('No messages yet'))
                 : ListView.builder(
                     reverse: true,
                     padding: const EdgeInsets.all(12),
-                    itemCount: messages.length,
+                    itemCount: items.length,
                     itemBuilder: (context, i) {
-                      final message = messages[messages.length - 1 - i];
+                      final item = items[items.length - 1 - i];
+                      final message = item.message;
+                      final replyTo = item.replyTo;
                       return _Bubble(
                         message: message,
+                        body: item.replyText ?? message.body,
                         showSender: widget.isChannel,
                         author: _authorName(message.authorPrefix, contacts),
+                        replyTo: replyTo == null
+                            ? null
+                            : (name: senderOf(replyTo), body: replyTo.body),
+                        reactions: item.reactions,
                         retrying: retrying.contains(message.id),
-                        onLongPress: message.outgoing
+                        onReact: canReply && !_sending
+                            ? (emoji) =>
+                                  _send(reactionText(emoji, message.body))
+                            : null,
+                        onLongPress: message.outgoing || canReply
                             ? () => _showActions(
                                 message,
-                                retrying.contains(message.id),
-                                _contact(contacts),
+                                senderOf(message),
+                                retrying: retrying.contains(message.id),
+                                canReply: canReply,
+                                contact: _contact(contacts),
                               )
                             : null,
                       );
                     },
                   ),
           ),
+          if (_replyTo case final reply? when canReply)
+            _ReplyBanner(
+              name: reply.name,
+              body: reply.message.body,
+              onCancel: () => setState(() => _replyTo = null),
+            ),
           SafeArea(
             top: false,
             child: Padding(
@@ -441,16 +515,30 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
 class _Bubble extends StatelessWidget {
   const _Bubble({
     required this.message,
+    required this.body,
     required this.showSender,
     this.retrying = false,
     this.onLongPress,
+    this.onReact,
     this.author,
+    this.replyTo,
+    this.reactions = const [],
   });
 
   final Message message;
+
+  /// The text shown: a reply's leading mention is left off.
+  final String body;
   final bool showSender;
   final bool retrying;
   final VoidCallback? onLongPress;
+
+  /// Adds the same reaction; null when sending isn't possible.
+  final void Function(String emoji)? onReact;
+
+  /// The message this one replies to.
+  final ({String name, String body})? replyTo;
+  final List<ReactionCount> reactions;
 
   /// Room posts: who wrote it.
   final String? author;
@@ -500,7 +588,9 @@ class _Bubble extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                Text(message.body),
+                if (replyTo case final quoted?)
+                  _Quote(name: quoted.name, body: quoted.body),
+                Text(body),
                 const SizedBox(height: 2),
                 Row(
                   mainAxisSize: MainAxisSize.min,
@@ -518,6 +608,23 @@ class _Bubble extends StatelessWidget {
                     ],
                   ],
                 ),
+                if (reactions.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Wrap(
+                      spacing: 4,
+                      runSpacing: 4,
+                      children: [
+                        for (final r in reactions)
+                          _ReactionChip(
+                            reaction: r,
+                            onTap: r.mine || onReact == null
+                                ? null
+                                : () => onReact!(r.emoji),
+                          ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),
@@ -561,6 +668,158 @@ class _StatusIcon extends StatelessWidget {
         color: status == MessageStatus.failed
             ? Theme.of(context).colorScheme.error
             : null,
+      ),
+    );
+  }
+}
+
+/// The message a reply answers, shown small above the reply.
+class _Quote extends StatelessWidget {
+  const _Quote({required this.name, required this.body});
+
+  final String name;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Semantics(
+      label: 'In reply to $name: $body',
+      excludeSemantics: true,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 4),
+        padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+        decoration: BoxDecoration(
+          border: Border(left: BorderSide(color: scheme.primary, width: 3)),
+          color: scheme.surface.withValues(alpha: 0.5),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.reply, size: 14, color: scheme.primary),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    name,
+                    style: Theme.of(context).textTheme.labelMedium
+                        ?.copyWith(color: scheme.primary),
+                  ),
+                ),
+              ],
+            ),
+            Text(
+              body,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ReactionChip extends StatelessWidget {
+  const _ReactionChip({required this.reaction, this.onTap});
+
+  final ReactionCount reaction;
+
+  /// Adds this reaction too; null when it's already yours or can't be sent.
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final names = reaction.who.join(', ');
+    final yours = reaction.mine ? ', including you' : '';
+    return Semantics(
+      button: onTap != null,
+      label: '${reaction.emoji} ${reaction.count}: $names$yours',
+      excludeSemantics: true,
+      child: Tooltip(
+        message: names,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 28, minWidth: 44),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: scheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: reaction.mine ? scheme.primary : scheme.outlineVariant,
+                width: reaction.mine ? 2 : 1,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(reaction.emoji),
+                if (reaction.count > 1) ...[
+                  const SizedBox(width: 4),
+                  Text('${reaction.count}'),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Shown above the box while a reply is being written.
+class _ReplyBanner extends StatelessWidget {
+  const _ReplyBanner({
+    required this.name,
+    required this.body,
+    required this.onCancel,
+  });
+
+  final String name;
+  final String body;
+  final VoidCallback onCancel;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Material(
+      color: scheme.surfaceContainer,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 4, 4, 4),
+        child: Row(
+          children: [
+            Icon(Icons.reply, color: scheme.primary),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Replying to $name',
+                    style: Theme.of(context).textTheme.labelLarge,
+                  ),
+                  Text(
+                    body,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              tooltip: 'Cancel reply',
+              onPressed: onCancel,
+              icon: const Icon(Icons.close),
+            ),
+          ],
+        ),
       ),
     );
   }

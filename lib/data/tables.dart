@@ -162,3 +162,22 @@ class TelemetrySamples extends Table {
   IntColumn get at => integer()();
   BlobColumn get data => blob()();
 }
+
+/// The connected radio's receiver figures over time, sampled while
+/// connected. A rising noise floor means something nearby is drowning out
+/// weak signals.
+@TableIndex(name: 'radio_stats_by_radio', columns: {#radioKey, #at})
+class RadioStatsSamples extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get radioKey => text().references(Radios, #publicKey)();
+
+  /// When it was read, Unix milliseconds.
+  IntColumn get at => integer()();
+
+  /// dBm.
+  IntColumn get noiseFloor => integer()();
+  IntColumn get lastRssi => integer()();
+  RealColumn get lastSnr => real()();
+  IntColumn get txAirSeconds => integer()();
+  IntColumn get rxAirSeconds => integer()();
+}

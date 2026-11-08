@@ -3736,6 +3736,523 @@ class TelemetrySamplesCompanion extends UpdateCompanion<TelemetrySample> {
   }
 }
 
+class $RadioStatsSamplesTable extends RadioStatsSamples
+    with TableInfo<$RadioStatsSamplesTable, RadioStatsSample> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RadioStatsSamplesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _radioKeyMeta = const VerificationMeta(
+    'radioKey',
+  );
+  @override
+  late final GeneratedColumn<String> radioKey = GeneratedColumn<String>(
+    'radio_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES radios (public_key)',
+    ),
+  );
+  static const VerificationMeta _atMeta = const VerificationMeta('at');
+  @override
+  late final GeneratedColumn<int> at = GeneratedColumn<int>(
+    'at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _noiseFloorMeta = const VerificationMeta(
+    'noiseFloor',
+  );
+  @override
+  late final GeneratedColumn<int> noiseFloor = GeneratedColumn<int>(
+    'noise_floor',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lastRssiMeta = const VerificationMeta(
+    'lastRssi',
+  );
+  @override
+  late final GeneratedColumn<int> lastRssi = GeneratedColumn<int>(
+    'last_rssi',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lastSnrMeta = const VerificationMeta(
+    'lastSnr',
+  );
+  @override
+  late final GeneratedColumn<double> lastSnr = GeneratedColumn<double>(
+    'last_snr',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _txAirSecondsMeta = const VerificationMeta(
+    'txAirSeconds',
+  );
+  @override
+  late final GeneratedColumn<int> txAirSeconds = GeneratedColumn<int>(
+    'tx_air_seconds',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _rxAirSecondsMeta = const VerificationMeta(
+    'rxAirSeconds',
+  );
+  @override
+  late final GeneratedColumn<int> rxAirSeconds = GeneratedColumn<int>(
+    'rx_air_seconds',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    radioKey,
+    at,
+    noiseFloor,
+    lastRssi,
+    lastSnr,
+    txAirSeconds,
+    rxAirSeconds,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'radio_stats_samples';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RadioStatsSample> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('radio_key')) {
+      context.handle(
+        _radioKeyMeta,
+        radioKey.isAcceptableOrUnknown(data['radio_key']!, _radioKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_radioKeyMeta);
+    }
+    if (data.containsKey('at')) {
+      context.handle(_atMeta, at.isAcceptableOrUnknown(data['at']!, _atMeta));
+    } else if (isInserting) {
+      context.missing(_atMeta);
+    }
+    if (data.containsKey('noise_floor')) {
+      context.handle(
+        _noiseFloorMeta,
+        noiseFloor.isAcceptableOrUnknown(data['noise_floor']!, _noiseFloorMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_noiseFloorMeta);
+    }
+    if (data.containsKey('last_rssi')) {
+      context.handle(
+        _lastRssiMeta,
+        lastRssi.isAcceptableOrUnknown(data['last_rssi']!, _lastRssiMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lastRssiMeta);
+    }
+    if (data.containsKey('last_snr')) {
+      context.handle(
+        _lastSnrMeta,
+        lastSnr.isAcceptableOrUnknown(data['last_snr']!, _lastSnrMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lastSnrMeta);
+    }
+    if (data.containsKey('tx_air_seconds')) {
+      context.handle(
+        _txAirSecondsMeta,
+        txAirSeconds.isAcceptableOrUnknown(
+          data['tx_air_seconds']!,
+          _txAirSecondsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_txAirSecondsMeta);
+    }
+    if (data.containsKey('rx_air_seconds')) {
+      context.handle(
+        _rxAirSecondsMeta,
+        rxAirSeconds.isAcceptableOrUnknown(
+          data['rx_air_seconds']!,
+          _rxAirSecondsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_rxAirSecondsMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  RadioStatsSample map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RadioStatsSample(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      radioKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}radio_key'],
+      )!,
+      at: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}at'],
+      )!,
+      noiseFloor: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}noise_floor'],
+      )!,
+      lastRssi: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}last_rssi'],
+      )!,
+      lastSnr: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}last_snr'],
+      )!,
+      txAirSeconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}tx_air_seconds'],
+      )!,
+      rxAirSeconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}rx_air_seconds'],
+      )!,
+    );
+  }
+
+  @override
+  $RadioStatsSamplesTable createAlias(String alias) {
+    return $RadioStatsSamplesTable(attachedDatabase, alias);
+  }
+}
+
+class RadioStatsSample extends DataClass
+    implements Insertable<RadioStatsSample> {
+  final int id;
+  final String radioKey;
+
+  /// When it was read, Unix milliseconds.
+  final int at;
+
+  /// dBm.
+  final int noiseFloor;
+  final int lastRssi;
+  final double lastSnr;
+  final int txAirSeconds;
+  final int rxAirSeconds;
+  const RadioStatsSample({
+    required this.id,
+    required this.radioKey,
+    required this.at,
+    required this.noiseFloor,
+    required this.lastRssi,
+    required this.lastSnr,
+    required this.txAirSeconds,
+    required this.rxAirSeconds,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['radio_key'] = Variable<String>(radioKey);
+    map['at'] = Variable<int>(at);
+    map['noise_floor'] = Variable<int>(noiseFloor);
+    map['last_rssi'] = Variable<int>(lastRssi);
+    map['last_snr'] = Variable<double>(lastSnr);
+    map['tx_air_seconds'] = Variable<int>(txAirSeconds);
+    map['rx_air_seconds'] = Variable<int>(rxAirSeconds);
+    return map;
+  }
+
+  RadioStatsSamplesCompanion toCompanion(bool nullToAbsent) {
+    return RadioStatsSamplesCompanion(
+      id: Value(id),
+      radioKey: Value(radioKey),
+      at: Value(at),
+      noiseFloor: Value(noiseFloor),
+      lastRssi: Value(lastRssi),
+      lastSnr: Value(lastSnr),
+      txAirSeconds: Value(txAirSeconds),
+      rxAirSeconds: Value(rxAirSeconds),
+    );
+  }
+
+  factory RadioStatsSample.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RadioStatsSample(
+      id: serializer.fromJson<int>(json['id']),
+      radioKey: serializer.fromJson<String>(json['radioKey']),
+      at: serializer.fromJson<int>(json['at']),
+      noiseFloor: serializer.fromJson<int>(json['noiseFloor']),
+      lastRssi: serializer.fromJson<int>(json['lastRssi']),
+      lastSnr: serializer.fromJson<double>(json['lastSnr']),
+      txAirSeconds: serializer.fromJson<int>(json['txAirSeconds']),
+      rxAirSeconds: serializer.fromJson<int>(json['rxAirSeconds']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'radioKey': serializer.toJson<String>(radioKey),
+      'at': serializer.toJson<int>(at),
+      'noiseFloor': serializer.toJson<int>(noiseFloor),
+      'lastRssi': serializer.toJson<int>(lastRssi),
+      'lastSnr': serializer.toJson<double>(lastSnr),
+      'txAirSeconds': serializer.toJson<int>(txAirSeconds),
+      'rxAirSeconds': serializer.toJson<int>(rxAirSeconds),
+    };
+  }
+
+  RadioStatsSample copyWith({
+    int? id,
+    String? radioKey,
+    int? at,
+    int? noiseFloor,
+    int? lastRssi,
+    double? lastSnr,
+    int? txAirSeconds,
+    int? rxAirSeconds,
+  }) => RadioStatsSample(
+    id: id ?? this.id,
+    radioKey: radioKey ?? this.radioKey,
+    at: at ?? this.at,
+    noiseFloor: noiseFloor ?? this.noiseFloor,
+    lastRssi: lastRssi ?? this.lastRssi,
+    lastSnr: lastSnr ?? this.lastSnr,
+    txAirSeconds: txAirSeconds ?? this.txAirSeconds,
+    rxAirSeconds: rxAirSeconds ?? this.rxAirSeconds,
+  );
+  RadioStatsSample copyWithCompanion(RadioStatsSamplesCompanion data) {
+    return RadioStatsSample(
+      id: data.id.present ? data.id.value : this.id,
+      radioKey: data.radioKey.present ? data.radioKey.value : this.radioKey,
+      at: data.at.present ? data.at.value : this.at,
+      noiseFloor: data.noiseFloor.present
+          ? data.noiseFloor.value
+          : this.noiseFloor,
+      lastRssi: data.lastRssi.present ? data.lastRssi.value : this.lastRssi,
+      lastSnr: data.lastSnr.present ? data.lastSnr.value : this.lastSnr,
+      txAirSeconds: data.txAirSeconds.present
+          ? data.txAirSeconds.value
+          : this.txAirSeconds,
+      rxAirSeconds: data.rxAirSeconds.present
+          ? data.rxAirSeconds.value
+          : this.rxAirSeconds,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RadioStatsSample(')
+          ..write('id: $id, ')
+          ..write('radioKey: $radioKey, ')
+          ..write('at: $at, ')
+          ..write('noiseFloor: $noiseFloor, ')
+          ..write('lastRssi: $lastRssi, ')
+          ..write('lastSnr: $lastSnr, ')
+          ..write('txAirSeconds: $txAirSeconds, ')
+          ..write('rxAirSeconds: $rxAirSeconds')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    radioKey,
+    at,
+    noiseFloor,
+    lastRssi,
+    lastSnr,
+    txAirSeconds,
+    rxAirSeconds,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RadioStatsSample &&
+          other.id == this.id &&
+          other.radioKey == this.radioKey &&
+          other.at == this.at &&
+          other.noiseFloor == this.noiseFloor &&
+          other.lastRssi == this.lastRssi &&
+          other.lastSnr == this.lastSnr &&
+          other.txAirSeconds == this.txAirSeconds &&
+          other.rxAirSeconds == this.rxAirSeconds);
+}
+
+class RadioStatsSamplesCompanion extends UpdateCompanion<RadioStatsSample> {
+  final Value<int> id;
+  final Value<String> radioKey;
+  final Value<int> at;
+  final Value<int> noiseFloor;
+  final Value<int> lastRssi;
+  final Value<double> lastSnr;
+  final Value<int> txAirSeconds;
+  final Value<int> rxAirSeconds;
+  const RadioStatsSamplesCompanion({
+    this.id = const Value.absent(),
+    this.radioKey = const Value.absent(),
+    this.at = const Value.absent(),
+    this.noiseFloor = const Value.absent(),
+    this.lastRssi = const Value.absent(),
+    this.lastSnr = const Value.absent(),
+    this.txAirSeconds = const Value.absent(),
+    this.rxAirSeconds = const Value.absent(),
+  });
+  RadioStatsSamplesCompanion.insert({
+    this.id = const Value.absent(),
+    required String radioKey,
+    required int at,
+    required int noiseFloor,
+    required int lastRssi,
+    required double lastSnr,
+    required int txAirSeconds,
+    required int rxAirSeconds,
+  }) : radioKey = Value(radioKey),
+       at = Value(at),
+       noiseFloor = Value(noiseFloor),
+       lastRssi = Value(lastRssi),
+       lastSnr = Value(lastSnr),
+       txAirSeconds = Value(txAirSeconds),
+       rxAirSeconds = Value(rxAirSeconds);
+  static Insertable<RadioStatsSample> custom({
+    Expression<int>? id,
+    Expression<String>? radioKey,
+    Expression<int>? at,
+    Expression<int>? noiseFloor,
+    Expression<int>? lastRssi,
+    Expression<double>? lastSnr,
+    Expression<int>? txAirSeconds,
+    Expression<int>? rxAirSeconds,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (radioKey != null) 'radio_key': radioKey,
+      if (at != null) 'at': at,
+      if (noiseFloor != null) 'noise_floor': noiseFloor,
+      if (lastRssi != null) 'last_rssi': lastRssi,
+      if (lastSnr != null) 'last_snr': lastSnr,
+      if (txAirSeconds != null) 'tx_air_seconds': txAirSeconds,
+      if (rxAirSeconds != null) 'rx_air_seconds': rxAirSeconds,
+    });
+  }
+
+  RadioStatsSamplesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? radioKey,
+    Value<int>? at,
+    Value<int>? noiseFloor,
+    Value<int>? lastRssi,
+    Value<double>? lastSnr,
+    Value<int>? txAirSeconds,
+    Value<int>? rxAirSeconds,
+  }) {
+    return RadioStatsSamplesCompanion(
+      id: id ?? this.id,
+      radioKey: radioKey ?? this.radioKey,
+      at: at ?? this.at,
+      noiseFloor: noiseFloor ?? this.noiseFloor,
+      lastRssi: lastRssi ?? this.lastRssi,
+      lastSnr: lastSnr ?? this.lastSnr,
+      txAirSeconds: txAirSeconds ?? this.txAirSeconds,
+      rxAirSeconds: rxAirSeconds ?? this.rxAirSeconds,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (radioKey.present) {
+      map['radio_key'] = Variable<String>(radioKey.value);
+    }
+    if (at.present) {
+      map['at'] = Variable<int>(at.value);
+    }
+    if (noiseFloor.present) {
+      map['noise_floor'] = Variable<int>(noiseFloor.value);
+    }
+    if (lastRssi.present) {
+      map['last_rssi'] = Variable<int>(lastRssi.value);
+    }
+    if (lastSnr.present) {
+      map['last_snr'] = Variable<double>(lastSnr.value);
+    }
+    if (txAirSeconds.present) {
+      map['tx_air_seconds'] = Variable<int>(txAirSeconds.value);
+    }
+    if (rxAirSeconds.present) {
+      map['rx_air_seconds'] = Variable<int>(rxAirSeconds.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RadioStatsSamplesCompanion(')
+          ..write('id: $id, ')
+          ..write('radioKey: $radioKey, ')
+          ..write('at: $at, ')
+          ..write('noiseFloor: $noiseFloor, ')
+          ..write('lastRssi: $lastRssi, ')
+          ..write('lastSnr: $lastSnr, ')
+          ..write('txAirSeconds: $txAirSeconds, ')
+          ..write('rxAirSeconds: $rxAirSeconds')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$MeshDatabase extends GeneratedDatabase {
   _$MeshDatabase(QueryExecutor e) : super(e);
   $MeshDatabaseManager get managers => $MeshDatabaseManager(this);
@@ -3749,6 +4266,8 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
   late final $TelemetrySamplesTable telemetrySamples = $TelemetrySamplesTable(
     this,
   );
+  late final $RadioStatsSamplesTable radioStatsSamples =
+      $RadioStatsSamplesTable(this);
   late final Index messagesByThread = Index(
     'messages_by_thread',
     'CREATE INDEX messages_by_thread ON messages (radio_key, thread, id)',
@@ -3760,6 +4279,10 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
   late final Index telemetryByNode = Index(
     'telemetry_by_node',
     'CREATE INDEX telemetry_by_node ON telemetry_samples (radio_key, node_key, at)',
+  );
+  late final Index radioStatsByRadio = Index(
+    'radio_stats_by_radio',
+    'CREATE INDEX radio_stats_by_radio ON radio_stats_samples (radio_key, at)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -3774,9 +4297,11 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
     threadStates,
     discovered,
     telemetrySamples,
+    radioStatsSamples,
     messagesByThread,
     messagesByAck,
     telemetryByNode,
+    radioStatsByRadio,
   ];
 }
 
@@ -3911,6 +4436,32 @@ final class $$RadiosTableReferences
 
     final cache = $_typedResult.readTableOrNull(
       _telemetrySamplesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$RadioStatsSamplesTable, List<RadioStatsSample>>
+  _radioStatsSamplesRefsTable(_$MeshDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.radioStatsSamples,
+        aliasName: 'radios__public_key__radio_stats_samples__radio_key',
+      );
+
+  $$RadioStatsSamplesTableProcessedTableManager get radioStatsSamplesRefs {
+    final manager =
+        $$RadioStatsSamplesTableTableManager(
+          $_db,
+          $_db.radioStatsSamples,
+        ).filter(
+          (f) => f.radioKey.publicKey.sqlEquals(
+            $_itemColumn<String>('public_key')!,
+          ),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _radioStatsSamplesRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -4088,6 +4639,31 @@ class $$RadiosTableFilterComposer
           }) => $$TelemetrySamplesTableFilterComposer(
             $db: $db,
             $table: $db.telemetrySamples,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> radioStatsSamplesRefs(
+    Expression<bool> Function($$RadioStatsSamplesTableFilterComposer f) f,
+  ) {
+    final $$RadioStatsSamplesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.publicKey,
+      referencedTable: $db.radioStatsSamples,
+      getReferencedColumn: (t) => t.radioKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RadioStatsSamplesTableFilterComposer(
+            $db: $db,
+            $table: $db.radioStatsSamples,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4302,6 +4878,32 @@ class $$RadiosTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> radioStatsSamplesRefs<T extends Object>(
+    Expression<T> Function($$RadioStatsSamplesTableAnnotationComposer a) f,
+  ) {
+    final $$RadioStatsSamplesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.publicKey,
+          referencedTable: $db.radioStatsSamples,
+          getReferencedColumn: (t) => t.radioKey,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$RadioStatsSamplesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.radioStatsSamples,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$RadiosTableTableManager
@@ -4324,6 +4926,7 @@ class $$RadiosTableTableManager
             bool threadStatesRefs,
             bool discoveredRefs,
             bool telemetrySamplesRefs,
+            bool radioStatsSamplesRefs,
           })
         > {
   $$RadiosTableTableManager(_$MeshDatabase db, $RadiosTable table)
@@ -4381,6 +4984,7 @@ class $$RadiosTableTableManager
                 threadStatesRefs = false,
                 discoveredRefs = false,
                 telemetrySamplesRefs = false,
+                radioStatsSamplesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -4391,6 +4995,7 @@ class $$RadiosTableTableManager
                     if (threadStatesRefs) db.threadStates,
                     if (discoveredRefs) db.discovered,
                     if (telemetrySamplesRefs) db.telemetrySamples,
+                    if (radioStatsSamplesRefs) db.radioStatsSamples,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -4515,6 +5120,26 @@ class $$RadiosTableTableManager
                           referencedColumn: 'radio_key',
                           typedResults: items,
                         ),
+                      if (radioStatsSamplesRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Radio,
+                          $RadiosTable,
+                          RadioStatsSample,
+                          $RadioStatsSamplesTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$RadiosTableReferences
+                              ._radioStatsSamplesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$RadiosTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).radioStatsSamplesRefs,
+                          currentColumn: 'public_key',
+                          referencedColumn: 'radio_key',
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -4542,6 +5167,7 @@ typedef $$RadiosTableProcessedTableManager =
         bool threadStatesRefs,
         bool discoveredRefs,
         bool telemetrySamplesRefs,
+        bool radioStatsSamplesRefs,
       })
     >;
 typedef $$ContactsTableCreateCompanionBuilder = ContactsCompanion Function({
@@ -6957,6 +7583,392 @@ typedef $$TelemetrySamplesTableProcessedTableManager =
       TelemetrySample,
       PrefetchHooks Function({bool radioKey})
     >;
+typedef $$RadioStatsSamplesTableCreateCompanionBuilder =
+    RadioStatsSamplesCompanion Function({
+      Value<int> id,
+      required String radioKey,
+      required int at,
+      required int noiseFloor,
+      required int lastRssi,
+      required double lastSnr,
+      required int txAirSeconds,
+      required int rxAirSeconds,
+    });
+typedef $$RadioStatsSamplesTableUpdateCompanionBuilder =
+    RadioStatsSamplesCompanion Function({
+      Value<int> id,
+      Value<String> radioKey,
+      Value<int> at,
+      Value<int> noiseFloor,
+      Value<int> lastRssi,
+      Value<double> lastSnr,
+      Value<int> txAirSeconds,
+      Value<int> rxAirSeconds,
+    });
+
+final class $$RadioStatsSamplesTableReferences
+    extends
+        BaseReferences<
+          _$MeshDatabase,
+          $RadioStatsSamplesTable,
+          RadioStatsSample
+        > {
+  $$RadioStatsSamplesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $RadiosTable _radioKeyTable(_$MeshDatabase db) => db.radios
+      .createAlias('radio_stats_samples__radio_key__radios__public_key');
+
+  $$RadiosTableProcessedTableManager get radioKey {
+    final $_column = $_itemColumn<String>('radio_key')!;
+
+    final manager = $$RadiosTableTableManager(
+      $_db,
+      $_db.radios,
+    ).filter((f) => f.publicKey.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_radioKeyTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$RadioStatsSamplesTableFilterComposer
+    extends Composer<_$MeshDatabase, $RadioStatsSamplesTable> {
+  $$RadioStatsSamplesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get at => $composableBuilder(
+    column: $table.at,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get noiseFloor => $composableBuilder(
+    column: $table.noiseFloor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lastRssi => $composableBuilder(
+    column: $table.lastRssi,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get lastSnr => $composableBuilder(
+    column: $table.lastSnr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get txAirSeconds => $composableBuilder(
+    column: $table.txAirSeconds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get rxAirSeconds => $composableBuilder(
+    column: $table.rxAirSeconds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$RadiosTableFilterComposer get radioKey {
+    final $$RadiosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.radioKey,
+      referencedTable: $db.radios,
+      getReferencedColumn: (t) => t.publicKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RadiosTableFilterComposer(
+            $db: $db,
+            $table: $db.radios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RadioStatsSamplesTableOrderingComposer
+    extends Composer<_$MeshDatabase, $RadioStatsSamplesTable> {
+  $$RadioStatsSamplesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get at => $composableBuilder(
+    column: $table.at,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get noiseFloor => $composableBuilder(
+    column: $table.noiseFloor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lastRssi => $composableBuilder(
+    column: $table.lastRssi,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get lastSnr => $composableBuilder(
+    column: $table.lastSnr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get txAirSeconds => $composableBuilder(
+    column: $table.txAirSeconds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get rxAirSeconds => $composableBuilder(
+    column: $table.rxAirSeconds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$RadiosTableOrderingComposer get radioKey {
+    final $$RadiosTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.radioKey,
+      referencedTable: $db.radios,
+      getReferencedColumn: (t) => t.publicKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RadiosTableOrderingComposer(
+            $db: $db,
+            $table: $db.radios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RadioStatsSamplesTableAnnotationComposer
+    extends Composer<_$MeshDatabase, $RadioStatsSamplesTable> {
+  $$RadioStatsSamplesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get at =>
+      $composableBuilder(column: $table.at, builder: (column) => column);
+
+  GeneratedColumn<int> get noiseFloor => $composableBuilder(
+    column: $table.noiseFloor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get lastRssi =>
+      $composableBuilder(column: $table.lastRssi, builder: (column) => column);
+
+  GeneratedColumn<double> get lastSnr =>
+      $composableBuilder(column: $table.lastSnr, builder: (column) => column);
+
+  GeneratedColumn<int> get txAirSeconds => $composableBuilder(
+    column: $table.txAirSeconds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get rxAirSeconds => $composableBuilder(
+    column: $table.rxAirSeconds,
+    builder: (column) => column,
+  );
+
+  $$RadiosTableAnnotationComposer get radioKey {
+    final $$RadiosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.radioKey,
+      referencedTable: $db.radios,
+      getReferencedColumn: (t) => t.publicKey,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RadiosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.radios,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RadioStatsSamplesTableTableManager
+    extends
+        RootTableManager<
+          _$MeshDatabase,
+          $RadioStatsSamplesTable,
+          RadioStatsSample,
+          $$RadioStatsSamplesTableFilterComposer,
+          $$RadioStatsSamplesTableOrderingComposer,
+          $$RadioStatsSamplesTableAnnotationComposer,
+          $$RadioStatsSamplesTableCreateCompanionBuilder,
+          $$RadioStatsSamplesTableUpdateCompanionBuilder,
+          (RadioStatsSample, $$RadioStatsSamplesTableReferences),
+          RadioStatsSample,
+          PrefetchHooks Function({bool radioKey})
+        > {
+  $$RadioStatsSamplesTableTableManager(
+    _$MeshDatabase db,
+    $RadioStatsSamplesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RadioStatsSamplesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RadioStatsSamplesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RadioStatsSamplesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> radioKey = const Value.absent(),
+                Value<int> at = const Value.absent(),
+                Value<int> noiseFloor = const Value.absent(),
+                Value<int> lastRssi = const Value.absent(),
+                Value<double> lastSnr = const Value.absent(),
+                Value<int> txAirSeconds = const Value.absent(),
+                Value<int> rxAirSeconds = const Value.absent(),
+              }) => RadioStatsSamplesCompanion(
+                id: id,
+                radioKey: radioKey,
+                at: at,
+                noiseFloor: noiseFloor,
+                lastRssi: lastRssi,
+                lastSnr: lastSnr,
+                txAirSeconds: txAirSeconds,
+                rxAirSeconds: rxAirSeconds,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String radioKey,
+                required int at,
+                required int noiseFloor,
+                required int lastRssi,
+                required double lastSnr,
+                required int txAirSeconds,
+                required int rxAirSeconds,
+              }) => RadioStatsSamplesCompanion.insert(
+                id: id,
+                radioKey: radioKey,
+                at: at,
+                noiseFloor: noiseFloor,
+                lastRssi: lastRssi,
+                lastSnr: lastSnr,
+                txAirSeconds: txAirSeconds,
+                rxAirSeconds: rxAirSeconds,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$RadioStatsSamplesTable, RadioStatsSample>(table),
+                  $$RadioStatsSamplesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({radioKey = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (radioKey) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.radioKey,
+                        referencedTable: $$RadioStatsSamplesTableReferences
+                            ._radioKeyTable(db),
+                        referencedColumn: $$RadioStatsSamplesTableReferences
+                            ._radioKeyTable(db)
+                            .publicKey,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$RadioStatsSamplesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$MeshDatabase,
+      $RadioStatsSamplesTable,
+      RadioStatsSample,
+      $$RadioStatsSamplesTableFilterComposer,
+      $$RadioStatsSamplesTableOrderingComposer,
+      $$RadioStatsSamplesTableAnnotationComposer,
+      $$RadioStatsSamplesTableCreateCompanionBuilder,
+      $$RadioStatsSamplesTableUpdateCompanionBuilder,
+      (RadioStatsSample, $$RadioStatsSamplesTableReferences),
+      RadioStatsSample,
+      PrefetchHooks Function({bool radioKey})
+    >;
 
 class $MeshDatabaseManager {
   final _$MeshDatabase _db;
@@ -6977,4 +7989,6 @@ class $MeshDatabaseManager {
       $$DiscoveredTableTableManager(_db, _db.discovered);
   $$TelemetrySamplesTableTableManager get telemetrySamples =>
       $$TelemetrySamplesTableTableManager(_db, _db.telemetrySamples);
+  $$RadioStatsSamplesTableTableManager get radioStatsSamples =>
+      $$RadioStatsSamplesTableTableManager(_db, _db.radioStatsSamples);
 }
