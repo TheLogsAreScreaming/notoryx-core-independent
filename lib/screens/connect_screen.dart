@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/connection.dart';
 import '../app/radio_connector.dart';
 import 'connection_log_screen.dart';
+import 'about_screen.dart';
 
 /// Finds a radio over Bluetooth, USB or Wi-Fi and connects to it.
 class ConnectScreen extends ConsumerStatefulWidget {
@@ -104,7 +105,16 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Connect a radio'),
-        actions: const [ConnectionLogButton()],
+        actions: [
+          const ConnectionLogButton(),
+          IconButton(
+            tooltip: 'About',
+            icon: const Icon(Icons.info_outline),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const AboutScreen()),
+            ),
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8),

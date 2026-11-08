@@ -7,6 +7,7 @@ import '../radio/radio.dart';
 import 'area_screen.dart';
 import 'radio_noise_screen.dart';
 import 'telemetry_screen.dart';
+import 'about_screen.dart';
 
 /// Standard LoRa bandwidths the firmware accepts, in kHz.
 const loraBandwidths = [
@@ -321,6 +322,14 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
                     isSelf: true,
                   ),
                 ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('About this app'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const AboutScreen()),
               ),
             ),
             ListTile(
