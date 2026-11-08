@@ -93,6 +93,7 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
     ref.listen(radioStatsSamplerProvider, (_, _) {});
     ref.listen(checkInWatchdogProvider, (_, _) {});
     ref.listen(sosWatchdogProvider, (_, _) {});
+    ref.listen(tripQuietWatchdogProvider, (_, _) {});
     // Disconnecting closes any open conversation so the connect screen is
     // what's showing. While reconnecting the chats stay open.
     ref.listen(connectionProvider, (previous, next) {

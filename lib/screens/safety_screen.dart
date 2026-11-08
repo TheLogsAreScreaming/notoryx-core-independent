@@ -34,9 +34,9 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
     }
   }
 
-  Future<void> _startSos(String targetName) => _run(
+  Future<void> _startSos(String who) => _run(
     () => ref.read(safetyProvider.notifier).sendSos(),
-    'SOS sent to $targetName. It repeats every '
+    'SOS sent to $who. It repeats every '
     '${ref.read(sosRepeatProvider).inMinutes} minutes until someone answers.',
   );
 
@@ -69,6 +69,38 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
     );
   }
 
+  /// "#trail", "#trail and 2 trip contacts", "1 trip contact".
+  static String _who(String? main, int trip) {
+    final people = trip == 0
+        ? null
+        : '$trip trip contact${trip == 1 ? '' : 's'}';
+    if (main == null) return people ?? 'nobody';
+    return people == null ? main : '$main and $people';
+  }
+
+  Future<void> _pickTripContact(List<Contact> choices) async {
+    final notifier = ref.read(safetyProvider.notifier);
+    final picked = await showDialog<String>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: const Text('Add a trip contact'),
+        children: [
+          if (choices.isEmpty)
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text('No other people in your contacts.'),
+            ),
+          for (final c in choices)
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(context, c.publicKey),
+              child: Text(c.name),
+            ),
+        ],
+      ),
+    );
+    if (picked != null) await notifier.addTripContact(picked);
+  }
+
   String _time(DateTime t) {
     final day = MaterialLocalizations.of(context).formatShortDate(t);
     return '$day ${TimeOfDay.fromDateTime(t).format(context)}';
@@ -93,23 +125,31 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
       for (final c in contacts) Threads.direct(c.publicKey): c.name,
     };
     final target = targets.containsKey(safety.target) ? safety.target : null;
-    final targetName = target == null ? null : targets[target];
-    final canSend = connected && target != null && !_busy;
+    String nameOf(String thread) =>
+        targets[thread] ?? 'Unknown ${thread.substring(2, 8)}';
+    final recipients = safety.recipients
+        .where((t) => t != safety.target || target != null)
+        .toList();
+    final trip = safety.tripContacts;
+    final who = _who(target == null ? null : targets[target], trip.length);
+    final canSend = connected && recipients.isNotEmpty && !_busy;
+    final notifier = ref.read(safetyProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Safety')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          DropdownButtonFormField<String>(
+          DropdownButtonFormField<String?>(
             initialValue: target,
             isExpanded: true,
             decoration: const InputDecoration(
-              labelText: 'Send to',
+              labelText: 'Main chat',
               helperText: 'A channel your group watches, or one person.',
               border: OutlineInputBorder(),
             ),
             items: [
+              const DropdownMenuItem(value: null, child: Text('None')),
               for (final MapEntry(:key, :value) in targets.entries)
                 DropdownMenuItem(
                   value: key,
@@ -125,9 +165,37 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
                   ),
                 ),
             ],
-            onChanged: (v) {
-              if (v != null) ref.read(safetyProvider.notifier).setTarget(v);
-            },
+            onChanged: notifier.setTarget,
+          ),
+          const SizedBox(height: 16),
+          Text('Trip contacts', style: theme.textTheme.titleSmall),
+          Text(
+            'Up to $maxTripContacts people who also get every check-in and '
+            'SOS, each as a direct message, so you can see who it reached.',
+            style: theme.textTheme.bodySmall,
+          ),
+          const SizedBox(height: 4),
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: [
+              for (final key in trip)
+                InputChip(
+                  avatar: const Icon(Icons.person, size: 18),
+                  label: Text(nameOf(Threads.direct(key))),
+                  deleteButtonTooltipMessage:
+                      'Remove ${nameOf(Threads.direct(key))}',
+                  onDeleted: () => notifier.removeTripContact(key),
+                ),
+              if (trip.length < maxTripContacts)
+                ActionChip(
+                  avatar: const Icon(Icons.person_add_alt, size: 18),
+                  label: const Text('Add trip contact'),
+                  onPressed: () => _pickTripContact(
+                    contacts.where((c) => !trip.contains(c.publicKey)).toList(),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: 24),
           if (safety.sosActive)
@@ -137,10 +205,7 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
               time: _time,
               busy: _busy,
               canSend: canSend,
-              onSendAgain: () => _run(
-                () => ref.read(safetyProvider.notifier).sendSos(),
-                'SOS sent again.',
-              ),
+              onSendAgain: () => _run(notifier.sendSos, 'SOS sent again.'),
               onSafe: () => _endSos(allClear: true),
               onStop: () => _endSos(allClear: false),
             )
@@ -148,36 +213,64 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
             HoldToSendButton(
               label: 'Hold for SOS',
               enabled: canSend,
-              onSend: () => _startSos(targetName!),
+              onSend: () => _startSos(who),
             ),
           const SizedBox(height: 12),
           SizedBox(
             height: 56,
             child: FilledButton.tonalIcon(
               onPressed: canSend
-                  ? () => _run(
-                      () => ref.read(safetyProvider.notifier).checkIn(),
-                      'Check-in sent to $targetName.',
-                    )
+                  ? () =>
+                        _run(notifier.checkIn, "Check-in sent to $who: I'm OK.")
                   : null,
               icon: const Icon(Icons.check_circle_outline),
-              label: const Text("I'm OK"),
+              label: Text(CheckInKind.ok.label),
             ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              for (final (i, kind) in CheckInKind.values.skip(1).indexed) ...[
+                if (i > 0) const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: canSend
+                        ? () => _run(
+                            () => notifier.checkIn(kind),
+                            'Check-in sent to $who: ${kind.label}.',
+                          )
+                        : null,
+                    child: Text(kind.label, textAlign: TextAlign.center),
+                  ),
+                ),
+              ],
+            ],
           ),
           const SizedBox(height: 8),
           Text(
             !connected
                 ? 'Connect a radio to send.'
-                : target == null
-                ? 'Choose where to send first.'
-                : 'Both include your position, from the phone or else the '
-                      'radio. An SOS repeats every '
+                : recipients.isEmpty
+                ? 'Choose a main chat or a trip contact first.'
+                : 'Everything goes to $who, with your position from the '
+                      'phone or else the radio. An SOS repeats every '
                       '${ref.watch(sosRepeatProvider).inMinutes} minutes until '
-                      'someone answers: any reply in a direct chat, or on a '
-                      'channel a message that mentions you or says SOS.',
+                      'someone answers: any direct reply, or on a channel a '
+                      'message that mentions you or says SOS.',
             style: theme.textTheme.bodySmall,
           ),
-          if (safety.lastCheckIn case final last?)
+          if (safety.lastRecord case final record?)
+            _CheckInReport(
+              record: record,
+              nameOf: nameOf,
+              time: _time,
+              canResend: canSend,
+              onResend: (missed) => _run(
+                () => notifier.resendCheckIn(missed),
+                'Sent again to ${missed.length}.',
+              ),
+            )
+          else if (safety.lastCheckIn case final last?)
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Text(
@@ -185,6 +278,25 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
                 style: theme.textTheme.bodySmall,
               ),
             ),
+          if (trip.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            DropdownButtonFormField<Duration?>(
+              initialValue: safety.quietLimit,
+              decoration: const InputDecoration(
+                labelText: 'Warn me if a trip contact is quiet for',
+                helperText:
+                    'Nothing from them (a check-in or any message) for '
+                    'this long.',
+                border: OutlineInputBorder(),
+              ),
+              items: [
+                const DropdownMenuItem(value: null, child: Text('Never')),
+                for (final d in quietChoices)
+                  DropdownMenuItem(value: d, child: Text(_every(d))),
+              ],
+              onChanged: notifier.setQuietLimit,
+            ),
+          ],
           const Divider(height: 40),
           Text('Check-in timer', style: theme.textTheme.titleMedium),
           const SizedBox(height: 4),
@@ -206,7 +318,7 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
               for (final d in checkInChoices)
                 DropdownMenuItem(value: d, child: Text(_every(d))),
             ],
-            onChanged: target == null
+            onChanged: recipients.isEmpty
                 ? null
                 : (d) {
                     final safety = ref.read(safetyProvider.notifier);
@@ -227,7 +339,9 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
             ),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: Text('Tell ${targetName ?? 'the chat'} if I miss one'),
+            title: Text(
+              'Tell ${recipients.isEmpty ? 'the chat' : who} if I miss one',
+            ),
             subtitle: Text(
               '${ref.watch(checkInGraceProvider).inMinutes} minutes after '
               'the reminder. Needs the radio connected.',
@@ -507,6 +621,104 @@ class SosBanner extends ConsumerWidget {
               Icon(Icons.chevron_right, color: scheme.onError),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Who the latest check-in reached, with a resend for the ones it missed.
+class _CheckInReport extends ConsumerWidget {
+  const _CheckInReport({
+    required this.record,
+    required this.nameOf,
+    required this.time,
+    required this.canResend,
+    required this.onResend,
+  });
+
+  final CheckInRecord record;
+  final String Function(String thread) nameOf;
+  final String Function(DateTime) time;
+  final bool canResend;
+  final void Function(Set<String> missed) onResend;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final ids = [for (final s in record.sends) ?s.messageId];
+    final messages =
+        ref.watch(checkInMessagesProvider(ids.join(','))).value ??
+        const <Message>[];
+    final byId = {for (final m in messages) m.id: m};
+    final missed = <String>{};
+    final rows = <Widget>[];
+    for (final send in record.sends) {
+      final m = send.messageId == null ? null : byId[send.messageId];
+      final channel = send.thread.startsWith('c:');
+      final (icon, status) = switch (m?.status) {
+        _ when send.messageId == null => (Icons.error_outline, 'Not sent'),
+        MessageStatus.delivered => (Icons.done_all, 'Reached'),
+        MessageStatus.sent when channel => (
+          Icons.check,
+          'Sent (channels don’t confirm)',
+        ),
+        MessageStatus.sent => (Icons.check, 'Sent, not confirmed yet'),
+        MessageStatus.pending => (Icons.schedule, 'Sending'),
+        MessageStatus.failed => (Icons.error_outline, 'Didn’t reach them'),
+        _ => (Icons.schedule, 'Sending'),
+      };
+      if (send.messageId == null || m?.status == MessageStatus.failed) {
+        missed.add(send.thread);
+      }
+      final name = nameOf(send.thread);
+      rows.add(
+        Semantics(
+          label: '$name: $status',
+          excludeSemantics: true,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  size: 18,
+                  color: icon == Icons.error_outline
+                      ? theme.colorScheme.error
+                      : null,
+                ),
+                const SizedBox(width: 8),
+                Expanded(child: Text(name)),
+                Text(status, style: theme.textTheme.bodySmall),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    return Card(
+      margin: const EdgeInsets.only(top: 12),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Last check-in: ${record.kind.label}, ${time(record.at)}',
+              style: theme.textTheme.titleSmall,
+            ),
+            const SizedBox(height: 4),
+            ...rows,
+            if (missed.isNotEmpty)
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: TextButton.icon(
+                  onPressed: canResend ? () => onResend(missed) : null,
+                  icon: const Icon(Icons.refresh),
+                  label: Text('Send again to ${missed.length} missed'),
+                ),
+              ),
+          ],
         ),
       ),
     );
