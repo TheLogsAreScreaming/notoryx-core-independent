@@ -520,6 +520,55 @@ void main() {
     await cleanUp(tester);
   });
 
+  testWidgets('a full contact table offers to swap out the oldest', (
+    tester,
+  ) async {
+    radioSetup = (r) => r
+      ..contactLimit = 2
+      ..contacts.add(
+        contactFrame('Tom', keyByte: 9, lastModified: 11, lastAdvert: 5),
+      );
+    await connect(tester);
+    await tester.tap(find.text('Contacts'));
+    await settle(tester);
+    expect(find.text('2 of 2 contacts'), findsOneWidget);
+    expect(
+      find.text('Full: the radio won’t add new nodes it hears.'),
+      findsOneWidget,
+    );
+
+    link.emit(contactFrame('Eve', keyByte: 5)..[0] = PushCode.newAdvert);
+    await settle(tester);
+    await tester.tap(find.widgetWithText(TextButton, 'Add'));
+    await settle(tester);
+    expect(find.text('Contacts are full'), findsOneWidget);
+    // Alice was never heard, so she goes before Tom.
+    expect(find.textContaining('remove Alice (never heard)'), findsOneWidget);
+    await tester.tap(find.text('Swap'));
+    await settle(tester);
+    expect(find.text('Removed Alice and added Eve'), findsOneWidget);
+    expect(find.text('Alice'), findsNothing);
+    expect(find.text('Tom'), findsOneWidget);
+    expect(find.text('Eve'), findsOneWidget);
+
+    // Make room: pick and remove (once the snackbar has gone).
+    await tester.pump(const Duration(seconds: 5));
+    await settle(tester);
+    await tester.tap(find.text('Make room'));
+    await settle(tester);
+    expect(find.text('Make room for contacts'), findsOneWidget);
+    await tester.tap(find.text('Pick oldest 10'));
+    await settle(tester);
+    expect(find.text('After removing: 0 of 2 contacts'), findsOneWidget);
+    await tester.tap(find.text('Remove 2'));
+    await settle(tester);
+    await tester.tap(find.widgetWithText(FilledButton, 'Remove'));
+    await settle(tester);
+    expect(find.text('Removed 2.'), findsOneWidget);
+    expect(find.text('Nothing to remove.'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
   testWidgets('favourites are starred and listed first', (tester) async {
     radioSetup = (r) =>
         r.contacts.add(contactFrame('Zed', keyByte: 9, lastModified: 11));

@@ -56,10 +56,14 @@ List<int> u16(int v) => [v & 0xFF, (v >> 8) & 0xFF];
 List<int> i32(int v) =>
     (ByteData(4)..setInt32(0, v, Endian.little)).buffer.asUint8List();
 
-List<int> deviceInfoFrame({int versionCode = 14, int maxChannels = 8}) => [
+List<int> deviceInfoFrame({
+  int versionCode = 14,
+  int maxChannels = 8,
+  int maxContacts = 100,
+}) => [
   ResponseCode.deviceInfo,
   versionCode,
-  50,
+  maxContacts ~/ 2,
   maxChannels,
   ...u32(0),
   ...padded('', 12),

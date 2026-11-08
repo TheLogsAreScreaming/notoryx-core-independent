@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/connection.dart';
+import '../app/contact_room.dart';
 import '../app/quick_messages.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
 import 'connection_log_screen.dart';
+import 'contact_cleanup_screen.dart';
 import 'area_screen.dart';
 import 'battery_banner.dart';
 import 'conversation_screen.dart';
@@ -381,9 +383,20 @@ class _ContactsTab extends ConsumerWidget {
       ...contacts.where((c) => c.flags & 1 == 1),
       ...contacts.where((c) => c.flags & 1 == 0),
     ];
+    final state = ref.watch(connectionProvider);
+    final max = state is Connected ? state.radio.device.maxContacts : null;
     return ListView(
       padding: const EdgeInsets.only(bottom: 88), // room for the + button
       children: [
+        if (max != null && max > 0)
+          ContactMeterBar(
+            meter: ContactMeter(contacts.length, max),
+            onMakeRoom: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => ContactCleanupScreen(radioKey: radioKey),
+              ),
+            ),
+          ),
         for (final contact in sorted)
           ListTile(
             leading: CircleAvatar(child: Icon(_icon(contact.type))),

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/connection.dart';
+import '../app/contact_room.dart';
 import '../app/mesh_links.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
@@ -335,10 +336,12 @@ Future<void> _addLink(
         done: 'Added $name',
       );
     case ContactLink(:final name, :final publicKey, :final type):
-      await _run(
+      await _addMakingRoom(
         context,
+        ref,
+        sync,
+        name,
         () => sync.addContact(publicKey: publicKey, name: name, type: type),
-        done: 'Added $name',
       );
   }
 }
@@ -441,8 +444,11 @@ Future<void> addDiscovered(
 ) async {
   final sync = _syncOrNotice(context, ref);
   if (sync == null) return;
-  await _run(
+  await _addMakingRoom(
     context,
+    ref,
+    sync,
+    node.name,
     () => sync.addContact(
       publicKey: PublicKey.fromHex(node.publicKey),
       name: node.name,
@@ -451,6 +457,62 @@ Future<void> addDiscovered(
       longitude: node.longitude,
       lastAdvert: node.lastAdvert,
     ),
-    done: 'Added ${node.name}',
   );
+}
+
+/// Adds a contact. When the radio's table is full, offers to swap out the
+/// contact heard longest ago (never a favourite) and tries once more.
+Future<void> _addMakingRoom(
+  BuildContext context,
+  WidgetRef ref,
+  MeshSync sync,
+  String name,
+  Future<void> Function() add,
+) async {
+  final messenger = ScaffoldMessenger.of(context);
+  try {
+    await add();
+    messenger.showSnackBar(SnackBar(content: Text('Added $name')));
+    return;
+  } on RadioRejected catch (e) {
+    if (e.code != RadioErrorCode.tableFull) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('The radio could not make that change.')),
+      );
+      return;
+    }
+  } on RadioRequestException {
+    messenger.showSnackBar(
+      const SnackBar(content: Text('The radio could not make that change.')),
+    );
+    return;
+  }
+  final radioKey = ref.read(radioKeyProvider);
+  final contacts = radioKey == null
+      ? const <Contact>[]
+      : await ref.read(storeProvider).watchContacts(radioKey).first;
+  final out = removalCandidates(contacts).firstOrNull;
+  if (!context.mounted) return;
+  if (out == null) {
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text(
+          'The radio’s contacts are full, and all of them are favourites.',
+        ),
+      ),
+    );
+    return;
+  }
+  final swap = await _confirm(
+    context,
+    'Contacts are full',
+    'To add $name, remove ${out.name} '
+        '(${lastHeard(out.lastAdvert, DateTime.now())})?',
+    'Swap',
+  );
+  if (!swap || !context.mounted) return;
+  await _run(context, () async {
+    await sync.removeContact(PublicKey.fromHex(out.publicKey));
+    await add();
+  }, done: 'Removed ${out.name} and added $name');
 }

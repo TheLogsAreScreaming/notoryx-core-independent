@@ -78,7 +78,9 @@ class ScriptedRadio {
       ),
     ],
     CommandCode.setRadioParams => _setRadio(frame),
-    CommandCode.deviceQuery => [deviceInfoFrame(maxChannels: 3)],
+    CommandCode.deviceQuery => [
+      deviceInfoFrame(maxChannels: 3, maxContacts: contactLimit),
+    ],
     CommandCode.setDeviceTime => [okFrame()],
     CommandCode.getContacts => _contacts(frame),
     CommandCode.getChannel => [_channel(frame[1])],
@@ -293,9 +295,16 @@ class ScriptedRadio {
     return [okFrame()];
   }
 
+  /// How many contacts the radio holds (even numbers only, as on the wire).
+  int contactLimit = 100;
+
   List<List<int>> _addContact(List<int> frame) {
     // Same layout as a contact frame after the first byte.
     final entry = [ResponseCode.contact, ...frame.sublist(1)];
+    final known = contacts.any((c) => _sameKey(c, entry));
+    if (!known && contacts.length >= contactLimit) {
+      return [errorFrame(RadioErrorCode.tableFull)];
+    }
     contacts.removeWhere((c) => _sameKey(c, entry));
     contacts.add(entry);
     return [okFrame()];
