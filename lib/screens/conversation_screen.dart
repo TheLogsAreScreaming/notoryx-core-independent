@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../app/blocking.dart';
 import '../app/connection.dart';
 import '../app/delivery.dart';
 import '../app/notifications.dart';
@@ -220,6 +221,18 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                 onTap: () => Navigator.pop(context, 'reply'),
               ),
             ],
+            if (!message.outgoing)
+              ListTile(
+                leading: const Icon(Icons.block),
+                title: Text('Block $sender'),
+                subtitle: Text(
+                  message.kind == MessageKind.channel
+                      ? 'Hides messages posted under this name, on every '
+                            'channel.'
+                      : 'Hides their direct messages.',
+                ),
+                onTap: () => Navigator.pop(context, 'block'),
+              ),
             if (message.outgoing)
               ListTile(
                 leading: const Icon(Icons.info_outline),
@@ -249,6 +262,32 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     }
     if (action == 'reply') {
       setState(() => _replyTo = (message: message, name: sender));
+      return;
+    }
+    if (action == 'block') {
+      final blocking = ref.read(blockingProvider);
+      if (message.kind == MessageKind.channel) {
+        final name = message.senderName;
+        if (name != null) await blocking.blockName(name);
+      } else {
+        await blocking.blockKey(message.thread.substring(2));
+      }
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Blocked $sender.'),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () {
+              if (message.kind == MessageKind.channel) {
+                final name = message.senderName;
+                if (name != null) unawaited(blocking.unblockName(name));
+              } else {
+                unawaited(blocking.unblockKey(message.thread.substring(2)));
+              }
+            },
+          ),
+        ),
+      );
       return;
     }
     if (action == 'details') {
@@ -389,7 +428,13 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
           (widget.isChannel ? m.senderName ?? 'Someone' : widget.title);
     }
 
-    final items = chatItems(messages, senderOf: senderOf);
+    final blocked = ref.watch(blockListProvider).value ?? const BlockList();
+    final directKey = widget.isChannel ? null : widget.thread.substring(2);
+    final threadBlocked = directKey != null && blocked.keys.contains(directKey);
+    final items = chatItems([
+      for (final m in messages)
+        if (!blocked.blocks(m)) m,
+    ], senderOf: senderOf);
 
     return Scaffold(
       appBar: AppBar(
@@ -411,6 +456,19 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
       ),
       body: Column(
         children: [
+          if (threadBlocked)
+            MaterialBanner(
+              content: Text(
+                'You blocked ${widget.title}. Their messages are hidden.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () =>
+                      ref.read(blockingProvider).unblockKey(directKey),
+                  child: const Text('Unblock'),
+                ),
+              ],
+            ),
           if (!widget.isChannel)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -441,12 +499,20 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                             ? null
                             : (name: senderOf(replyTo), body: replyTo.body),
                         reactions: item.reactions,
+                        mentionsMe:
+                            !message.outgoing &&
+                            mentions(
+                              message.body,
+                              connection is Connected
+                                  ? connection.radio.self.name
+                                  : null,
+                            ),
                         retrying: retrying.contains(message.id),
                         onReact: canReply && !_sending
                             ? (emoji) =>
                                   _send(reactionText(emoji, message.body))
                             : null,
-                        onLongPress: message.outgoing || canReply
+                        onLongPress: message.outgoing || canReply || connected
                             ? () => _showActions(
                                 message,
                                 senderOf(message),
@@ -523,7 +589,11 @@ class _Bubble extends StatelessWidget {
     this.author,
     this.replyTo,
     this.reactions = const [],
+    this.mentionsMe = false,
   });
+
+  /// Whether this mentions you; such messages stand out.
+  final bool mentionsMe;
 
   final Message message;
 
@@ -574,12 +644,34 @@ class _Bubble extends StatelessWidget {
             decoration: BoxDecoration(
               color: mine
                   ? scheme.primaryContainer
+                  : mentionsMe
+                  ? scheme.tertiaryContainer
                   : scheme.surfaceContainerHigh,
               borderRadius: BorderRadius.circular(14),
+              border: mentionsMe
+                  ? Border.all(color: scheme.tertiary, width: 2)
+                  : null,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (mentionsMe)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.alternate_email,
+                        size: 14,
+                        color: scheme.onTertiaryContainer,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Mentions you',
+                        style: Theme.of(context).textTheme.labelSmall
+                            ?.copyWith(color: scheme.onTertiaryContainer),
+                      ),
+                    ],
+                  ),
                 if (shownName case final name?)
                   Text(
                     name,

@@ -7,6 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/data.dart';
+import 'blocking.dart';
 import 'connection.dart';
 
 /// A chat to open, carried by a notification.
@@ -127,7 +128,11 @@ final messageAlertsProvider = Provider<void>((ref) {
   final sub = state.sync.incoming.listen((message) async {
     final open = ref.read(openThreadProvider);
     if (inFront() && open == message.thread) return;
-    if (await store.isMuted(key, message.thread)) return;
+    final blocked = await readBlockList(store);
+    if (blocked.blocks(message)) return;
+    // A mention gets through even in a muted chat.
+    final mentioned = mentions(message.body, state.radio.self.name);
+    if (!mentioned && await store.isMuted(key, message.thread)) return;
     final chat = await chatLinkFor(store, key, message.thread);
     final body =
         message.kind == MessageKind.channel && message.senderName != null
@@ -135,7 +140,7 @@ final messageAlertsProvider = Provider<void>((ref) {
         : message.body;
     await notifier.show(
       id: message.id,
-      title: chat.title,
+      title: mentioned ? '${chat.title}: mentioned you' : chat.title,
       body: body,
       chat: chat,
     );
