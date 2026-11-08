@@ -323,17 +323,18 @@ Future<void> addFromLink(BuildContext context, WidgetRef ref) async {
     pasteButton: true,
   );
   if (text == null || !context.mounted) return;
-  await _addLink(context, ref, MeshLink.parse(text));
+  await addLink(context, ref, MeshLink.parse(text));
 }
 
 /// Scans a QR code and adds the channel or contact in it.
 Future<void> addFromQr(BuildContext context, WidgetRef ref) async {
   final link = await scanMeshLink(context);
   if (link == null || !context.mounted) return;
-  await _addLink(context, ref, link);
+  await addLink(context, ref, link);
 }
 
-Future<void> _addLink(
+/// Adds the contact or joins the channel in [link].
+Future<void> addLink(
   BuildContext context,
   WidgetRef ref,
   MeshLink? link,
