@@ -2,13 +2,19 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../app/connection.dart';
 import '../app/delivery.dart';
 import '../app/notifications.dart';
+import '../app/mesh_links.dart';
+import '../app/position.dart';
 import '../app/reactions.dart';
+import '../app/shared_items.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
+import 'manage_actions.dart';
+import 'position_map_screen.dart';
 import 'quick_messages_screen.dart';
 
 /// One direct or channel conversation with a box to reply.
@@ -104,6 +110,100 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     final radioKey = _draftRadio;
     if (radioKey == null) return;
     unawaited(_store.saveDraft(radioKey, widget.thread, _text.text));
+  }
+
+  /// Puts [text] in the box, after anything already typed, to check
+  /// before sending.
+  void _insert(String text) {
+    final current = _text.text.trimRight();
+    final next = current.isEmpty ? text : '$current $text';
+    _text.value = TextEditingValue(
+      text: next,
+      selection: TextSelection.collapsed(offset: next.length),
+    );
+  }
+
+  Future<void> _share(List<Contact> contacts) async {
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.my_location),
+              title: const Text('My position'),
+              subtitle: const Text('From the phone, or else the radio'),
+              onTap: () => Navigator.pop(context, 'position'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.contact_page_outlined),
+              title: const Text('A contact'),
+              subtitle: const Text('They can add it in one tap'),
+              onTap: () => Navigator.pop(context, 'contact'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || choice == null) return;
+    final messenger = ScaffoldMessenger.of(context);
+    if (choice == 'position') {
+      LatLng? here;
+      try {
+        here = await ref
+            .read(phonePositionProvider)()
+            .timeout(const Duration(seconds: 15));
+      } on Object {
+        here = null;
+      }
+      final state = ref.read(connectionProvider);
+      if (here == null && state is Connected) {
+        final self = state.radio.self;
+        if (self.latitude case final lat? when self.longitude != null) {
+          here = LatLng(lat, self.longitude!);
+        }
+      }
+      if (!mounted) return;
+      if (here == null) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text(
+              'No position: turn on location, or set the radio’s position.',
+            ),
+          ),
+        );
+        return;
+      }
+      _insert(positionText(here));
+      return;
+    }
+    final picked = await showDialog<Contact>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: const Text('Share a contact'),
+        children: [
+          if (contacts.isEmpty)
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text('No contacts on this radio yet.'),
+            ),
+          for (final c in contacts)
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(context, c),
+              child: Text(c.name),
+            ),
+        ],
+      ),
+    );
+    if (picked == null || !mounted) return;
+    _insert(
+      ContactLink(
+        name: picked.name,
+        publicKey: PublicKey.fromHex(picked.publicKey),
+        type: NodeType.fromByte(picked.type),
+      ).url,
+    );
   }
 
   Future<void> _pickQuick() async {
@@ -441,6 +541,21 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                             ? null
                             : (name: senderOf(replyTo), body: replyTo.body),
                         reactions: item.reactions,
+                        onShowPosition: switch (sharedPosition(message.body)) {
+                          final p? => () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => PositionMapScreen(
+                                position: p,
+                                label: senderOf(message),
+                              ),
+                            ),
+                          ),
+                          null => null,
+                        },
+                        link: message.outgoing
+                            ? null
+                            : sharedLink(message.body),
+                        onAddLink: (link) => addLink(context, ref, link),
                         retrying: retrying.contains(message.id),
                         onReact: canReply && !_sending
                             ? (emoji) =>
@@ -475,6 +590,13 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                     tooltip: 'Quick messages',
                     onPressed: canReply && !_sending ? _pickQuick : null,
                     icon: const Icon(Icons.bolt),
+                  ),
+                  IconButton(
+                    tooltip: 'Share position or contact',
+                    onPressed: canReply && !_sending
+                        ? () => _share(contacts)
+                        : null,
+                    icon: const Icon(Icons.add_location_alt_outlined),
                   ),
                   Expanded(
                     child: TextField(
@@ -523,7 +645,17 @@ class _Bubble extends StatelessWidget {
     this.author,
     this.replyTo,
     this.reactions = const [],
+    this.onShowPosition,
+    this.link,
+    this.onAddLink,
   });
+
+  /// Opens the position this message shares; null when it shares none.
+  final VoidCallback? onShowPosition;
+
+  /// A contact or channel this message shares, and how to add it.
+  final MeshLink? link;
+  final void Function(MeshLink link)? onAddLink;
 
   final Message message;
 
@@ -608,6 +740,38 @@ class _Bubble extends StatelessWidget {
                     ],
                   ],
                 ),
+                if (onShowPosition != null || link != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Wrap(
+                      spacing: 6,
+                      runSpacing: 4,
+                      children: [
+                        if (onShowPosition case final show?)
+                          ActionChip(
+                            avatar: const Icon(Icons.map_outlined, size: 18),
+                            label: const Text('Show on map'),
+                            onPressed: show,
+                          ),
+                        if (link case final link?)
+                          ActionChip(
+                            avatar: Icon(
+                              link is ChannelLink
+                                  ? Icons.tag
+                                  : Icons.person_add_alt,
+                              size: 18,
+                            ),
+                            label: Text(switch (link) {
+                              ChannelLink(:final name) => 'Join $name',
+                              ContactLink(:final name) => 'Add $name',
+                            }),
+                            onPressed: onAddLink == null
+                                ? null
+                                : () => onAddLink!(link),
+                          ),
+                      ],
+                    ),
+                  ),
                 if (reactions.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
