@@ -234,8 +234,7 @@ final safetyProvider = AsyncNotifierProvider<Safety, SafetyState>(Safety.new);
 /// Keyed by the ids joined with commas, since lists compare by identity.
 final checkInMessagesProvider = StreamProvider.family<List<Message>, String>(
   (ref, ids) => ref.watch(storeProvider).watchMessagesById([
-    for (final id in ids.split(','))
-      if (int.tryParse(id) case final n?) n,
+    for (final id in ids.split(',')) ?int.tryParse(id),
   ]),
 );
 
@@ -702,7 +701,10 @@ final tripQuietWatchdogProvider = Provider<void>((ref) {
   Timer? timer;
   // When each contact was last warned about, so a spell warns once.
   final warned = <String, DateTime>{};
+  // When each contact was last heard while the app ran, by the safety clock.
+  final heardAt = <String, DateTime>{};
   DateTime? watchingSince;
+  StreamSubscription<Message>? incoming;
 
   Future<void> tick() async {
     final s = ref.read(safetyProvider).value;
@@ -710,11 +712,12 @@ final tripQuietWatchdogProvider = Provider<void>((ref) {
     final radioKey = ref.read(radioKeyProvider);
     if (s == null || limit == null || radioKey == null) return;
     final now = ref.read(safetyClockProvider)();
-    final since = watchingSince ??= now;
+    final since = watchingSince ?? now;
     final store = ref.read(storeProvider);
     for (final key in s.tripContacts) {
       final thread = Threads.direct(key);
-      final heard = await store.lastIncomingAt(radioKey, thread);
+      final heard =
+          heardAt[key] ?? await store.lastIncomingAt(radioKey, thread);
       final quietFrom = heard != null && heard.isAfter(since) ? heard : since;
       if (now.difference(quietFrom) < limit) continue;
       final last = warned[key];
@@ -743,13 +746,31 @@ final tripQuietWatchdogProvider = Provider<void>((ref) {
       warned.clear();
       return;
     }
+    // Quiet time counts from when the warning was turned on (or the app
+    // started), not from before.
+    watchingSince ??= ref.read(safetyClockProvider)();
     timer = Timer.periodic(
       const Duration(minutes: 1),
       (_) => unawaited(tick()),
     );
   }
 
-  ref.onDispose(() => timer?.cancel());
+  void listenTo(RadioConnectionState state) {
+    unawaited(incoming?.cancel());
+    incoming = state is Connected
+        ? state.sync.incoming.listen((m) {
+            if (m.outgoing || !m.thread.startsWith('d:')) return;
+            heardAt[m.thread.substring(2)] = ref.read(safetyClockProvider)();
+          })
+        : null;
+  }
+
+  ref.onDispose(() {
+    timer?.cancel();
+    unawaited(incoming?.cancel());
+  });
+  listenTo(ref.read(connectionProvider));
+  ref.listen(connectionProvider, (_, next) => listenTo(next));
   follow(ref.read(safetyProvider).value);
   ref.listen(safetyProvider, (_, next) => follow(next.value));
 });

@@ -697,6 +697,8 @@ class _CheckInReport extends ConsumerWidget {
       );
     }
     return Card(
+      // Each recipient reads as its own line to a screen reader.
+      semanticContainer: false,
       margin: const EdgeInsets.only(top: 12),
       child: Padding(
         padding: const EdgeInsets.all(12),
