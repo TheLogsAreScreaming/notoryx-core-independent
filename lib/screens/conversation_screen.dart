@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../app/blocking.dart';
+import '../app/appearance.dart';
 import '../app/connection.dart';
 import '../app/delivery.dart';
 import '../app/notifications.dart';
@@ -487,6 +488,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
   @override
   Widget build(BuildContext context) {
     final radioKey = ref.watch(radioKeyProvider);
+    final chatScale = ref.watch(appearanceProvider.select((a) => a.chatScale));
     final connected = ref.watch(connectionProvider) is Connected;
     final messages = radioKey == null
         ? const <Message>[]
@@ -590,52 +592,62 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                       final item = items[items.length - 1 - i];
                       final message = item.message;
                       final replyTo = item.replyTo;
-                      return _Bubble(
-                        message: message,
-                        body: item.replyText ?? message.body,
-                        showSender: widget.isChannel,
-                        author: _authorName(message.authorPrefix, contacts),
-                        replyTo: replyTo == null
-                            ? null
-                            : (name: senderOf(replyTo), body: replyTo.body),
-                        reactions: item.reactions,
-                        mentionsMe:
-                            !message.outgoing &&
-                            mentions(
-                              message.body,
-                              connection is Connected
-                                  ? connection.radio.self.name
-                                  : null,
-                            ),
-                        onShowPosition: switch (sharedPosition(message.body)) {
-                          final p? => () => Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => PositionMapScreen(
-                                position: p,
-                                label: senderOf(message),
+                      return MediaQuery(
+                        data: MediaQuery.of(context).copyWith(
+                          textScaler: TextScaler.linear(
+                            MediaQuery.textScalerOf(context).scale(1) *
+                                chatScale,
+                          ),
+                        ),
+                        child: _Bubble(
+                          message: message,
+                          body: item.replyText ?? message.body,
+                          showSender: widget.isChannel,
+                          author: _authorName(message.authorPrefix, contacts),
+                          replyTo: replyTo == null
+                              ? null
+                              : (name: senderOf(replyTo), body: replyTo.body),
+                          reactions: item.reactions,
+                          mentionsMe:
+                              !message.outgoing &&
+                              mentions(
+                                message.body,
+                                connection is Connected
+                                    ? connection.radio.self.name
+                                    : null,
+                              ),
+                          onShowPosition: switch (sharedPosition(
+                            message.body,
+                          )) {
+                            final p? => () => Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => PositionMapScreen(
+                                  position: p,
+                                  label: senderOf(message),
+                                ),
                               ),
                             ),
-                          ),
-                          null => null,
-                        },
-                        link: message.outgoing
-                            ? null
-                            : sharedLink(message.body),
-                        onAddLink: (link) => addLink(context, ref, link),
-                        retrying: retrying.contains(message.id),
-                        onReact: canReply && !_sending
-                            ? (emoji) =>
-                                  _send(reactionText(emoji, message.body))
-                            : null,
-                        onLongPress: message.outgoing || canReply || connected
-                            ? () => _showActions(
-                                message,
-                                senderOf(message),
-                                retrying: retrying.contains(message.id),
-                                canReply: canReply,
-                                contact: _contact(contacts),
-                              )
-                            : null,
+                            null => null,
+                          },
+                          link: message.outgoing
+                              ? null
+                              : sharedLink(message.body),
+                          onAddLink: (link) => addLink(context, ref, link),
+                          retrying: retrying.contains(message.id),
+                          onReact: canReply && !_sending
+                              ? (emoji) =>
+                                    _send(reactionText(emoji, message.body))
+                              : null,
+                          onLongPress: message.outgoing || canReply || connected
+                              ? () => _showActions(
+                                  message,
+                                  senderOf(message),
+                                  retrying: retrying.contains(message.id),
+                                  canReply: canReply,
+                                  contact: _contact(contacts),
+                                )
+                              : null,
+                        ),
                       );
                     },
                   ),

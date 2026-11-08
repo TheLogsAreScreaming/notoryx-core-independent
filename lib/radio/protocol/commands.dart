@@ -356,6 +356,21 @@ final class GetBatteryAndStorage extends RadioCommand {
   void _write(FrameWriter out) => out.u8(CommandCode.getBatteryAndStorage);
 }
 
+/// Runs a command on the radio's own command line (firmware 14 and later).
+/// Answered with [CliReply].
+final class RunCliCommand extends RadioCommand {
+  const RunCliCommand(this.text);
+
+  final String text;
+
+  @override
+  void _write(FrameWriter out) {
+    out
+      ..u8(CommandCode.runCliCommand)
+      ..string(text);
+  }
+}
+
 /// Restarts the radio. It sends no reply.
 final class Reboot extends RadioCommand {
   const Reboot();

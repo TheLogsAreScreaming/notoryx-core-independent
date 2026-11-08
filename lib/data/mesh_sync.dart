@@ -231,6 +231,11 @@ class MeshSync {
       _session.request<BatteryAndStorage>(const GetBatteryAndStorage());
 
   /// Restarts the radio. The link drops and reconnecting takes over.
+  /// Runs [command] on the connected radio's own command line and returns
+  /// what it said. Needs firmware 14 or later.
+  Future<String> runRadioCommand(String command) async =>
+      (await _session.request<CliReply>(RunCliCommand(command))).text;
+
   Future<void> reboot() => _session.sendOnly(const Reboot());
 
   /// Sends a direct message and stores it. Returns the message id once the

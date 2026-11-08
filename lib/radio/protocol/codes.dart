@@ -32,6 +32,7 @@ abstract final class CommandCode {
   static const setOtherParams = 38;
   static const sendTelemetryRequest = 39;
   static const getStats = 56;
+  static const runCliCommand = 66;
   static const setAutoAddConfig = 58;
   static const getAutoAddConfig = 59;
 }
@@ -65,6 +66,7 @@ abstract final class ResponseCode {
   static const stats = 24;
   static const autoAddConfig = 25;
   static const channelData = 27;
+  static const cliReply = 29;
 }
 
 /// First byte of a notification the radio sends on its own.

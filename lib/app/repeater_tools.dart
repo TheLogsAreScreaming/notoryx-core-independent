@@ -12,7 +12,7 @@ final _neighborLine = RegExp(r'^([0-9A-Fa-f]{2,64}):(\d+):(-?\d+)$');
 /// line, SNR in quarter-dB. Returns null when [reply] isn't that reply.
 /// An empty list means it has heard nobody yet.
 List<RepeaterNeighbor>? parseNeighbors(String reply) {
-  final text = reply.trim();
+  final text = reply.replaceFirst(RegExp(r'^\s*>\s*'), '').trim();
   if (text == '-none-') return const [];
   final out = <RepeaterNeighbor>[];
   for (final line in text.split('\n')) {
