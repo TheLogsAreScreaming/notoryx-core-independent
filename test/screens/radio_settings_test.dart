@@ -225,6 +225,8 @@ void main() {
     tester,
   ) async {
     await openSettings(tester);
+    await tester.ensureVisible(find.text('LoRa settings'));
+    await settle(tester);
     await tester.tap(find.text('LoRa settings'));
     await settle(tester);
     await tester.enterText(find.byType(TextField), '3000');

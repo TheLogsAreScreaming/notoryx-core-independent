@@ -702,6 +702,53 @@ void main() {
     await settle(tester);
     expect(find.text('> ver'), findsOneWidget);
     expect(find.text('v1.18.0'), findsOneWidget);
+
+    radio.consoleReply = '42AABBCC:90:-22';
+    await tester.scrollUntilVisible(
+      find.text('Neighbors'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('Neighbors'));
+    await settle(tester);
+    expect(find.text('> neighbors'), findsOneWidget);
+    expect(find.textContaining('-5.5 dB'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.text('Ping'),
+      -200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('Ping'));
+    await settle(tester);
+    expect(find.textContaining('It heard you at'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
+  testWidgets('the radio command line runs commands and hides passwords', (
+    tester,
+  ) async {
+    await connect(tester);
+    await tester.tap(find.byTooltip('Radio settings'));
+    await settle(tester);
+    await tester.scrollUntilVisible(find.text('Command line'), 200);
+    await tester.ensureVisible(find.text('Command line'));
+    await settle(tester);
+    await tester.tap(find.text('Command line'));
+    await settle(tester);
+    await tester.enterText(find.byType(TextField), 'get name');
+    await tester.tap(find.byTooltip('Run command'));
+    await settle(tester);
+    expect(find.text('> ran get name'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Wi-Fi setup'));
+    await settle(tester);
+    await tester.enterText(find.byType(TextField).at(1), 'Camp');
+    await tester.enterText(find.byType(TextField).at(2), 'hunter2');
+    await tester.tap(find.text('Save'));
+    await settle(tester);
+    expect(find.text('> set wifi.pwd ••••••'), findsOneWidget);
+    expect(find.textContaining('> ran set wifi.pwd hunter2'), findsOneWidget);
     await cleanUp(tester);
   });
 
