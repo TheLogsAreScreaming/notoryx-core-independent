@@ -6,6 +6,7 @@ import '../data/data.dart';
 import '../radio/radio.dart';
 import 'conversation_screen.dart';
 import 'node_details.dart';
+import 'repeater_tools.dart';
 import 'telemetry_screen.dart';
 
 /// A repeater or room server: log in, check its status, open the room, and
@@ -283,6 +284,8 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
             ),
           ),
 
+          RepeaterPingCard(publicKey: widget.node.publicKey),
+
           // Console
           if (role == ServerRole.admin && radioKey != null)
             Card(
@@ -293,6 +296,20 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
                   children: [
                     Text('Console', style: theme.textTheme.titleMedium),
                     const SizedBox(height: 8),
+                    RepeaterAdminTools(
+                      radioKey: radioKey,
+                      server: _key,
+                      lines:
+                          ref
+                              .watch(
+                                consoleProvider((
+                                  radioKey: radioKey,
+                                  thread: Threads.direct(widget.node.publicKey),
+                                )),
+                              )
+                              .value ??
+                          const [],
+                    ),
                     _Console(
                       radioKey: radioKey,
                       thread: Threads.direct(widget.node.publicKey),
