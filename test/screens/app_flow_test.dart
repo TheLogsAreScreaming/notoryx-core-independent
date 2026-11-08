@@ -392,6 +392,50 @@ void main() {
     await cleanUp(tester);
   });
 
+  testWidgets('blocking hides a sender, and mentions get through mute', (
+    tester,
+  ) async {
+    await connect(tester);
+    radio.queue.addAll([
+      channelMessageFrame('Spammy: buy now', channel: 1),
+      channelMessageFrame('Ridge: summit at noon', channel: 1),
+    ]);
+    link.emit([PushCode.messagesWaiting]);
+    await settle(tester);
+    await tester.tap(find.text('#trail'));
+    await settle(tester);
+
+    await tester.longPress(find.text('buy now'));
+    await settle(tester);
+    await tester.tap(find.text('Block Spammy'));
+    await settle(tester);
+    expect(find.text('buy now'), findsNothing);
+    expect(find.text('summit at noon'), findsOneWidget);
+
+    // Muted, and not in front: a blocked sender doesn't notify, nor does
+    // chatter, but a mention does.
+    await tester.tap(find.byTooltip('Mute notifications'));
+    await settle(tester);
+    await tester.pageBack();
+    await settle(tester);
+    final before = notifier.shown.length;
+    radio.queue.addAll([
+      channelMessageFrame('Spammy: still here', channel: 1),
+      channelMessageFrame('Ridge: lunch?', channel: 1),
+      channelMessageFrame('Ann: @[Base] are you coming?', channel: 1),
+    ]);
+    link.emit([PushCode.messagesWaiting]);
+    await settle(tester);
+    expect(notifier.shown.length, before + 1);
+    expect(notifier.shown.last.title, '#trail: mentioned you');
+
+    await tester.tap(find.text('#trail'));
+    await settle(tester);
+    expect(find.text('still here'), findsNothing);
+    expect(find.text('Mentions you'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
   testWidgets('a message notifies unless its chat is open or muted', (
     tester,
   ) async {

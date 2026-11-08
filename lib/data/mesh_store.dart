@@ -464,7 +464,8 @@ class MeshStore {
       ..addColumns([latest])
       ..where(
         _db.messages.radioKey.equals(radioKey) &
-            _db.messages.textType.equals(TextType.cliData.value).not(),
+            _db.messages.textType.equals(TextType.cliData.value).not() &
+            CustomExpression<bool>(notBlockedSql('')),
       )
       ..groupBy([_db.messages.thread]);
     return (_db.select(_db.messages)
@@ -472,6 +473,24 @@ class MeshStore {
           ..orderBy([(m) => OrderingTerm.desc(m.id)]))
         .watch();
   }
+
+  // Blocking
+
+  /// Setting keys holding blocked senders as JSON lists: channel senders by
+  /// the name they post under, direct senders by public key (hex).
+  static const blockedNamesSetting = 'blocked_names';
+  static const blockedKeysSetting = 'blocked_keys';
+
+  /// SQL that is true unless the message (columns prefixed with [p], such
+  /// as `m.`) came from a blocked sender.
+  static String notBlockedSql(String p) =>
+      'NOT (${p}outgoing = 0 AND ('
+      '(${p}kind = ${MessageKind.channel.index} AND ${p}sender_name IN '
+      '(SELECT value FROM json_each(COALESCE((SELECT value FROM settings '
+      "WHERE key = '$blockedNamesSetting'), '[]')))) OR "
+      '(${p}kind = ${MessageKind.direct.index} AND substr(${p}thread, 3) IN '
+      '(SELECT value FROM json_each(COALESCE((SELECT value FROM settings '
+      "WHERE key = '$blockedKeysSetting'), '[]'))))))";
 
   // Unread and muting
 
@@ -483,9 +502,10 @@ class MeshStore {
         'ON t.radio_key = m.radio_key AND t.thread = m.thread '
         'WHERE m.radio_key = ? AND m.outgoing = 0 AND m.text_type != 1 '
         'AND m.id > COALESCE(t.last_read_id, 0) '
+        'AND ${notBlockedSql('m.')} '
         'GROUP BY m.thread',
         variables: [Variable.withString(radioKey)],
-        readsFrom: {_db.messages, _db.threadStates},
+        readsFrom: {_db.messages, _db.threadStates, _db.settings},
       )
       .watch()
       .map(
