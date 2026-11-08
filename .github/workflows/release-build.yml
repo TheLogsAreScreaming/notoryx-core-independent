@@ -48,13 +48,34 @@ jobs:
           } > android/key.properties
 
       - run: flutter pub get
+      # A tag build names the app after its tag (v0.1.0-test.15 gives
+      # 0.1.0-test.15), so update checkers such as Obtainium see the
+      # installed version match the release. Other builds keep pubspec's.
+      - name: Version name
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            echo "BUILD_NAME=--build-name=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          fi
       # The phone build first: the full build below overwrites the output.
       # Same version code as the full one, so people can switch freely.
       - name: Phone-only APK (64-bit ARM, most phones since 2017)
         run: |
-          flutter build apk --release --target-platform android-arm64
+          flutter build apk --release --target-platform android-arm64 $BUILD_NAME
           cp build/app/outputs/flutter-apk/app-release.apk app-arm64.apk
-      - run: flutter build apk --release
+      - run: flutter build apk --release $BUILD_NAME
+
+      - name: Check the version name
+        run: |
+          aapt=$(ls "$ANDROID_HOME"/build-tools/*/aapt2 | sort -V | tail -1)
+          for apk in build/app/outputs/flutter-apk/app-release.apk app-arm64.apk; do
+            "$aapt" dump badging "$apk" | grep -o "versionCode='[0-9]*' versionName='[^']*'"
+          done
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            "$aapt" dump badging app-arm64.apk | grep -q "versionName='${GITHUB_REF_NAME#v}'" || {
+              echo "::error::versionName does not match the tag"
+              exit 1
+            }
+          fi
 
       - name: Check the APK signer
         env:
