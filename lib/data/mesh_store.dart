@@ -699,6 +699,18 @@ class MeshStore {
           .watch()
           .map((rows) => {for (final r in rows) r.nodeKey: r});
 
+  /// Deletes channel messages stored more than [age] ago, on every radio,
+  /// and returns how many went. Direct messages are never touched.
+  Future<int> deleteOldChannelMessages(Duration age) =>
+      (_db.delete(_db.messages)..where(
+            (m) =>
+                m.thread.like('c:%') &
+                m.storedAt.isSmallerThanValue(
+                  _clock().subtract(age).millisecondsSinceEpoch,
+                ),
+          ))
+          .go();
+
   // Track log
 
   /// Starts a new track and returns its id.

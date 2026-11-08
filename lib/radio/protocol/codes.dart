@@ -31,6 +31,7 @@ abstract final class CommandCode {
   static const sendTracePath = 36;
   static const setOtherParams = 38;
   static const sendTelemetryRequest = 39;
+  static const importContact = 18;
   static const getStats = 56;
   static const runCliCommand = 66;
   static const setAutoAddConfig = 58;

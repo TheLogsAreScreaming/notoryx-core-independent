@@ -231,6 +231,12 @@ class MeshSync {
       _session.request<BatteryAndStorage>(const GetBatteryAndStorage());
 
   /// Restarts the radio. The link drops and reconnecting takes over.
+  /// Adds a contact from a raw advert packet, as shared by other apps.
+  Future<void> importAdvert(List<int> advert) async {
+    await _session.run(ImportContact(advert));
+    await _syncContacts();
+  }
+
   /// Runs [command] on the connected radio's own command line and returns
   /// what it said. Needs firmware 14 or later.
   Future<String> runRadioCommand(String command) async =>
