@@ -92,7 +92,7 @@ void main() {
     await settle(tester);
     await tester.tap(find.byTooltip('Safety: SOS and check-ins'));
     await settle(tester);
-    await tester.tap(find.text('Send to'));
+    await tester.tap(find.text('Main chat'));
     await settle(tester);
     await tester.tap(find.text('#trail').last);
     await settle(tester);
@@ -211,8 +211,117 @@ void main() {
     await cleanUp(tester);
   });
 
+  /// A direct message from Alice (key byte 1) arrives.
+  Future<void> hearAlice(WidgetTester tester, String text) async {
+    radio.queue.add([
+      ResponseCode.contactMessageV3,
+      0,
+      0,
+      0,
+      ...List.filled(6, 1),
+      0,
+      0,
+      ...u32(1700000100),
+      ...text.codeUnits,
+    ]);
+    link.emit([PushCode.messagesWaiting]);
+    await settle(tester);
+  }
+
+  Future<void> addAlice(WidgetTester tester) async {
+    await tester.tap(find.text('Add trip contact'));
+    await settle(tester);
+    await tester.tap(find.widgetWithText(SimpleDialogOption, 'Alice'));
+    await settle(tester);
+  }
+
+  testWidgets('check-ins go to trip contacts, with who it reached', (
+    tester,
+  ) async {
+    await openSafety(tester);
+    await addAlice(tester);
+    expect(find.widgetWithText(InputChip, 'Alice'), findsOneWidget);
+
+    // Alice's radio refuses the first one: shown as missed.
+    radio.refuseText = true;
+    await tester.tap(find.text('At camp'));
+    await settle(tester);
+    // The refused one is stored too, as failed.
+    expect(await sent(tester), [
+      for (var i = 0; i < 2; i++)
+        'Check-in: At camp. Position 46.50000,-121.25000',
+    ]);
+    expect(find.textContaining('Last check-in: At camp'), findsOneWidget);
+    expect(
+      find.bySemanticsLabel('#trail: Sent (channels don’t confirm)'),
+      findsOneWidget,
+    );
+    expect(find.bySemanticsLabel('Alice: Not sent'), findsOneWidget);
+
+    radio.refuseText = false;
+    await tester.pump(const Duration(seconds: 5)); // the snackbar goes
+    await settle(tester);
+    await tester.scrollUntilVisible(find.text('Send again to 1 missed'), 200);
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, -150));
+    await settle(tester);
+    await tester.tap(find.text('Send again to 1 missed'));
+    await settle(tester);
+    expect(await sent(tester), hasLength(3));
+    expect(
+      find.bySemanticsLabel('Alice: Sent, not confirmed yet'),
+      findsOneWidget,
+    );
+    expect(find.text('Send again to 1 missed'), findsNothing);
+
+    link.emit([
+      PushCode.sendConfirmed,
+      ...u32(radio.ack + radio.textAttempts.last),
+      ...u32(300),
+    ]);
+    await settle(tester);
+    expect(find.bySemanticsLabel('Alice: Reached'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
+  testWidgets('a quiet trip contact is warned about once per spell', (
+    tester,
+  ) async {
+    await openSafety(tester);
+    await addAlice(tester);
+    await tester.scrollUntilVisible(
+      find.text('Warn me if a trip contact is quiet for'),
+      200,
+    );
+    await tester.tap(find.text('Warn me if a trip contact is quiet for'));
+    await settle(tester);
+    await tester.tap(find.text('1 hour').last);
+    await settle(tester);
+
+    await wait(tester, const Duration(minutes: 30));
+    expect(notifier.shown, isEmpty);
+    await wait(tester, const Duration(minutes: 31));
+    expect(notifier.shown.single.title, 'Alice has gone quiet');
+    expect(
+      notifier.shown.single.body,
+      'Nothing from Alice for over 61 minutes.',
+    );
+    await wait(tester, const Duration(minutes: 30));
+    expect(notifier.shown, hasLength(1), reason: 'once per quiet spell');
+
+    // Hearing from her starts a new spell.
+    await hearAlice(tester, "Check-in: I'm OK. Position unknown.");
+    final heardAt = notifier.shown.length;
+    await wait(tester, const Duration(minutes: 30));
+    expect(notifier.shown, hasLength(heardAt));
+    await wait(tester, const Duration(minutes: 40));
+    expect(notifier.shown.last.title, 'Alice has gone quiet');
+    expect(notifier.shown.last.body, startsWith('Last heard from Alice'));
+    await cleanUp(tester);
+  });
+
   testWidgets('a missed check-in reminds, then tells the chat', (tester) async {
     await openSafety(tester);
+    await tester.scrollUntilVisible(find.text('Check in every'), 200);
     await tester.tap(find.text('Check in every'));
     await settle(tester);
     await tester.tap(find.text('30 minutes').last);
@@ -221,6 +330,7 @@ void main() {
 
     // Checking in on time pushes the deadline back.
     now = now.add(const Duration(minutes: 20));
+    await tester.scrollUntilVisible(find.text("I'm OK"), -200);
     await tester.tap(find.text("I'm OK"));
     await settle(tester);
     expect(await sent(tester), [

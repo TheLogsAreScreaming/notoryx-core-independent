@@ -352,6 +352,30 @@ class MeshStore {
         ),
       );
 
+  /// The messages with these [ids], as they change (for delivery status).
+  Stream<List<Message>> watchMessagesById(List<int> ids) => ids.isEmpty
+      ? Stream.value(const [])
+      : (_db.select(_db.messages)..where((m) => m.id.isIn(ids))).watch();
+
+  /// When the newest message from the other side of [thread] was stored,
+  /// or null if none ever arrived.
+  Future<DateTime?> lastIncomingAt(String radioKey, String thread) async {
+    final row =
+        await (_db.select(_db.messages)
+              ..where(
+                (m) =>
+                    m.radioKey.equals(radioKey) &
+                    m.thread.equals(thread) &
+                    m.outgoing.equals(false),
+              )
+              ..orderBy([(m) => OrderingTerm.desc(m.id)])
+              ..limit(1))
+            .getSingleOrNull();
+    return row == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(row.storedAt);
+  }
+
   /// The radio accepted the message. Direct messages carry the [ackCode]
   /// their delivery confirmation will match, and how many [attempts] have
   /// been sent so far.
