@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/keep_alive.dart';
 import 'app/packet_log.dart';
+import 'app/radio_stats.dart';
 import 'app/telemetry.dart';
 import 'app/connection.dart';
 import 'app/notifications.dart';
@@ -88,6 +89,7 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
     // Listened, not watched: a packet mustn't rebuild the whole app.
     ref.listen(packetLogProvider, (_, _) {});
     ref.listen(selfTelemetrySamplerProvider, (_, _) {});
+    ref.listen(radioStatsSamplerProvider, (_, _) {});
     // Disconnecting closes any open conversation so the connect screen is
     // what's showing. While reconnecting the chats stay open.
     ref.listen(connectionProvider, (previous, next) {

@@ -641,4 +641,57 @@ class MeshStore {
             (t) => t.radioKey.equals(radioKey) & t.nodeKey.equals(nodeKey),
           ))
           .go();
+
+  // Radio stats
+
+  /// How many receiver samples are kept per radio: about two weeks at one
+  /// every 10 minutes.
+  static const radioStatsKept = 2000;
+
+  /// Stores one reading of the radio's receiver figures.
+  Future<void> saveRadioStats(String radioKey, RadioStats stats) =>
+      _db.transaction(() async {
+        await _db
+            .into(_db.radioStatsSamples)
+            .insert(
+              RadioStatsSamplesCompanion.insert(
+                radioKey: radioKey,
+                at: _clock().millisecondsSinceEpoch,
+                noiseFloor: stats.noiseFloor,
+                lastRssi: stats.lastRssi,
+                lastSnr: stats.lastSnr,
+                txAirSeconds: stats.txAirSeconds,
+                rxAirSeconds: stats.rxAirSeconds,
+              ),
+            );
+        await _db.customStatement(
+          'DELETE FROM radio_stats_samples WHERE radio_key = ? '
+          'AND id NOT IN (SELECT id FROM radio_stats_samples '
+          'WHERE radio_key = ? ORDER BY id DESC LIMIT ?)',
+          [radioKey, radioKey, radioStatsKept],
+        );
+      });
+
+  /// A radio's receiver history, oldest first.
+  Stream<List<RadioStatsSample>> watchRadioStats(String radioKey) =>
+      (_db.select(_db.radioStatsSamples)
+            ..where((t) => t.radioKey.equals(radioKey))
+            ..orderBy([(t) => OrderingTerm.asc(t.id)]))
+          .watch();
+
+  /// When the newest receiver sample was taken, or null if none.
+  Future<DateTime?> lastRadioStatsAt(String radioKey) async {
+    final row =
+        await (_db.select(_db.radioStatsSamples)
+              ..where((t) => t.radioKey.equals(radioKey))
+              ..orderBy([(t) => OrderingTerm.desc(t.id)])
+              ..limit(1))
+            .getSingleOrNull();
+    return row == null ? null : DateTime.fromMillisecondsSinceEpoch(row.at);
+  }
+
+  /// Forgets a radio's receiver history.
+  Future<void> clearRadioStats(String radioKey) => (_db.delete(
+    _db.radioStatsSamples,
+  )..where((t) => t.radioKey.equals(radioKey))).go();
 }

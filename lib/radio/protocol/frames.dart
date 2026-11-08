@@ -171,6 +171,35 @@ final class BatteryAndStorage extends ReplyFrame {
   final int? totalKb;
 }
 
+/// The radio's receiver figures, the reply to [GetRadioStats].
+final class RadioStats extends ReplyFrame {
+  const RadioStats({
+    required this.noiseFloor,
+    required this.lastRssi,
+    required this.lastSnr,
+    required this.txAirSeconds,
+    required this.rxAirSeconds,
+  });
+
+  /// Background noise on the channel, dBm.
+  final int noiseFloor;
+
+  /// The last packet received: signal strength in dBm and SNR in dB.
+  final int lastRssi;
+  final double lastSnr;
+
+  /// Time spent sending and receiving since the radio started, seconds.
+  final int txAirSeconds;
+  final int rxAirSeconds;
+}
+
+/// Stats from a group this app doesn't read.
+final class OtherStats extends ReplyFrame {
+  const OtherStats(this.group);
+
+  final int group;
+}
+
 final class ChannelInfo extends ReplyFrame {
   ChannelInfo({
     required this.index,
@@ -458,6 +487,7 @@ RadioFrame decodeFrame(List<int> frame) {
         usedKb: r.remaining >= 8 ? r.u32() : null,
         totalKb: r.remaining >= 4 ? r.u32() : null,
       ),
+      ResponseCode.stats => _stats(r),
       ResponseCode.channelInfo => ChannelInfo(
         index: r.u8(),
         name: r.fixedString(32),
@@ -505,6 +535,18 @@ RadioFrame decodeFrame(List<int> frame) {
   } on FormatException catch (e) {
     return MalformedFrame(bytes, e.message);
   }
+}
+
+ReplyFrame _stats(FrameReader r) {
+  final group = r.u8();
+  if (group != StatsGroup.radio) return OtherStats(group);
+  return RadioStats(
+    noiseFloor: r.i16(),
+    lastRssi: r.i8(),
+    lastSnr: r.i8() / 4,
+    txAirSeconds: r.u32(),
+    rxAirSeconds: r.u32(),
+  );
 }
 
 /// Reads the SNR byte and the two reserved bytes that follow it in v3 frames.

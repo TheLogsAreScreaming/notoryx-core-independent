@@ -337,6 +337,18 @@ final class SetTxPower extends RadioCommand {
   }
 }
 
+/// Asks for the radio's own receiver figures: noise floor, the last
+/// packet's signal, and airtime so far. Answered with [RadioStats] on
+/// firmware that has it.
+final class GetRadioStats extends RadioCommand {
+  const GetRadioStats();
+
+  @override
+  void _write(FrameWriter out) => out
+    ..u8(CommandCode.getStats)
+    ..u8(StatsGroup.radio);
+}
+
 final class GetBatteryAndStorage extends RadioCommand {
   const GetBatteryAndStorage();
 
