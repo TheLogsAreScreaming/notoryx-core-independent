@@ -702,6 +702,26 @@ void main() {
     await settle(tester);
     expect(find.text('> ver'), findsOneWidget);
     expect(find.text('v1.18.0'), findsOneWidget);
+
+    radio.consoleReply = '42AABBCC:90:-22';
+    await tester.scrollUntilVisible(
+      find.text('Neighbors'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('Neighbors'));
+    await settle(tester);
+    expect(find.text('> neighbors'), findsOneWidget);
+    expect(find.textContaining('-5.5 dB'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.text('Ping'),
+      -200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('Ping'));
+    await settle(tester);
+    expect(find.textContaining('It heard you at'), findsOneWidget);
     await cleanUp(tester);
   });
 
