@@ -120,32 +120,10 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
     }
   }
 
-  Future<String?> _askPassword() {
-    final controller = TextEditingController();
-    return showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Backup password'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          obscureText: true,
-          decoration: const InputDecoration(labelText: 'Password'),
-          onSubmitted: (v) => Navigator.pop(context, v),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('Open'),
-          ),
-        ],
-      ),
-    ).whenComplete(controller.dispose);
-  }
+  Future<String?> _askPassword() => showDialog<String>(
+    context: context,
+    builder: (context) => const _PasswordDialog(),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -241,4 +219,45 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
       ),
     );
   }
+}
+
+/// Asks for a backup's password. Owns its text box, so it is disposed only
+/// once the dialog has finished closing.
+class _PasswordDialog extends StatefulWidget {
+  const _PasswordDialog();
+
+  @override
+  State<_PasswordDialog> createState() => _PasswordDialogState();
+}
+
+class _PasswordDialogState extends State<_PasswordDialog> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('Backup password'),
+    content: TextField(
+      controller: _controller,
+      autofocus: true,
+      obscureText: true,
+      decoration: const InputDecoration(labelText: 'Password'),
+      onSubmitted: (v) => Navigator.pop(context, v),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('Cancel'),
+      ),
+      FilledButton(
+        onPressed: () => Navigator.pop(context, _controller.text),
+        child: const Text('Open'),
+      ),
+    ],
+  );
 }
