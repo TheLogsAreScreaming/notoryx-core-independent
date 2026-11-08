@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/about.dart';
 import '../app/connection.dart';
+import 'backup_screen.dart';
 
 /// The app's version, where it comes from, and the details to put in a
 /// problem report.
@@ -89,6 +90,16 @@ class AboutScreen extends ConsumerWidget {
             label: 'Source code',
             url: sourceUrl,
             onCopy: () => _copy(context, sourceUrl, 'Link copied'),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.backup_outlined),
+            title: const Text('Backup and restore'),
+            subtitle: const Text('Move your chats to a new phone'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const BackupScreen()),
+            ),
           ),
           ListTile(
             contentPadding: EdgeInsets.zero,
