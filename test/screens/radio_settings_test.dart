@@ -242,6 +242,10 @@ void main() {
   testWidgets('reboot asks first', (tester) async {
     await openSettings(tester);
     await tester.scrollUntilVisible(find.text('Reboot radio'), 200);
+    // Clear of the bottom edge, so the tap lands on the button.
+    await tester.ensureVisible(find.text('Reboot radio'));
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, -200));
+    await settle(tester);
     await tester.tap(find.text('Reboot radio'));
     await settle(tester);
     await tester.tap(find.text('Cancel'));
