@@ -868,6 +868,7 @@ class _Bubble extends StatelessWidget {
                             label: Text(switch (link) {
                               ChannelLink(:final name) => 'Join $name',
                               ContactLink(:final name) => 'Add $name',
+                              AdvertLink() => 'Add contact',
                             }),
                             onPressed: onAddLink == null
                                 ? null

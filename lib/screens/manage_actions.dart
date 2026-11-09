@@ -318,7 +318,7 @@ Future<void> addFromLink(BuildContext context, WidgetRef ref) async {
   final text = await _ask(
     context,
     title: 'Add from a link',
-    label: 'meshcore:// link',
+    label: 'Link, advert or public key',
     action: 'Add',
     pasteButton: true,
   );
@@ -342,7 +342,7 @@ Future<void> addLink(
   if (link == null) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('That isn’t a MeshCore channel or contact link.'),
+        content: Text('That isn’t a MeshCore link, advert or public key.'),
       ),
     );
     return;
@@ -355,6 +355,12 @@ Future<void> addLink(
         context,
         () => sync.addChannel(name, secret),
         done: 'Added $name',
+      );
+    case AdvertLink(:final packet):
+      await _run(
+        context,
+        () => sync.importAdvert(packet),
+        done: 'Contact added',
       );
     case ContactLink(:final name, :final publicKey, :final type):
       await _addMakingRoom(
@@ -478,6 +484,99 @@ Future<void> addDiscovered(
       longitude: node.longitude,
       lastAdvert: node.lastAdvert,
     ),
+  );
+}
+
+/// Asks which of [heard] to add, up to [room] of them, and adds them.
+Future<void> addSeveralDiscovered(
+  BuildContext context,
+  WidgetRef ref,
+  List<DiscoveredData> heard,
+  int room,
+) async {
+  final messenger = ScaffoldMessenger.of(context);
+  final picked = await showDialog<List<DiscoveredData>>(
+    context: context,
+    builder: (_) => _AddSeveralDialog(heard: heard, room: room),
+  );
+  if (picked == null || picked.isEmpty || !context.mounted) return;
+  final sync = _syncOrNotice(context, ref);
+  if (sync == null) return;
+  var added = 0;
+  try {
+    for (final node in picked) {
+      await sync.addContact(
+        publicKey: PublicKey.fromHex(node.publicKey),
+        name: node.name,
+        type: NodeType.fromByte(node.type),
+        latitude: node.latitude,
+        longitude: node.longitude,
+        lastAdvert: node.lastAdvert,
+      );
+      added++;
+    }
+    messenger.showSnackBar(SnackBar(content: Text('Added $added.')));
+  } on RadioRequestException {
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          'Added $added of ${picked.length}. The radio refused the next one.',
+        ),
+      ),
+    );
+  }
+}
+
+class _AddSeveralDialog extends StatefulWidget {
+  const _AddSeveralDialog({required this.heard, required this.room});
+
+  final List<DiscoveredData> heard;
+  final int room;
+
+  @override
+  State<_AddSeveralDialog> createState() => _AddSeveralDialogState();
+}
+
+class _AddSeveralDialogState extends State<_AddSeveralDialog> {
+  late final Set<DiscoveredData> _picked = widget.heard
+      .take(widget.room)
+      .toSet();
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: Text('Add contacts (${_picked.length} of ${widget.room} free)'),
+    content: SizedBox(
+      width: double.maxFinite,
+      child: ListView(
+        shrinkWrap: true,
+        children: [
+          for (final node in widget.heard)
+            CheckboxListTile(
+              value: _picked.contains(node),
+              title: Text(node.name),
+              onChanged:
+                  !_picked.contains(node) && _picked.length >= widget.room
+                  ? null
+                  : (on) => setState(
+                      () =>
+                          on == true ? _picked.add(node) : _picked.remove(node),
+                    ),
+            ),
+        ],
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.of(context).pop(),
+        child: const Text('Cancel'),
+      ),
+      TextButton(
+        onPressed: _picked.isEmpty
+            ? null
+            : () => Navigator.of(context).pop(_picked.toList()),
+        child: const Text('Add'),
+      ),
+    ],
   );
 }
 

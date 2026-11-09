@@ -428,10 +428,26 @@ class _ContactsTab extends ConsumerWidget {
           ),
         if (heard.isNotEmpty) ...[
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
-            child: Text(
-              'Heard nearby, not added',
-              style: Theme.of(context).textTheme.titleSmall,
+            padding: const EdgeInsets.fromLTRB(16, 20, 8, 4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Heard nearby, not added',
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                ),
+                if (heard.length > 1 && max != null && max > contacts.length)
+                  TextButton(
+                    onPressed: () => addSeveralDiscovered(
+                      context,
+                      ref,
+                      heard,
+                      max - contacts.length,
+                    ),
+                    child: const Text('Add several'),
+                  ),
+              ],
             ),
           ),
           for (final node in heard)

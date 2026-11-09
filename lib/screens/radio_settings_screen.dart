@@ -9,6 +9,7 @@ import 'radio_noise_screen.dart';
 import 'telemetry_screen.dart';
 import 'about_screen.dart';
 import 'appearance_screen.dart';
+import '../app/channel_cleanup.dart';
 import 'radio_console_screen.dart';
 import 'backup_screen.dart';
 import 'blocked_screen.dart';
@@ -202,28 +203,6 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.terminal),
-              title: const Text('Command line'),
-              subtitle: const Text('Your radio’s console and Wi-Fi setup'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => const RadioConsoleScreen(),
-                ),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.palette_outlined),
-              title: const Text('Appearance'),
-              subtitle: const Text('Theme and chat text size'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => const AppearanceScreen(),
-                ),
-              ),
-            ),
-            ListTile(
               leading: const Icon(Icons.graphic_eq),
               title: const Text('LoRa settings'),
               subtitle: Text(_lora(self)),
@@ -374,6 +353,18 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
                 MaterialPageRoute<void>(builder: (_) => const AboutScreen()),
               ),
             ),
+            ListTile(
+              leading: const Icon(Icons.terminal),
+              title: const Text('Command line'),
+              subtitle: const Text('Your radio’s console and Wi-Fi setup'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const RadioConsoleScreen(),
+                ),
+              ),
+            ),
+            const ChannelCleanupTile(),
             ListTile(
               leading: const Icon(Icons.palette_outlined),
               title: const Text('Appearance'),

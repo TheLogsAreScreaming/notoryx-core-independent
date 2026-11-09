@@ -356,6 +356,20 @@ final class GetBatteryAndStorage extends RadioCommand {
   void _write(FrameWriter out) => out.u8(CommandCode.getBatteryAndStorage);
 }
 
+/// Adds a contact from a raw advert packet. Answered with OK.
+final class ImportContact extends RadioCommand {
+  ImportContact(List<int> advert) : advert = Uint8List.fromList(advert);
+
+  final Uint8List advert;
+
+  @override
+  void _write(FrameWriter out) {
+    out
+      ..u8(CommandCode.importContact)
+      ..bytes(advert);
+  }
+}
+
 /// Runs a command on the radio's own command line (firmware 14 and later).
 /// Answered with [CliReply].
 final class RunCliCommand extends RadioCommand {

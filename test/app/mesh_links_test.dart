@@ -5,6 +5,20 @@ import 'package:notoryx_core/app/mesh_links.dart';
 import 'package:notoryx_core/radio/radio.dart';
 
 void main() {
+  test('a bare public key is a contact', () {
+    final key = 'AB' * 32;
+    final link = MeshLink.parse(' $key\n') as ContactLink;
+    expect(link.publicKey.hex, 'ab' * 32);
+    expect(link.name, 'Node ABABABAB');
+  });
+
+  test('a raw advert is recognised, with or without the scheme', () {
+    final hex = '11' * 110;
+    expect((MeshLink.parse(hex) as AdvertLink).packet, hasLength(110));
+    expect(MeshLink.parse('meshcore://$hex'), isA<AdvertLink>());
+    expect(MeshLink.parse('11' * 40), isNull);
+  });
+
   test('reads the documented channel link', () {
     final link = MeshLink.parse(
       'meshcore://channel/add?name=Public&secret=8b3387e9c5cdea6ac9e5edbaa115cd72',

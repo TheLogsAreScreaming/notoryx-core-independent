@@ -14,7 +14,21 @@ sealed class MeshLink {
   /// Reads a `meshcore://` link, ignoring surrounding spaces. Returns null
   /// for anything else or a link with missing or bad parts.
   static MeshLink? parse(String text) {
-    final uri = Uri.tryParse(text.trim());
+    final bare = text.trim();
+    final key = RegExp(r'^[0-9a-fA-F]{64}$');
+    if (key.hasMatch(bare)) {
+      return ContactLink(
+        name: 'Node ${bare.substring(0, 8).toUpperCase()}',
+        publicKey: PublicKey.fromHex(bare.toLowerCase()),
+        type: NodeType.chat,
+      );
+    }
+    // A raw advert: bare hex, or after `meshcore://`. A packet holds at
+    // least a key and signature, so it can't be mistaken for a key.
+    final advert = RegExp(r'^(?:meshcore://)?((?:[0-9a-fA-F]{2}){98,})$')
+        .firstMatch(bare);
+    if (advert != null) return AdvertLink(fromHex(advert[1]!));
+    final uri = Uri.tryParse(bare);
     if (uri == null || uri.scheme != 'meshcore' || uri.path != '/add') {
       return null;
     }
@@ -83,6 +97,16 @@ final class ContactLink extends MeshLink {
       'type': '${type.value}',
     },
   ).toString();
+}
+
+/// A contact's whole advert packet, which the radio checks and adds.
+final class AdvertLink extends MeshLink {
+  AdvertLink(List<int> packet) : packet = Uint8List.fromList(packet);
+
+  final Uint8List packet;
+
+  @override
+  String get url => 'meshcore://${toHex(packet)}';
 }
 
 /// The well-known key of the built-in Public channel.
