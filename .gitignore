@@ -46,3 +46,6 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Made by flutter gen-l10n at build time.
+lib/l10n/generated/

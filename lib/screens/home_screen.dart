@@ -13,6 +13,7 @@ import 'connect_screen.dart';
 import 'connection_log_screen.dart';
 import 'contact_cleanup_screen.dart';
 import 'area_screen.dart';
+import '../l10n/l10n.dart';
 import 'battery_banner.dart';
 import 'own_status_strip.dart';
 import 'conversation_screen.dart';
@@ -102,7 +103,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         title: Text(widget.radioName),
         actions: [
           IconButton(
-            tooltip: 'Search messages',
+            tooltip: context.l10n.searchMessages,
             icon: const Icon(Icons.search),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
@@ -111,7 +112,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           IconButton(
-            tooltip: 'Safety: SOS and check-ins',
+            tooltip: context.l10n.safetyTooltip,
             icon: const Icon(Icons.health_and_safety_outlined),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(builder: (_) => const SafetyScreen()),
@@ -119,14 +120,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           const ConnectionLogButton(),
           IconButton(
-            tooltip: 'Local mesh settings',
+            tooltip: context.l10n.localMeshSettings,
             icon: const Icon(Icons.public),
             onPressed: () => Navigator.of(
               context,
             ).push(MaterialPageRoute<void>(builder: (_) => const AreaScreen())),
           ),
           IconButton(
-            tooltip: 'Radio settings',
+            tooltip: context.l10n.radioSettings,
             icon: const Icon(Icons.tune),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
@@ -136,13 +137,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           if (connection is ViewingSaved)
             IconButton(
-              tooltip: 'Connect a radio',
+              tooltip: context.l10n.connectARadio,
               icon: const Icon(Icons.link),
               onPressed: () => _openConnect(context),
             )
           else
             IconButton(
-              tooltip: 'Disconnect',
+              tooltip: context.l10n.disconnect,
               icon: const Icon(Icons.link_off),
               onPressed: () =>
                   ref.read(connectionProvider.notifier).disconnect(),
@@ -198,17 +199,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               count: _unreadTotal(),
               child: const Icon(Icons.chat_bubble),
             ),
-            label: 'Chats',
+            label: context.l10n.navChats,
           ),
-          const NavigationDestination(
-            icon: Icon(Icons.people_outline),
-            selectedIcon: Icon(Icons.people),
-            label: 'Contacts',
+          NavigationDestination(
+            icon: const Icon(Icons.people_outline),
+            selectedIcon: const Icon(Icons.people),
+            label: context.l10n.navContacts,
           ),
-          const NavigationDestination(
-            icon: Icon(Icons.map_outlined),
-            selectedIcon: Icon(Icons.map),
-            label: 'Map',
+          NavigationDestination(
+            icon: const Icon(Icons.map_outlined),
+            selectedIcon: const Icon(Icons.map),
+            label: context.l10n.navMap,
           ),
         ],
       ),
@@ -571,7 +572,7 @@ class _ViewingSavedBanner extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () => _openConnect(context),
-            child: const Text('Connect'),
+            child: Text(context.l10n.connect),
           ),
         ],
       ),
