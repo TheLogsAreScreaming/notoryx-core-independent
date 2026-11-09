@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/connection.dart';
 import '../app/radio_connector.dart';
+import 'appearance_screen.dart';
+import 'backup_screen.dart';
 import 'connection_log_screen.dart';
 import 'about_screen.dart';
 
@@ -101,6 +103,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
     final state = ref.watch(connectionProvider);
     final connecting = state is Connecting;
     final theme = Theme.of(context);
+    final saved = ref.watch(savedRadiosProvider).value ?? const [];
 
     return Scaffold(
       appBar: AppBar(
@@ -127,6 +130,44 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               color: theme.colorScheme.secondaryContainer,
               busy: true,
             ),
+          for (final radio in saved)
+            ListTile(
+              leading: const Icon(Icons.forum_outlined),
+              title: Text('Open saved chats: ${radio.name}'),
+              subtitle: const Text(
+                'Read chats, contacts and the map, no radio',
+              ),
+              enabled: !connecting,
+              onTap: () => ref
+                  .read(connectionProvider.notifier)
+                  .viewSaved(radioKey: radio.publicKey, radioName: radio.name),
+            ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Wrap(
+              spacing: 8,
+              children: [
+                ActionChip(
+                  avatar: const Icon(Icons.palette_outlined, size: 18),
+                  label: const Text('Appearance'),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const AppearanceScreen(),
+                    ),
+                  ),
+                ),
+                ActionChip(
+                  avatar: const Icon(Icons.backup_outlined, size: 18),
+                  label: const Text('Backup and restore'),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const BackupScreen(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           _Header(
             'Bluetooth',
             trailing: _scanning

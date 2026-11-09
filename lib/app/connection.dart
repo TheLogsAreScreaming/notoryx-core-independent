@@ -61,6 +61,15 @@ final class Reconnecting extends RadioConnectionState {
   final String? error;
 }
 
+/// Looking through a radio's saved chats, contacts and map with no radio
+/// attached. Nothing can be sent, and no connection is being attempted.
+final class ViewingSaved extends RadioConnectionState {
+  const ViewingSaved({required this.radioKey, required this.radioName});
+
+  final String radioKey;
+  final String radioName;
+}
+
 final databaseProvider = Provider<MeshDatabase>((ref) {
   final db = MeshDatabase.open();
   ref.onDispose(db.close);
@@ -144,6 +153,7 @@ class ConnectionController extends Notifier<RadioConnectionState> {
     Connecting(:final target) => 'connecting to ${target.label}',
     Connected(:final radio) => 'connected to ${radio.self.name}',
     Reconnecting(:final target) => 'reconnecting to ${target.label}',
+    ViewingSaved(:final radioName) => 'viewing saved data of $radioName',
   };
 
   Future<void> connect(RadioTarget target) async {
@@ -172,6 +182,17 @@ class ConnectionController extends Notifier<RadioConnectionState> {
     await _teardown();
     await _saveLast(autoConnect: false);
     if (ref.mounted) state = const Disconnected();
+  }
+
+  /// Opens what's saved for a radio, without connecting to anything.
+  void viewSaved({required String radioKey, required String radioName}) {
+    if (state is! Disconnected) return;
+    state = ViewingSaved(radioKey: radioKey, radioName: radioName);
+  }
+
+  /// Goes back to the connect screen from viewing saved data.
+  void stopViewingSaved() {
+    if (state is ViewingSaved) state = const Disconnected();
   }
 
   /// Skips the wait before the next reconnect try.
@@ -381,8 +402,14 @@ final radioKeyProvider = Provider<String?>(
   (ref) => switch (ref.watch(connectionProvider)) {
     Connected(:final radio) => radio.key,
     Reconnecting(:final radioKey) => radioKey,
+    ViewingSaved(:final radioKey) => radioKey,
     _ => null,
   },
+);
+
+/// Every radio this phone has been connected to, most recent first.
+final savedRadiosProvider = StreamProvider<List<Radio>>(
+  (ref) => ref.watch(storeProvider).watchRadios(),
 );
 
 final contactsProvider = StreamProvider.family<List<Contact>, String>(

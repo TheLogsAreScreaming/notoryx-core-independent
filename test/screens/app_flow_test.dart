@@ -871,6 +871,27 @@ void main() {
     await cleanUp(tester);
   });
 
+  testWidgets('saved chats open with no radio, and lead back to connecting', (
+    tester,
+  ) async {
+    await connect(tester);
+    await tester.tap(find.byTooltip('Disconnect'));
+    await settle(tester);
+    final opens = connector.opened.length;
+
+    await tester.tap(find.textContaining('Open saved chats'));
+    await settle(tester);
+    expect(find.textContaining('No radio connected'), findsOneWidget);
+    expect(find.byTooltip('Disconnect'), findsNothing);
+    expect(find.text('Chats'), findsOneWidget);
+    expect(connector.opened.length, opens, reason: 'nothing connects');
+
+    await tester.tap(find.text('Connect'));
+    await settle(tester);
+    expect(find.text('Connect a radio'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
   testWidgets('the app stays alive in the background while connected', (
     tester,
   ) async {

@@ -132,11 +132,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
           ),
-          IconButton(
-            tooltip: 'Disconnect',
-            icon: const Icon(Icons.link_off),
-            onPressed: () => ref.read(connectionProvider.notifier).disconnect(),
-          ),
+          if (connection is! ViewingSaved)
+            IconButton(
+              tooltip: 'Disconnect',
+              icon: const Icon(Icons.link_off),
+              onPressed: () =>
+                  ref.read(connectionProvider.notifier).disconnect(),
+            ),
         ],
       ),
       body: Column(
@@ -144,6 +146,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SosBanner(),
           if (connection case Reconnecting(:final attempt, :final error))
             _ReconnectBanner(attempt: attempt, error: error),
+          if (connection is ViewingSaved) const _ViewingSavedBanner(),
           const BatteryBanner(),
           const AreaBanner(),
           if (_tab == 0)
@@ -529,6 +532,33 @@ class _ContactsTab extends ConsumerWidget {
     final hops = c.outPathLength & 0x3F;
     return '$kind · ${hops == 0 ? 'direct' : '$hops hops'}';
   }
+}
+
+/// Says no radio is attached, and leads back to connecting one.
+class _ViewingSavedBanner extends ConsumerWidget {
+  const _ViewingSavedBanner();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => Material(
+    color: Theme.of(context).colorScheme.secondaryContainer,
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 8, 4),
+      child: Row(
+        children: [
+          const Icon(Icons.link_off, size: 18),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Text('No radio connected. You can read, but not send.'),
+          ),
+          TextButton(
+            onPressed: () =>
+                ref.read(connectionProvider.notifier).stopViewingSaved(),
+            child: const Text('Connect'),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _ReconnectBanner extends ConsumerWidget {
