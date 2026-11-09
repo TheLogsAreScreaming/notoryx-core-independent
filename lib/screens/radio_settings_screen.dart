@@ -7,6 +7,7 @@ import '../app/connection.dart';
 import '../radio/radio.dart';
 import 'area_screen.dart';
 import 'radio_noise_screen.dart';
+import 'bots_screen.dart';
 import 'region_tag_tile.dart';
 import 'telemetry_screen.dart';
 import 'about_screen.dart';
@@ -365,6 +366,15 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
                 MaterialPageRoute<void>(
                   builder: (_) => const RadioConsoleScreen(),
                 ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.smart_toy_outlined),
+              title: const Text('Auto-replies'),
+              subtitle: const Text('Bots and away messages'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const BotsScreen()),
               ),
             ),
             const ChannelCleanupTile(),
