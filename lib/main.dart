@@ -11,6 +11,7 @@ import 'app/scheduled_messages.dart';
 import 'app/telemetry.dart';
 import 'app/connection.dart';
 import 'app/notifications.dart';
+import 'screens/app_lock_screen.dart';
 import 'screens/conversation_screen.dart';
 import 'screens/home_screen.dart';
 
@@ -34,6 +35,7 @@ class NotoryxApp extends ConsumerWidget {
       theme: themeFor(theme, Brightness.light),
       darkTheme: themeFor(theme, Brightness.dark),
       themeMode: theme.mode,
+      builder: (_, child) => AppLockGate(child: child!),
       home: const _RadioGate(),
     );
   }

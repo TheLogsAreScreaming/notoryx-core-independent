@@ -7,6 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/data.dart';
+import 'app_lock.dart';
 import 'blocking.dart';
 import 'spam_filter.dart';
 import 'connection.dart';
@@ -146,10 +147,16 @@ final messageAlertsProvider = Provider<void>((ref) {
         message.kind == MessageKind.channel && message.senderName != null
         ? '${message.senderName}: ${message.body}'
         : message.body;
+    // A locked app shouldn't show its messages on the lock screen.
+    final hide = parseAppLock(await store.setting(appLockSetting)).enabled;
     await notifier.show(
       id: message.id,
-      title: mentioned ? '${chat.title}: mentioned you' : chat.title,
-      body: body,
+      title: hide
+          ? 'NOTORYX Core'
+          : mentioned
+          ? '${chat.title}: mentioned you'
+          : chat.title,
+      body: hide ? 'New message' : body,
       chat: chat,
     );
   });
