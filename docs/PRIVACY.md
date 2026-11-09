@@ -24,6 +24,6 @@ QR codes are read on your phone by Google's ML Kit barcode component, which may 
 ## Children
 The app is not directed at children under 13.
 
-Questions or requests: [CONTACT EMAIL - owner to fill in]
+Questions or requests: bastionappsupport@gmail.com
 
-Effective date: [DATE - owner to fill in]
+Effective date: November 9, 2026
