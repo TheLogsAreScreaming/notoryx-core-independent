@@ -1,9 +1,7 @@
 package com.bastionmesh.notoryx_core
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.PowerManager
 import android.provider.Settings
 import io.flutter.embedding.android.FlutterFragmentActivity
@@ -39,15 +37,8 @@ class MainActivity : FlutterFragmentActivity() {
         return power.isIgnoringBatteryOptimizations(packageName)
     }
 
-    // Sideloaded app: asking directly is allowed and is one tap for the person.
-    @SuppressLint("BatteryLife")
+    // Opens the system list; Google Play restricts asking for the exemption directly.
     private fun requestBatteryUnrestricted() {
-        val direct = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
-            .setData(Uri.parse("package:$packageName"))
-        try {
-            startActivity(direct)
-        } catch (e: Exception) {
-            startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
-        }
+        startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
     }
 }

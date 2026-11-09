@@ -7,7 +7,7 @@ plugins {
 }
 
 // Release signing comes from android/key.properties when present (CI writes
-// it from repository secrets). Without it, release builds use the debug key.
+// it from repository secrets). Without it, release builds stop with an error.
 val keyProperties = Properties().apply {
     val file = rootProject.file("key.properties")
     if (file.exists()) file.inputStream().use { load(it) }
@@ -53,7 +53,6 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.findByName("release")
-                ?: signingConfigs.getByName("debug")
         }
     }
 }
@@ -70,4 +69,13 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+}
+
+// A release build must carry the real key: Play refuses debug-signed uploads,
+// and a debug-signed file would not update existing installs.
+gradle.taskGraph.whenReady {
+    val buildsRelease = allTasks.any { it.name == "assembleRelease" || it.name == "bundleRelease" }
+    if (buildsRelease && keyProperties.isEmpty()) {
+        throw GradleException("Release builds need android/key.properties with the release key.")
+    }
 }
