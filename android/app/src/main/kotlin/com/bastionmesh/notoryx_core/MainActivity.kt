@@ -9,6 +9,8 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterFragmentActivity() {
+    private var widgetChannel: MethodChannel? = null
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "notoryx/keep_alive")
@@ -30,6 +32,32 @@ class MainActivity : FlutterFragmentActivity() {
                     else -> result.notImplemented()
                 }
             }
+        widgetChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "notoryx/widget")
+        widgetChannel?.setMethodCallHandler { call, result ->
+            when (call.method) {
+                "update" -> {
+                    StatusWidget.update(
+                        this,
+                        call.argument<String>("status") ?: "",
+                        call.argument<String>("detail") ?: "",
+                    )
+                    result.success(null)
+                }
+                "takeLaunch" -> {
+                    val opened = intent?.action == StatusWidget.ACTION_OPEN_SAFETY
+                    if (opened) intent.action = Intent.ACTION_MAIN
+                    result.success(opened)
+                }
+                else -> result.notImplemented()
+            }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (intent.action == StatusWidget.ACTION_OPEN_SAFETY) {
+            widgetChannel?.invokeMethod("openSafety", null)
+        }
     }
 
     private fun batteryUnrestricted(): Boolean {
