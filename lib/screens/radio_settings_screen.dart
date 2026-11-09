@@ -7,6 +7,7 @@ import '../app/connection.dart';
 import '../radio/radio.dart';
 import 'area_screen.dart';
 import 'radio_noise_screen.dart';
+import 'app_lock_screen.dart';
 import 'region_tag_tile.dart';
 import 'telemetry_screen.dart';
 import 'about_screen.dart';
@@ -354,6 +355,17 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(builder: (_) => const AboutScreen()),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.lock_outline),
+              title: const Text('App lock'),
+              subtitle: const Text('Fingerprint, face or screen lock'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const AppLockSettingsScreen(),
+                ),
               ),
             ),
             ListTile(
