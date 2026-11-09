@@ -277,6 +277,23 @@ void main() {
     await cleanUp(tester);
   });
 
+  testWidgets('a SALUTE report goes to the main chat', (tester) async {
+    await openSafety(tester);
+    await tester.scrollUntilVisible(
+      find.text('SALUTE report'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('SALUTE report'));
+    await settle(tester);
+    await tester.enterText(find.widgetWithText(TextField, 'Size'), '4 people');
+    await tester.pump();
+    await tester.tap(find.text('Send to main chat and trip contacts'));
+    await settle(tester);
+    expect(await sent(tester), contains('SALUTE S:4 people'));
+    await cleanUp(tester);
+  });
+
   testWidgets('check-ins go to trip contacts, with who it reached', (
     tester,
   ) async {
@@ -375,6 +392,8 @@ void main() {
     // Checking in on time pushes the deadline back.
     now = now.add(const Duration(minutes: 20));
     await tester.scrollUntilVisible(find.text("I'm OK"), -200);
+    await tester.ensureVisible(find.text("I'm OK"));
+    await settle(tester);
     await tester.tap(find.text("I'm OK"));
     await settle(tester);
     expect(await sent(tester), [

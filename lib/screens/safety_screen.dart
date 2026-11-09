@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'field_log_screen.dart';
+import '../app/field_report.dart';
+import 'field_report_screen.dart';
 import 'trip_brief_screen.dart';
 import '../app/connection.dart';
 import '../app/safety.dart';
@@ -300,6 +302,18 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
             ),
           ],
           const Divider(height: 40),
+          for (final report in const [saluteReport, nineLineReport])
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.assignment_outlined),
+              title: Text(report.title),
+              subtitle: const Text('Fill in a report and send it'),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => FieldReportScreen(template: report),
+                ),
+              ),
+            ),
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.map_outlined),
