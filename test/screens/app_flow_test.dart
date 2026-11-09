@@ -365,6 +365,59 @@ void main() {
     await cleanUp(tester);
   });
 
+  group('screen reader', () {
+    Future<void> check(WidgetTester tester, String where) async {
+      final handle = tester.ensureSemantics();
+      await tester.pump();
+      await expectLater(
+        tester,
+        meetsGuideline(labeledTapTargetGuideline),
+        reason: where,
+      );
+      await expectLater(
+        tester,
+        meetsGuideline(androidTapTargetGuideline),
+        reason: where,
+      );
+      handle.dispose();
+    }
+
+    testWidgets('main screens label every control', (tester) async {
+      await connect(tester);
+      await check(tester, 'chats');
+      await tester.tap(find.text('Contacts'));
+      await settle(tester);
+      await check(tester, 'contacts');
+      await tester.tap(find.text('Map'));
+      await settle(tester);
+      await check(tester, 'map');
+      await tester.tap(find.text('Chats'));
+      await settle(tester);
+      await tester.tap(find.text('#trail'));
+      await settle(tester);
+      await check(tester, 'conversation');
+      await tester.pageBack();
+      await settle(tester);
+      await tester.tap(find.byTooltip('Safety: SOS and check-ins'));
+      await settle(tester);
+      await check(tester, 'safety');
+      await tester.pageBack();
+      await settle(tester);
+      await tester.tap(find.byTooltip('Radio settings'));
+      await settle(tester);
+      await check(tester, 'radio settings');
+      await cleanUp(tester);
+    });
+
+    testWidgets('the connect screen labels every control', (tester) async {
+      await pumpApp(tester);
+      await check(tester, 'no radio home');
+      await openConnect(tester);
+      await check(tester, 'connect');
+      await cleanUp(tester);
+    });
+  });
+
   testWidgets('a message forwards to another chat', (tester) async {
     await connect(tester);
     radio.queue.add(
