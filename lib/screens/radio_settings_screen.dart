@@ -7,6 +7,7 @@ import '../app/connection.dart';
 import '../radio/radio.dart';
 import 'area_screen.dart';
 import 'radio_noise_screen.dart';
+import 'region_tag_tile.dart';
 import 'telemetry_screen.dart';
 import 'about_screen.dart';
 import 'appearance_screen.dart';
@@ -367,6 +368,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
               ),
             ),
             const ChannelCleanupTile(),
+            const RegionTagTile(),
             const RefreshRateTile(),
             ListTile(
               leading: const Icon(Icons.palette_outlined),

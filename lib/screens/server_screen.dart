@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/connection.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
+import 'antenna_hunt_screen.dart';
 import 'conversation_screen.dart';
 import 'node_details.dart';
 import 'repeater_tools.dart';
@@ -285,6 +286,22 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
           ),
 
           RepeaterPingCard(publicKey: widget.node.publicKey),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.settings_input_antenna),
+              title: const Text('Antenna hunt'),
+              subtitle: const Text('Clicks faster as this one gets louder'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => AntennaHuntScreen(
+                    publicKey: widget.node.publicKey,
+                    name: widget.node.name,
+                  ),
+                ),
+              ),
+            ),
+          ),
 
           // Console
           if (role == ServerRole.admin && radioKey != null)

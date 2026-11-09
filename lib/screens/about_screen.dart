@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/about.dart';
 import '../app/connection.dart';
 import 'backup_screen.dart';
+import 'field_guide_screen.dart';
 
 /// The app's version, where it comes from, and the details to put in a
 /// problem report.
@@ -90,6 +91,16 @@ class AboutScreen extends ConsumerWidget {
             label: 'Source code',
             url: sourceUrl,
             onCopy: () => _copy(context, sourceUrl, 'Link copied'),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.menu_book_outlined),
+            title: const Text('Field guide'),
+            subtitle: const Text('Short help that works offline'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const FieldGuideScreen()),
+            ),
           ),
           ListTile(
             contentPadding: EdgeInsets.zero,

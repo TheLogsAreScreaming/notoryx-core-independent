@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../app/blocking.dart';
+import '../app/region_tag.dart';
 import '../app/spam_filter.dart';
 import '../app/appearance.dart';
 import '../app/connection.dart';
@@ -244,7 +245,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     try {
       final target = widget.thread.substring(2);
       if (widget.isChannel) {
-        await state.sync.sendChannel(int.parse(target), text);
+        final tag = await ref.read(storeProvider).setting(regionTagSetting);
+        await state.sync.sendChannel(
+          int.parse(target),
+          withRegionTag(text, tag),
+        );
       } else {
         await state.sync.sendDirect(PublicKey.fromHex(target), text);
       }
