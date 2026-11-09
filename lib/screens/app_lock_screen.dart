@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/app_lock.dart';
+import '../app/db_encryption_control.dart';
+import '../data/data.dart';
 import 'safety_screen.dart';
 
 /// Covers the app while it is locked, and asks to unlock at launch.
@@ -181,6 +183,16 @@ class AppLockSettingsScreen extends ConsumerWidget {
                 },
               ),
             ),
+          if (databaseSetAside)
+            const ListTile(
+              leading: Icon(Icons.warning_amber),
+              title: Text('Earlier chat history couldn’t be opened'),
+              subtitle: Text(
+                'Its key is gone from this device. The file was kept, and '
+                'a backup can bring your history back.',
+              ),
+            ),
+          const _EncryptHistoryTile(),
           const Padding(
             padding: EdgeInsets.all(16),
             child: Text(
@@ -191,6 +203,68 @@ class AppLockSettingsScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Encrypts chat history on this device, after saying what could go wrong.
+class _EncryptHistoryTile extends ConsumerStatefulWidget {
+  const _EncryptHistoryTile();
+
+  @override
+  ConsumerState<_EncryptHistoryTile> createState() =>
+      _EncryptHistoryTileState();
+}
+
+class _EncryptHistoryTileState extends ConsumerState<_EncryptHistoryTile> {
+  bool _working = false;
+
+  Future<void> _change(bool on) async {
+    final messenger = ScaffoldMessenger.of(context);
+    if (on) {
+      final sure = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Encrypt chat history?'),
+          content: const Text(
+            'The key stays in this device’s secure storage. If that is ever '
+            'wiped, or the app’s data moves to another phone, this history '
+            'can’t be read. Make a backup first: backups use your own '
+            'password and still work.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Encrypt'),
+            ),
+          ],
+        ),
+      );
+      if (sure != true || !mounted) return;
+    }
+    setState(() => _working = true);
+    try {
+      await ref.read(dbEncryptionProvider.notifier).set(on);
+    } on DbEncryptionException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+    } finally {
+      if (mounted) setState(() => _working = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final encrypted = ref.watch(dbEncryptionProvider).value;
+    if (encrypted == null) return const SizedBox.shrink();
+    return SwitchListTile(
+      title: const Text('Encrypt chat history'),
+      subtitle: const Text('Protects chats stored on this device'),
+      value: encrypted,
+      onChanged: _working ? null : _change,
     );
   }
 }

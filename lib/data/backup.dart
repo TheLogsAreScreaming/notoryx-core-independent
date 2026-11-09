@@ -16,6 +16,7 @@ import 'dart:typed_data';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:sqlite3/sqlite3.dart';
 
 import 'backup_crypto.dart';
 import 'database.dart';
@@ -36,12 +37,25 @@ Future<Uint8List> backupPayload(
   required Directory temp,
   required String appVersion,
   DateTime? now,
+  String? key,
 }) async {
   final file = File(
     '${temp.path}/notoryx-backup-${DateTime.now().microsecondsSinceEpoch}.sqlite',
   );
   try {
     await db.customStatement('VACUUM INTO ?', [file.path]);
+    // The copy inherits this phone's key. A backup must restore on another
+    // phone, so it is plain here and sealed with the password afterwards.
+    if (key != null) {
+      final copy = sqlite3.open(file.path);
+      try {
+        copy
+          ..execute("PRAGMA key = '$key'")
+          ..execute("PRAGMA rekey = ''");
+      } finally {
+        copy.close();
+      }
+    }
     final sqlite = await file.readAsBytes();
     final header = utf8.encode(
       jsonEncode({
@@ -117,7 +131,10 @@ Future<RestoreSummary> restoreDatabase(
     }
 
     final tables = live.allTables.toList();
-    await live.customStatement('ATTACH DATABASE ? AS restore', [staging.path]);
+    // An empty key, or it would be read with the live database's key.
+    await live.customStatement("ATTACH DATABASE ? AS restore KEY ''", [
+      staging.path,
+    ]);
     try {
       await live.transaction(() async {
         // Children before parents, so foreign keys hold throughout.
