@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/open_connect.dart';
 
+import 'package:notoryx_core/app/read_aloud.dart';
 import 'package:notoryx_core/app/channel_directory.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:notoryx_core/app/connection.dart';
@@ -141,6 +142,8 @@ void main() {
     }
   }
 
+  final spoken = <String>[];
+
   Future<void> pumpApp(WidgetTester tester) async {
     await tester.pumpWidget(
       ProviderScope(
@@ -149,6 +152,7 @@ void main() {
           radioConnectorProvider.overrideWithValue(connector),
           messageNotifierProvider.overrideWithValue(notifier),
           foregroundCheckProvider.overrideWithValue(() => inFront),
+          speakerProvider.overrideWithValue((text) async => spoken.add(text)),
           reconnectDelaysProvider.overrideWithValue(const [
             Duration(milliseconds: 100),
           ]),
@@ -416,6 +420,24 @@ void main() {
       await check(tester, 'connect');
       await cleanUp(tester);
     });
+  });
+
+  testWidgets('a message can be read aloud', (tester) async {
+    spoken.clear();
+    await connect(tester);
+    radio.queue.add(
+      channelMessageFrame('Ridge: lunch at the hut?', channel: 1),
+    );
+    link.emit([PushCode.messagesWaiting]);
+    await settle(tester);
+    await tester.tap(find.text('#trail'));
+    await settle(tester);
+    await tester.longPress(find.text('lunch at the hut?'));
+    await settle(tester);
+    await tester.tap(find.text('Read aloud'));
+    await settle(tester);
+    expect(spoken, ['Ridge says: lunch at the hut?']);
+    await cleanUp(tester);
   });
 
   testWidgets('a message forwards to another chat', (tester) async {

@@ -18,6 +18,7 @@ import '../app/delivery.dart';
 import '../app/notifications.dart';
 import '../app/mesh_links.dart';
 import '../app/position.dart';
+import '../app/read_aloud.dart';
 import '../app/reactions.dart';
 import '../app/shared_items.dart';
 import '../data/data.dart';
@@ -396,9 +397,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     final messenger = ScaffoldMessenger.of(context);
     final action = await showModalBottomSheet<String>(
       context: context,
+      isScrollControlled: true,
       builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        // Scrolls, because it can hold more rows than fit on a small phone.
+        child: ListView(
+          shrinkWrap: true,
           children: [
             if (canReply) ...[
               Padding(
@@ -422,6 +425,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                 onTap: () => Navigator.pop(context, 'reply'),
               ),
             ],
+            ListTile(
+              leading: const Icon(Icons.volume_up_outlined),
+              title: Text(context.l10n.readAloud),
+              onTap: () => Navigator.pop(context, 'read'),
+            ),
             if (connected)
               ListTile(
                 leading: const Icon(Icons.forward),
@@ -465,6 +473,18 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     if (!mounted || action == null) return;
     if (action.startsWith('react:')) {
       await _send(reactionText(action.substring(6), message.body));
+      return;
+    }
+    if (action == 'read') {
+      try {
+        await ref.read(speakerProvider)(
+          readAloudText(sender, message.body, mine: message.outgoing),
+        );
+      } on Object {
+        messenger.showSnackBar(
+          const SnackBar(content: Text('This device can’t read aloud.')),
+        );
+      }
       return;
     }
     if (action == 'forward') {
