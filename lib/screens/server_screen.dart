@@ -11,6 +11,7 @@ import 'conversation_screen.dart';
 import 'node_details.dart';
 import 'repeater_tools.dart';
 import 'telemetry_screen.dart';
+import '../l10n/l10n.dart';
 
 /// A repeater or room server: log in, check its status, open the room, and
 /// (as admin) use its console.
@@ -46,7 +47,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
     final state = ref.read(connectionProvider);
     if (state is Connected) return state.sync;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Connect to the radio first.')),
+      SnackBar(content: Text(context.l10n.connectToTheRadioFirst)),
     );
     return null;
   }
@@ -67,7 +68,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
           _password.clear();
         case LoginRefused():
           messenger.showSnackBar(
-            const SnackBar(content: Text('Login refused.')),
+            SnackBar(content: Text(context.l10n.loginRefused)),
           );
         case LoginNoReply():
           messenger.showSnackBar(
@@ -81,7 +82,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
       }
     } on RadioRequestException {
       messenger.showSnackBar(
-        const SnackBar(content: Text('The radio could not send the login.')),
+        SnackBar(content: Text(context.l10n.theRadioCouldNotSendThe)),
       );
     } finally {
       if (mounted) setState(() => _loggingIn = false);
@@ -133,11 +134,11 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
       _command.clear();
     } on ArgumentError {
       messenger.showSnackBar(
-        const SnackBar(content: Text('That command is too long.')),
+        SnackBar(content: Text('That command is too long.')),
       );
     } on RadioRequestException {
       messenger.showSnackBar(
-        const SnackBar(content: Text('The radio could not send it.')),
+        SnackBar(content: Text('The radio could not send it.')),
       );
     } finally {
       if (mounted) setState(() => _sending = false);
@@ -181,14 +182,17 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
                         Expanded(child: Text('Logged in as ${role.label}')),
                         TextButton(
                           onPressed: _logout,
-                          child: const Text('Log out'),
+                          child: Text(context.l10n.logOut),
                         ),
                       ],
                     )
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text('Log in', style: theme.textTheme.titleMedium),
+                        Text(
+                          context.l10n.logIn,
+                          style: theme.textTheme.titleMedium,
+                        ),
                         const SizedBox(height: 4),
                         Text(
                           _isRoom
@@ -200,8 +204,8 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
                           controller: _password,
                           obscureText: true,
                           enabled: !_loggingIn,
-                          decoration: const InputDecoration(
-                            labelText: 'Password',
+                          decoration: InputDecoration(
+                            labelText: context.l10n.password,
                           ),
                           onSubmitted: (_) => _login(),
                         ),
@@ -219,8 +223,8 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
             Card(
               child: ListTile(
                 leading: const Icon(Icons.forum_outlined),
-                title: const Text('Open the room'),
-                subtitle: const Text('Posts arrive after you log in'),
+                title: Text(context.l10n.openTheRoom),
+                subtitle: Text(context.l10n.postsArriveAfterYouLogIn),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
@@ -244,7 +248,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          'Status',
+                          context.l10n.status,
                           style: theme.textTheme.titleMedium,
                         ),
                       ),
@@ -272,8 +276,8 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.sensors),
-              title: const Text('Telemetry'),
-              subtitle: const Text('Battery and sensors over time'),
+              title: Text(context.l10n.telemetry),
+              subtitle: Text(context.l10n.batteryAndSensorsOverTime),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
@@ -291,8 +295,8 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.settings_input_antenna),
-              title: const Text('Antenna hunt'),
-              subtitle: const Text('Clicks faster as this one gets louder'),
+              title: Text(context.l10n.antennaHunt),
+              subtitle: Text(context.l10n.clicksFasterAsThisOneGets),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
@@ -313,7 +317,10 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text('Console', style: theme.textTheme.titleMedium),
+                    Text(
+                      context.l10n.console,
+                      style: theme.textTheme.titleMedium,
+                    ),
                     const SizedBox(height: 8),
                     RepeaterAdminTools(
                       radioKey: radioKey,
@@ -333,7 +340,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
                       alignment: Alignment.centerLeft,
                       child: TextButton.icon(
                         icon: const Icon(Icons.map_outlined),
-                        label: const Text('Region setup'),
+                        label: Text(context.l10n.regionSetup),
                         onPressed: () => Navigator.of(context).push(
                           MaterialPageRoute<void>(
                             builder: (_) => RegionSetupScreen(
@@ -356,14 +363,14 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
                             enabled: !_sending,
                             autocorrect: false,
                             style: const TextStyle(fontFamily: 'monospace'),
-                            decoration: const InputDecoration(
-                              hintText: 'Command, e.g. ver or clock',
+                            decoration: InputDecoration(
+                              hintText: context.l10n.commandEGVerOrClock,
                             ),
                             onSubmitted: (_) => _sendCommand(),
                           ),
                         ),
                         IconButton(
-                          tooltip: 'Send command',
+                          tooltip: context.l10n.sendCommand,
                           onPressed: _sending ? null : _sendCommand,
                           icon: const Icon(Icons.send),
                         ),
@@ -441,9 +448,9 @@ class _Console extends ConsumerWidget {
             .value ??
         const [];
     if (lines.isEmpty) {
-      return const Padding(
+      return Padding(
         padding: EdgeInsets.only(bottom: 8),
-        child: Text('Commands and replies show here.'),
+        child: Text(context.l10n.commandsAndRepliesShowHere),
       );
     }
     return Container(

@@ -490,7 +490,7 @@ class _ContactsTab extends ConsumerWidget {
               children: [
                 Expanded(
                   child: Text(
-                    'Heard nearby, not added',
+                    context.l10n.heardNearbyNotAdded,
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                 ),
@@ -502,7 +502,7 @@ class _ContactsTab extends ConsumerWidget {
                       heard,
                       max - contacts.length,
                     ),
-                    child: const Text('Add several'),
+                    child: Text(context.l10n.addSeveral),
                   ),
               ],
             ),
@@ -514,7 +514,7 @@ class _ContactsTab extends ConsumerWidget {
               subtitle: Text(_kind(node.type)),
               trailing: TextButton(
                 onPressed: () => addDiscovered(context, ref, node),
-                child: const Text('Add'),
+                child: Text(context.l10n.add),
               ),
             ),
         ],
@@ -616,7 +616,7 @@ class _ReconnectBanner extends ConsumerWidget {
             ),
             TextButton(
               onPressed: () => ref.read(connectionProvider.notifier).retryNow(),
-              child: const Text('Try now'),
+              child: Text(context.l10n.tryNow),
             ),
           ],
         ),

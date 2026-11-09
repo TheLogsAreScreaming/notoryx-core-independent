@@ -6,6 +6,7 @@ import '../app/telemetry.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
 import 'history_chart.dart';
+import '../l10n/l10n.dart';
 
 export 'history_chart.dart' show TelemetryRange;
 
@@ -78,16 +79,16 @@ class _TelemetryScreenState extends ConsumerState<TelemetryScreen> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Clear history?'),
+        title: Text(context.l10n.clearHistory2),
         content: Text('All saved readings from ${widget.name} are deleted.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Clear'),
+            child: Text(context.l10n.clear),
           ),
         ],
       ),
@@ -126,7 +127,7 @@ class _TelemetryScreenState extends ConsumerState<TelemetryScreen> {
         actions: [
           if (radioKey != null && samples.isNotEmpty)
             IconButton(
-              tooltip: 'Clear history',
+              tooltip: context.l10n.clearHistory,
               icon: const Icon(Icons.delete_outline),
               onPressed: () => _clear(radioKey),
             ),
@@ -162,10 +163,10 @@ class _TelemetryScreenState extends ConsumerState<TelemetryScreen> {
           const SizedBox(height: 16),
           if (latest != null) _Latest(sample: latest),
           if (samples.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 24),
               child: Text(
-                'No readings saved yet.',
+                context.l10n.noReadingsSavedYet,
                 textAlign: TextAlign.center,
               ),
             )
@@ -181,9 +182,9 @@ class _TelemetryScreenState extends ConsumerState<TelemetryScreen> {
             ),
             const SizedBox(height: 8),
             if (series.isEmpty)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(vertical: 16),
-                child: Text('No readings in this range.'),
+                child: Text(context.l10n.noReadingsInThisRange),
               ),
             for (final entry in series.entries)
               _SeriesCard(seriesKey: entry.key, points: entry.value),
@@ -210,10 +211,10 @@ class _Latest extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Latest', style: theme.textTheme.titleMedium),
+            Text(context.l10n.latest, style: theme.textTheme.titleMedium),
             Text(_when(at), style: theme.textTheme.bodySmall),
             const SizedBox(height: 8),
-            if (readings.isEmpty) const Text('No readings in this reply.'),
+            if (readings.isEmpty) Text(context.l10n.noReadingsInThisReply),
             for (final r in readings)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 3),

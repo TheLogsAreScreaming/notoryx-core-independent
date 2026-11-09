@@ -7,6 +7,7 @@ import '../app/mesh_links.dart';
 import '../data/data.dart';
 import '../presets/area_presets_provider.dart';
 import 'manage_actions.dart';
+import '../l10n/l10n.dart';
 
 /// Channels to join: ones heard on air, ones for this area, and common
 /// public ones. Any other #name can be checked and joined too.
@@ -66,12 +67,12 @@ class _ChannelDirectoryScreenState
         title: Text(name),
         subtitle: subtitle.isEmpty ? null : Text(subtitle),
         trailing: joined
-            ? const Chip(label: Text('Joined'))
+            ? Chip(label: Text(context.l10n.joined))
             : FilledButton.tonal(
                 onPressed: connected
                     ? () => joinHashtag(context, ref, name)
                     : null,
-                child: Text('Join', semanticsLabel: 'Join $name'),
+                child: Text(context.l10n.join, semanticsLabel: 'Join $name'),
               ),
       );
     }
@@ -84,7 +85,7 @@ class _ChannelDirectoryScreenState
           ..sort((a, b) => b.value.count.compareTo(a.value.count));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Find channels')),
+      appBar: AppBar(title: Text(context.l10n.findChannels)),
       body: ListView(
         children: [
           Padding(
@@ -92,9 +93,9 @@ class _ChannelDirectoryScreenState
             child: TextField(
               controller: _search,
               onChanged: (_) => setState(() {}),
-              decoration: const InputDecoration(
-                labelText: 'Any #hashtag channel',
-                hintText: '#hiking',
+              decoration: InputDecoration(
+                labelText: context.l10n.anyHashtagChannel,
+                hintText: context.l10n.hiking,
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(),
               ),
@@ -109,9 +110,9 @@ class _ChannelDirectoryScreenState
                 : 'Connect a radio to hear which channels are in use.',
           ),
           if (connected && unheardOf.isEmpty)
-            const ListTile(
+            ListTile(
               dense: true,
-              title: Text('Nothing yet. Leave this open a while.'),
+              title: Text(context.l10n.nothingYetLeaveThisOpenA),
             ),
           for (final MapEntry(key: code, value: h) in unheardOf)
             if (namesForCode(code, known) case final names

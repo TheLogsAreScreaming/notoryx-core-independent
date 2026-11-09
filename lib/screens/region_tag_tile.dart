@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/connection.dart';
 import '../app/region_tag.dart';
 import '../radio/protocol/region_scope.dart';
+import '../l10n/l10n.dart';
 
 /// Chooses the region channel posts go out in, and which regions to show.
 class RegionTagTile extends ConsumerStatefulWidget {
@@ -60,7 +61,7 @@ class _RegionTagTileState extends ConsumerState<RegionTagTile> {
   @override
   Widget build(BuildContext context) => ListTile(
     leading: const Icon(Icons.place_outlined),
-    title: const Text('Channel post region'),
+    title: Text(context.l10n.channelPostRegion),
     subtitle: Text(_send == null ? 'Off' : 'Posts go out in $_send'),
     onTap: _edit,
   );
@@ -89,7 +90,7 @@ class _RegionDialogState extends State<_RegionDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Channel post region'),
+    title: Text(context.l10n.channelPostRegion),
     content: SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -101,17 +102,17 @@ class _RegionDialogState extends State<_RegionDialog> {
           ),
           TextField(
             controller: _send,
-            decoration: const InputDecoration(
-              labelText: 'Send my posts in',
-              hintText: 'ct',
-              helperText: 'Leave empty for no region.',
+            decoration: InputDecoration(
+              labelText: context.l10n.sendMyPostsIn,
+              hintText: context.l10n.ct,
+              helperText: context.l10n.leaveEmptyForNoRegion,
             ),
           ),
           TextField(
             controller: _known,
-            decoration: const InputDecoration(
-              labelText: 'Also show these regions',
-              hintText: 'ny, ma',
+            decoration: InputDecoration(
+              labelText: context.l10n.alsoShowTheseRegions,
+              hintText: context.l10n.nyMa,
             ),
           ),
         ],
@@ -120,12 +121,12 @@ class _RegionDialogState extends State<_RegionDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.of(context).pop(),
-        child: const Text('Cancel'),
+        child: Text(context.l10n.cancel),
       ),
       TextButton(
         onPressed: () =>
             Navigator.of(context).pop((send: _send.text, known: _known.text)),
-        child: const Text('Save'),
+        child: Text(context.l10n.save),
       ),
     ],
   );

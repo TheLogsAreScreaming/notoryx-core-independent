@@ -26,6 +26,7 @@ import 'manage_actions.dart';
 import 'position_map_screen.dart';
 import 'quick_messages_screen.dart';
 import 'scheduled_screen.dart';
+import '../l10n/l10n.dart';
 
 /// One direct or channel conversation with a box to reply.
 class ConversationScreen extends ConsumerStatefulWidget {
@@ -142,14 +143,14 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
           children: [
             ListTile(
               leading: const Icon(Icons.my_location),
-              title: const Text('My position'),
-              subtitle: const Text('From the phone, or else the radio'),
+              title: Text(context.l10n.myPosition),
+              subtitle: Text(context.l10n.fromThePhoneOrElseThe),
               onTap: () => Navigator.pop(context, 'position'),
             ),
             ListTile(
               leading: const Icon(Icons.contact_page_outlined),
-              title: const Text('A contact'),
-              subtitle: const Text('They can add it in one tap'),
+              title: Text(context.l10n.aContact),
+              subtitle: Text(context.l10n.theyCanAddItInOne),
               onTap: () => Navigator.pop(context, 'contact'),
             ),
           ],
@@ -177,11 +178,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
       if (!mounted) return;
       if (here == null) {
         messenger.showSnackBar(
-          const SnackBar(
-            content: Text(
-              'No position: turn on location, or set the radio’s position.',
-            ),
-          ),
+          SnackBar(content: Text(context.l10n.noPositionTurnOnLocationOr)),
         );
         return;
       }
@@ -191,12 +188,12 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     final picked = await showDialog<Contact>(
       context: context,
       builder: (context) => SimpleDialog(
-        title: const Text('Share a contact'),
+        title: Text(context.l10n.shareAContact),
         children: [
           if (contacts.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(16),
-              child: Text('No contacts on this radio yet.'),
+              child: Text(context.l10n.noContactsOnThisRadioYet),
             ),
           for (final c in contacts)
             SimpleDialogOption(
@@ -264,7 +261,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
       if (replyTo != null && mounted) setState(() => _replyTo = null);
     } on ArgumentError {
       messenger.showSnackBar(
-        const SnackBar(content: Text('That message is too long to send.')),
+        SnackBar(content: Text('That message is too long to send.')),
       );
     } on RadioRequestException {
       // The message is stored as failed with a resend option, so don't
@@ -272,7 +269,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
       if (typed) _clearBox();
       if (replyTo != null && mounted) setState(() => _replyTo = null);
       messenger.showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('The radio could not send it. Hold it to try again.'),
         ),
       );
@@ -297,7 +294,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
         child: ListView(
           shrinkWrap: true,
           children: [
-            const ListTile(title: Text('Forward to')),
+            ListTile(title: Text(context.l10n.forwardTo)),
             for (final c in channels)
               if (c.name.isNotEmpty)
                 ListTile(
@@ -333,7 +330,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
       );
     } on RadioRequestException {
       messenger.showSnackBar(
-        const SnackBar(content: Text('The radio could not send it.')),
+        SnackBar(content: Text('The radio could not send it.')),
       );
     }
   }
@@ -346,13 +343,13 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     if (radioKey == null || radioKey.isEmpty) return;
     if (text.isEmpty) {
       messenger.showSnackBar(
-        const SnackBar(content: Text('Type the message first.')),
+        SnackBar(content: Text(context.l10n.typeTheMessageFirst)),
       );
       return;
     }
     if (utf8.encode(text).length > maxDirectTextBytes) {
       messenger.showSnackBar(
-        const SnackBar(content: Text('That message is too long to send.')),
+        SnackBar(content: Text(context.l10n.thatMessageIsTooLongTo)),
       );
       return;
     }
@@ -368,7 +365,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
           at: at,
         );
     _clearBox();
-    messenger.showSnackBar(const SnackBar(content: Text('Scheduled.')));
+    messenger.showSnackBar(SnackBar(content: Text('Scheduled.')));
   }
 
   void _clearBox() {
@@ -421,14 +418,14 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
               ),
               ListTile(
                 leading: const Icon(Icons.reply),
-                title: const Text('Reply'),
+                title: Text(context.l10n.reply),
                 onTap: () => Navigator.pop(context, 'reply'),
               ),
             ],
             if (connected)
               ListTile(
                 leading: const Icon(Icons.forward),
-                title: const Text('Forward'),
+                title: Text(context.l10n.forward),
                 onTap: () => Navigator.pop(context, 'forward'),
               ),
             if (!message.outgoing)
@@ -446,19 +443,19 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
             if (message.outgoing)
               ListTile(
                 leading: const Icon(Icons.info_outline),
-                title: const Text('Delivery details'),
+                title: Text(context.l10n.deliveryDetails),
                 onTap: () => Navigator.pop(context, 'details'),
               ),
             if (failed && connected)
               ListTile(
                 leading: const Icon(Icons.refresh),
-                title: const Text('Send again'),
+                title: Text(context.l10n.sendAgain),
                 onTap: () => Navigator.pop(context, 'resend'),
               ),
             if (retrying && connected)
               ListTile(
                 leading: const Icon(Icons.stop_circle_outlined),
-                title: const Text('Stop trying'),
+                title: Text(context.l10n.stopTrying),
                 onTap: () => Navigator.pop(context, 'stop'),
               ),
           ],
@@ -518,7 +515,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
       }
     } on RadioRequestException {
       messenger.showSnackBar(
-        const SnackBar(content: Text('The radio could not send it.')),
+        SnackBar(content: Text('The radio could not send it.')),
       );
     }
   }
@@ -565,11 +562,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
           if (canReset)
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Reset route'),
+              child: Text(context.l10n.resetRoute),
             ),
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Close'),
+            child: Text(context.l10n.close),
           ),
         ],
       ),
@@ -579,11 +576,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     try {
       await state.sync.resetRoute(PublicKey.fromHex(contact.publicKey));
       messenger.showSnackBar(
-        const SnackBar(content: Text('Route reset. The next message floods.')),
+        SnackBar(content: Text('Route reset. The next message floods.')),
       );
     } on RadioRequestException {
       messenger.showSnackBar(
-        const SnackBar(content: Text('The radio could not reset the route.')),
+        SnackBar(content: Text('The radio could not reset the route.')),
       );
     }
   }
@@ -659,7 +656,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
         title: Text(widget.title),
         actions: [
           IconButton(
-            tooltip: 'Schedule message',
+            tooltip: context.l10n.scheduleMessage,
             icon: const Icon(Icons.schedule_send),
             onPressed: _schedule,
           ),
@@ -688,7 +685,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                 TextButton(
                   onPressed: () =>
                       ref.read(blockingProvider).unblockKey(directKey),
-                  child: const Text('Unblock'),
+                  child: Text(context.l10n.unblock),
                 ),
               ],
             ),
@@ -704,7 +701,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
             ),
           Expanded(
             child: items.isEmpty
-                ? const Center(child: Text('No messages yet'))
+                ? Center(child: Text(context.l10n.noMessagesYet))
                 : ListView.builder(
                     reverse: true,
                     padding: const EdgeInsets.all(12),
@@ -786,12 +783,12 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
               child: Row(
                 children: [
                   IconButton(
-                    tooltip: 'Quick messages',
+                    tooltip: context.l10n.quickMessages,
                     onPressed: canReply && !_sending ? _pickQuick : null,
                     icon: const Icon(Icons.bolt),
                   ),
                   IconButton(
-                    tooltip: 'Share position or contact',
+                    tooltip: context.l10n.sharePositionOrContact,
                     onPressed: canReply && !_sending
                         ? () => _share(contacts)
                         : null,
@@ -819,7 +816,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                   ),
                   const SizedBox(width: 8),
                   IconButton.filled(
-                    tooltip: 'Send',
+                    tooltip: context.l10n.send,
                     onPressed: canReply && !_sending ? _send : null,
                     icon: const Icon(Icons.send),
                   ),
@@ -934,7 +931,7 @@ class _Bubble extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'Mentions you',
+                          context.l10n.mentionsYou,
                           style: Theme.of(context).textTheme.labelSmall
                               ?.copyWith(color: scheme.onTertiaryContainer),
                         ),
@@ -978,7 +975,7 @@ class _Bubble extends StatelessWidget {
                           if (onShowPosition case final show?)
                             ActionChip(
                               avatar: const Icon(Icons.map_outlined, size: 18),
-                              label: const Text('Show on map'),
+                              label: Text(context.l10n.showOnMap),
                               onPressed: show,
                             ),
                           if (link case final link?)
@@ -1208,7 +1205,7 @@ class _ReplyBanner extends StatelessWidget {
               ),
             ),
             IconButton(
-              tooltip: 'Cancel reply',
+              tooltip: context.l10n.cancelReply,
               onPressed: onCancel,
               icon: const Icon(Icons.close),
             ),

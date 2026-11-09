@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/connection.dart';
 import '../data/data.dart';
 import 'conversation_screen.dart';
+import '../l10n/l10n.dart';
 
 /// Searches every chat stored on this device for the connected radio.
 class SearchScreen extends ConsumerStatefulWidget {
@@ -70,8 +71,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           controller: _query,
           autofocus: true,
           textInputAction: TextInputAction.search,
-          decoration: const InputDecoration(
-            hintText: 'Search messages',
+          decoration: InputDecoration(
+            hintText: context.l10n.searchMessages,
             border: InputBorder.none,
           ),
           onChanged: _changed,
@@ -79,7 +80,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         ),
       ),
       body: _searched.isEmpty
-          ? const Center(child: Text('Type to search your chats.'))
+          ? Center(child: Text(context.l10n.typeToSearchYourChats))
           : _results.isEmpty
           ? Center(child: Text('Nothing found for “$_searched”.'))
           : ListView.builder(

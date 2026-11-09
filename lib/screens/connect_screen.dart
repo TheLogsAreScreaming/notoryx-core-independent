@@ -141,9 +141,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
             ListTile(
               leading: const Icon(Icons.forum_outlined),
               title: Text('Open saved chats: ${radio.name}'),
-              subtitle: const Text(
-                'Read chats, contacts and the map, no radio',
-              ),
+              subtitle: Text(context.l10n.readChatsContactsAndTheMap),
               enabled: !connecting,
               onTap: () {
                 ref
@@ -162,7 +160,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               children: [
                 ActionChip(
                   avatar: const Icon(Icons.menu_book_outlined, size: 18),
-                  label: const Text('Field guide'),
+                  label: Text(context.l10n.fieldGuide),
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) => const FieldGuideScreen(),
@@ -171,7 +169,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
                 ),
                 ActionChip(
                   avatar: const Icon(Icons.palette_outlined, size: 18),
-                  label: const Text('Appearance'),
+                  label: Text(context.l10n.appearance),
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) => const AppearanceScreen(),
@@ -180,7 +178,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
                 ),
                 ActionChip(
                   avatar: const Icon(Icons.backup_outlined, size: 18),
-                  label: const Text('Backup and restore'),
+                  label: Text(context.l10n.backupAndRestore),
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) => const BackupScreen(),
@@ -199,7 +197,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
                   )
                 : TextButton(
                     onPressed: connecting ? null : _startScan,
-                    child: const Text('Scan again'),
+                    child: Text(context.l10n.scanAgain),
                   ),
           ),
           if (_scanError case final error?)
@@ -233,7 +231,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               onTap: () => _connect(radio),
             ),
           SwitchListTile(
-            title: const Text('Show all Bluetooth devices'),
+            title: Text(context.l10n.showAllBluetoothDevices),
             subtitle: const Text('For a radio that doesn\u2019t show up'),
             value: _showAll,
             onChanged: connecting
@@ -248,13 +246,13 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               'USB',
               trailing: TextButton(
                 onPressed: connecting ? null : _refreshUsb,
-                child: const Text('Refresh'),
+                child: Text(context.l10n.refresh),
               ),
             ),
             if (_usb.isEmpty)
-              const ListTile(
+              ListTile(
                 leading: Icon(Icons.usb_off),
-                title: Text('No USB devices'),
+                title: Text(context.l10n.noUSBDevices),
               ),
             for (final port in _usb)
               ListTile(
@@ -275,9 +273,9 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
                     enabled: !connecting,
                     keyboardType: TextInputType.url,
                     autocorrect: false,
-                    decoration: const InputDecoration(
-                      labelText: 'Radio address',
-                      hintText: '192.168.1.50 or host:port',
+                    decoration: InputDecoration(
+                      labelText: context.l10n.radioAddress,
+                      hintText: context.l10n.t192168150OrHost,
                     ),
                     onSubmitted: (_) => _connectWifi(),
                   ),
@@ -285,7 +283,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
                 const SizedBox(width: 12),
                 FilledButton(
                   onPressed: connecting ? null : _connectWifi,
-                  child: const Text('Connect'),
+                  child: Text(context.l10n.connect),
                 ),
               ],
             ),

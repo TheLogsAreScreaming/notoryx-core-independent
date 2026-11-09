@@ -5,6 +5,7 @@ import '../app/connection.dart';
 import '../app/repeater_tools.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
+import '../l10n/l10n.dart';
 
 /// One-tap, one-hop trace showing the signal in both directions.
 class RepeaterPingCard extends ConsumerStatefulWidget {
@@ -54,7 +55,7 @@ class _RepeaterPingCardState extends ConsumerState<RepeaterPingCard> {
   Widget build(BuildContext context) => Card(
     child: ListTile(
       leading: const Icon(Icons.network_ping),
-      title: const Text('Ping'),
+      title: Text(context.l10n.ping2),
       subtitle: Text(_result ?? 'Signal both ways, one hop'),
       trailing: _busy
           ? const SizedBox.square(
@@ -87,7 +88,7 @@ class RepeaterAdminTools extends ConsumerWidget {
     final state = ref.read(connectionProvider);
     if (state is! Connected) {
       messenger.showSnackBar(
-        const SnackBar(content: Text('Connect to the radio first.')),
+        SnackBar(content: Text(context.l10n.connectToTheRadioFirst)),
       );
       return;
     }
@@ -95,7 +96,7 @@ class RepeaterAdminTools extends ConsumerWidget {
       await state.sync.sendCommand(server, text);
     } on RadioRequestException {
       messenger.showSnackBar(
-        const SnackBar(content: Text('The radio could not send it.')),
+        SnackBar(content: Text('The radio could not send it.')),
       );
     }
   }
@@ -140,12 +141,12 @@ class RepeaterAdminTools extends ConsumerWidget {
           children: [
             ActionChip(
               avatar: const Icon(Icons.hub_outlined, size: 18),
-              label: const Text('Neighbors'),
+              label: Text(context.l10n.neighbors),
               onPressed: () => _send(context, ref, 'neighbors'),
             ),
             ActionChip(
               avatar: const Icon(Icons.admin_panel_settings_outlined, size: 18),
-              label: const Text('Access control'),
+              label: Text(context.l10n.accessControl),
               onPressed: people.isEmpty
                   ? null
                   : () => _access(context, ref, people),
@@ -154,7 +155,7 @@ class RepeaterAdminTools extends ConsumerWidget {
         ),
         if (neighbors case final list?) ...[
           const SizedBox(height: 4),
-          if (list.isEmpty) const Text('It hasn’t heard any neighbors yet.'),
+          if (list.isEmpty) Text(context.l10n.itHasnTHeardAnyNeighbors),
           for (final n in list)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 2),
@@ -193,14 +194,14 @@ class _AccessDialogState extends State<_AccessDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Access control'),
+    title: Text(context.l10n.accessControl),
     content: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         DropdownButtonFormField<Contact>(
           initialValue: _who,
           isExpanded: true,
-          decoration: const InputDecoration(labelText: 'Contact'),
+          decoration: InputDecoration(labelText: context.l10n.contact),
           items: [
             for (final c in widget.people)
               DropdownMenuItem(value: c, child: Text(c.name)),
@@ -210,7 +211,7 @@ class _AccessDialogState extends State<_AccessDialog> {
         DropdownButtonFormField<ServerPermission>(
           initialValue: _what,
           isExpanded: true,
-          decoration: const InputDecoration(labelText: 'Permission'),
+          decoration: InputDecoration(labelText: context.l10n.permission),
           items: [
             for (final p in ServerPermission.values)
               DropdownMenuItem(value: p, child: Text(p.label)),
@@ -222,11 +223,11 @@ class _AccessDialogState extends State<_AccessDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.of(context).pop(),
-        child: const Text('Cancel'),
+        child: Text(context.l10n.cancel),
       ),
       TextButton(
         onPressed: () => Navigator.of(context).pop((_who, _what)),
-        child: const Text('Set'),
+        child: Text(context.l10n.set),
       ),
     ],
   );

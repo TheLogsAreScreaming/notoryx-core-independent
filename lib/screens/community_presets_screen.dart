@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../presets/community_presets.dart';
 import 'area_screen.dart';
+import '../l10n/l10n.dart';
 
 /// MeshCore's community presets, with search and your country first.
 class CommunityPresetsScreen extends ConsumerStatefulWidget {
@@ -28,14 +29,14 @@ class _CommunityPresetsScreenState
       query: _query,
     );
     return Scaffold(
-      appBar: AppBar(title: const Text('Community presets')),
+      appBar: AppBar(title: Text(context.l10n.communityPresets)),
       body: ListView(
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
             child: TextField(
-              decoration: const InputDecoration(
-                labelText: 'Search',
+              decoration: InputDecoration(
+                labelText: context.l10n.search,
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(),
               ),
@@ -48,7 +49,7 @@ class _CommunityPresetsScreenState
               subtitle: Text(preset.summary),
               onTap: () => reviewArea(context, ref, preset),
             ),
-          if (shown.isEmpty) const ListTile(title: Text('No matches')),
+          if (shown.isEmpty) ListTile(title: Text(context.l10n.noMatches)),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(

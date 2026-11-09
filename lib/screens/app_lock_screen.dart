@@ -107,7 +107,7 @@ class _LockedScreenState extends ConsumerState<_LockedScreen> {
               ),
               if (_failed) ...[
                 const SizedBox(height: 8),
-                const Text('That didn’t unlock it. Try again.'),
+                Text(context.l10n.thatDidnTUnlockItTry),
               ],
               const SizedBox(height: 24),
               FilledButton.icon(
@@ -159,18 +159,18 @@ class AppLockSettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final lock = ref.watch(appLockProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('App lock')),
+      appBar: AppBar(title: Text(context.l10n.appLock)),
       body: ListView(
         children: [
           SwitchListTile(
-            title: const Text('Lock the app'),
-            subtitle: const Text('Uses your fingerprint, face or screen lock'),
+            title: Text(context.l10n.lockTheApp),
+            subtitle: Text(context.l10n.usesYourFingerprintFaceOrScreen),
             value: lock.enabled,
             onChanged: (on) => _toggle(context, ref, on),
           ),
           if (lock.enabled)
             ListTile(
-              title: const Text('Lock when away'),
+              title: Text(context.l10n.lockWhenAway),
               trailing: DropdownButton<Duration>(
                 value: lock.timeout,
                 items: [
@@ -185,9 +185,9 @@ class AppLockSettingsScreen extends ConsumerWidget {
               ),
             ),
           if (databaseSetAside)
-            const ListTile(
+            ListTile(
               leading: Icon(Icons.warning_amber),
-              title: Text('Earlier chat history couldn’t be opened'),
+              title: Text(context.l10n.earlierChatHistoryCouldnTBe),
               subtitle: Text(
                 'Its key is gone from this device. The file was kept, and '
                 'a backup can bring your history back.',
@@ -226,7 +226,7 @@ class _EncryptHistoryTileState extends ConsumerState<_EncryptHistoryTile> {
       final sure = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Encrypt chat history?'),
+          title: Text(context.l10n.encryptChatHistory),
           content: const Text(
             'The key stays in this device’s secure storage. If that is ever '
             'wiped, or the app’s data moves to another phone, this history '
@@ -236,11 +236,11 @@ class _EncryptHistoryTileState extends ConsumerState<_EncryptHistoryTile> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Encrypt'),
+              child: Text(context.l10n.encrypt),
             ),
           ],
         ),
@@ -262,8 +262,8 @@ class _EncryptHistoryTileState extends ConsumerState<_EncryptHistoryTile> {
     final encrypted = ref.watch(dbEncryptionProvider).value;
     if (encrypted == null) return const SizedBox.shrink();
     return SwitchListTile(
-      title: const Text('Encrypt chat history'),
-      subtitle: const Text('Protects chats stored on this device'),
+      title: Text(context.l10n.encryptChatHistory2),
+      subtitle: Text(context.l10n.protectsChatsStoredOnThisDevice),
       value: encrypted,
       onChanged: _working ? null : _change,
     );

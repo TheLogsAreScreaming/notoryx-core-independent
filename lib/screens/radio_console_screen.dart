@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/connection.dart';
 import '../radio/radio.dart';
+import '../l10n/l10n.dart';
 
 /// The connected radio's own command line, and Wi-Fi setup for radios
 /// built with it. Commands go over the cable or Bluetooth, not the mesh.
@@ -74,10 +75,10 @@ class _RadioConsoleScreenState extends ConsumerState<RadioConsoleScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: const Text('Command line'),
+      title: Text(context.l10n.commandLine),
       actions: [
         IconButton(
-          tooltip: 'Wi-Fi setup',
+          tooltip: context.l10n.wiFiSetup,
           onPressed: _busy ? null : _wifi,
           icon: const Icon(Icons.wifi),
         ),
@@ -117,12 +118,12 @@ class _RadioConsoleScreenState extends ConsumerState<RadioConsoleScreen> {
                     controller: _command,
                     autocorrect: false,
                     style: const TextStyle(fontFamily: 'monospace'),
-                    decoration: const InputDecoration(hintText: 'Command'),
+                    decoration: InputDecoration(hintText: context.l10n.command),
                     onSubmitted: (_) => _send(),
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Run command',
+                  tooltip: context.l10n.runCommand,
                   onPressed: _busy ? null : _send,
                   icon: const Icon(Icons.send),
                 ),
@@ -155,33 +156,33 @@ class _WifiDialogState extends State<_WifiDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Wi-Fi setup'),
+    title: Text(context.l10n.wiFiSetup),
     content: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         TextField(
           controller: _ssid,
           autocorrect: false,
-          decoration: const InputDecoration(labelText: 'Network name'),
+          decoration: InputDecoration(labelText: context.l10n.networkName),
         ),
         TextField(
           controller: _password,
           obscureText: true,
-          decoration: const InputDecoration(labelText: 'Password'),
+          decoration: InputDecoration(labelText: context.l10n.password),
         ),
       ],
     ),
     actions: [
       TextButton(
         onPressed: () => Navigator.of(context).pop(),
-        child: const Text('Cancel'),
+        child: Text(context.l10n.cancel),
       ),
       TextButton(
         onPressed: () {
           if (_ssid.text.trim().isEmpty) return;
           Navigator.of(context).pop((_ssid.text.trim(), _password.text));
         },
-        child: const Text('Save'),
+        child: Text(context.l10n.save),
       ),
     ],
   );

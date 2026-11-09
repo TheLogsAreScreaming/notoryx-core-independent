@@ -6,6 +6,7 @@ import '../app/field_log.dart';
 import '../app/safety.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
+import '../l10n/l10n.dart';
 
 /// Writes down where you're going and sends it to your main chat and trip
 /// contacts as one message.
@@ -75,7 +76,7 @@ class _TripBriefScreenState extends ConsumerState<TripBriefScreen> {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
     } on RadioRequestException {
       messenger.showSnackBar(
-        const SnackBar(content: Text('The radio could not send it.')),
+        SnackBar(content: Text('The radio could not send it.')),
       );
     } finally {
       if (mounted) setState(() => _sending = false);
@@ -102,7 +103,7 @@ class _TripBriefScreenState extends ConsumerState<TripBriefScreen> {
     final tooLong = length > maxDirectTextBytes;
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Trip brief')),
+      appBar: AppBar(title: Text(context.l10n.tripBrief)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -111,7 +112,7 @@ class _TripBriefScreenState extends ConsumerState<TripBriefScreen> {
           _field(_people, 'Who’s going', 'Sam, Alex'),
           _field(_notes, 'Notes', 'Car at north lot'),
           if (!brief.isEmpty) ...[
-            Text('Will send', style: theme.textTheme.titleSmall),
+            Text(context.l10n.willSend, style: theme.textTheme.titleSmall),
             const SizedBox(height: 4),
             Text(brief.text),
             const SizedBox(height: 4),
@@ -128,7 +129,7 @@ class _TripBriefScreenState extends ConsumerState<TripBriefScreen> {
           const SizedBox(height: 16),
           FilledButton.icon(
             icon: const Icon(Icons.send),
-            label: const Text('Send to main chat and trip contacts'),
+            label: Text(context.l10n.sendToMainChatAndTrip),
             onPressed: brief.isEmpty || tooLong || _sending ? null : _send,
           ),
         ],

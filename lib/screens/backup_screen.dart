@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/backup_service.dart';
 import '../app/connection.dart';
 import '../data/backup_crypto.dart';
+import '../l10n/l10n.dart';
 
 /// Save everything to an encrypted file, or bring it back on a new phone.
 class BackupScreen extends ConsumerStatefulWidget {
@@ -79,7 +80,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
       final sure = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Replace everything on this device?'),
+          title: Text(context.l10n.replaceEverythingOnThisDevice),
           content: Text(
             'The backup from '
             '${MaterialLocalizations.of(context).formatMediumDate(when)} '
@@ -90,11 +91,11 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Replace'),
+              child: Text(context.l10n.replace),
             ),
           ],
         ),
@@ -134,7 +135,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
     final busy = _working != null;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Backup and restore')),
+      appBar: AppBar(title: Text(context.l10n.backupAndRestore)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -152,7 +153,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
                 ],
               ),
             ),
-          Text('Back up', style: theme.textTheme.titleMedium),
+          Text(context.l10n.backUp, style: theme.textTheme.titleMedium),
           const SizedBox(height: 4),
           Text(
             'Saves everything in this app (chats, contacts, channels and '
@@ -168,7 +169,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
             obscureText: !_show,
             onChanged: (_) => setState(() {}),
             decoration: InputDecoration(
-              labelText: 'Password',
+              labelText: context.l10n.password,
               border: const OutlineInputBorder(),
               suffixIcon: IconButton(
                 tooltip: _show ? 'Hide password' : 'Show password',
@@ -183,24 +184,24 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
             obscureText: !_show,
             onChanged: (_) => setState(() {}),
             decoration: InputDecoration(
-              labelText: 'Password again',
+              labelText: context.l10n.passwordAgain,
               border: const OutlineInputBorder(),
               errorText: _password.text.isEmpty ? null : problem,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            'There is no way to recover a forgotten password.',
+            context.l10n.thereIsNoWayToRecover,
             style: theme.textTheme.bodySmall,
           ),
           const SizedBox(height: 12),
           FilledButton.icon(
             onPressed: problem == null && !busy ? _backUp : null,
             icon: const Icon(Icons.save_alt),
-            label: const Text('Save backup file'),
+            label: Text(context.l10n.saveBackupFile),
           ),
           const Divider(height: 40),
-          Text('Restore', style: theme.textTheme.titleMedium),
+          Text(context.l10n.restore, style: theme.textTheme.titleMedium),
           const SizedBox(height: 4),
           Text(
             disconnected
@@ -214,7 +215,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
           OutlinedButton.icon(
             onPressed: disconnected && !busy ? _restore : null,
             icon: const Icon(Icons.restore),
-            label: const Text('Choose backup file'),
+            label: Text(context.l10n.chooseBackupFile),
           ),
         ],
       ),
@@ -242,22 +243,22 @@ class _PasswordDialogState extends State<_PasswordDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Backup password'),
+    title: Text(context.l10n.backupPassword),
     content: TextField(
       controller: _controller,
       autofocus: true,
       obscureText: true,
-      decoration: const InputDecoration(labelText: 'Password'),
+      decoration: InputDecoration(labelText: context.l10n.password),
       onSubmitted: (v) => Navigator.pop(context, v),
     ),
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancel'),
+        child: Text(context.l10n.cancel),
       ),
       FilledButton(
         onPressed: () => Navigator.pop(context, _controller.text),
-        child: const Text('Open'),
+        child: Text(context.l10n.open),
       ),
     ],
   );

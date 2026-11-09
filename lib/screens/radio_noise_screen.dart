@@ -5,6 +5,7 @@ import '../app/connection.dart';
 import '../app/radio_stats.dart';
 import '../data/data.dart';
 import 'history_chart.dart';
+import '../l10n/l10n.dart';
 
 /// The connected radio's noise floor and last-packet signal over time.
 class RadioNoiseScreen extends ConsumerStatefulWidget {
@@ -45,16 +46,16 @@ class _RadioNoiseScreenState extends ConsumerState<RadioNoiseScreen> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Clear noise history?'),
-        content: const Text('Saved readings for this radio are removed.'),
+        title: Text(context.l10n.clearNoiseHistory),
+        content: Text(context.l10n.savedReadingsForThisRadioAre),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Clear'),
+            child: Text(context.l10n.clear),
           ),
         ],
       ),
@@ -80,11 +81,11 @@ class _RadioNoiseScreenState extends ConsumerState<RadioNoiseScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Noise floor'),
+        title: Text(context.l10n.noiseFloor),
         actions: [
           if (radioKey != null && samples.isNotEmpty)
             IconButton(
-              tooltip: 'Clear history',
+              tooltip: context.l10n.clearHistory,
               icon: const Icon(Icons.delete_outline),
               onPressed: () => _clear(radioKey),
             ),
@@ -133,10 +134,10 @@ class _RadioNoiseScreenState extends ConsumerState<RadioNoiseScreen> {
             ),
           ],
           if (samples.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 24),
               child: Text(
-                'No readings saved yet.',
+                context.l10n.noReadingsSavedYet,
                 textAlign: TextAlign.center,
               ),
             )
@@ -152,9 +153,9 @@ class _RadioNoiseScreenState extends ConsumerState<RadioNoiseScreen> {
             ),
             const SizedBox(height: 8),
             if (shown.isEmpty)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(vertical: 16),
-                child: Text('No readings in this range.'),
+                child: Text(context.l10n.noReadingsInThisRange),
               )
             else
               for (final series in RadioStatsSeries.values)

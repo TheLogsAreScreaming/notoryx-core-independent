@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/connection.dart';
 import '../app/keep_alive.dart';
+import '../l10n/l10n.dart';
 
 /// Asks to be left alone by Android's battery saver, which otherwise can
 /// drop the radio connection when the app is in the background.
@@ -54,11 +55,11 @@ class _BatteryBannerState extends ConsumerState<BatteryBanner>
         'background. Let it run to stay connected and get alerts.',
       ),
       actions: [
-        TextButton(onPressed: _notNow, child: const Text('Not now')),
+        TextButton(onPressed: _notNow, child: Text(context.l10n.notNow)),
         TextButton(
           onPressed: () =>
               ref.read(keepAliveProvider).requestBatteryUnrestricted(),
-          child: const Text('Allow'),
+          child: Text(context.l10n.allow),
         ),
       ],
     );

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/connection.dart';
 import '../app/repeater_regions.dart';
 import '../radio/radio.dart';
+import '../l10n/l10n.dart';
 
 /// Which 1-byte repeater IDs are in use around here, and which are free.
 class RepeaterIdsScreen extends ConsumerStatefulWidget {
@@ -35,7 +36,7 @@ class _RepeaterIdsScreenState extends ConsumerState<RepeaterIdsScreen> {
         if (query.isEmpty || idLabel(id).startsWith(query)) id,
     ];
     return Scaffold(
-      appBar: AppBar(title: const Text('Repeater IDs')),
+      appBar: AppBar(title: Text(context.l10n.repeaterIDs)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -46,9 +47,9 @@ class _RepeaterIdsScreenState extends ConsumerState<RepeaterIdsScreen> {
           ),
           const SizedBox(height: 12),
           TextField(
-            decoration: const InputDecoration(
-              labelText: 'Look up an ID',
-              hintText: 'A7',
+            decoration: InputDecoration(
+              labelText: context.l10n.lookUpAnID,
+              hintText: context.l10n.a7,
               border: OutlineInputBorder(),
             ),
             onChanged: (v) => setState(() => _query = v),

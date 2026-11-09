@@ -9,6 +9,7 @@ import '../app/connection.dart';
 import '../app/safety.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
+import '../l10n/l10n.dart';
 
 /// SOS, "I'm OK" check-ins, and the check-in timer.
 class SafetyScreen extends ConsumerStatefulWidget {
@@ -31,7 +32,7 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
     } on RadioRequestException {
       messenger.showSnackBar(
-        const SnackBar(content: Text('The radio could not send it.')),
+        SnackBar(content: Text('The radio could not send it.')),
       );
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -49,18 +50,16 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
       final stop = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Stop the SOS without an all-clear?'),
-          content: const Text(
-            'It stops repeating, but nobody is told you are safe.',
-          ),
+          title: Text(context.l10n.stopTheSOSWithoutAnAll),
+          content: Text(context.l10n.itStopsRepeatingButNobodyIs),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Keep it going'),
+              child: Text(context.l10n.keepItGoing),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Stop'),
+              child: Text(context.l10n.stop),
             ),
           ],
         ),
@@ -87,12 +86,12 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
     final picked = await showDialog<String>(
       context: context,
       builder: (context) => SimpleDialog(
-        title: const Text('Add a trip contact'),
+        title: Text(context.l10n.addATripContact),
         children: [
           if (choices.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(16),
-              child: Text('No other people in your contacts.'),
+              child: Text(context.l10n.noOtherPeopleInYourContacts),
             ),
           for (final c in choices)
             SimpleDialogOption(
@@ -140,20 +139,20 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
     final notifier = ref.read(safetyProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Safety')),
+      appBar: AppBar(title: Text(context.l10n.safety)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           DropdownButtonFormField<String?>(
             initialValue: target,
             isExpanded: true,
-            decoration: const InputDecoration(
-              labelText: 'Main chat',
-              helperText: 'A channel your group watches, or one person.',
+            decoration: InputDecoration(
+              labelText: context.l10n.mainChat,
+              helperText: context.l10n.aChannelYourGroupWatchesOr,
               border: OutlineInputBorder(),
             ),
             items: [
-              const DropdownMenuItem(value: null, child: Text('None')),
+              DropdownMenuItem(value: null, child: Text(context.l10n.none)),
               for (final MapEntry(:key, :value) in targets.entries)
                 DropdownMenuItem(
                   value: key,
@@ -172,7 +171,7 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
             onChanged: notifier.setTarget,
           ),
           const SizedBox(height: 16),
-          Text('Trip contacts', style: theme.textTheme.titleSmall),
+          Text(context.l10n.tripContacts, style: theme.textTheme.titleSmall),
           Text(
             'Up to $maxTripContacts people who also get every check-in and '
             'SOS, each as a direct message, so you can see who it reached.',
@@ -194,7 +193,7 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
               if (trip.length < maxTripContacts)
                 ActionChip(
                   avatar: const Icon(Icons.person_add_alt, size: 18),
-                  label: const Text('Add trip contact'),
+                  label: Text(context.l10n.addTripContact),
                   onPressed: () => _pickTripContact(
                     contacts.where((c) => !trip.contains(c.publicKey)).toList(),
                   ),
@@ -286,15 +285,15 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
             const SizedBox(height: 16),
             DropdownButtonFormField<Duration?>(
               initialValue: safety.quietLimit,
-              decoration: const InputDecoration(
-                labelText: 'Warn me if a trip contact is quiet for',
+              decoration: InputDecoration(
+                labelText: context.l10n.warnMeIfATripContact,
                 helperText:
                     'Nothing from them (a check-in or any message) for '
                     'this long.',
                 border: OutlineInputBorder(),
               ),
               items: [
-                const DropdownMenuItem(value: null, child: Text('Never')),
+                DropdownMenuItem(value: null, child: Text(context.l10n.never)),
                 for (final d in quietChoices)
                   DropdownMenuItem(value: d, child: Text(_every(d))),
               ],
@@ -307,7 +306,7 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.assignment_outlined),
               title: Text(report.title),
-              subtitle: const Text('Fill in a report and send it'),
+              subtitle: Text(context.l10n.fillInAReportAndSend),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
                   builder: (_) => FieldReportScreen(template: report),
@@ -317,8 +316,8 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.map_outlined),
-            title: const Text('Trip brief'),
-            subtitle: const Text('Tell your people where you’re going'),
+            title: Text(context.l10n.tripBrief),
+            subtitle: Text(context.l10n.tellYourPeopleWhereYouRe),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute<void>(builder: (_) => const TripBriefScreen()),
@@ -328,8 +327,8 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.article_outlined),
-              title: const Text('Field Log'),
-              subtitle: const Text('Everything sent and received'),
+              title: Text(context.l10n.fieldLog),
+              subtitle: Text(context.l10n.everythingSentAndReceived),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
@@ -338,7 +337,7 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
               ),
             ),
           const SizedBox(height: 16),
-          Text('Check-in timer', style: theme.textTheme.titleMedium),
+          Text(context.l10n.checkInTimer, style: theme.textTheme.titleMedium),
           const SizedBox(height: 4),
           Text(
             'Going somewhere alone? Set how often you’ll check in. When one '
@@ -349,12 +348,12 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
           const SizedBox(height: 12),
           DropdownButtonFormField<Duration?>(
             initialValue: safety.timerOn ? safety.every : null,
-            decoration: const InputDecoration(
-              labelText: 'Check in every',
+            decoration: InputDecoration(
+              labelText: context.l10n.checkInEvery,
               border: OutlineInputBorder(),
             ),
             items: [
-              const DropdownMenuItem(value: null, child: Text('Off')),
+              DropdownMenuItem(value: null, child: Text(context.l10n.off)),
               for (final d in checkInChoices)
                 DropdownMenuItem(value: d, child: Text(_every(d))),
             ],
@@ -564,7 +563,7 @@ class _SosActiveCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'SOS active',
+                    context.l10n.sosActive,
                     style: theme.textTheme.titleLarge?.copyWith(
                       color: scheme.onErrorContainer,
                     ),
@@ -608,14 +607,14 @@ class _SosActiveCard extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: canSend ? onSendAgain : null,
-                    child: const Text('Send again now'),
+                    child: Text(context.l10n.sendAgainNow),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: TextButton(
                     onPressed: busy ? null : onStop,
-                    child: const Text('Stop without all-clear'),
+                    child: Text(context.l10n.stopWithoutAllClear),
                   ),
                 ),
               ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/quick_messages.dart';
+import '../l10n/l10n.dart';
 
 /// What the person picked in the quick message sheet.
 typedef QuickPick = ({String text, bool edit});
@@ -36,7 +37,7 @@ class _Picker extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      'Quick messages',
+                      context.l10n.quickMessages,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
@@ -49,13 +50,13 @@ class _Picker extends ConsumerWidget {
                         ),
                       );
                     },
-                    child: const Text('Edit list'),
+                    child: Text(context.l10n.editList),
                   ),
                 ],
               ),
             ),
             if (items.isEmpty)
-              const ListTile(title: Text('No quick messages. Tap Edit list.')),
+              ListTile(title: Text(context.l10n.noQuickMessagesTapEditList)),
             for (final text in items)
               ListTile(
                 title: Text(text),
@@ -64,7 +65,7 @@ class _Picker extends ConsumerWidget {
                   edit: false,
                 )),
                 trailing: IconButton(
-                  tooltip: 'Change before sending',
+                  tooltip: context.l10n.changeBeforeSending,
                   icon: const Icon(Icons.edit_outlined),
                   onPressed: () => Navigator.pop<QuickPick>(context, (
                     text: text,
@@ -99,11 +100,11 @@ class QuickMessagesScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('Save'),
+            child: Text(context.l10n.save),
           ),
         ],
       ),
@@ -116,13 +117,13 @@ class QuickMessagesScreen extends ConsumerWidget {
     final quick = ref.read(quickMessagesProvider.notifier);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Quick messages'),
+        title: Text(context.l10n.quickMessages),
         actions: [
           PopupMenuButton<void>(
             itemBuilder: (_) => [
               PopupMenuItem(
                 onTap: quick.reset,
-                child: const Text('Reset to the starting list'),
+                child: Text(context.l10n.resetToTheStartingList),
               ),
             ],
           ),
@@ -130,14 +131,14 @@ class QuickMessagesScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(Icons.add),
-        label: const Text('Add'),
+        label: Text(context.l10n.add),
         onPressed: () async {
           final text = await _ask(context);
           if (text != null) await quick.add(text);
         },
       ),
       body: items.isEmpty
-          ? const Center(child: Text('No quick messages yet.'))
+          ? Center(child: Text(context.l10n.noQuickMessagesYet))
           : ReorderableListView.builder(
               padding: const EdgeInsets.only(bottom: 88),
               itemCount: items.length,

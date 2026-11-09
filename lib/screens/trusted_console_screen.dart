@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/connection.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
+import '../l10n/l10n.dart';
 
 /// Runs commands on a trusted contact's radio, if they've allowed you.
 class TrustedConsoleScreen extends ConsumerStatefulWidget {
@@ -41,11 +42,11 @@ class _TrustedConsoleScreenState extends ConsumerState<TrustedConsoleScreen> {
       _command.clear();
     } on ArgumentError {
       messenger.showSnackBar(
-        const SnackBar(content: Text('That command is too long.')),
+        SnackBar(content: Text('That command is too long.')),
       );
     } on RadioRequestException {
       messenger.showSnackBar(
-        const SnackBar(content: Text('The radio could not send it.')),
+        SnackBar(content: Text('The radio could not send it.')),
       );
     } finally {
       if (mounted) setState(() => _sending = false);
@@ -114,7 +115,7 @@ class _TrustedConsoleScreenState extends ConsumerState<TrustedConsoleScreen> {
                     ),
                   ),
                   IconButton(
-                    tooltip: 'Send command',
+                    tooltip: context.l10n.sendCommand,
                     icon: const Icon(Icons.send),
                     onPressed: connected && !_sending ? _send : null,
                   ),

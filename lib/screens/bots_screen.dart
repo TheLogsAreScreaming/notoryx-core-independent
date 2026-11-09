@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/bots.dart';
 import '../data/data.dart';
+import '../l10n/l10n.dart';
 
 /// Turns automatic replies on and off, and edits their rules.
 class BotsScreen extends ConsumerWidget {
@@ -30,9 +31,9 @@ class BotsScreen extends ConsumerWidget {
     final settings = ref.watch(botsProvider).value ?? const BotSettings();
     final notifier = ref.read(botsProvider.notifier);
     return Scaffold(
-      appBar: AppBar(title: const Text('Auto-replies')),
+      appBar: AppBar(title: Text(context.l10n.autoReplies)),
       floatingActionButton: FloatingActionButton(
-        tooltip: 'Add a rule',
+        tooltip: context.l10n.addARule,
         onPressed: () => _add(context, ref),
         child: const Icon(Icons.add),
       ),
@@ -40,10 +41,8 @@ class BotsScreen extends ConsumerWidget {
         padding: const EdgeInsets.only(bottom: 88),
         children: [
           SwitchListTile(
-            title: const Text('Send automatic replies'),
-            subtitle: const Text(
-              'Only while the app is running and connected.',
-            ),
+            title: Text(context.l10n.sendAutomaticReplies),
+            subtitle: Text(context.l10n.onlyWhileTheAppIsRunning),
             value: settings.enabled,
             onChanged: notifier.setEnabled,
           ),
@@ -57,9 +56,9 @@ class BotsScreen extends ConsumerWidget {
             ),
           ),
           if (settings.rules.isEmpty)
-            const ListTile(
-              title: Text('No rules yet'),
-              subtitle: Text('Add one with the + button.'),
+            ListTile(
+              title: Text(context.l10n.noRulesYet),
+              subtitle: Text(context.l10n.addOneWithTheButton),
             ),
           for (final rule in settings.rules)
             ListTile(
@@ -75,7 +74,7 @@ class BotsScreen extends ConsumerWidget {
               ),
               isThreeLine: true,
               trailing: IconButton(
-                tooltip: 'Delete rule',
+                tooltip: context.l10n.deleteRule,
                 icon: const Icon(Icons.delete_outline),
                 onPressed: () => notifier.removeRule(rule.id),
               ),
@@ -113,7 +112,7 @@ class _RuleDialogState extends State<_RuleDialog> {
     final away = _trigger.text.trim().isEmpty;
     final fits = utf8.encode(reply).length <= maxDirectTextBytes;
     return AlertDialog(
-      title: const Text('New rule'),
+      title: Text(context.l10n.newRule),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -121,24 +120,24 @@ class _RuleDialogState extends State<_RuleDialog> {
             TextField(
               controller: _trigger,
               onChanged: (_) => setState(() {}),
-              decoration: const InputDecoration(
-                labelText: 'When a message says',
-                hintText: 'ping',
-                helperText: 'Empty makes an away message for direct chats.',
+              decoration: InputDecoration(
+                labelText: context.l10n.whenAMessageSays,
+                hintText: context.l10n.ping,
+                helperText: context.l10n.emptyMakesAnAwayMessageFor,
               ),
             ),
             TextField(
               controller: _reply,
               onChanged: (_) => setState(() {}),
               decoration: InputDecoration(
-                labelText: 'Reply with',
+                labelText: context.l10n.replyWith,
                 hintText: 'pong {name}, it is {time}',
                 errorText: fits ? null : 'Too long for one message.',
               ),
             ),
             CheckboxListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Also on channels'),
+              title: Text(context.l10n.alsoOnChannels),
               value: _channels && !away,
               onChanged: away
                   ? null
@@ -150,7 +149,7 @@ class _RuleDialogState extends State<_RuleDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.cancel),
         ),
         TextButton(
           onPressed: reply.isEmpty || !fits
@@ -160,7 +159,7 @@ class _RuleDialogState extends State<_RuleDialog> {
                   reply: reply,
                   onChannels: _channels,
                 )),
-          child: const Text('Save'),
+          child: Text(context.l10n.save),
         ),
       ],
     );
