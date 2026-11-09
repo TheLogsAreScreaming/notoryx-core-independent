@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../presets/area_preset.dart';
 import '../presets/area_presets_provider.dart';
+import 'community_presets_screen.dart';
 
 /// "Phoenix, Arizona uses…" with Not now and Review, shown when the radio
 /// isn't on its area's settings.
@@ -186,6 +187,17 @@ class AreaScreen extends ConsumerWidget {
                   child: Text('Review ${active.name} settings'),
                 ),
               ),
+            ListTile(
+              leading: const Icon(Icons.public),
+              title: const Text('Community presets'),
+              subtitle: const Text('MeshCore’s list, by country'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const CommunityPresetsScreen(),
+                ),
+              ),
+            ),
             const Divider(),
             for (final area in sorted)
               RadioListTile<String>(
