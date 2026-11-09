@@ -64,7 +64,14 @@ final class Reconnecting extends RadioConnectionState {
 /// Looking through a radio's saved chats, contacts and map with no radio
 /// attached. Nothing can be sent, and no connection is being attempted.
 final class ViewingSaved extends RadioConnectionState {
-  const ViewingSaved({required this.radioKey, required this.radioName});
+  const ViewingSaved({
+    required this.radioKey,
+    required this.radioName,
+    this.error,
+  });
+
+  /// Why the last attempt or connection ended, if it wasn't the user.
+  final String? error;
 
   final String radioKey;
   final String radioName;
@@ -185,9 +192,17 @@ class ConnectionController extends Notifier<RadioConnectionState> {
   }
 
   /// Opens what's saved for a radio, without connecting to anything.
-  void viewSaved({required String radioKey, required String radioName}) {
-    if (state is! Disconnected) return;
-    state = ViewingSaved(radioKey: radioKey, radioName: radioName);
+  void viewSaved({
+    required String radioKey,
+    required String radioName,
+    String? error,
+  }) {
+    if (state is! Disconnected && state is! ViewingSaved) return;
+    state = ViewingSaved(
+      radioKey: radioKey,
+      radioName: radioName,
+      error: error,
+    );
   }
 
   /// Goes back to the connect screen from viewing saved data.
@@ -245,7 +260,9 @@ class ConnectionController extends Notifier<RadioConnectionState> {
       _log.add('last radio ${saved.target.label}: auto-connect is off');
       return;
     }
-    if (!ref.mounted || state is! Disconnected) return;
+    if (!ref.mounted || (state is! Disconnected && state is! ViewingSaved)) {
+      return;
+    }
     final reconnecting = Reconnecting(
       target: saved.target,
       radioKey: saved.radioKey,

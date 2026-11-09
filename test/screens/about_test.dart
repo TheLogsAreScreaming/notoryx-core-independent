@@ -2,6 +2,9 @@ import 'package:drift/drift.dart' show driftRuntimeOptions;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../support/open_connect.dart';
+
 import 'package:notoryx_core/app/connection.dart';
 import 'package:flutter/services.dart';
 import 'package:notoryx_core/app/about.dart';
@@ -104,6 +107,7 @@ void main() {
     await start(tester);
 
     // Before connecting: from the connect screen.
+    await openConnect(tester);
     await tester.tap(find.byTooltip('About'));
     await settle(tester);
     expect(find.text('Version 0.1.0-test.16 (build 16)'), findsOneWidget);
@@ -112,6 +116,7 @@ void main() {
     await settle(tester);
 
     // Connected: from radio settings, with the radio's details.
+    await openConnect(tester);
     await tester.tap(find.text('MeshCore-Base'));
     await settle(tester);
     await tester.tap(find.byTooltip('Radio settings'));

@@ -110,7 +110,8 @@ class BackupService {
   /// Replaces everything on this device with [backup]. Only while no radio
   /// is connected, so nothing writes to the database meanwhile.
   Future<RestoreSummary> restore(OpenedBackup backup) async {
-    if (_ref.read(connectionProvider) is! Disconnected) {
+    final state = _ref.read(connectionProvider);
+    if (state is! Disconnected && state is! ViewingSaved) {
       throw const BackupException('Disconnect the radio first.');
     }
     final summary = await restoreDatabase(
