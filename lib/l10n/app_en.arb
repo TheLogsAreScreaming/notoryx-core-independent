@@ -920,5 +920,6 @@
         "type": "Object"
       }
     }
-  }
+  },
+  "readAloud": "Read aloud"
 }
