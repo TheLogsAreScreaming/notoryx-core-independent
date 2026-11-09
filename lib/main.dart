@@ -6,6 +6,7 @@ import 'app/bots.dart';
 import 'app/channel_cleanup.dart';
 import 'app/home_widget.dart';
 import 'app/keep_alive.dart';
+import 'app/language.dart';
 import 'app/packet_log.dart';
 import 'app/radio_stats.dart';
 import 'app/safety.dart';
@@ -39,6 +40,7 @@ class NotoryxApp extends ConsumerWidget {
       theme: themeFor(theme, Brightness.light),
       darkTheme: themeFor(theme, Brightness.dark),
       themeMode: theme.mode,
+      locale: ref.watch(languageProvider).value,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       builder: (_, child) => AppLockGate(child: child!),

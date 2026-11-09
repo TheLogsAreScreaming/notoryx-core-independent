@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/appearance.dart';
 import '../l10n/l10n.dart';
+import '../app/language.dart';
 
 /// Pick a theme and the size of chat text.
 class AppearanceScreen extends ConsumerWidget {
@@ -17,6 +18,7 @@ class AppearanceScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(context.l10n.appearance)),
       body: ListView(
         children: [
+          const _LanguageTile(),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -67,6 +69,41 @@ class AppearanceScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _LanguageTile extends ConsumerWidget {
+  const _LanguageTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final chosen = ref.watch(languageProvider).value?.languageCode;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListTile(
+          leading: const Icon(Icons.translate),
+          title: Text(context.l10n.language),
+          trailing: DropdownButton<String?>(
+            value: chosen,
+            items: [
+              DropdownMenuItem(child: Text(context.l10n.phoneSetting)),
+              for (final MapEntry(:key, :value) in appLanguages.entries)
+                DropdownMenuItem(value: key, child: Text(value)),
+            ],
+            onChanged: (code) =>
+                ref.read(languageProvider.notifier).choose(code),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child: Text(
+            context.l10n.machineTranslatedNote,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
+      ],
     );
   }
 }
