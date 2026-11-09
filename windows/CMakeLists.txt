@@ -2,6 +2,11 @@
 cmake_minimum_required(VERSION 3.14)
 project(notoryx_core LANGUAGES CXX)
 
+# Some plugins (local_auth_windows, geolocator_windows, flutter_tts) still
+# use C++/WinRT's old /await coroutines. Visual Studio 2026 refuses them
+# unless this is set. Remove it once those plugins move to C++20 coroutines.
+add_compile_definitions(_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
+
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
 set(BINARY_NAME "notoryx_independent")
