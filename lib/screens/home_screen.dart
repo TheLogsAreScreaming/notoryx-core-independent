@@ -633,7 +633,15 @@ class _UnreadBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) => count == 0
       ? child
-      : Badge(label: Text(count > 99 ? '99+' : '$count'), child: child);
+      : Semantics(
+          label: count == 1 ? '1 unread' : '$count unread',
+          child: ExcludeSemantics(
+            child: Badge(
+              label: Text(count > 99 ? '99+' : '$count'),
+              child: child,
+            ),
+          ),
+        );
 }
 
 class _Empty extends StatelessWidget {

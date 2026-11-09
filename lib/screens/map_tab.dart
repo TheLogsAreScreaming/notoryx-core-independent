@@ -274,24 +274,33 @@ class _NodeMarker extends StatelessWidget {
           button: true,
           label: badgeText == null ? node.name : '${node.name}, $badgeText',
           child: GestureDetector(
+            // Bigger than the dot, so it's a comfortable target.
+            behavior: HitTestBehavior.opaque,
             onTap: onTap,
             child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: color,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: node.isContact ? scheme.primary : scheme.outline,
-                  width: 2,
+              width: 48,
+              height: 48,
+              alignment: Alignment.center,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: node.isContact ? scheme.primary : scheme.outline,
+                    width: 2,
+                  ),
                 ),
-              ),
-              child: Icon(
-                node.type == NodeType.chat ? Icons.person : nodeIcon(node.type),
-                size: 20,
-                color: node.isContact
-                    ? scheme.onPrimaryContainer
-                    : scheme.onSurfaceVariant,
+                child: Icon(
+                  node.type == NodeType.chat
+                      ? Icons.person
+                      : nodeIcon(node.type),
+                  size: 20,
+                  color: node.isContact
+                      ? scheme.onPrimaryContainer
+                      : scheme.onSurfaceVariant,
+                ),
               ),
             ),
           ),

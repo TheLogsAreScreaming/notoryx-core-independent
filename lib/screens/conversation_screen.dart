@@ -900,123 +900,126 @@ class _Bubble extends StatelessWidget {
 
     return Align(
       alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
-      child: GestureDetector(
-        onLongPress: onLongPress,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 320),
-          child: Container(
-            margin: const EdgeInsets.symmetric(vertical: 3),
-            padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
-            decoration: BoxDecoration(
-              color: mine
-                  ? scheme.primaryContainer
-                  : mentionsMe
-                  ? scheme.tertiaryContainer
-                  : scheme.surfaceContainerHigh,
-              borderRadius: BorderRadius.circular(14),
-              border: mentionsMe
-                  ? Border.all(color: scheme.tertiary, width: 2)
-                  : null,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (mentionsMe)
+      child: Semantics(
+        onLongPressHint: onLongPress == null ? null : 'show options',
+        child: GestureDetector(
+          onLongPress: onLongPress,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 320),
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 3),
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
+              decoration: BoxDecoration(
+                color: mine
+                    ? scheme.primaryContainer
+                    : mentionsMe
+                    ? scheme.tertiaryContainer
+                    : scheme.surfaceContainerHigh,
+                borderRadius: BorderRadius.circular(14),
+                border: mentionsMe
+                    ? Border.all(color: scheme.tertiary, width: 2)
+                    : null,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (mentionsMe)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.alternate_email,
+                          size: 14,
+                          color: scheme.onTertiaryContainer,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Mentions you',
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(color: scheme.onTertiaryContainer),
+                        ),
+                      ],
+                    ),
+                  if (shownName case final name?)
+                    Text(
+                      name,
+                      style: TextStyle(
+                        color: scheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  if (replyTo case final quoted?)
+                    _Quote(name: quoted.name, body: quoted.body),
+                  Text(body),
+                  const SizedBox(height: 2),
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.alternate_email,
-                        size: 14,
-                        color: scheme.onTertiaryContainer,
+                      // Wraps rather than overflowing a narrow bubble.
+                      Flexible(
+                        child: Text(
+                          details,
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Mentions you',
-                        style: Theme.of(context).textTheme.labelSmall
-                            ?.copyWith(color: scheme.onTertiaryContainer),
-                      ),
+                      if (mine) ...[
+                        const SizedBox(width: 4),
+                        _StatusIcon(message.status),
+                      ],
                     ],
                   ),
-                if (shownName case final name?)
-                  Text(
-                    name,
-                    style: TextStyle(
-                      color: scheme.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                if (replyTo case final quoted?)
-                  _Quote(name: quoted.name, body: quoted.body),
-                Text(body),
-                const SizedBox(height: 2),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Wraps rather than overflowing a narrow bubble.
-                    Flexible(
-                      child: Text(
-                        details,
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
-                    ),
-                    if (mine) ...[
-                      const SizedBox(width: 4),
-                      _StatusIcon(message.status),
-                    ],
-                  ],
-                ),
-                if (onShowPosition != null || link != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Wrap(
-                      spacing: 6,
-                      runSpacing: 4,
-                      children: [
-                        if (onShowPosition case final show?)
-                          ActionChip(
-                            avatar: const Icon(Icons.map_outlined, size: 18),
-                            label: const Text('Show on map'),
-                            onPressed: show,
-                          ),
-                        if (link case final link?)
-                          ActionChip(
-                            avatar: Icon(
-                              link is ChannelLink
-                                  ? Icons.tag
-                                  : Icons.person_add_alt,
-                              size: 18,
+                  if (onShowPosition != null || link != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: [
+                          if (onShowPosition case final show?)
+                            ActionChip(
+                              avatar: const Icon(Icons.map_outlined, size: 18),
+                              label: const Text('Show on map'),
+                              onPressed: show,
                             ),
-                            label: Text(switch (link) {
-                              ChannelLink(:final name) => 'Join $name',
-                              ContactLink(:final name) => 'Add $name',
-                              AdvertLink() => 'Add contact',
-                            }),
-                            onPressed: onAddLink == null
-                                ? null
-                                : () => onAddLink!(link),
-                          ),
-                      ],
+                          if (link case final link?)
+                            ActionChip(
+                              avatar: Icon(
+                                link is ChannelLink
+                                    ? Icons.tag
+                                    : Icons.person_add_alt,
+                                size: 18,
+                              ),
+                              label: Text(switch (link) {
+                                ChannelLink(:final name) => 'Join $name',
+                                ContactLink(:final name) => 'Add $name',
+                                AdvertLink() => 'Add contact',
+                              }),
+                              onPressed: onAddLink == null
+                                  ? null
+                                  : () => onAddLink!(link),
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
-                if (reactions.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Wrap(
-                      spacing: 4,
-                      runSpacing: 4,
-                      children: [
-                        for (final r in reactions)
-                          _ReactionChip(
-                            reaction: r,
-                            onTap: r.mine || onReact == null
-                                ? null
-                                : () => onReact!(r.emoji),
-                          ),
-                      ],
+                  if (reactions.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Wrap(
+                        spacing: 4,
+                        runSpacing: 4,
+                        children: [
+                          for (final r in reactions)
+                            _ReactionChip(
+                              reaction: r,
+                              onTap: r.mine || onReact == null
+                                  ? null
+                                  : () => onReact!(r.emoji),
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
