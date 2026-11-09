@@ -76,21 +76,22 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
   /// Sends [commands] and reports the outcome.
   Future<void> _change(List<RadioCommand> commands, {String? done}) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     setState(() => _busy = true);
     try {
       await ref.read(connectionProvider.notifier).changeRadio(commands);
       if (done != null) messenger.showSnackBar(SnackBar(content: Text(done)));
     } on RadioRejected {
       messenger.showSnackBar(
-        SnackBar(content: Text('The radio refused that setting.')),
+        SnackBar(content: Text(l10n.theRadioRefusedThatSetting)),
       );
     } on RadioRequestException {
       messenger.showSnackBar(
-        SnackBar(content: Text('The radio did not answer.')),
+        SnackBar(content: Text(l10n.theRadioDidNotAnswer)),
       );
     } on StateError {
       messenger.showSnackBar(
-        SnackBar(content: Text('Connect to the radio first.')),
+        SnackBar(content: Text(l10n.connectToTheRadioFirst)),
       );
     } finally {
       if (mounted) setState(() => _busy = false);

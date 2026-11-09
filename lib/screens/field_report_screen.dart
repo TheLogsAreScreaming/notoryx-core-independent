@@ -49,6 +49,7 @@ class _FieldReportScreenState extends ConsumerState<FieldReportScreen> {
 
   Future<void> _send(List<String> messages) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final safety = ref.read(safetyProvider.notifier);
     setState(() => _sending = true);
     try {
@@ -57,13 +58,13 @@ class _FieldReportScreenState extends ConsumerState<FieldReportScreen> {
         count = await safety.sendTripBrief(message);
       }
       messenger.showSnackBar(
-        SnackBar(content: Text('${widget.template.title} sent to $count.')),
+        SnackBar(content: Text(l10n.sentTo(widget.template.title, count))),
       );
     } on SafetyException catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
     } on RadioRequestException {
       messenger.showSnackBar(
-        SnackBar(content: Text('The radio could not send it.')),
+        SnackBar(content: Text(l10n.theRadioCouldNotSendIt)),
       );
     } finally {
       if (mounted) setState(() => _sending = false);

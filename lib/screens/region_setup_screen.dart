@@ -52,6 +52,7 @@ class _RegionSetupScreenState extends State<RegionSetupScreen> {
 
   Future<void> _sendAll(List<String> commands) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     setState(() {
       _sending = true;
       _sent = 0;
@@ -63,13 +64,11 @@ class _RegionSetupScreenState extends State<RegionSetupScreen> {
         if (mounted) setState(() => _sent = i + 1);
       }
       messenger.showSnackBar(
-        SnackBar(
-          content: Text('Sent. Check the console for the repeater’s replies.'),
-        ),
+        SnackBar(content: Text(l10n.sentCheckTheConsoleForThe)),
       );
     } on RadioRequestException {
       messenger.showSnackBar(
-        SnackBar(content: Text('The radio could not send it.')),
+        SnackBar(content: Text(l10n.theRadioCouldNotSendIt)),
       );
     } finally {
       if (mounted) setState(() => _sending = false);

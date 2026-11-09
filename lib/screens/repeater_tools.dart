@@ -85,6 +85,7 @@ class RepeaterAdminTools extends ConsumerWidget {
 
   Future<void> _send(BuildContext context, WidgetRef ref, String text) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final state = ref.read(connectionProvider);
     if (state is! Connected) {
       messenger.showSnackBar(
@@ -96,7 +97,7 @@ class RepeaterAdminTools extends ConsumerWidget {
       await state.sync.sendCommand(server, text);
     } on RadioRequestException {
       messenger.showSnackBar(
-        SnackBar(content: Text('The radio could not send it.')),
+        SnackBar(content: Text(l10n.theRadioCouldNotSendIt)),
       );
     }
   }

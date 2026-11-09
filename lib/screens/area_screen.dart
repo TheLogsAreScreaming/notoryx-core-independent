@@ -67,6 +67,7 @@ Future<void> reviewArea(
   final radio = ref.read(radioSettingsProvider);
   final changes = radio == null ? const <String>[] : area.changesFrom(radio);
   final messenger = ScaffoldMessenger.of(context);
+  final l10n = context.l10n;
   final ok = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
@@ -122,11 +123,11 @@ Future<void> reviewArea(
   try {
     await applyArea(ref, area);
     messenger.showSnackBar(
-      SnackBar(content: Text('Radio set to ${area.name} settings.')),
+      SnackBar(content: Text(l10n.radioSetToSettings(area.name))),
     );
   } on Object catch (e) {
     messenger.showSnackBar(
-      SnackBar(content: Text('Could not change the radio: $e')),
+      SnackBar(content: Text(l10n.couldNotChangeTheRadio(e))),
     );
   }
 }

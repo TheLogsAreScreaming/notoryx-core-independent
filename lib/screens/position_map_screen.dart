@@ -36,9 +36,10 @@ class PositionMapScreen extends ConsumerWidget {
             icon: const Icon(Icons.copy),
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
+              final l10n = context.l10n;
               await Clipboard.setData(ClipboardData(text: coordinates));
               messenger.showSnackBar(
-                SnackBar(content: Text('Copied $coordinates')),
+                SnackBar(content: Text(l10n.copied(coordinates))),
               );
             },
           ),

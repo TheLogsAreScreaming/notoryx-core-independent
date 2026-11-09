@@ -106,13 +106,14 @@ class TrackDetailScreen extends ConsumerWidget {
 
   Future<void> _export(BuildContext context, WidgetRef ref) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     try {
       final saved = await exportTrack(ref, track);
       messenger.showSnackBar(
         SnackBar(content: Text(saved ? 'GPX saved.' : 'Not saved.')),
       );
     } on Object catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('Export failed: $e')));
+      messenger.showSnackBar(SnackBar(content: Text(l10n.exportFailed(e))));
     }
   }
 

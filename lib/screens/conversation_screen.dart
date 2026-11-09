@@ -244,6 +244,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
         ? typedText
         : replyText(replyTo.name, typedText);
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     setState(() => _sending = true);
     try {
       final target = widget.thread.substring(2);
@@ -261,7 +262,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
       if (replyTo != null && mounted) setState(() => _replyTo = null);
     } on ArgumentError {
       messenger.showSnackBar(
-        SnackBar(content: Text('That message is too long to send.')),
+        SnackBar(content: Text(l10n.thatMessageIsTooLongTo)),
       );
     } on RadioRequestException {
       // The message is stored as failed with a resend option, so don't
@@ -269,9 +270,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
       if (typed) _clearBox();
       if (replyTo != null && mounted) setState(() => _replyTo = null);
       messenger.showSnackBar(
-        SnackBar(
-          content: Text('The radio could not send it. Hold it to try again.'),
-        ),
+        SnackBar(content: Text(l10n.theRadioCouldNotSendIt2)),
       );
     } finally {
       if (mounted) setState(() => _sending = false);
@@ -284,6 +283,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     if (state is! Connected) return;
     final store = ref.read(storeProvider);
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final key = state.radio.key;
     final channels = ref.read(channelsProvider(key)).value ?? const [];
     final contacts = ref.read(contactsProvider(key)).value ?? const [];
@@ -326,11 +326,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
         forwardText(sender, message.body),
       );
       messenger.showSnackBar(
-        SnackBar(content: Text('Forwarded to ${picked.$2}.')),
+        SnackBar(content: Text(l10n.forwardedTo(picked.$2))),
       );
     } on RadioRequestException {
       messenger.showSnackBar(
-        SnackBar(content: Text('The radio could not send it.')),
+        SnackBar(content: Text(l10n.theRadioCouldNotSendIt)),
       );
     }
   }
@@ -340,6 +340,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     final text = _text.text.trim();
     final radioKey = ref.read(radioKeyProvider);
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     if (radioKey == null || radioKey.isEmpty) return;
     if (text.isEmpty) {
       messenger.showSnackBar(
@@ -365,7 +366,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
           at: at,
         );
     _clearBox();
-    messenger.showSnackBar(SnackBar(content: Text('Scheduled.')));
+    messenger.showSnackBar(SnackBar(content: Text(l10n.scheduled)));
   }
 
   void _clearBox() {
@@ -394,6 +395,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     final connected = state is Connected;
     final failed = message.status == MessageStatus.failed;
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final action = await showModalBottomSheet<String>(
       context: context,
       builder: (context) => SafeArea(
@@ -485,7 +487,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
       }
       messenger.showSnackBar(
         SnackBar(
-          content: Text('Blocked $sender.'),
+          content: Text(l10n.blocked2(sender)),
           action: SnackBarAction(
             label: 'Undo',
             onPressed: () {
@@ -515,7 +517,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
       }
     } on RadioRequestException {
       messenger.showSnackBar(
-        SnackBar(content: Text('The radio could not send it.')),
+        SnackBar(content: Text(l10n.theRadioCouldNotSendIt)),
       );
     }
   }
@@ -536,6 +538,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
         contact.outPathLength != pathUnknown &&
         ref.read(connectionProvider) is Connected;
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final reset = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -578,11 +581,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     try {
       await state.sync.resetRoute(PublicKey.fromHex(contact.publicKey));
       messenger.showSnackBar(
-        SnackBar(content: Text('Route reset. The next message floods.')),
+        SnackBar(content: Text(l10n.routeResetTheNextMessageFloods)),
       );
     } on RadioRequestException {
       messenger.showSnackBar(
-        SnackBar(content: Text('The radio could not reset the route.')),
+        SnackBar(content: Text(l10n.theRadioCouldNotResetThe)),
       );
     }
   }
