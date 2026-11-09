@@ -23,6 +23,7 @@ import 'radio_settings_screen.dart';
 import 'search_screen.dart';
 import 'server_screen.dart';
 import 'safety_screen.dart';
+import 'scheduled_screen.dart';
 
 /// A radio's chats and contacts. While the radio is being reconnected a
 /// banner says so and the stored chats stay readable.
@@ -158,6 +159,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const AreaBanner(),
           if (_tab == 0)
             OwnStatusStrip(radioKey: key, radioName: widget.radioName),
+          if (_tab == 0) const ScheduledStrip(),
           Expanded(
             child: switch (_tab) {
               0 => _ChatsTab(radioKey: key),

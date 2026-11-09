@@ -365,6 +365,47 @@ void main() {
     await cleanUp(tester);
   });
 
+  testWidgets('a message forwards to another chat', (tester) async {
+    await connect(tester);
+    radio.queue.add(
+      channelMessageFrame('Ridge: lunch at the hut?', channel: 1),
+    );
+    link.emit([PushCode.messagesWaiting]);
+    await settle(tester);
+    await tester.tap(find.text('#trail'));
+    await settle(tester);
+    await tester.longPress(find.text('lunch at the hut?'));
+    await settle(tester);
+    await tester.tap(find.text('Forward'));
+    await settle(tester);
+    await tester.tap(find.text('Public').last);
+    await settle(tester);
+    expect(find.text('Forwarded to Public.'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
+  testWidgets('a scheduled message waits, lists, and cancels', (tester) async {
+    await connect(tester);
+    await tester.tap(find.text('#trail'));
+    await settle(tester);
+    await tester.enterText(find.byType(TextField), 'Back by six');
+    await tester.pump();
+    await tester.tap(find.byTooltip('Schedule message'));
+    await settle(tester);
+    await tester.tap(find.text('In 1 hour'));
+    await settle(tester);
+    expect(find.text('Scheduled.'), findsOneWidget);
+    await tester.pageBack();
+    await settle(tester);
+    await tester.tap(find.text('1 scheduled message'));
+    await settle(tester);
+    expect(find.textContaining('Back by six'), findsOneWidget);
+    await tester.tap(find.byTooltip('Cancel this message'));
+    await settle(tester);
+    expect(find.textContaining('Back by six'), findsNothing);
+    await cleanUp(tester);
+  });
+
   testWidgets('holding a message reacts to it or replies to it', (
     tester,
   ) async {
