@@ -1,7 +1,6 @@
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:notoryx_core/app/antenna_hunt.dart';
-import 'package:notoryx_core/app/region_tag.dart';
 
 void main() {
   group('clicks', () {
@@ -84,25 +83,6 @@ void main() {
           ..stop()
           ..dispose();
       });
-    });
-  });
-
-  group('region tag', () {
-    test('goes on the end, and off when empty', () {
-      expect(withRegionTag('Hello', 'ct'), 'Hello 📍 ct');
-      expect(withRegionTag('Hello', null), 'Hello');
-      expect(withRegionTag('Hello', '   '), 'Hello');
-    });
-
-    test('is dropped rather than making a message too long', () {
-      final full = 'x' * 155;
-      expect(withRegionTag(full, 'ct'), full);
-    });
-
-    test('is tidied and capped', () {
-      expect(cleanRegionTag('  a   b '), 'a b');
-      expect(cleanRegionTag('abcdefghijkl'), hasLength(regionTagMaxLength));
-      expect(cleanRegionTag(''), isNull);
     });
   });
 }

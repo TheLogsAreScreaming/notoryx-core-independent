@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../support/open_connect.dart';
+
 import 'package:notoryx_core/app/channel_directory.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:notoryx_core/app/connection.dart';
@@ -164,6 +167,7 @@ void main() {
 
   Future<void> connect(WidgetTester tester) async {
     await pumpApp(tester);
+    await openConnect(tester);
     await tester.tap(find.text('MeshCore-Base'));
     await settle(tester);
   }
@@ -183,9 +187,11 @@ void main() {
     tester,
   ) async {
     await pumpApp(tester);
+    await openConnect(tester);
     expect(find.text('Connect a radio'), findsOneWidget);
     expect(find.text('MeshCore-Base'), findsOneWidget);
 
+    await openConnect(tester);
     await tester.tap(find.text('MeshCore-Base'));
     await settle(tester);
     expect(
@@ -212,6 +218,7 @@ void main() {
     tester,
   ) async {
     await pumpApp(tester);
+    await openConnect(tester);
     expect(find.text('Headphones'), findsNothing);
     await tester.tap(find.text('Show all Bluetooth devices'));
     await settle(tester);
@@ -854,7 +861,7 @@ void main() {
     await connect(tester);
     await tester.tap(find.byTooltip('Disconnect'));
     await settle(tester);
-    expect(find.text('Connect a radio'), findsOneWidget);
+    expect(find.textContaining('No radio connected'), findsOneWidget);
 
     final saved = await tester.runAsync(
       () => MeshStore(db).setting(ConnectionController.lastRadioSetting),
@@ -866,8 +873,19 @@ void main() {
     await settle(tester);
     await pumpApp(tester);
     await settle(tester);
-    expect(find.text('Connect a radio'), findsOneWidget);
+    expect(find.textContaining('No radio connected'), findsOneWidget);
     expect(connector.opened.length, opens, reason: 'no automatic connect');
+    await cleanUp(tester);
+  });
+
+  testWidgets('the full app shows with no radio ever connected', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    expect(find.textContaining('No radio yet'), findsOneWidget);
+    expect(find.text('Chats'), findsOneWidget);
+    expect(find.text('Map'), findsOneWidget);
+    expect(find.byTooltip('Radio settings'), findsOneWidget);
     await cleanUp(tester);
   });
 
@@ -879,8 +897,6 @@ void main() {
     await settle(tester);
     final opens = connector.opened.length;
 
-    await tester.tap(find.textContaining('Open saved chats'));
-    await settle(tester);
     expect(find.textContaining('No radio connected'), findsOneWidget);
     expect(find.byTooltip('Disconnect'), findsNothing);
     expect(find.text('Chats'), findsOneWidget);

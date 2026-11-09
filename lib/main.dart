@@ -10,7 +10,6 @@ import 'app/safety.dart';
 import 'app/telemetry.dart';
 import 'app/connection.dart';
 import 'app/notifications.dart';
-import 'screens/connect_screen.dart';
 import 'screens/conversation_screen.dart';
 import 'screens/home_screen.dart';
 
@@ -39,8 +38,9 @@ class NotoryxApp extends ConsumerWidget {
   }
 }
 
-/// Shows the chats while a radio is connected or being reconnected, and the
-/// connect screen otherwise. Also sets up message notifications.
+/// Always shows the full app: the connected radio's chats, or the last
+/// radio's saved ones when none is connected. Connecting is a screen opened
+/// from there. Also sets up message notifications.
 class _RadioGate extends ConsumerStatefulWidget {
   const _RadioGate();
 
@@ -51,6 +51,9 @@ class _RadioGate extends ConsumerStatefulWidget {
 class _RadioGateState extends ConsumerState<_RadioGate> {
   /// A chat a notification asked for before its radio's chats were showing.
   ChatLink? _pendingChat;
+
+  /// What the home screen last showed, kept through a connection attempt.
+  ({String key, String name})? _shown;
 
   @override
   void initState() {
@@ -63,7 +66,7 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
 
   void _openChat(ChatLink chat) {
     if (!mounted) return;
-    if (ref.read(radioKeyProvider) == null) {
+    if (ref.read(radioKeyProvider) case null || '') {
       _pendingChat = chat; // opened once the chats are showing
       return;
     }
@@ -92,14 +95,14 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
     ref.listen(sosWatchdogProvider, (_, _) {});
     ref.listen(tripQuietWatchdogProvider, (_, _) {});
     ref.listen(channelCleanerProvider, (_, _) {});
-    // Disconnecting closes any open conversation so the connect screen is
-    // what's showing. While reconnecting the chats stay open.
+    // Connecting closes the connect screen, and disconnecting closes any
+    // open conversation. While reconnecting the chats stay open.
     ref.listen(connectionProvider, (previous, next) {
       bool showsChats(RadioConnectionState? s) =>
           s is Connected || s is Reconnecting || s is ViewingSaved;
-      final hadChats = showsChats(previous);
+      bool live(RadioConnectionState? s) => s is Connected || s is Reconnecting;
       final hasChats = showsChats(next);
-      if (hadChats && !hasChats) {
+      if (live(previous) != live(next)) {
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
       if (hasChats && _pendingChat != null) {
@@ -107,20 +110,39 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
         WidgetsBinding.instance.addPostFrameCallback((_) => _openChat(chat));
       }
     });
-    return switch (ref.watch(connectionProvider)) {
-      Connected(:final radio) => HomeScreen(
-        radioKey: radio.key,
-        radioName: radio.self.name,
-      ),
-      Reconnecting(:final radioKey, :final radioName) => HomeScreen(
-        radioKey: radioKey,
-        radioName: radioName,
-      ),
-      ViewingSaved(:final radioKey, :final radioName) => HomeScreen(
-        radioKey: radioKey,
-        radioName: radioName,
-      ),
-      _ => const ConnectScreen(),
+    final state = ref.watch(connectionProvider);
+    final saved = ref.watch(savedRadiosProvider);
+    // A radio can appear while none is connected, by restoring a backup.
+    final radio = saved.value?.firstOrNull;
+    final noRadioYet =
+        state is ViewingSaved &&
+        !(saved.value ?? const []).any((r) => r.publicKey == state.radioKey);
+    if ((state is Disconnected || (noRadioYet && radio != null)) &&
+        !saved.isLoading) {
+      final error = state is Disconnected ? state.error : null;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || ref.read(connectionProvider) != state) return;
+        ref
+            .read(connectionProvider.notifier)
+            .viewSaved(
+              radioKey: radio?.publicKey ?? '',
+              radioName: radio?.name ?? 'NOTORYX Core',
+              error: error,
+            );
+      });
+    }
+    _shown = switch (state) {
+      Connected(:final radio) => (key: radio.key, name: radio.self.name),
+      Reconnecting(:final radioKey, :final radioName) ||
+      ViewingSaved(
+        :final radioKey,
+        :final radioName,
+      ) => (key: radioKey, name: radioName),
+      _ => _shown,
+    };
+    return switch (_shown) {
+      (:final key, :final name) => HomeScreen(radioKey: key, radioName: name),
+      null => const Scaffold(body: Center(child: CircularProgressIndicator())),
     };
   }
 }

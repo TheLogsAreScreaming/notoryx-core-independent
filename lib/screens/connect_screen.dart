@@ -88,7 +88,9 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
   void _connect(RadioTarget target) {
     _scan?.cancel();
     setState(() => _scanning = false);
-    ref.read(connectionProvider.notifier).connect(target);
+    ref.read(connectionProvider.notifier)
+      ..stopViewingSaved()
+      ..connect(target);
   }
 
   void _connectWifi() {
@@ -123,7 +125,8 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
-          if (state case Disconnected(:final error?))
+          if (state
+              case Disconnected(:final error?) || ViewingSaved(:final error?))
             _Banner(message: error, color: theme.colorScheme.errorContainer),
           if (state case Connecting(:final target))
             _Banner(
@@ -131,7 +134,9 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               color: theme.colorScheme.secondaryContainer,
               busy: true,
             ),
-          for (final radio in saved)
+          for (final radio in saved.where(
+            (r) => state is! ViewingSaved || state.radioKey != r.publicKey,
+          ))
             ListTile(
               leading: const Icon(Icons.forum_outlined),
               title: Text('Open saved chats: ${radio.name}'),
@@ -139,9 +144,15 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
                 'Read chats, contacts and the map, no radio',
               ),
               enabled: !connecting,
-              onTap: () => ref
-                  .read(connectionProvider.notifier)
-                  .viewSaved(radioKey: radio.publicKey, radioName: radio.name),
+              onTap: () {
+                ref
+                    .read(connectionProvider.notifier)
+                    .viewSaved(
+                      radioKey: radio.publicKey,
+                      radioName: radio.name,
+                    );
+                Navigator.of(context).maybePop();
+              },
             ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),

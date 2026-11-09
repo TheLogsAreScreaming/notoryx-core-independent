@@ -2,6 +2,9 @@ import 'package:drift/drift.dart' show driftRuntimeOptions;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../support/open_connect.dart';
+
 import 'package:latlong2/latlong.dart';
 import 'package:notoryx_core/app/connection.dart';
 import 'package:notoryx_core/app/notifications.dart';
@@ -88,6 +91,7 @@ void main() {
       ),
     );
     await settle(tester);
+    await openConnect(tester);
     await tester.tap(find.text('MeshCore-Base'));
     await settle(tester);
     await tester.tap(find.byTooltip('Safety: SOS and check-ins'));

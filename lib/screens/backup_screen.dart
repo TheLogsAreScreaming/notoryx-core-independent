@@ -128,7 +128,8 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final disconnected = ref.watch(connectionProvider) is Disconnected;
+    final state = ref.watch(connectionProvider);
+    final disconnected = state is Disconnected || state is ViewingSaved;
     final problem = _passwordProblem;
     final busy = _working != null;
 
