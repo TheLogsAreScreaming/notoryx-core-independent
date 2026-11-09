@@ -7,6 +7,7 @@ import 'app/keep_alive.dart';
 import 'app/packet_log.dart';
 import 'app/radio_stats.dart';
 import 'app/safety.dart';
+import 'app/scheduled_messages.dart';
 import 'app/telemetry.dart';
 import 'app/connection.dart';
 import 'app/notifications.dart';
@@ -94,6 +95,7 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
     ref.listen(checkInWatchdogProvider, (_, _) {});
     ref.listen(sosWatchdogProvider, (_, _) {});
     ref.listen(tripQuietWatchdogProvider, (_, _) {});
+    ref.listen(scheduledSenderProvider, (_, _) {});
     ref.listen(channelCleanerProvider, (_, _) {});
     // Connecting closes the connect screen, and disconnecting closes any
     // open conversation. While reconnecting the chats stay open.

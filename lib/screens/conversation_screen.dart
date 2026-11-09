@@ -1,10 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../app/blocking.dart';
+import '../app/chat_send.dart';
+import '../app/safety.dart';
+import '../app/scheduled_messages.dart';
 import '../app/region_tag.dart';
 import '../radio/protocol/region_scope.dart';
 import '../app/spam_filter.dart';
@@ -21,6 +25,7 @@ import '../radio/radio.dart';
 import 'manage_actions.dart';
 import 'position_map_screen.dart';
 import 'quick_messages_screen.dart';
+import 'scheduled_screen.dart';
 
 /// One direct or channel conversation with a box to reply.
 class ConversationScreen extends ConsumerStatefulWidget {
@@ -276,6 +281,96 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     }
   }
 
+  /// Asks which chat, then sends [message] there.
+  Future<void> _forward(Message message, String sender) async {
+    final state = ref.read(connectionProvider);
+    if (state is! Connected) return;
+    final store = ref.read(storeProvider);
+    final messenger = ScaffoldMessenger.of(context);
+    final key = state.radio.key;
+    final channels = ref.read(channelsProvider(key)).value ?? const [];
+    final contacts = ref.read(contactsProvider(key)).value ?? const [];
+    final picked = await showModalBottomSheet<(String, String)>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            const ListTile(title: Text('Forward to')),
+            for (final c in channels)
+              if (c.name.isNotEmpty)
+                ListTile(
+                  leading: const Icon(Icons.tag),
+                  title: Text(c.name),
+                  onTap: () =>
+                      Navigator.pop(context, (Threads.channel(c.slot), c.name)),
+                ),
+            for (final c in contacts)
+              if (c.type == NodeType.chat.value)
+                ListTile(
+                  leading: const Icon(Icons.person_outline),
+                  title: Text(c.name),
+                  onTap: () => Navigator.pop(context, (
+                    Threads.direct(c.publicKey),
+                    c.name,
+                  )),
+                ),
+          ],
+        ),
+      ),
+    );
+    if (picked == null) return;
+    try {
+      await sendToThread(
+        state,
+        store,
+        picked.$1,
+        forwardText(sender, message.body),
+      );
+      messenger.showSnackBar(
+        SnackBar(content: Text('Forwarded to ${picked.$2}.')),
+      );
+    } on RadioRequestException {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('The radio could not send it.')),
+      );
+    }
+  }
+
+  /// Takes what's in the box and sets it to go out later.
+  Future<void> _schedule() async {
+    final text = _text.text.trim();
+    final radioKey = ref.read(radioKeyProvider);
+    final messenger = ScaffoldMessenger.of(context);
+    if (radioKey == null || radioKey.isEmpty) return;
+    if (text.isEmpty) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Type the message first.')),
+      );
+      return;
+    }
+    if (utf8.encode(text).length > maxDirectTextBytes) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('That message is too long to send.')),
+      );
+      return;
+    }
+    final at = await pickSendTime(context, ref.read(safetyClockProvider)());
+    if (at == null || !mounted) return;
+    await ref
+        .read(scheduledMessagesProvider.notifier)
+        .add(
+          radioKey: radioKey,
+          thread: widget.thread,
+          title: widget.title,
+          text: text,
+          at: at,
+        );
+    _clearBox();
+    messenger.showSnackBar(const SnackBar(content: Text('Scheduled.')));
+  }
+
   void _clearBox() {
     _text.clear();
     _flushDraft();
@@ -330,6 +425,12 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                 onTap: () => Navigator.pop(context, 'reply'),
               ),
             ],
+            if (connected)
+              ListTile(
+                leading: const Icon(Icons.forward),
+                title: const Text('Forward'),
+                onTap: () => Navigator.pop(context, 'forward'),
+              ),
             if (!message.outgoing)
               ListTile(
                 leading: const Icon(Icons.block),
@@ -367,6 +468,10 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     if (!mounted || action == null) return;
     if (action.startsWith('react:')) {
       await _send(reactionText(action.substring(6), message.body));
+      return;
+    }
+    if (action == 'forward') {
+      await _forward(message, sender);
       return;
     }
     if (action == 'reply') {
@@ -553,6 +658,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
       appBar: AppBar(
         title: Text(widget.title),
         actions: [
+          IconButton(
+            tooltip: 'Schedule message',
+            icon: const Icon(Icons.schedule_send),
+            onPressed: _schedule,
+          ),
           if (radioKey != null)
             IconButton(
               tooltip: muted ? 'Unmute' : 'Mute notifications',
