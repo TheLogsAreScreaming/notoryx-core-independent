@@ -43,6 +43,11 @@ final class LocalMessageNotifier implements MessageNotifier {
         android: AndroidInitializationSettings('ic_notification'),
         iOS: darwin,
         macOS: darwin,
+        windows: WindowsInitializationSettings(
+          appName: 'NOTORYX Independent',
+          appUserModelId: 'BastionMesh.NotoryxIndependent',
+          guid: '0277b9dd-2b81-4f49-939b-30acccb4dab8',
+        ),
       ),
       onDidReceiveNotificationResponse: (response) {
         final chat = _decode(response.payload);
