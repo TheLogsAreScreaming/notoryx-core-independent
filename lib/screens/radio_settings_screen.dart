@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../app/refresh_rate.dart';
 import '../app/connection.dart';
 import '../radio/radio.dart';
 import 'area_screen.dart';
@@ -366,6 +367,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
               ),
             ),
             const ChannelCleanupTile(),
+            const RefreshRateTile(),
             ListTile(
               leading: const Icon(Icons.palette_outlined),
               title: const Text('Appearance'),
