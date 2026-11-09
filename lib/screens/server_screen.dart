@@ -72,11 +72,8 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
           );
         case LoginNoReply():
           messenger.showSnackBar(
-            const SnackBar(
-              content: Text(
-                'No reply. Check the password (servers stay silent when it’s '
-                'wrong) and that the server is in range.',
-              ),
+            SnackBar(
+              content: Text(context.l10n.noReplyCheckThePasswordServers),
             ),
           );
       }
@@ -179,7 +176,9 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
                       children: [
                         const Icon(Icons.verified_user_outlined),
                         const SizedBox(width: 12),
-                        Expanded(child: Text('Logged in as ${role.label}')),
+                        Expanded(
+                          child: Text(context.l10n.loggedInAs(role.label)),
+                        ),
                         TextButton(
                           onPressed: _logout,
                           child: Text(context.l10n.logOut),

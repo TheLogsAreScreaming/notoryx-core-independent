@@ -190,14 +190,11 @@ class _MapTabState extends ConsumerState<MapTab> {
           ],
         ),
         if (nodes.isEmpty && radio == null)
-          const Center(
+          Center(
             child: Card(
               child: Padding(
                 padding: EdgeInsets.all(16),
-                child: Text(
-                  'No positions yet. Nodes appear here when their '
-                  'adverts share where they are.',
-                ),
+                child: Text(context.l10n.noPositionsYetNodesAppearHere),
               ),
             ),
           ),

@@ -82,11 +82,11 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
         builder: (context) => AlertDialog(
           title: Text(context.l10n.replaceEverythingOnThisDevice),
           content: Text(
-            'The backup from '
-            '${MaterialLocalizations.of(context).formatMediumDate(when)} '
-            '${TimeOfDay.fromDateTime(when).format(context)} '
-            '(app ${backup.info.appVersion}) replaces all chats, contacts, '
-            'settings and history here. This can’t be undone.',
+            context.l10n.theBackupFromAppReplacesAll(
+              MaterialLocalizations.of(context).formatMediumDate(when),
+              TimeOfDay.fromDateTime(when).format(context),
+              backup.info.appVersion,
+            ),
           ),
           actions: [
             TextButton(
@@ -156,11 +156,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
           Text(context.l10n.backUp, style: theme.textTheme.titleMedium),
           const SizedBox(height: 4),
           Text(
-            'Saves everything in this app (chats, contacts, channels and '
-            'their keys, settings, history) to one file, encrypted with a '
-            'password you choose. Keep the file somewhere safe: anyone with '
-            'it and the password can read your chats and join your private '
-            'channels.',
+            context.l10n.savesEverythingInThisAppChats,
             style: theme.textTheme.bodySmall,
           ),
           const SizedBox(height: 12),

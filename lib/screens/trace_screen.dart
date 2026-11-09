@@ -98,7 +98,7 @@ class _TraceScreenState extends ConsumerState<TraceScreen> {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Trace to ${widget.contact.name}'),
+        title: Text(context.l10n.traceTo(widget.contact.name)),
         actions: [
           IconButton(
             tooltip: context.l10n.traceAgain,
@@ -130,8 +130,7 @@ class _TraceScreenState extends ConsumerState<TraceScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
               child: Text(
-                'Signal-to-noise for each hop, out and back. Above 0 dB is '
-                'comfortable; below −10 dB is close to the limit.',
+                context.l10n.signalToNoiseForEachHop,
                 style: theme.textTheme.bodySmall,
               ),
             ),
@@ -145,7 +144,7 @@ class _TraceScreenState extends ConsumerState<TraceScreen> {
                       : Icons.signal_cellular_alt_1_bar,
                 ),
                 title: Text('${leg.from} → ${leg.to}'),
-                trailing: Text('${leg.snr.toStringAsFixed(1)} dB'),
+                trailing: Text(context.l10n.db2(leg.snr.toStringAsFixed(1))),
               ),
           ],
         ),

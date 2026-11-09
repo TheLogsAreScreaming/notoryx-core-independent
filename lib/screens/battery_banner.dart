@@ -50,10 +50,7 @@ class _BatteryBannerState extends ConsumerState<BatteryBanner>
     }
     return MaterialBanner(
       leading: const Icon(Icons.battery_alert_outlined),
-      content: const Text(
-        'Battery saver can drop the radio while the app is in the '
-        'background. Let it run to stay connected and get alerts.',
-      ),
+      content: Text(context.l10n.batterySaverCanDropTheRadio),
       actions: [
         TextButton(onPressed: _notNow, child: Text(context.l10n.notNow)),
         TextButton(

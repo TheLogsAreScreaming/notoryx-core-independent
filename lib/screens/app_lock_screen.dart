@@ -188,19 +188,12 @@ class AppLockSettingsScreen extends ConsumerWidget {
             ListTile(
               leading: Icon(Icons.warning_amber),
               title: Text(context.l10n.earlierChatHistoryCouldnTBe),
-              subtitle: Text(
-                'Its key is gone from this device. The file was kept, and '
-                'a backup can bring your history back.',
-              ),
+              subtitle: Text(context.l10n.itsKeyIsGoneFromThis),
             ),
           const _EncryptHistoryTile(),
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(16),
-            child: Text(
-              'While locked, the radio stays connected, SOS repeats keep '
-              'going, and SOS and check-ins can still be opened without '
-              'unlocking. Message notifications hide who and what.',
-            ),
+            child: Text(context.l10n.whileLockedTheRadioStaysConnected),
           ),
         ],
       ),
@@ -227,12 +220,7 @@ class _EncryptHistoryTileState extends ConsumerState<_EncryptHistoryTile> {
         context: context,
         builder: (context) => AlertDialog(
           title: Text(context.l10n.encryptChatHistory),
-          content: const Text(
-            'The key stays in this device’s secure storage. If that is ever '
-            'wiped, or the app’s data moves to another phone, this history '
-            'can’t be read. Make a backup first: backups use your own '
-            'password and still work.',
-          ),
+          content: Text(context.l10n.theKeyStaysInThisDevice),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),

@@ -40,11 +40,7 @@ class _RepeaterIdsScreenState extends ConsumerState<RepeaterIdsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text(
-            'A repeater’s ID is the first byte of its key. Only repeaters '
-            'this radio knows or has heard are counted, so a free ID may '
-            'still be in use further away.',
-          ),
+          Text(context.l10n.aRepeaterSIDIsThe),
           const SizedBox(height: 12),
           TextField(
             decoration: InputDecoration(
@@ -56,7 +52,7 @@ class _RepeaterIdsScreenState extends ConsumerState<RepeaterIdsScreen> {
           ),
           const SizedBox(height: 16),
           if (lookup != null && !used.containsKey(lookup))
-            Text('$query is free.'),
+            Text(context.l10n.isFree(query)),
           for (final id in shown)
             ListTile(
               contentPadding: EdgeInsets.zero,
@@ -66,12 +62,12 @@ class _RepeaterIdsScreenState extends ConsumerState<RepeaterIdsScreen> {
               ),
               title: Text([for (final n in used[id]!) n.name].join(', ')),
               subtitle: used[id]!.length > 1
-                  ? Text('${used[id]!.length} repeaters share this ID')
+                  ? Text(context.l10n.repeatersShareThisID(used[id]!.length))
                   : null,
             ),
           const Divider(height: 32),
           Text(
-            '${free.length} free',
+            context.l10n.free(free.length),
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 8),

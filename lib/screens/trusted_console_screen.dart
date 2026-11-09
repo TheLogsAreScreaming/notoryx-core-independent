@@ -70,15 +70,15 @@ class _TrustedConsoleScreenState extends ConsumerState<TrustedConsoleScreen> {
               const <Message>[];
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text('${widget.contact.name}: command line')),
+      appBar: AppBar(
+        title: Text(context.l10n.commandLine2(widget.contact.name)),
+      ),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              'These run on ${widget.contact.name}’s radio. It only answers '
-              'if they’ve allowed you; otherwise they’ll see your command as '
-              'a message, and nothing comes back here.',
+              context.l10n.theseRunOnSRadioIt(widget.contact.name),
               style: theme.textTheme.bodySmall,
             ),
           ),

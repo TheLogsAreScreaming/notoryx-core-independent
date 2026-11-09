@@ -589,7 +589,7 @@ class _AddSeveralDialogState extends State<_AddSeveralDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: Text('Add contacts (${_picked.length} of ${widget.room} free)'),
+    title: Text(context.l10n.addContactsOfFree(_picked.length, widget.room)),
     content: SizedBox(
       width: double.maxFinite,
       child: ListView(

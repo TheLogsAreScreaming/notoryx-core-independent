@@ -89,14 +89,10 @@ class _RadioConsoleScreenState extends ConsumerState<RadioConsoleScreen> {
         children: [
           Expanded(
             child: _lines.isEmpty
-                ? const Center(
+                ? Center(
                     child: Padding(
                       padding: EdgeInsets.all(24),
-                      child: Text(
-                        'Commands run on your radio, not over the mesh. '
-                        'Try "get name". Wi-Fi setup works only on radios '
-                        'built with Wi-Fi.',
-                      ),
+                      child: Text(context.l10n.commandsRunOnYourRadioNot),
                     ),
                   )
                 : ListView.builder(

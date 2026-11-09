@@ -121,11 +121,12 @@ class _ChannelDirectoryScreenState
             else
               ListTile(
                 leading: const Icon(Icons.lock_outline),
-                title: Text('Unnamed channel (code ${codeLabel(code)})'),
+                title: Text(context.l10n.unnamedChannelCode(codeLabel(code))),
                 subtitle: Text(
-                  'Heard ${h.count}×, last ${_ago(h.last)}. A private '
-                  'channel, or a #name not listed here: ask around, then '
-                  'type it above.',
+                  context.l10n.heardLastAPrivateChannelOr(
+                    h.count,
+                    _ago(h.last),
+                  ),
                 ),
               ),
           if (local.isNotEmpty) ...[

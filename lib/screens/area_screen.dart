@@ -31,8 +31,7 @@ class AreaBanner extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '$who ${area.summary}. Your radio is set differently, so you '
-              'may not hear them.',
+              context.l10n.yourRadioIsSetDifferentlySo(who, area.summary),
               style: TextStyle(color: scheme.onTertiaryContainer),
             ),
             Align(
@@ -71,7 +70,7 @@ Future<void> reviewArea(
   final ok = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
-      title: Text('Use ${area.name} settings?'),
+      title: Text(context.l10n.useSettings(area.name)),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -93,10 +92,7 @@ Future<void> reviewArea(
             ],
             if (area.pathHashBytes case final bytes?) ...[
               const SizedBox(height: 8),
-              Text(
-                'This area also uses $bytes-byte paths. This app does not '
-                'change that setting yet.',
-              ),
+              Text(context.l10n.thisAreaAlsoUsesBytePaths(bytes)),
             ],
             const SizedBox(height: 8),
             Text(
@@ -185,7 +181,7 @@ class AreaScreen extends ConsumerWidget {
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                 child: FilledButton.tonal(
                   onPressed: () => reviewArea(context, ref, active),
-                  child: Text('Review ${active.name} settings'),
+                  child: Text(context.l10n.reviewSettings(active.name)),
                 ),
               ),
             ListTile(
@@ -217,10 +213,7 @@ class AreaScreen extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                'Areas come from the public MeshCore map, where node owners '
-                'report their settings, and from local groups. Only areas '
-                'that differ from the usual settings for their part of the '
-                'world are listed.',
+                context.l10n.areasComeFromThePublicMeshCore,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ),

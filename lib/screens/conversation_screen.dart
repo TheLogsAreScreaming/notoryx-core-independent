@@ -409,7 +409,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                   children: [
                     for (final emoji in quickReactions)
                       IconButton(
-                        tooltip: 'React $emoji',
+                        tooltip: context.l10n.react(emoji),
                         onPressed: () => Navigator.pop(context, 'react:$emoji'),
                         icon: Text(emoji, style: const TextStyle(fontSize: 26)),
                       ),
@@ -431,7 +431,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
             if (!message.outgoing)
               ListTile(
                 leading: const Icon(Icons.block),
-                title: Text('Block $sender'),
+                title: Text(context.l10n.block(sender)),
                 subtitle: Text(
                   message.kind == MessageKind.channel
                       ? 'Hides messages posted under this name, on every '
@@ -546,8 +546,10 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Sent ${MaterialLocalizations.of(context).formatShortDate(sent)} '
-                '${TimeOfDay.fromDateTime(sent).format(context)}',
+                context.l10n.sent(
+                  MaterialLocalizations.of(context).formatShortDate(sent),
+                  TimeOfDay.fromDateTime(sent).format(context),
+                ),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               for (final line in report.details)
@@ -679,7 +681,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
           if (threadBlocked)
             MaterialBanner(
               content: Text(
-                'You blocked ${widget.title}. Their messages are hidden.',
+                context.l10n.youBlockedTheirMessagesAreHidden(widget.title),
               ),
               actions: [
                 TextButton(
@@ -693,8 +695,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: Text(
-                'Direct messages only arrive if ${widget.title} has added you '
-                'as a contact.',
+                context.l10n.directMessagesOnlyArriveIfHas(widget.title),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
@@ -1192,7 +1193,7 @@ class _ReplyBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Replying to $name',
+                    context.l10n.replyingTo(name),
                     style: Theme.of(context).textTheme.labelLarge,
                   ),
                   Text(

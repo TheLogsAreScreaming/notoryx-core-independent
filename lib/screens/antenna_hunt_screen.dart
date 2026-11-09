@@ -59,10 +59,7 @@ class _AntennaHuntScreenState extends ConsumerState<AntennaHuntScreen> {
           children: [
             Text(widget.name, style: theme.textTheme.titleLarge),
             const SizedBox(height: 8),
-            const Text(
-              'Move or turn the antenna slowly. Faster clicks mean this '
-              'repeater is louder. It must be one hop away.',
-            ),
+            Text(context.l10n.moveOrTurnTheAntennaSlowly),
             const SizedBox(height: 24),
             Semantics(
               liveRegion: true,
@@ -74,7 +71,7 @@ class _AntennaHuntScreenState extends ConsumerState<AntennaHuntScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Best so far: ${_db(_hunt.best)}',
+              context.l10n.bestSoFar(_db(_hunt.best)),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),

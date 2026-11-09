@@ -34,10 +34,7 @@ class _ContactCleanupScreenState extends ConsumerState<ContactCleanupScreen> {
         title: Text(
           'Remove ${picked.length} contact${picked.length == 1 ? '' : 's'}?',
         ),
-        content: const Text(
-          'The radio forgets them. Chats already here stay, and they come '
-          'back when they advertise again.',
-        ),
+        content: Text(context.l10n.theRadioForgetsThemChatsAlready),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
