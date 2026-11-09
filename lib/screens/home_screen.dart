@@ -9,6 +9,7 @@ import '../app/contact_room.dart';
 import '../app/quick_messages.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
+import 'connect_screen.dart';
 import 'connection_log_screen.dart';
 import 'contact_cleanup_screen.dart';
 import 'area_screen.dart';
@@ -132,7 +133,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
           ),
-          if (connection is! ViewingSaved)
+          if (connection is ViewingSaved)
+            IconButton(
+              tooltip: 'Connect a radio',
+              icon: const Icon(Icons.link),
+              onPressed: () => _openConnect(context),
+            )
+          else
             IconButton(
               tooltip: 'Disconnect',
               icon: const Icon(Icons.link_off),
@@ -535,6 +542,10 @@ class _ContactsTab extends ConsumerWidget {
 }
 
 /// Says no radio is attached, and leads back to connecting one.
+void _openConnect(BuildContext context) =>
+    Navigator.of(context)
+        .push(MaterialPageRoute<void>(builder: (_) => const ConnectScreen()));
+
 class _ViewingSavedBanner extends ConsumerWidget {
   const _ViewingSavedBanner();
 
@@ -547,12 +558,16 @@ class _ViewingSavedBanner extends ConsumerWidget {
         children: [
           const Icon(Icons.link_off, size: 18),
           const SizedBox(width: 12),
-          const Expanded(
-            child: Text('No radio connected. You can read, but not send.'),
+          Expanded(
+            child: Text(switch (ref.watch(connectionProvider)) {
+              ViewingSaved(radioKey: '') =>
+                'No radio yet. Connect one to start chatting.',
+              ViewingSaved(:final error?) => error,
+              _ => 'No radio connected. You can read, but not send.',
+            }),
           ),
           TextButton(
-            onPressed: () =>
-                ref.read(connectionProvider.notifier).stopViewingSaved(),
+            onPressed: () => _openConnect(context),
             child: const Text('Connect'),
           ),
         ],
