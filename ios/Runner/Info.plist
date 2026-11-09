@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>notoryx_core</string>
+	<string>NOTORYX Independent</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -27,11 +27,19 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>NOTORYX Core uses Bluetooth to connect to your MeshCore radio.</string>
+	<string>NOTORYX Independent uses Bluetooth to connect to your MeshCore radio.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>NOTORYX Core uses Bluetooth to connect to your MeshCore radio.</string>
+	<string>NOTORYX Independent uses Bluetooth to connect to your MeshCore radio.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>NOTORYX Independent shows where you are on the map.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>NOTORYX Independent uses Face ID to unlock the app when App lock is on.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>NOTORYX Independent connects to MeshCore radios on your Wi-Fi network.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>bluetooth-central</string>
+	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>NOTORYX Independent uses the camera to scan contact and channel QR codes.</string>
 	<key>UIApplicationSceneManifest</key>

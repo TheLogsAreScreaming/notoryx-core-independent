@@ -1,0 +1,37 @@
+name: iOS build
+
+# An unsigned device build, to show the iPhone version still compiles. It
+# proves nothing about running on an iPhone. Signing and uploading need an
+# Apple Developer account and come later.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'ios/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - '.github/workflows/ios-build.yml'
+  pull_request:
+    paths:
+      - 'ios/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - '.github/workflows/ios-build.yml'
+
+jobs:
+  ios:
+    # Same reason as the Mac release build: Apple-silicon runners have been
+    # out of capacity for hours at a time.
+    runs-on: macos-15-intel
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.47.7'
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter build ios --release --no-codesign
