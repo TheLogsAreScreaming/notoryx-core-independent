@@ -6,6 +6,7 @@ import '../app/about.dart';
 import '../app/connection.dart';
 import 'backup_screen.dart';
 import 'field_guide_screen.dart';
+import '../l10n/l10n.dart';
 
 /// The app's version, where it comes from, and the details to put in a
 /// problem report.
@@ -29,7 +30,7 @@ class AboutScreen extends ConsumerWidget {
         : reportDetails(app: app, platform: platform, connection: connection);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('About')),
+      appBar: AppBar(title: Text(context.l10n.about)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -51,7 +52,7 @@ class AboutScreen extends ConsumerWidget {
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 24),
-          Text('Report a problem', style: theme.textTheme.titleMedium),
+          Text(context.l10n.reportAProblem, style: theme.textTheme.titleMedium),
           const SizedBox(height: 4),
           Text(
             'Open an issue on the releases page below and paste these '
@@ -78,7 +79,7 @@ class AboutScreen extends ConsumerWidget {
                   ? null
                   : () => _copy(context, details, 'Details copied'),
               icon: const Icon(Icons.copy),
-              label: const Text('Copy details'),
+              label: Text(context.l10n.copyDetails),
             ),
           ),
           const SizedBox(height: 24),
@@ -95,8 +96,8 @@ class AboutScreen extends ConsumerWidget {
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.menu_book_outlined),
-            title: const Text('Field guide'),
-            subtitle: const Text('Short help that works offline'),
+            title: Text(context.l10n.fieldGuide),
+            subtitle: Text(context.l10n.shortHelpThatWorksOffline),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute<void>(builder: (_) => const FieldGuideScreen()),
@@ -105,8 +106,8 @@ class AboutScreen extends ConsumerWidget {
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.backup_outlined),
-            title: const Text('Backup and restore'),
-            subtitle: const Text('Move your chats to a new phone'),
+            title: Text(context.l10n.backupAndRestore),
+            subtitle: Text(context.l10n.moveYourChatsToANew),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute<void>(builder: (_) => const BackupScreen()),
@@ -115,7 +116,7 @@ class AboutScreen extends ConsumerWidget {
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.description_outlined),
-            title: const Text('Open-source licences'),
+            title: Text(context.l10n.openSourceLicences),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => showLicensePage(
               context: context,

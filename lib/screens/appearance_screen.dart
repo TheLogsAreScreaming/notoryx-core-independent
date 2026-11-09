@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/appearance.dart';
+import '../l10n/l10n.dart';
 
 /// Pick a theme and the size of chat text.
 class AppearanceScreen extends ConsumerWidget {
@@ -13,7 +14,7 @@ class AppearanceScreen extends ConsumerWidget {
     final notifier = ref.read(appearanceProvider.notifier);
     final index = chatScales.indexOf(look.chatScale);
     return Scaffold(
-      appBar: AppBar(title: const Text('Appearance')),
+      appBar: AppBar(title: Text(context.l10n.appearance)),
       body: ListView(
         children: [
           Padding(
@@ -22,7 +23,7 @@ class AppearanceScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Chat text size',
+                  context.l10n.chatTextSize,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 Slider(
@@ -42,7 +43,7 @@ class AppearanceScreen extends ConsumerWidget {
                           look.chatScale,
                     ),
                   ),
-                  child: const Text('Summit at noon. Bring water.'),
+                  child: Text(context.l10n.summitAtNoonBringWater),
                 ),
               ],
             ),

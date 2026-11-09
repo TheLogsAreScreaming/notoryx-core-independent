@@ -5,6 +5,7 @@ import '../app/connection.dart';
 import '../app/contact_room.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
+import '../l10n/l10n.dart';
 
 /// Pick contacts to remove so the radio has room for new ones. Favourites
 /// are never listed; the ones heard longest ago come first.
@@ -40,11 +41,11 @@ class _ContactCleanupScreenState extends ConsumerState<ContactCleanupScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Remove'),
+            child: Text(context.l10n.remove),
           ),
         ],
       ),
@@ -96,7 +97,7 @@ class _ContactCleanupScreenState extends ConsumerState<ContactCleanupScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Make room for contacts')),
+      appBar: AppBar(title: Text(context.l10n.makeRoomForContacts)),
       body: Column(
         children: [
           if (max != null)
@@ -110,7 +111,7 @@ class _ContactCleanupScreenState extends ConsumerState<ContactCleanupScreen> {
               children: [
                 Expanded(
                   child: Text(
-                    'Heard longest ago first. Favourites aren’t listed.',
+                    context.l10n.heardLongestAgoFirstFavouritesAren,
                     style: theme.textTheme.bodySmall,
                   ),
                 ),
@@ -124,14 +125,14 @@ class _ContactCleanupScreenState extends ConsumerState<ContactCleanupScreen> {
                               candidates.take(10).map((c) => c.publicKey),
                             );
                         }),
-                  child: const Text('Pick oldest 10'),
+                  child: Text(context.l10n.pickOldest10),
                 ),
               ],
             ),
           ),
           Expanded(
             child: candidates.isEmpty
-                ? const Center(child: Text('Nothing to remove.'))
+                ? Center(child: Text(context.l10n.nothingToRemove))
                 : ListView(
                     children: [
                       for (final c in candidates)
@@ -260,7 +261,7 @@ class ContactMeterBar extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 8),
                 child: TextButton(
                   onPressed: onMakeRoom,
-                  child: const Text('Make room'),
+                  child: Text(context.l10n.makeRoom),
                 ),
               ),
           ],

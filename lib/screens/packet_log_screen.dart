@@ -5,6 +5,7 @@ import '../app/connection.dart';
 import '../app/packet_log.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
+import '../l10n/l10n.dart';
 
 /// Every packet the radio has heard over the air while connected: what it
 /// was, how it travelled, who passed it on, and how strong it was.
@@ -29,7 +30,7 @@ class PacketLogScreen extends ConsumerWidget {
             onPressed: () => log.setPaused(!log.paused),
           ),
           IconButton(
-            tooltip: 'Clear',
+            tooltip: context.l10n.clear,
             icon: const Icon(Icons.delete_outline),
             onPressed: log.clear,
           ),

@@ -7,6 +7,7 @@ import '../app/connection.dart';
 import '../app/track_log.dart';
 import '../data/data.dart';
 import 'map_tab.dart' show mapTilesProvider;
+import '../l10n/l10n.dart';
 
 final tracksProvider = StreamProvider<List<Track>>(
   (ref) => ref.watch(storeProvider).watchTracks(),
@@ -48,7 +49,7 @@ class TrackLogScreen extends ConsumerWidget {
     final active = ref.watch(trackRecorderProvider);
     final tracks = ref.watch(tracksProvider).value ?? const <Track>[];
     return Scaffold(
-      appBar: AppBar(title: const Text('Track log')),
+      appBar: AppBar(title: Text(context.l10n.trackLog)),
       body: ListView(
         children: [
           Padding(
@@ -74,9 +75,9 @@ class TrackLogScreen extends ConsumerWidget {
             ),
           ),
           if (tracks.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(16),
-              child: Text('No tracks yet.'),
+              child: Text(context.l10n.noTracksYet),
             ),
           for (final t in tracks)
             ListTile(
@@ -124,16 +125,16 @@ class TrackDetailScreen extends ConsumerWidget {
     final sure = await showDialog<bool>(
       context: context,
       builder: (dialog) => AlertDialog(
-        title: const Text('Delete this track?'),
-        content: const Text('This can’t be undone.'),
+        title: Text(context.l10n.deleteThisTrack),
+        content: Text(context.l10n.thisCanTBeUndone),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialog).pop(false),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(dialog).pop(true),
-            child: const Text('Delete'),
+            child: Text(context.l10n.delete),
           ),
         ],
       ),
@@ -154,12 +155,12 @@ class TrackDetailScreen extends ConsumerWidget {
         title: Text(track.name),
         actions: [
           IconButton(
-            tooltip: 'Save as GPX',
+            tooltip: context.l10n.saveAsGPX,
             onPressed: points.isEmpty ? null : () => _export(context, ref),
             icon: const Icon(Icons.save_alt),
           ),
           IconButton(
-            tooltip: 'Delete track',
+            tooltip: context.l10n.deleteTrack,
             onPressed: recording ? null : () => _delete(context, ref),
             icon: const Icon(Icons.delete_outline),
           ),
@@ -173,7 +174,7 @@ class TrackDetailScreen extends ConsumerWidget {
           ),
           Expanded(
             child: line.isEmpty
-                ? const Center(child: Text('No points yet.'))
+                ? Center(child: Text(context.l10n.noPointsYet))
                 : FlutterMap(
                     key: ValueKey(line.length > 1),
                     options: MapOptions(

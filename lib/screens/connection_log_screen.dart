@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/connection.dart';
 import '../app/connection_log.dart';
 import 'packet_log_screen.dart';
+import '../l10n/l10n.dart';
 
 /// What the connection has been doing, newest at the bottom, with a button
 /// to copy it all for a bug report.
@@ -30,17 +31,17 @@ class _ConnectionLogScreenState extends ConsumerState<ConnectionLogScreen> {
     final log = ref.watch(connectionLogProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Connection log'),
+        title: Text(context.l10n.connectionLog),
         actions: [
           IconButton(
-            tooltip: 'Packets heard',
+            tooltip: context.l10n.packetsHeard,
             icon: const Icon(Icons.podcasts),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(builder: (_) => const PacketLogScreen()),
             ),
           ),
           IconButton(
-            tooltip: 'Copy log',
+            tooltip: context.l10n.copyLog,
             icon: const Icon(Icons.copy),
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
@@ -48,28 +49,34 @@ class _ConnectionLogScreenState extends ConsumerState<ConnectionLogScreen> {
                 ClipboardData(text: entriesFor(log.entries, _view).join('\n')),
               );
               messenger.showSnackBar(
-                const SnackBar(content: Text('Connection log copied')),
+                SnackBar(content: Text('Connection log copied')),
               );
             },
           ),
           IconButton(
-            tooltip: 'Clear log',
+            tooltip: context.l10n.clearLog,
             icon: const Icon(Icons.delete_outline),
             onPressed: log.clear,
           ),
         ],
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(56),
+          preferredSize: Size.fromHeight(56),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+            padding: EdgeInsets.fromLTRB(12, 0, 12, 8),
             child: SegmentedButton<LogView>(
-              segments: const [
-                ButtonSegment(value: LogView.all, label: Text('All')),
+              segments: [
+                ButtonSegment(
+                  value: LogView.all,
+                  label: Text(context.l10n.all),
+                ),
                 ButtonSegment(
                   value: LogView.bluetooth,
-                  label: Text('Bluetooth'),
+                  label: Text(context.l10n.bluetooth),
                 ),
-                ButtonSegment(value: LogView.app, label: Text('App')),
+                ButtonSegment(
+                  value: LogView.app,
+                  label: Text(context.l10n.app),
+                ),
               ],
               selected: {_view},
               onSelectionChanged: (v) => setState(() => _view = v.first),
@@ -83,7 +90,7 @@ class _ConnectionLogScreenState extends ConsumerState<ConnectionLogScreen> {
         builder: (context, snapshot) {
           final entries = entriesFor(snapshot.data ?? const <String>[], _view);
           if (entries.isEmpty) {
-            return const Center(child: Text('Nothing logged yet'));
+            return Center(child: Text(context.l10n.nothingLoggedYet));
           }
           return ListView.builder(
             reverse: true,
@@ -109,7 +116,7 @@ class ConnectionLogButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => IconButton(
-    tooltip: 'Connection log',
+    tooltip: context.l10n.connectionLog,
     icon: const Icon(Icons.receipt_long_outlined),
     onPressed: () => Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => const ConnectionLogScreen()),

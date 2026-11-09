@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../presets/area_preset.dart';
 import '../presets/area_presets_provider.dart';
 import 'community_presets_screen.dart';
+import '../l10n/l10n.dart';
 
 /// "Phoenix, Arizona uses…" with Not now and Review, shown when the radio
 /// isn't on its area's settings.
@@ -42,11 +43,11 @@ class AreaBanner extends ConsumerWidget {
                   TextButton(
                     onPressed: () =>
                         ref.read(dismissedAreaProvider.notifier).dismiss(area),
-                    child: const Text('Not now'),
+                    child: Text(context.l10n.notNow),
                   ),
                   FilledButton.tonal(
                     onPressed: () => reviewArea(context, ref, area),
-                    child: const Text('Review'),
+                    child: Text(context.l10n.review),
                   ),
                 ],
               ),
@@ -77,9 +78,9 @@ Future<void> reviewArea(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (radio == null)
-              const Text('Connect your radio to change its settings.')
+              Text(context.l10n.connectYourRadioToChangeIts)
             else if (changes.isEmpty)
-              const Text('Your radio already uses these settings.')
+              Text(context.l10n.yourRadioAlreadyUsesTheseSettings)
             else
               for (final change in changes)
                 Padding(
@@ -110,13 +111,13 @@ Future<void> reviewArea(
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, false),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.cancel),
         ),
         FilledButton(
           onPressed: changes.isEmpty
               ? null
               : () => Navigator.pop(context, true),
-          child: const Text('Apply to radio'),
+          child: Text(context.l10n.applyToRadio),
         ),
       ],
     ),
@@ -162,7 +163,7 @@ class AreaScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Local mesh settings')),
+      appBar: AppBar(title: Text(context.l10n.localMeshSettings)),
       body: RadioGroup<String>(
         groupValue: choice,
         onChanged: choose,
@@ -170,7 +171,7 @@ class AreaScreen extends ConsumerWidget {
           children: [
             RadioListTile<String>(
               value: autoArea,
-              title: const Text('Automatic'),
+              title: Text(context.l10n.automatic),
               subtitle: Text(
                 at == null
                     ? "Your radio has no position, so pick your area below."
@@ -189,8 +190,8 @@ class AreaScreen extends ConsumerWidget {
               ),
             ListTile(
               leading: const Icon(Icons.public),
-              title: const Text('Community presets'),
-              subtitle: const Text('MeshCore’s list, by country'),
+              title: Text(context.l10n.communityPresets),
+              subtitle: Text(context.l10n.meshcoreSListByCountry),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(

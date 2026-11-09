@@ -6,6 +6,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../app/mesh_links.dart';
+import '../l10n/l10n.dart';
 
 /// Shows a link as a QR code with a copy button, so another phone can scan
 /// it or the text can be pasted into a message.
@@ -53,13 +54,11 @@ Future<void> showLinkSheet(
           const SizedBox(height: 16),
           FilledButton.icon(
             icon: const Icon(Icons.copy),
-            label: const Text('Copy link'),
+            label: Text(context.l10n.copyLink),
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
               await Clipboard.setData(ClipboardData(text: link.url));
-              messenger.showSnackBar(
-                const SnackBar(content: Text('Link copied')),
-              );
+              messenger.showSnackBar(SnackBar(content: Text('Link copied')));
             },
           ),
         ],
@@ -105,7 +104,7 @@ class _QrScanScreenState extends State<QrScanScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Scan a QR code')),
+    appBar: AppBar(title: Text(context.l10n.scanAQRCode)),
     body: Stack(
       children: [
         Positioned.fill(

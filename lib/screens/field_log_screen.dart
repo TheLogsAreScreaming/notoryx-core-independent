@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/connection.dart';
 import '../app/field_log.dart';
 import '../app/notifications.dart';
+import '../l10n/l10n.dart';
 
 /// Everything sent and received, across every chat, newest first, with a
 /// button to copy it as a record of the trip.
@@ -46,16 +47,16 @@ class _FieldLogScreenState extends ConsumerState<FieldLogScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final lines = await _lines;
     await Clipboard.setData(ClipboardData(text: lines.reversed.join('\n')));
-    messenger.showSnackBar(const SnackBar(content: Text('Field Log copied')));
+    messenger.showSnackBar(SnackBar(content: Text('Field Log copied')));
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: const Text('Field Log'),
+      title: Text(context.l10n.fieldLog),
       actions: [
         IconButton(
-          tooltip: 'Copy log',
+          tooltip: context.l10n.copyLog,
           icon: const Icon(Icons.copy),
           onPressed: _copy,
         ),
@@ -82,14 +83,14 @@ class _FieldLogScreenState extends ConsumerState<FieldLogScreen> {
             future: _lines,
             builder: (context, snapshot) {
               if (snapshot.hasError) {
-                return const Center(child: Text('Couldn’t read the log.'));
+                return Center(child: Text(context.l10n.couldnTReadTheLog));
               }
               final lines = snapshot.data;
               if (lines == null) {
                 return const Center(child: CircularProgressIndicator());
               }
               if (lines.isEmpty) {
-                return const Center(child: Text('Nothing in this period.'));
+                return Center(child: Text(context.l10n.nothingInThisPeriod));
               }
               return ListView.separated(
                 padding: const EdgeInsets.symmetric(horizontal: 16),

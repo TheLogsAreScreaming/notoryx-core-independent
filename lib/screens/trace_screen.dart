@@ -5,6 +5,7 @@ import '../app/connection.dart';
 import '../app/trace.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
+import '../l10n/l10n.dart';
 
 /// Sends a trace along the route to [contact] and back, then shows how
 /// well each hop heard the one before.
@@ -100,20 +101,20 @@ class _TraceScreenState extends ConsumerState<TraceScreen> {
         title: Text('Trace to ${widget.contact.name}'),
         actions: [
           IconButton(
-            tooltip: 'Trace again',
+            tooltip: context.l10n.traceAgain,
             icon: const Icon(Icons.refresh),
             onPressed: _state is _Running ? null : _run,
           ),
         ],
       ),
       body: switch (_state) {
-        _Running() => const Center(
+        _Running() => Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               CircularProgressIndicator(),
               SizedBox(height: 12),
-              Text('Tracing the route…'),
+              Text(context.l10n.tracingTheRoute),
             ],
           ),
         ),

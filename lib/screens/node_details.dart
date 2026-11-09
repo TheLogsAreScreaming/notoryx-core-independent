@@ -10,6 +10,7 @@ import 'manage_actions.dart';
 import 'server_screen.dart';
 import 'telemetry_screen.dart';
 import 'trace_screen.dart';
+import '../l10n/l10n.dart';
 
 /// What the app knows about one node, whether it's a contact or only heard
 /// nearby. Built from either kind of row.
@@ -149,7 +150,7 @@ Future<void> showNodeDetails(
                 if (node.isContact && node.type == NodeType.chat)
                   FilledButton.icon(
                     icon: const Icon(Icons.chat_bubble_outline),
-                    label: const Text('Message'),
+                    label: Text(context.l10n.message),
                     onPressed: () {
                       Navigator.pop(sheet);
                       Navigator.of(context).push(
@@ -167,7 +168,7 @@ Future<void> showNodeDetails(
                         node.type == NodeType.room))
                   FilledButton.icon(
                     icon: const Icon(Icons.login),
-                    label: const Text('Open'),
+                    label: Text(context.l10n.open),
                     onPressed: () {
                       Navigator.pop(sheet);
                       Navigator.of(context).push(
@@ -180,7 +181,7 @@ Future<void> showNodeDetails(
                 if (!node.isContact)
                   FilledButton.icon(
                     icon: const Icon(Icons.person_add_alt),
-                    label: const Text('Add contact'),
+                    label: Text(context.l10n.addContact),
                     onPressed: () async {
                       Navigator.pop(sheet);
                       final key = ref.read(radioKeyProvider);
@@ -205,7 +206,7 @@ Future<void> showNodeDetails(
                         node.type == NodeType.room))
                   OutlinedButton.icon(
                     icon: const Icon(Icons.route),
-                    label: const Text('Trace route'),
+                    label: Text(context.l10n.traceRoute),
                     onPressed: () async {
                       Navigator.pop(sheet);
                       final key = ref.read(radioKeyProvider);
@@ -225,7 +226,7 @@ Future<void> showNodeDetails(
                 if (node.isContact)
                   OutlinedButton.icon(
                     icon: const Icon(Icons.sensors),
-                    label: const Text('Telemetry'),
+                    label: Text(context.l10n.telemetry),
                     onPressed: () {
                       Navigator.pop(sheet);
                       Navigator.of(context).push(
@@ -242,7 +243,7 @@ Future<void> showNodeDetails(
                 if (node.isContact)
                   OutlinedButton.icon(
                     icon: const Icon(Icons.more_horiz),
-                    label: const Text('More'),
+                    label: Text(context.l10n.more),
                     onPressed: () async {
                       Navigator.pop(sheet);
                       final key = ref.read(radioKeyProvider);

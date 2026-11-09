@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'map_tab.dart';
+import '../l10n/l10n.dart';
 
 /// One shared position on a map, with a way to copy it.
 class PositionMapScreen extends ConsumerWidget {
@@ -31,7 +32,7 @@ class PositionMapScreen extends ConsumerWidget {
         title: Text(label),
         actions: [
           IconButton(
-            tooltip: 'Copy coordinates',
+            tooltip: context.l10n.copyCoordinates,
             icon: const Icon(Icons.copy),
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/antenna_hunt.dart';
 import '../app/connection.dart';
 import '../radio/radio.dart';
+import '../l10n/l10n.dart';
 
 /// Move the antenna around and listen: faster clicks mean a louder repeater.
 class AntennaHuntScreen extends ConsumerStatefulWidget {
@@ -50,7 +51,7 @@ class _AntennaHuntScreenState extends ConsumerState<AntennaHuntScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Antenna hunt')),
+      appBar: AppBar(title: Text(context.l10n.antennaHunt)),
       body: ListenableBuilder(
         listenable: _hunt,
         builder: (context, _) => ListView(

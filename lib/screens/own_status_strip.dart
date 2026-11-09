@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/connection.dart';
 import '../app/telemetry.dart';
 import 'telemetry_screen.dart';
+import '../l10n/l10n.dart';
 
 /// The connected radio's own battery and sensors, on the home screen. Tap
 /// for the history. Reading them goes over the link, so it costs no airtime.
@@ -33,12 +34,12 @@ class _OwnStatusStripState extends ConsumerState<OwnStatusStrip> {
       final readings = await state.sync.requestTelemetry();
       if (readings == null) {
         messenger.showSnackBar(
-          const SnackBar(content: Text('The radio didn’t answer.')),
+          SnackBar(content: Text('The radio didn’t answer.')),
         );
       }
     } on Object {
       messenger.showSnackBar(
-        const SnackBar(content: Text('Couldn’t read the radio.')),
+        SnackBar(content: Text('Couldn’t read the radio.')),
       );
     } finally {
       if (mounted) setState(() => _reading = false);
@@ -83,7 +84,7 @@ class _OwnStatusStripState extends ConsumerState<OwnStatusStrip> {
             ),
           ),
           IconButton(
-            tooltip: 'Read battery and sensors now',
+            tooltip: context.l10n.readBatteryAndSensorsNow,
             onPressed: _reading ? null : _read,
             icon: const Icon(Icons.refresh),
           ),

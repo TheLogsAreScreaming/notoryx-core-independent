@@ -12,6 +12,7 @@ import '../radio/radio.dart';
 import 'node_details.dart';
 import 'track_log_screen.dart';
 import '../app/position.dart';
+import '../l10n/l10n.dart';
 
 export '../app/position.dart' show phonePositionProvider;
 
@@ -63,11 +64,7 @@ class _MapTabState extends ConsumerState<MapTab> {
       if (!mounted) return;
       if (here == null) {
         messenger.showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Location is off or not allowed for NOTORYX Independent.',
-            ),
-          ),
+          SnackBar(content: Text(context.l10n.locationIsOffOrNotAllowed)),
         );
         return;
       }
@@ -212,7 +209,7 @@ class _MapTabState extends ConsumerState<MapTab> {
               if (radio != null)
                 FloatingActionButton.small(
                   heroTag: 'map-radio',
-                  tooltip: 'Go to my radio',
+                  tooltip: context.l10n.goToMyRadio,
                   onPressed: () => _map.move(radio, 13),
                   child: const Icon(Icons.router),
                 ),
@@ -232,7 +229,7 @@ class _MapTabState extends ConsumerState<MapTab> {
               const SizedBox(height: 8),
               FloatingActionButton.small(
                 heroTag: 'map-phone',
-                tooltip: 'Go to my location',
+                tooltip: context.l10n.goToMyLocation,
                 onPressed: _locating ? null : _goToPhone,
                 child: _locating
                     ? const SizedBox.square(

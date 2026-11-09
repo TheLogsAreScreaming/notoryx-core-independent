@@ -10,6 +10,7 @@ import '../radio/radio.dart';
 import 'trusted_console_screen.dart';
 import 'channel_directory_screen.dart';
 import 'qr_widgets.dart';
+import '../l10n/l10n.dart';
 
 /// The live sync, or null with a notice when the radio isn't connected.
 MeshSync? _syncOrNotice(BuildContext context, WidgetRef ref) {
@@ -17,7 +18,7 @@ MeshSync? _syncOrNotice(BuildContext context, WidgetRef ref) {
   if (state is Connected) return state.sync;
   ScaffoldMessenger.of(
     context,
-  ).showSnackBar(const SnackBar(content: Text('Connect to the radio first.')));
+  ).showSnackBar(SnackBar(content: Text(context.l10n.connectToTheRadioFirst)));
   return null;
 }
 
@@ -36,7 +37,7 @@ Future<bool> _run(
     messenger.showSnackBar(SnackBar(content: Text('$e Leave one first.')));
   } on RadioRequestException {
     messenger.showSnackBar(
-      const SnackBar(content: Text('The radio could not make that change.')),
+      SnackBar(content: Text('The radio could not make that change.')),
     );
   }
   return false;
@@ -111,7 +112,7 @@ class _TextDialogState extends State<_TextDialog> {
         hintText: widget.hint,
         suffixIcon: widget.pasteButton
             ? IconButton(
-                tooltip: 'Paste',
+                tooltip: context.l10n.paste,
                 icon: const Icon(Icons.content_paste),
                 onPressed: () async {
                   final data = await Clipboard.getData(Clipboard.kTextPlain);
@@ -125,7 +126,7 @@ class _TextDialogState extends State<_TextDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancel'),
+        child: Text(context.l10n.cancel),
       ),
       FilledButton(onPressed: _done, child: Text(widget.action)),
     ],
@@ -146,7 +147,7 @@ Future<bool> _confirm(
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
@@ -341,11 +342,9 @@ Future<void> addLink(
   MeshLink? link,
 ) async {
   if (link == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('That isn’t a MeshCore link, advert or public key.'),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(context.l10n.thatIsnTAMeshCoreLink)));
     return;
   }
   final sync = _syncOrNotice(context, ref);
@@ -614,13 +613,13 @@ class _AddSeveralDialogState extends State<_AddSeveralDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.of(context).pop(),
-        child: const Text('Cancel'),
+        child: Text(context.l10n.cancel),
       ),
       TextButton(
         onPressed: _picked.isEmpty
             ? null
             : () => Navigator.of(context).pop(_picked.toList()),
-        child: const Text('Add'),
+        child: Text(context.l10n.add),
       ),
     ],
   );
@@ -643,13 +642,13 @@ Future<void> _addMakingRoom(
   } on RadioRejected catch (e) {
     if (e.code != RadioErrorCode.tableFull) {
       messenger.showSnackBar(
-        const SnackBar(content: Text('The radio could not make that change.')),
+        SnackBar(content: Text('The radio could not make that change.')),
       );
       return;
     }
   } on RadioRequestException {
     messenger.showSnackBar(
-      const SnackBar(content: Text('The radio could not make that change.')),
+      SnackBar(content: Text('The radio could not make that change.')),
     );
     return;
   }
@@ -661,11 +660,7 @@ Future<void> _addMakingRoom(
   if (!context.mounted) return;
   if (out == null) {
     messenger.showSnackBar(
-      const SnackBar(
-        content: Text(
-          'The radio’s contacts are full, and all of them are favourites.',
-        ),
-      ),
+      SnackBar(content: Text(context.l10n.theRadioSContactsAreFull)),
     );
     return;
   }

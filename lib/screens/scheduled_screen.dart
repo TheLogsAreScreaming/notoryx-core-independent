@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/connection.dart';
 import '../app/safety.dart';
 import '../app/scheduled_messages.dart';
+import '../l10n/l10n.dart';
 
 /// Offers when to send, and returns the time. Null if cancelled.
 Future<DateTime?> pickSendTime(BuildContext context, DateTime now) async {
@@ -26,7 +27,7 @@ Future<DateTime?> pickSendTime(BuildContext context, DateTime now) async {
             ),
           ListTile(
             leading: const Icon(Icons.schedule),
-            title: const Text('Pick a time'),
+            title: Text(context.l10n.pickATime),
             onTap: () => Navigator.pop(context, 'pick'),
           ),
         ],
@@ -84,7 +85,7 @@ class ScheduledScreen extends ConsumerWidget {
     final now = ref.read(safetyClockProvider)();
     final connected = ref.watch(connectionProvider) is Connected;
     return Scaffold(
-      appBar: AppBar(title: const Text('Scheduled messages')),
+      appBar: AppBar(title: Text(context.l10n.scheduledMessages)),
       body: ListView(
         children: [
           Padding(
@@ -103,7 +104,7 @@ class ScheduledScreen extends ConsumerWidget {
               ),
               isThreeLine: true,
               trailing: IconButton(
-                tooltip: 'Cancel this message',
+                tooltip: context.l10n.cancelThisMessage,
                 icon: const Icon(Icons.delete_outline),
                 onPressed: () =>
                     ref.read(scheduledMessagesProvider.notifier).remove(m.id),

@@ -18,6 +18,7 @@ import '../app/channel_cleanup.dart';
 import 'radio_console_screen.dart';
 import 'backup_screen.dart';
 import 'blocked_screen.dart';
+import '../l10n/l10n.dart';
 
 /// Standard LoRa bandwidths the firmware accepts, in kHz.
 const loraBandwidths = [
@@ -81,15 +82,15 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
       if (done != null) messenger.showSnackBar(SnackBar(content: Text(done)));
     } on RadioRejected {
       messenger.showSnackBar(
-        const SnackBar(content: Text('The radio refused that setting.')),
+        SnackBar(content: Text('The radio refused that setting.')),
       );
     } on RadioRequestException {
       messenger.showSnackBar(
-        const SnackBar(content: Text('The radio did not answer.')),
+        SnackBar(content: Text('The radio did not answer.')),
       );
     } on StateError {
       messenger.showSnackBar(
-        const SnackBar(content: Text('Connect to the radio first.')),
+        SnackBar(content: Text('Connect to the radio first.')),
       );
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -112,10 +113,8 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
     final state = ref.watch(connectionProvider);
     if (state is! Connected) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Radio settings')),
-        body: const Center(
-          child: Text('Connect to the radio to change its settings.'),
-        ),
+        appBar: AppBar(title: Text(context.l10n.radioSettings)),
+        body: Center(child: Text(context.l10n.connectToTheRadioToChange)),
       );
     }
     final self = state.radio.self;
@@ -125,7 +124,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Radio settings'),
+        title: Text(context.l10n.radioSettings),
         bottom: _busy
             ? const PreferredSize(
                 preferredSize: Size.fromHeight(2),
@@ -140,7 +139,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
             const _Section('This radio'),
             ListTile(
               leading: const Icon(Icons.badge_outlined),
-              title: const Text('Name'),
+              title: Text(context.l10n.name),
               subtitle: Text(self.name),
               onTap: () async {
                 final name = await _askText(
@@ -154,7 +153,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.place_outlined),
-              title: const Text('Position'),
+              title: Text(context.l10n.position),
               subtitle: Text(
                 self.latitude == null
                     ? 'Not set'
@@ -181,8 +180,8 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
             ),
             SwitchListTile(
               secondary: const Icon(Icons.share_location_outlined),
-              title: const Text('Share position in adverts'),
-              subtitle: const Text('Others see where this radio is on a map'),
+              title: Text(context.l10n.sharePositionInAdverts),
+              subtitle: Text(context.l10n.othersSeeWhereThisRadioIs),
               value: self.advertLocationPolicy == 1,
               onChanged: (on) =>
                   _change([_otherParams(self, locationPolicy: on ? 1 : 0)]),
@@ -191,7 +190,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
             const _Section('Radio'),
             ListTile(
               leading: const Icon(Icons.settings_input_antenna),
-              title: const Text('Transmit power'),
+              title: Text(context.l10n.transmitPower),
               subtitle: Text(
                 '${self.txPowerDbm} dBm (most this radio allows: '
                 '${self.maxTxPowerDbm} dBm)',
@@ -209,7 +208,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.graphic_eq),
-              title: const Text('LoRa settings'),
+              title: Text(context.l10n.loraSettings),
               subtitle: Text(_lora(self)),
               onTap: () async {
                 final params = await showDialog<SetRadioParams>(
@@ -226,10 +225,8 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.public),
-              title: const Text('Local mesh settings'),
-              subtitle: const Text(
-                'Use the settings most radios in an area use',
-              ),
+              title: Text(context.l10n.localMeshSettings),
+              subtitle: Text(context.l10n.useTheSettingsMostRadiosIn),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(builder: (_) => const AreaScreen()),
               ),
@@ -238,10 +235,8 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
             const _Section('Contacts'),
             SwitchListTile(
               secondary: const Icon(Icons.person_add_alt),
-              title: const Text('Add new nodes automatically'),
-              subtitle: const Text(
-                'When off, new nodes wait under "Heard nearby" for you to add',
-              ),
+              title: Text(context.l10n.addNewNodesAutomatically),
+              subtitle: Text(context.l10n.whenOffNewNodesWaitUnder),
               value: !self.manualAddContacts,
               onChanged: (on) => _change([_otherParams(self, manualAdd: !on)]),
             ),
@@ -268,13 +263,13 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
                 ),
               ListTile(
                 contentPadding: const EdgeInsets.only(left: 72, right: 16),
-                title: const Text('Only nodes within'),
+                title: Text(context.l10n.onlyNodesWithin),
                 trailing: DropdownButton<int>(
                   value: autoAdd.maxHops.clamp(0, 8),
                   items: [
-                    const DropdownMenuItem(
+                    DropdownMenuItem(
                       value: 0,
-                      child: Text('any distance'),
+                      child: Text(context.l10n.anyDistance),
                     ),
                     for (var h = 1; h <= 8; h++)
                       DropdownMenuItem(
@@ -322,7 +317,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
             ],
             ListTile(
               leading: const Icon(Icons.sensors),
-              title: const Text('Battery and sensor history'),
+              title: Text(context.l10n.batteryAndSensorHistory),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
@@ -336,7 +331,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.backup_outlined),
-              title: const Text('Backup and restore'),
+              title: Text(context.l10n.backupAndRestore),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(builder: (_) => const BackupScreen()),
@@ -344,7 +339,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.block),
-              title: const Text('Blocked senders'),
+              title: Text(context.l10n.blockedSenders),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(builder: (_) => const BlockedScreen()),
@@ -353,7 +348,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
             const SpamFilterTile(),
             ListTile(
               leading: const Icon(Icons.info_outline),
-              title: const Text('About this app'),
+              title: Text(context.l10n.aboutThisApp),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(builder: (_) => const AboutScreen()),
@@ -361,8 +356,8 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.lock_outline),
-              title: const Text('App lock'),
-              subtitle: const Text('Fingerprint, face or screen lock'),
+              title: Text(context.l10n.appLock),
+              subtitle: Text(context.l10n.fingerprintFaceOrScreenLock),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
@@ -372,8 +367,8 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.terminal),
-              title: const Text('Command line'),
-              subtitle: const Text('Your radio’s console and Wi-Fi setup'),
+              title: Text(context.l10n.commandLine),
+              subtitle: Text(context.l10n.yourRadioSConsoleAndWi),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
@@ -383,8 +378,8 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.pin_outlined),
-              title: const Text('Repeater IDs'),
-              subtitle: const Text('Who uses an ID, and which are free'),
+              title: Text(context.l10n.repeaterIDs),
+              subtitle: Text(context.l10n.whoUsesAnIDAndWhich),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
@@ -394,8 +389,8 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.smart_toy_outlined),
-              title: const Text('Auto-replies'),
-              subtitle: const Text('Bots and away messages'),
+              title: Text(context.l10n.autoReplies),
+              subtitle: Text(context.l10n.botsAndAwayMessages),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(builder: (_) => const BotsScreen()),
@@ -406,8 +401,8 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
             const RefreshRateTile(),
             ListTile(
               leading: const Icon(Icons.palette_outlined),
-              title: const Text('Appearance'),
-              subtitle: const Text('Theme and chat text size'),
+              title: Text(context.l10n.appearance),
+              subtitle: Text(context.l10n.themeAndChatTextSize),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
@@ -417,7 +412,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.graphic_eq),
-              title: const Text('Noise floor history'),
+              title: Text(context.l10n.noiseFloorHistory),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
@@ -429,12 +424,12 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
               child: OutlinedButton.icon(
                 icon: Icon(Icons.restart_alt, color: theme.colorScheme.error),
-                label: const Text('Reboot radio'),
+                label: Text(context.l10n.rebootRadio),
                 onPressed: () async {
                   final sure = await showDialog<bool>(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: const Text('Reboot the radio?'),
+                      title: Text(context.l10n.rebootTheRadio),
                       content: const Text(
                         'The radio restarts and the app reconnects to it '
                         'automatically.',
@@ -442,11 +437,11 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(context, false),
-                          child: const Text('Cancel'),
+                          child: Text(context.l10n.cancel),
                         ),
                         FilledButton(
                           onPressed: () => Navigator.pop(context, true),
-                          child: const Text('Reboot'),
+                          child: Text(context.l10n.reboot),
                         ),
                       ],
                     ),
@@ -543,15 +538,15 @@ class _NameDialogState extends State<_NameDialog> {
       controller: _controller,
       autofocus: true,
       inputFormatters: [_Utf8LimitFormatter(widget.maxBytes)],
-      decoration: const InputDecoration(labelText: 'Name'),
+      decoration: InputDecoration(labelText: context.l10n.name),
       onSubmitted: (_) => _save(),
     ),
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancel'),
+        child: Text(context.l10n.cancel),
       ),
-      FilledButton(onPressed: _save, child: const Text('Save')),
+      FilledButton(onPressed: _save, child: Text(context.l10n.save)),
     ],
   );
 }
@@ -630,23 +625,23 @@ class _PositionDialogState extends State<_PositionDialog> {
       signed: true,
     );
     return AlertDialog(
-      title: const Text('Radio position'),
+      title: Text(context.l10n.radioPosition),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
             controller: _lat,
             keyboardType: numbers,
-            decoration: const InputDecoration(
-              labelText: 'Latitude',
+            decoration: InputDecoration(
+              labelText: context.l10n.latitude,
               hintText: '35.22709',
             ),
           ),
           TextField(
             controller: _lon,
             keyboardType: numbers,
-            decoration: const InputDecoration(
-              labelText: 'Longitude',
+            decoration: InputDecoration(
+              labelText: context.l10n.longitude,
               hintText: '-80.84313',
             ),
           ),
@@ -663,9 +658,9 @@ class _PositionDialogState extends State<_PositionDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.cancel),
         ),
-        FilledButton(onPressed: _save, child: const Text('Save')),
+        FilledButton(onPressed: _save, child: Text(context.l10n.save)),
       ],
     );
   }
@@ -688,7 +683,7 @@ class _PowerDialogState extends State<_PowerDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Transmit power'),
+    title: Text(context.l10n.transmitPower),
     content: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -713,11 +708,11 @@ class _PowerDialogState extends State<_PowerDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancel'),
+        child: Text(context.l10n.cancel),
       ),
       FilledButton(
         onPressed: () => Navigator.pop(context, _value.round()),
-        child: const Text('Save'),
+        child: Text(context.l10n.save),
       ),
     ],
   );
@@ -772,7 +767,7 @@ class _LoraDialogState extends State<_LoraDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('LoRa settings'),
+    title: Text(context.l10n.loraSettings),
     content: SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -786,7 +781,7 @@ class _LoraDialogState extends State<_LoraDialog> {
           TextField(
             controller: _frequency,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(labelText: 'Frequency (MHz)'),
+            decoration: InputDecoration(labelText: context.l10n.frequencyMHz),
           ),
           _picker<double>('Bandwidth', _bandwidth, {
             for (final b in loraBandwidths) b: '$b kHz',
@@ -811,9 +806,9 @@ class _LoraDialogState extends State<_LoraDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancel'),
+        child: Text(context.l10n.cancel),
       ),
-      FilledButton(onPressed: _save, child: const Text('Apply')),
+      FilledButton(onPressed: _save, child: Text(context.l10n.apply)),
     ],
   );
 

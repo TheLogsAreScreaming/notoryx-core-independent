@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../app/repeater_regions.dart';
 import '../radio/protocol/region_scope.dart';
 import '../radio/radio.dart';
+import '../l10n/l10n.dart';
 
 enum _Tree {
   us('United States', 'usa', usRegions),
@@ -62,13 +63,13 @@ class _RegionSetupScreenState extends State<RegionSetupScreen> {
         if (mounted) setState(() => _sent = i + 1);
       }
       messenger.showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Sent. Check the console for the repeater’s replies.'),
         ),
       );
     } on RadioRequestException {
       messenger.showSnackBar(
-        const SnackBar(content: Text('The radio could not send it.')),
+        SnackBar(content: Text('The radio could not send it.')),
       );
     } finally {
       if (mounted) setState(() => _sending = false);
@@ -81,13 +82,13 @@ class _RegionSetupScreenState extends State<RegionSetupScreen> {
     final regions = _regions.toSet().toList();
     final home = regions.contains(_home) ? _home : null;
     return Scaffold(
-      appBar: AppBar(title: const Text('Region setup')),
+      appBar: AppBar(title: Text(context.l10n.regionSetup)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           DropdownButtonFormField<_Tree>(
             initialValue: _tree,
-            decoration: const InputDecoration(labelText: 'Regions from'),
+            decoration: InputDecoration(labelText: context.l10n.regionsFrom),
             items: [
               for (final t in _Tree.values)
                 DropdownMenuItem(value: t, child: Text(t.label)),
@@ -119,9 +120,9 @@ class _RegionSetupScreenState extends State<RegionSetupScreen> {
           TextField(
             controller: _own,
             onChanged: (_) => setState(() {}),
-            decoration: const InputDecoration(
-              labelText: 'Other regions',
-              hintText: 'hudson, nyc',
+            decoration: InputDecoration(
+              labelText: context.l10n.otherRegions,
+              hintText: context.l10n.hudsonNyc,
               border: OutlineInputBorder(),
             ),
           ),
@@ -129,7 +130,7 @@ class _RegionSetupScreenState extends State<RegionSetupScreen> {
           DropdownButtonFormField<String>(
             key: ValueKey(regions.join(',')),
             initialValue: home,
-            decoration: const InputDecoration(labelText: 'Home region'),
+            decoration: InputDecoration(labelText: context.l10n.homeRegion),
             items: [
               for (final r in regions)
                 DropdownMenuItem(value: r, child: Text(r)),
@@ -138,7 +139,10 @@ class _RegionSetupScreenState extends State<RegionSetupScreen> {
           ),
           const SizedBox(height: 16),
           if (commands.isNotEmpty) ...[
-            Text('Will send', style: Theme.of(context).textTheme.titleSmall),
+            Text(
+              context.l10n.willSend,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
             const SizedBox(height: 4),
             for (final c in commands) Text(c),
             const SizedBox(height: 8),

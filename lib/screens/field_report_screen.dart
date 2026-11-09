@@ -5,6 +5,7 @@ import '../app/field_report.dart';
 import '../app/position.dart';
 import '../app/safety.dart';
 import '../radio/radio.dart';
+import '../l10n/l10n.dart';
 
 /// Fills in a report and sends it to your main chat and trip contacts.
 class FieldReportScreen extends ConsumerStatefulWidget {
@@ -36,7 +37,7 @@ class _FieldReportScreenState extends ConsumerState<FieldReportScreen> {
     if (!mounted) return;
     if (here == null) {
       messenger.showSnackBar(
-        const SnackBar(content: Text('Your location isn’t available.')),
+        SnackBar(content: Text(context.l10n.yourLocationIsnTAvailable)),
       );
       return;
     }
@@ -62,7 +63,7 @@ class _FieldReportScreenState extends ConsumerState<FieldReportScreen> {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
     } on RadioRequestException {
       messenger.showSnackBar(
-        const SnackBar(content: Text('The radio could not send it.')),
+        SnackBar(content: Text('The radio could not send it.')),
       );
     } finally {
       if (mounted) setState(() => _sending = false);
@@ -93,7 +94,7 @@ class _FieldReportScreenState extends ConsumerState<FieldReportScreen> {
                   border: const OutlineInputBorder(),
                   suffixIcon: i == template.locationField
                       ? IconButton(
-                          tooltip: 'Use my location',
+                          tooltip: context.l10n.useMyLocation,
                           icon: const Icon(Icons.my_location),
                           onPressed: _useLocation,
                         )
@@ -103,7 +104,7 @@ class _FieldReportScreenState extends ConsumerState<FieldReportScreen> {
             ),
           if (messages == null)
             Text(
-              'One field is too long for a message. Shorten it to send.',
+              context.l10n.oneFieldIsTooLongFor,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.error,
               ),
@@ -125,7 +126,7 @@ class _FieldReportScreenState extends ConsumerState<FieldReportScreen> {
           const SizedBox(height: 16),
           FilledButton.icon(
             icon: const Icon(Icons.send),
-            label: const Text('Send to main chat and trip contacts'),
+            label: Text(context.l10n.sendToMainChatAndTrip),
             onPressed: messages == null || messages.isEmpty || _sending
                 ? null
                 : () => _send(messages),

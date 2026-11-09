@@ -5,6 +5,7 @@ import '../app/blocking.dart';
 import '../app/connection.dart';
 import '../app/spam_filter.dart';
 import '../data/data.dart';
+import '../l10n/l10n.dart';
 
 /// Turns the channel repeat filter on or off.
 class SpamFilterTile extends ConsumerWidget {
@@ -13,7 +14,7 @@ class SpamFilterTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => SwitchListTile(
     secondary: const Icon(Icons.filter_alt_outlined),
-    title: const Text('Hide repeated channel posts'),
+    title: Text(context.l10n.hideRepeatedChannelPosts),
     subtitle: const Text(
       'After someone posts the same thing twice in 30 minutes, hides the '
       'rest. SOS posts and mentions of you always show.',
@@ -42,7 +43,7 @@ class BlockedScreen extends ConsumerWidget {
     final keys = blocked.keys.toList()..sort();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Blocked senders')),
+      appBar: AppBar(title: Text(context.l10n.blockedSenders)),
       body: blocked.isEmpty
           ? const Center(
               child: Padding(
@@ -64,18 +65,21 @@ class BlockedScreen extends ConsumerWidget {
                   ),
                 ),
                 if (names.isNotEmpty)
-                  const ListTile(title: Text('On channels, by name')),
+                  ListTile(title: Text(context.l10n.onChannelsByName)),
                 for (final name in names)
                   ListTile(
                     leading: const Icon(Icons.tag),
                     title: Text(name),
                     trailing: TextButton(
                       onPressed: () => blocking.unblockName(name),
-                      child: Text('Unblock', semanticsLabel: 'Unblock $name'),
+                      child: Text(
+                        context.l10n.unblock,
+                        semanticsLabel: 'Unblock $name',
+                      ),
                     ),
                   ),
                 if (keys.isNotEmpty)
-                  const ListTile(title: Text('Direct messages')),
+                  ListTile(title: Text(context.l10n.directMessages)),
                 for (final key in keys)
                   ListTile(
                     leading: const Icon(Icons.person_off_outlined),
@@ -83,7 +87,7 @@ class BlockedScreen extends ConsumerWidget {
                     trailing: TextButton(
                       onPressed: () => blocking.unblockKey(key),
                       child: Text(
-                        'Unblock',
+                        context.l10n.unblock,
                         semanticsLabel: 'Unblock ${nameOf(key)}',
                       ),
                     ),

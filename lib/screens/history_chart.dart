@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../app/telemetry.dart' show TelemetryPoint;
+import '../l10n/l10n.dart';
 
 /// How far back the charts reach.
 enum TelemetryRange {
@@ -62,7 +63,7 @@ class HistoryChartCard extends StatelessWidget {
             const SizedBox(height: 8),
             if (points.length < 2)
               Text(
-                'The chart appears after a second reading.',
+                context.l10n.theChartAppearsAfterASecond,
                 style: theme.textTheme.bodySmall,
               )
             else

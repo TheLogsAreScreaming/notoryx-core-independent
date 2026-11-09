@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/l10n.dart';
+
 typedef _Topic = ({IconData icon, String title, List<String> points});
 
 const List<_Topic> _topics = [
@@ -86,7 +88,7 @@ class FieldGuideScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Field guide')),
+    appBar: AppBar(title: Text(context.l10n.fieldGuide)),
     body: ListView(
       children: [
         for (final topic in _topics)
