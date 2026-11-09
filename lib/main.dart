@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app/appearance.dart';
 import 'app/bots.dart';
 import 'app/channel_cleanup.dart';
+import 'app/home_widget.dart';
 import 'app/keep_alive.dart';
 import 'app/packet_log.dart';
 import 'app/radio_stats.dart';
@@ -15,6 +16,7 @@ import 'app/notifications.dart';
 import 'screens/app_lock_screen.dart';
 import 'screens/conversation_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/safety_screen.dart';
 
 void main() {
   runApp(const ProviderScope(child: NotoryxApp()));
@@ -63,9 +65,18 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      listenForWidgetTaps(_openSafety);
       final launched = await ref.read(messageNotifierProvider).init(_openChat);
       if (launched != null) _openChat(launched);
     });
+  }
+
+  void _openSafety() {
+    if (!mounted) return;
+    _navigator.currentState?.popUntil((route) => route.isFirst);
+    _navigator.currentState?.push(
+      MaterialPageRoute<void>(builder: (_) => const SafetyScreen()),
+    );
   }
 
   void _openChat(ChatLink chat) {
@@ -98,6 +109,7 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
     ref.listen(checkInWatchdogProvider, (_, _) {});
     ref.listen(sosWatchdogProvider, (_, _) {});
     ref.listen(tripQuietWatchdogProvider, (_, _) {});
+    ref.listen(homeWidgetSyncProvider, (_, _) {});
     ref.listen(scheduledSenderProvider, (_, _) {});
     ref.listen(botRunnerProvider, (_, _) {});
     ref.listen(channelCleanerProvider, (_, _) {});
