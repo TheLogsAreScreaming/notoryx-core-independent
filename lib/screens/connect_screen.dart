@@ -9,6 +9,7 @@ import 'appearance_screen.dart';
 import 'backup_screen.dart';
 import 'connection_log_screen.dart';
 import 'field_guide_screen.dart';
+import '../l10n/l10n.dart';
 import 'about_screen.dart';
 
 /// Finds a radio over Bluetooth, USB or Wi-Fi and connects to it.
@@ -110,11 +111,11 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Connect a radio'),
+        title: Text(context.l10n.connectARadio),
         actions: [
           const ConnectionLogButton(),
           IconButton(
-            tooltip: 'About',
+            tooltip: context.l10n.about,
             icon: const Icon(Icons.info_outline),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(builder: (_) => const AboutScreen()),

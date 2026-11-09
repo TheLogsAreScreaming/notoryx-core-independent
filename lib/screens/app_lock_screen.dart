@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/app_lock.dart';
 import '../app/db_encryption_control.dart';
 import '../data/data.dart';
+import '../l10n/l10n.dart';
 import 'safety_screen.dart';
 
 /// Covers the app while it is locked, and asks to unlock at launch.
@@ -100,7 +101,7 @@ class _LockedScreenState extends ConsumerState<_LockedScreen> {
               const Icon(Icons.lock_outline, size: 56),
               const SizedBox(height: 16),
               Text(
-                'NOTORYX Core is locked',
+                context.l10n.appLocked,
                 style: Theme.of(context).textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
@@ -111,13 +112,13 @@ class _LockedScreenState extends ConsumerState<_LockedScreen> {
               const SizedBox(height: 24),
               FilledButton.icon(
                 icon: const Icon(Icons.fingerprint),
-                label: const Text('Unlock'),
+                label: Text(context.l10n.unlock),
                 onPressed: _unlock,
               ),
               const SizedBox(height: 12),
               OutlinedButton.icon(
                 icon: const Icon(Icons.health_and_safety_outlined),
-                label: const Text('SOS and check-ins'),
+                label: Text(context.l10n.sosAndCheckIns),
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(builder: (_) => const SafetyScreen()),
                 ),

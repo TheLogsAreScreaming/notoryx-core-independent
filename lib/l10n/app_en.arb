@@ -1,0 +1,17 @@
+{
+  "@@locale": "en",
+  "navChats": "Chats",
+  "navContacts": "Contacts",
+  "navMap": "Map",
+  "searchMessages": "Search messages",
+  "safetyTooltip": "Safety: SOS and check-ins",
+  "localMeshSettings": "Local mesh settings",
+  "radioSettings": "Radio settings",
+  "connectARadio": "Connect a radio",
+  "disconnect": "Disconnect",
+  "connect": "Connect",
+  "about": "About",
+  "appLocked": "NOTORYX Core is locked",
+  "unlock": "Unlock",
+  "sosAndCheckIns": "SOS and check-ins"
+}
