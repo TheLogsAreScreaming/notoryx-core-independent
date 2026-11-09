@@ -14,6 +14,27 @@ TelemetrySample _sample(int id, List<int> data) => TelemetrySample(
 );
 
 void main() {
+  test('the home line shows battery and sensors, not the chip', () {
+    // Battery on channel 1, chip temperature on 1, a real sensor on 2.
+    final text = ownStatusText(
+      _sample(1, [1, 116, 0x01, 0x9A, 1, 103, 0x01, 0x90, 2, 103, 0x00, 0xC8]),
+    );
+    expect(text, 'Battery 4.10 V · Temperature (sensor 2) 20.0°C');
+  });
+
+  test('a reading with nothing to show gives no home line', () {
+    expect(ownStatusText(_sample(1, [])), isNull);
+  });
+
+  test('reading ages read naturally', () {
+    final now = DateTime(2026, 11, 8, 12);
+    String ago(Duration d) => readingAge(now.subtract(d), now);
+    expect(ago(const Duration(seconds: 20)), 'just now');
+    expect(ago(const Duration(minutes: 5)), '5 min ago');
+    expect(ago(const Duration(hours: 3)), '3 h ago');
+    expect(ago(const Duration(days: 2)), '2 d ago');
+  });
+
   test('replies split into one series per sensor value', () {
     final series = telemetrySeries([
       _sample(1, [1, 116, 0x01, 0x9A, 2, 103, 0x00, 0xC8]),

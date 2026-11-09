@@ -3,7 +3,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/blocking.dart';
 import '../app/connection.dart';
+import '../app/spam_filter.dart';
 import '../data/data.dart';
+
+/// Turns the channel repeat filter on or off.
+class SpamFilterTile extends ConsumerWidget {
+  const SpamFilterTile({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => SwitchListTile(
+    secondary: const Icon(Icons.filter_alt_outlined),
+    title: const Text('Hide repeated channel posts'),
+    subtitle: const Text(
+      'After someone posts the same thing twice in 30 minutes, hides the '
+      'rest. SOS posts and mentions of you always show.',
+    ),
+    value: ref.watch(spamFilterProvider).value ?? false,
+    onChanged: (on) => setSpamFilter(ref.read(storeProvider), on: on),
+  );
+}
 
 /// Everyone blocked, with a way to unblock them.
 class BlockedScreen extends ConsumerWidget {

@@ -95,6 +95,18 @@ void main() {
     expect(await store.watchContacts(key).first, isEmpty);
   });
 
+  test('forgetting a last advert keeps everything else', () async {
+    final alice = PublicKey(List.filled(32, 1));
+    await sync.setFavourite(alice, true);
+    final before = (await store.contact(key, alice.hex))!;
+    await sync.forgetLastAdvert(alice);
+    final after = (await store.contact(key, alice.hex))!;
+    expect(after.lastAdvert, 0);
+    expect(after.name, before.name);
+    expect(after.flags, before.flags);
+    expect(after.outPathLength, before.outPathLength);
+  });
+
   test('adverts go out zero-hop or flooded', () async {
     await sync.sendAdvert();
     await sync.sendAdvert(flood: true);

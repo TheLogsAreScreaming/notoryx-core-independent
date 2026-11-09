@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/data.dart';
 import 'blocking.dart';
+import 'spam_filter.dart';
 import 'connection.dart';
 
 /// A chat to open, carried by a notification.
@@ -130,6 +131,13 @@ final messageAlertsProvider = Provider<void>((ref) {
     if (inFront() && open == message.thread) return;
     final blocked = await readBlockList(store);
     if (blocked.blocks(message)) return;
+    if (await store.setting(spamFilterSetting) == '1' &&
+        spamRepeats(
+          await store.threadSnapshot(key, message.thread),
+          myName: state.radio.self.name,
+        ).contains(message.id)) {
+      return;
+    }
     // A mention gets through even in a muted chat.
     final mentioned = mentions(message.body, state.radio.self.name);
     if (!mentioned && await store.isMuted(key, message.thread)) return;

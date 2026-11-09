@@ -6,6 +6,14 @@ import 'package:notoryx_core/data/data.dart';
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
 
+  test('the log splits into Bluetooth and app entries', () {
+    const ble = '2026-11-08T09:30:00  BLE MTU 185';
+    const app = '2026-11-08T09:30:01  connect tapped: Hilltop';
+    expect(entriesFor([ble, app], LogView.all), [ble, app]);
+    expect(entriesFor([ble, app], LogView.bluetooth), [ble]);
+    expect(entriesFor([ble, app], LogView.app), [app]);
+  });
+
   test('entries are timestamped, kept across restarts and capped', () async {
     final db = MeshDatabase.inMemory();
     final store = MeshStore(db);
