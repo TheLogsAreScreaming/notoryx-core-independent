@@ -173,8 +173,7 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
           const SizedBox(height: 16),
           Text(context.l10n.tripContacts, style: theme.textTheme.titleSmall),
           Text(
-            'Up to $maxTripContacts people who also get every check-in and '
-            'SOS, each as a direct message, so you can see who it reached.',
+            context.l10n.upToPeopleWhoAlsoGet(maxTripContacts),
             style: theme.textTheme.bodySmall,
           ),
           const SizedBox(height: 4),
@@ -277,7 +276,7 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Text(
-                'Last check-in: ${_time(last)}',
+                context.l10n.lastCheckIn(_time(last)),
                 style: theme.textTheme.bodySmall,
               ),
             ),
@@ -287,9 +286,7 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
               initialValue: safety.quietLimit,
               decoration: InputDecoration(
                 labelText: context.l10n.warnMeIfATripContact,
-                helperText:
-                    'Nothing from them (a check-in or any message) for '
-                    'this long.',
+                helperText: context.l10n.nothingFromThemACheckIn,
                 border: OutlineInputBorder(),
               ),
               items: [
@@ -340,9 +337,7 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
           Text(context.l10n.checkInTimer, style: theme.textTheme.titleMedium),
           const SizedBox(height: 4),
           Text(
-            'Going somewhere alone? Set how often you’ll check in. When one '
-            'is due the phone reminds you, and if you don’t answer, your '
-            'chat is told where you were last.',
+            context.l10n.goingSomewhereAloneSetHowOften,
             style: theme.textTheme.bodySmall,
           ),
           const SizedBox(height: 12),
@@ -372,7 +367,7 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: Text(
-                'Next check-in due ${_time(due)}',
+                context.l10n.nextCheckInDue(_time(due)),
                 style: theme.textTheme.titleSmall,
               ),
             ),
@@ -382,8 +377,9 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
               'Tell ${recipients.isEmpty ? 'the chat' : who} if I miss one',
             ),
             subtitle: Text(
-              '${ref.watch(checkInGraceProvider).inMinutes} minutes after '
-              'the reminder. Needs the radio connected.',
+              context.l10n.minutesAfterTheReminderNeedsThe(
+                ref.watch(checkInGraceProvider).inMinutes,
+              ),
             ),
             value: safety.alertOnMiss,
             onChanged: (v) =>
@@ -445,7 +441,7 @@ class _HoldToSendButtonState extends State<HoldToSendButton>
   void _hint() => ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(
-        'Keep holding for ${widget.hold.inSeconds} seconds to send.',
+        context.l10n.keepHoldingForSecondsToSend(widget.hold.inSeconds),
       ),
     ),
   );
@@ -577,20 +573,21 @@ class _SosActiveCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Since ${time(safety.sosSince!)}'),
+                  Text(context.l10n.since(time(safety.sosSince!))),
                   Text(
                     'Sent $sends time${sends == 1 ? '' : 's'}'
                     '${last == null ? '' : ', last at ${time(last)}'}',
                   ),
                   if (answered != null)
                     Text(
-                      'Answered by $answered. It no longer repeats.',
+                      context.l10n.answeredByItNoLongerRepeats(answered),
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     )
                   else if (last != null)
                     Text(
-                      'Next repeat ${time(last.add(repeat))}, unless '
-                      'someone answers.',
+                      context.l10n.nextRepeatUnlessSomeoneAnswers(
+                        time(last.add(repeat)),
+                      ),
                     ),
                 ],
               ),
@@ -599,7 +596,7 @@ class _SosActiveCard extends StatelessWidget {
             FilledButton.icon(
               onPressed: canSend ? onSafe : null,
               icon: const Icon(Icons.check_circle),
-              label: const Text("I'm safe"),
+              label: Text(context.l10n.iMSafe),
             ),
             const SizedBox(height: 8),
             Row(
@@ -745,7 +742,7 @@ class _CheckInReport extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Last check-in: ${record.kind.label}, ${time(record.at)}',
+              context.l10n.lastCheckIn2(record.kind.label, time(record.at)),
               style: theme.textTheme.titleSmall,
             ),
             const SizedBox(height: 4),
@@ -756,7 +753,7 @@ class _CheckInReport extends ConsumerWidget {
                 child: TextButton.icon(
                   onPressed: canResend ? () => onResend(missed) : null,
                   icon: const Icon(Icons.refresh),
-                  label: Text('Send again to ${missed.length} missed'),
+                  label: Text(context.l10n.sendAgainToMissed(missed.length)),
                 ),
               ),
           ],

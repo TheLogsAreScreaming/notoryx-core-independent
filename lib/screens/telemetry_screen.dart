@@ -80,7 +80,7 @@ class _TelemetryScreenState extends ConsumerState<TelemetryScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(context.l10n.clearHistory2),
-        content: Text('All saved readings from ${widget.name} are deleted.'),
+        content: Text(context.l10n.allSavedReadingsFromAreDeleted(widget.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),

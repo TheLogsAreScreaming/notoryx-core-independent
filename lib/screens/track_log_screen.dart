@@ -67,10 +67,7 @@ class TrackLogScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Uses your phone’s GPS and sends nothing over the mesh. '
-                  'Recording stops if the app is closed.',
-                ),
+                Text(context.l10n.usesYourPhoneSGPSAnd),
               ],
             ),
           ),
@@ -170,7 +167,7 @@ class TrackDetailScreen extends ConsumerWidget {
         children: [
           ListTile(
             title: Text(_distanceText(trackLengthMetres(points))),
-            subtitle: Text('${points.length} points'),
+            subtitle: Text(context.l10n.points(points.length)),
           ),
           Expanded(
             child: line.isEmpty

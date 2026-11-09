@@ -46,17 +46,14 @@ class AboutScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'An independent MeshCore companion app, part of the NOTORYX '
-            'family. Written from scratch and free software under the MIT '
-            'licence.',
+            context.l10n.anIndependentMeshCoreCompanionAppPart,
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 24),
           Text(context.l10n.reportAProblem, style: theme.textTheme.titleMedium),
           const SizedBox(height: 4),
           Text(
-            'Open an issue on the releases page below and paste these '
-            'details, so we know which build, device and radio it was.',
+            context.l10n.openAnIssueOnTheReleases,
             style: theme.textTheme.bodySmall,
           ),
           const SizedBox(height: 8),
@@ -144,7 +141,7 @@ class _Link extends StatelessWidget {
     title: Text(label),
     subtitle: SelectableText(url),
     trailing: IconButton(
-      tooltip: 'Copy link: $label',
+      tooltip: context.l10n.copyLink2(label),
       icon: const Icon(Icons.copy),
       onPressed: onCopy,
     ),

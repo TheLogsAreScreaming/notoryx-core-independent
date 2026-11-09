@@ -53,9 +53,7 @@ class _CommunityPresetsScreenState
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              'From MeshCore’s community list. Make sure a preset is legal '
-              'where you are. Your country is taken from this phone’s '
-              'language settings.',
+              context.l10n.fromMeshCoreSCommunityListMake,
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),

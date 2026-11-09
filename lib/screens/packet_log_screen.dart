@@ -22,7 +22,7 @@ class PacketLogScreen extends ConsumerWidget {
         : ref.watch(contactsProvider(radioKey)).value ?? const <Contact>[];
     return Scaffold(
       appBar: AppBar(
-        title: Text('Packets heard (${packets.length})'),
+        title: Text(context.l10n.packetsHeard2(packets.length)),
         actions: [
           IconButton(
             tooltip: log.paused ? 'Resume' : 'Pause',
@@ -37,12 +37,11 @@ class PacketLogScreen extends ConsumerWidget {
         ],
       ),
       body: packets.isEmpty
-          ? const Center(
+          ? Center(
               child: Padding(
                 padding: EdgeInsets.all(24),
                 child: Text(
-                  'Nothing heard yet. Packets show here as the radio hears '
-                  'them, while the app is connected.',
+                  context.l10n.nothingHeardYetPacketsShowHere,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -82,7 +81,7 @@ class _PacketTile extends StatelessWidget {
       return ListTile(
         dense: true,
         leading: const Icon(Icons.help_outline),
-        title: Text('Unreadable packet (${packet.length} bytes)'),
+        title: Text(context.l10n.unreadablePacketBytes(packet.length)),
         subtitle: Text('$time:$seconds · $signal'),
       );
     }
@@ -103,8 +102,14 @@ class _PacketTile extends StatelessWidget {
       leading: Icon(_icon(h.payload)),
       title: Text(title),
       subtitle: Text(
-        '$time:$seconds · ${h.route.label}, $via\n'
-        '$signal · ${packet.length} bytes',
+        context.l10n.bytes(
+          time,
+          seconds,
+          h.route.label,
+          via,
+          signal,
+          packet.length,
+        ),
       ),
       isThreeLine: true,
     );

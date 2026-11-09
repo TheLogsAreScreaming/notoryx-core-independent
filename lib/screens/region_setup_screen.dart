@@ -146,10 +146,7 @@ class _RegionSetupScreenState extends State<RegionSetupScreen> {
             const SizedBox(height: 4),
             for (final c in commands) Text(c),
             const SizedBox(height: 8),
-            const Text(
-              'This only adds regions and allows floods in them. A repeater '
-              'holds a limited number, and it will say if it runs out.',
-            ),
+            Text(context.l10n.thisOnlyAddsRegionsAndAllows),
             const SizedBox(height: 16),
           ],
           FilledButton(

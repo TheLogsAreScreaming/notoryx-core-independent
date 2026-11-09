@@ -192,8 +192,10 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
               leading: const Icon(Icons.settings_input_antenna),
               title: Text(context.l10n.transmitPower),
               subtitle: Text(
-                '${self.txPowerDbm} dBm (most this radio allows: '
-                '${self.maxTxPowerDbm} dBm)',
+                context.l10n.dbmMostThisRadioAllowsDBm(
+                  self.txPowerDbm,
+                  self.maxTxPowerDbm,
+                ),
               ),
               onTap: () async {
                 final dbm = await showDialog<int>(
@@ -430,10 +432,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
                     context: context,
                     builder: (context) => AlertDialog(
                       title: Text(context.l10n.rebootTheRadio),
-                      content: const Text(
-                        'The radio restarts and the app reconnects to it '
-                        'automatically.',
-                      ),
+                      content: Text(context.l10n.theRadioRestartsAndTheApp),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(context, false),
@@ -688,7 +687,7 @@ class _PowerDialogState extends State<_PowerDialog> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          '${_value.round()} dBm',
+          context.l10n.dbm3(_value.round()),
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         Slider(
@@ -699,10 +698,7 @@ class _PowerDialogState extends State<_PowerDialog> {
           label: '${_value.round()} dBm',
           onChanged: (v) => setState(() => _value = v),
         ),
-        const Text(
-          'Higher power reaches further but uses more battery. Stay within '
-          'the limits for your country and licence.',
-        ),
+        Text(context.l10n.higherPowerReachesFurtherButUses),
       ],
     ),
     actions: [
@@ -773,10 +769,7 @@ class _LoraDialogState extends State<_LoraDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Every radio you talk to must use the same settings. A wrong value '
-            'cuts this radio off from the mesh until it’s changed back.',
-          ),
+          Text(context.l10n.everyRadioYouTalkToMust),
           const SizedBox(height: 12),
           TextField(
             controller: _frequency,

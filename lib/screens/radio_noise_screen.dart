@@ -95,9 +95,7 @@ class _RadioNoiseScreenState extends ConsumerState<RadioNoiseScreen> {
         padding: const EdgeInsets.all(16),
         children: [
           Text(
-            'How much background noise your radio hears. Lower is better: '
-            'a quiet channel lets weak, far-off signals through. Saved every '
-            '10 minutes while connected, at no airtime cost.',
+            context.l10n.howMuchBackgroundNoiseYourRadio,
             style: theme.textTheme.bodySmall,
           ),
           const SizedBox(height: 12),
@@ -117,15 +115,16 @@ class _RadioNoiseScreenState extends ConsumerState<RadioNoiseScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${latest.noiseFloor} dBm',
+                      context.l10n.dbm2(latest.noiseFloor),
                       style: theme.textTheme.headlineSmall,
                     ),
                     Text(noiseVerdict(latest.noiseFloor)),
                     const SizedBox(height: 8),
                     Text(
-                      'Airtime since the radio started: sending '
-                      '${formatAirtime(latest.txAirSeconds)}, receiving '
-                      '${formatAirtime(latest.rxAirSeconds)}.',
+                      context.l10n.airtimeSinceTheRadioStartedSending(
+                        formatAirtime(latest.txAirSeconds),
+                        formatAirtime(latest.rxAirSeconds),
+                      ),
                       style: theme.textTheme.bodySmall,
                     ),
                   ],

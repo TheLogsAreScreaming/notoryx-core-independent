@@ -15,10 +15,7 @@ class SpamFilterTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => SwitchListTile(
     secondary: const Icon(Icons.filter_alt_outlined),
     title: Text(context.l10n.hideRepeatedChannelPosts),
-    subtitle: const Text(
-      'After someone posts the same thing twice in 30 minutes, hides the '
-      'rest. SOS posts and mentions of you always show.',
-    ),
+    subtitle: Text(context.l10n.afterSomeonePostsTheSameThing),
     value: ref.watch(spamFilterProvider).value ?? false,
     onChanged: (on) => setSpamFilter(ref.read(storeProvider), on: on),
   );
@@ -45,24 +42,20 @@ class BlockedScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.blockedSenders)),
       body: blocked.isEmpty
-          ? const Center(
+          ? Center(
               child: Padding(
                 padding: EdgeInsets.all(24),
                 child: Text(
-                  'Nobody is blocked. To block someone, hold one of their '
-                  'messages.',
+                  context.l10n.nobodyIsBlockedToBlockSomeone,
                   textAlign: TextAlign.center,
                 ),
               ),
             )
           : ListView(
               children: [
-                const Padding(
+                Padding(
                   padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
-                  child: Text(
-                    'Their messages are kept but hidden, and don’t notify. '
-                    'Unblocking brings them back.',
-                  ),
+                  child: Text(context.l10n.theirMessagesAreKeptButHidden),
                 ),
                 if (names.isNotEmpty)
                   ListTile(title: Text(context.l10n.onChannelsByName)),

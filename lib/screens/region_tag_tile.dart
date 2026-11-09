@@ -95,11 +95,7 @@ class _RegionDialogState extends State<_RegionDialog> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            'Only repeaters that allow this region pass your post on. If '
-            'yours don\'t, your posts won\'t get past your own radio\'s '
-            'range. SOS and check-ins never use a region.',
-          ),
+          Text(context.l10n.onlyRepeatersThatAllowThisRegion),
           TextField(
             controller: _send,
             decoration: InputDecoration(

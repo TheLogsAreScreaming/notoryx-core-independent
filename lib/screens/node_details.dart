@@ -127,7 +127,7 @@ Future<void> showNodeDetails(
                 '${node.isContact ? '' : ' · heard nearby, not added'}',
               ),
               trailing: node.favourite
-                  ? const Icon(Icons.star, semanticLabel: 'Favourite')
+                  ? Icon(Icons.star, semanticLabel: context.l10n.favourite2)
                   : null,
             ),
             _Row('Last advert', timeAgo(node.lastAdvert, DateTime.now())),

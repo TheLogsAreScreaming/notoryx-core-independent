@@ -46,13 +46,10 @@ class BotsScreen extends ConsumerWidget {
             value: settings.enabled,
             onChanged: notifier.setEnabled,
           ),
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
-              'Every reply uses airtime other people share. Replies are '
-              'limited to $botHourlyLimit an hour, wait between repeats, and '
-              'never go to blocked senders, old messages, or SOS and '
-              'check-in messages.',
+              context.l10n.everyReplyUsesAirtimeOtherPeople(botHourlyLimit),
             ),
           ),
           if (settings.rules.isEmpty)

@@ -406,7 +406,7 @@ class _ThreadTile extends StatelessWidget {
             Icon(
               Icons.notifications_off_outlined,
               size: 18,
-              semanticLabel: 'Muted',
+              semanticLabel: context.l10n.muted,
               color: scheme.onSurfaceVariant,
             ),
           if (unread > 0) ...[
@@ -464,9 +464,9 @@ class _ContactsTab extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (contact.flags & 1 == 1)
-                  const Icon(Icons.star, semanticLabel: 'Favourite'),
+                  Icon(Icons.star, semanticLabel: context.l10n.favourite),
                 IconButton(
-                  tooltip: 'Details for ${contact.name}',
+                  tooltip: context.l10n.detailsFor(contact.name),
                   icon: const Icon(Icons.info_outline),
                   onPressed: () =>
                       showNodeDetails(context, ref, nodeFromContact(contact)),

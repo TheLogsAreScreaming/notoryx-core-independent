@@ -160,8 +160,11 @@ class RepeaterAdminTools extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 2),
               child: Text(
-                '${nameFor(n.prefix)} · ${n.snr.toStringAsFixed(1)} dB · '
-                '${_ago(n.secondsAgo)}',
+                context.l10n.db(
+                  nameFor(n.prefix),
+                  n.snr.toStringAsFixed(1),
+                  _ago(n.secondsAgo),
+                ),
               ),
             ),
         ],

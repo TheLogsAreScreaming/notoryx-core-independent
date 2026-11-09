@@ -82,7 +82,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       body: _searched.isEmpty
           ? Center(child: Text(context.l10n.typeToSearchYourChats))
           : _results.isEmpty
-          ? Center(child: Text('Nothing found for “$_searched”.'))
+          ? Center(child: Text(context.l10n.nothingFoundFor(_searched)))
           : ListView.builder(
               itemCount: _results.length,
               itemBuilder: (context, i) {

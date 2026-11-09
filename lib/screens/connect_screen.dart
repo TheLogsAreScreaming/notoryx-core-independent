@@ -131,7 +131,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
             _Banner(message: error, color: theme.colorScheme.errorContainer),
           if (state case Connecting(:final target))
             _Banner(
-              message: 'Connecting to ${target.label}…',
+              message: context.l10n.connectingTo(target.label),
               color: theme.colorScheme.secondaryContainer,
               busy: true,
             ),
@@ -140,7 +140,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
           ))
             ListTile(
               leading: const Icon(Icons.forum_outlined),
-              title: Text('Open saved chats: ${radio.name}'),
+              title: Text(context.l10n.openSavedChats(radio.name)),
               subtitle: Text(context.l10n.readChatsContactsAndTheMap),
               enabled: !connecting,
               onTap: () {
@@ -214,11 +214,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               ),
               subtitle: _scanning
                   ? null
-                  : const Text(
-                      'Check the radio is on and in Bluetooth mode, and not '
-                      'connected to another app or phone: a radio stops '
-                      'advertising while something is connected to it.',
-                    ),
+                  : Text(context.l10n.checkTheRadioIsOnAnd),
             ),
           for (final radio in _ble)
             ListTile(

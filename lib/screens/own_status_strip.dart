@@ -75,7 +75,7 @@ class _OwnStatusStripState extends ConsumerState<OwnStatusStrip> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
                 child: Text(
-                  '$text\nRead $age',
+                  context.l10n.read(text, age),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface,
                   ),

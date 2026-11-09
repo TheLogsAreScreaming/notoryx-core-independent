@@ -155,15 +155,18 @@ class QuickMessagesScreen extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      tooltip: 'Remove ${items[i]}',
+                      tooltip: context.l10n.remove2(items[i]),
                       icon: const Icon(Icons.delete_outline),
                       onPressed: () => quick.remove(i),
                     ),
                     ReorderableDragStartListener(
                       index: i,
-                      child: const Padding(
+                      child: Padding(
                         padding: EdgeInsets.all(8),
-                        child: Icon(Icons.drag_handle, semanticLabel: 'Move'),
+                        child: Icon(
+                          Icons.drag_handle,
+                          semanticLabel: context.l10n.move,
+                        ),
                       ),
                     ),
                   ],

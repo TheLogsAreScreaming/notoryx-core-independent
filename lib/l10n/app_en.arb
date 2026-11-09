@@ -278,5 +278,515 @@
   "delete": "Delete",
   "noPointsYet": "No points yet.",
   "saveAsGPX": "Save as GPX",
-  "deleteTrack": "Delete track"
+  "deleteTrack": "Delete track",
+  "anIndependentMeshCoreCompanionAppPart": "An independent MeshCore companion app, part of the NOTORYX family. Written from scratch and free software under the MIT licence.",
+  "openAnIssueOnTheReleases": "Open an issue on the releases page below and paste these details, so we know which build, device and radio it was.",
+  "copyLink2": "Copy link: {label}",
+  "@copyLink2": {
+    "placeholders": {
+      "label": {
+        "type": "Object"
+      }
+    }
+  },
+  "moveOrTurnTheAntennaSlowly": "Move or turn the antenna slowly. Faster clicks mean this repeater is louder. It must be one hop away.",
+  "bestSoFar": "Best so far: {value1}",
+  "@bestSoFar": {
+    "placeholders": {
+      "value1": {
+        "type": "Object"
+      }
+    }
+  },
+  "itsKeyIsGoneFromThis": "Its key is gone from this device. The file was kept, and a backup can bring your history back.",
+  "whileLockedTheRadioStaysConnected": "While locked, the radio stays connected, SOS repeats keep going, and SOS and check-ins can still be opened without unlocking. Message notifications hide who and what.",
+  "theKeyStaysInThisDevice": "The key stays in this device’s secure storage. If that is ever wiped, or the app’s data moves to another phone, this history can’t be read. Make a backup first: backups use your own password and still work.",
+  "yourRadioIsSetDifferentlySo": "{who} {summary}. Your radio is set differently, so you may not hear them.",
+  "@yourRadioIsSetDifferentlySo": {
+    "placeholders": {
+      "who": {
+        "type": "Object"
+      },
+      "summary": {
+        "type": "Object"
+      }
+    }
+  },
+  "useSettings": "Use {name} settings?",
+  "@useSettings": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "thisAreaAlsoUsesBytePaths": "This area also uses {bytes}-byte paths. This app does not change that setting yet.",
+  "@thisAreaAlsoUsesBytePaths": {
+    "placeholders": {
+      "bytes": {
+        "type": "Object"
+      }
+    }
+  },
+  "reviewSettings": "Review {name} settings",
+  "@reviewSettings": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "areasComeFromThePublicMeshCore": "Areas come from the public MeshCore map, where node owners report their settings, and from local groups. Only areas that differ from the usual settings for their part of the world are listed.",
+  "theBackupFromAppReplacesAll": "The backup from {value1} {value2} (app {appVersion}) replaces all chats, contacts, settings and history here. This can’t be undone.",
+  "@theBackupFromAppReplacesAll": {
+    "placeholders": {
+      "value1": {
+        "type": "Object"
+      },
+      "value2": {
+        "type": "Object"
+      },
+      "appVersion": {
+        "type": "Object"
+      }
+    }
+  },
+  "savesEverythingInThisAppChats": "Saves everything in this app (chats, contacts, channels and their keys, settings, history) to one file, encrypted with a password you choose. Keep the file somewhere safe: anyone with it and the password can read your chats and join your private channels.",
+  "batterySaverCanDropTheRadio": "Battery saver can drop the radio while the app is in the background. Let it run to stay connected and get alerts.",
+  "afterSomeonePostsTheSameThing": "After someone posts the same thing twice in 30 minutes, hides the rest. SOS posts and mentions of you always show.",
+  "nobodyIsBlockedToBlockSomeone": "Nobody is blocked. To block someone, hold one of their messages.",
+  "theirMessagesAreKeptButHidden": "Their messages are kept but hidden, and don’t notify. Unblocking brings them back.",
+  "everyReplyUsesAirtimeOtherPeople": "Every reply uses airtime other people share. Replies are limited to {botHourlyLimit} an hour, wait between repeats, and never go to blocked senders, old messages, or SOS and check-in messages.",
+  "@everyReplyUsesAirtimeOtherPeople": {
+    "placeholders": {
+      "botHourlyLimit": {
+        "type": "Object"
+      }
+    }
+  },
+  "unnamedChannelCode": "Unnamed channel (code {value1})",
+  "@unnamedChannelCode": {
+    "placeholders": {
+      "value1": {
+        "type": "Object"
+      }
+    }
+  },
+  "heardLastAPrivateChannelOr": "Heard {count}×, last {value1}. A private channel, or a #name not listed here: ask around, then type it above.",
+  "@heardLastAPrivateChannelOr": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      },
+      "value1": {
+        "type": "Object"
+      }
+    }
+  },
+  "fromMeshCoreSCommunityListMake": "From MeshCore’s community list. Make sure a preset is legal where you are. Your country is taken from this phone’s language settings.",
+  "connectingTo": "Connecting to {label}…",
+  "@connectingTo": {
+    "placeholders": {
+      "label": {
+        "type": "Object"
+      }
+    }
+  },
+  "openSavedChats": "Open saved chats: {name}",
+  "@openSavedChats": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "checkTheRadioIsOnAnd": "Check the radio is on and in Bluetooth mode, and not connected to another app or phone: a radio stops advertising while something is connected to it.",
+  "dbm": "{rssi} dBm",
+  "@dbm": {
+    "placeholders": {
+      "rssi": {
+        "type": "Object"
+      }
+    }
+  },
+  "theRadioForgetsThemChatsAlready": "The radio forgets them. Chats already here stay, and they come back when they advertise again.",
+  "react": "React {emoji}",
+  "@react": {
+    "placeholders": {
+      "emoji": {
+        "type": "Object"
+      }
+    }
+  },
+  "block": "Block {sender}",
+  "@block": {
+    "placeholders": {
+      "sender": {
+        "type": "Object"
+      }
+    }
+  },
+  "blocked": "Blocked {sender}.",
+  "@blocked": {
+    "placeholders": {
+      "sender": {
+        "type": "Object"
+      }
+    }
+  },
+  "sent": "Sent {value1} {value2}",
+  "@sent": {
+    "placeholders": {
+      "value1": {
+        "type": "Object"
+      },
+      "value2": {
+        "type": "Object"
+      }
+    }
+  },
+  "youBlockedTheirMessagesAreHidden": "You blocked {title}. Their messages are hidden.",
+  "@youBlockedTheirMessagesAreHidden": {
+    "placeholders": {
+      "title": {
+        "type": "Object"
+      }
+    }
+  },
+  "directMessagesOnlyArriveIfHas": "Direct messages only arrive if {title} has added you as a contact.",
+  "@directMessagesOnlyArriveIfHas": {
+    "placeholders": {
+      "title": {
+        "type": "Object"
+      }
+    }
+  },
+  "replyingTo": "Replying to {name}",
+  "@replyingTo": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "muted": "Muted",
+  "favourite": "Favourite",
+  "detailsFor": "Details for {name}",
+  "@detailsFor": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "addContactsOfFree": "Add contacts ({length} of {room} free)",
+  "@addContactsOfFree": {
+    "placeholders": {
+      "length": {
+        "type": "Object"
+      },
+      "room": {
+        "type": "Object"
+      }
+    }
+  },
+  "noPositionsYetNodesAppearHere": "No positions yet. Nodes appear here when their adverts share where they are.",
+  "favourite2": "Favourite",
+  "read": "{text}\nRead {age}",
+  "@read": {
+    "placeholders": {
+      "text": {
+        "type": "Object"
+      },
+      "age": {
+        "type": "Object"
+      }
+    }
+  },
+  "packetsHeard2": "Packets heard ({length})",
+  "@packetsHeard2": {
+    "placeholders": {
+      "length": {
+        "type": "Object"
+      }
+    }
+  },
+  "nothingHeardYetPacketsShowHere": "Nothing heard yet. Packets show here as the radio hears them, while the app is connected.",
+  "unreadablePacketBytes": "Unreadable packet ({length} bytes)",
+  "@unreadablePacketBytes": {
+    "placeholders": {
+      "length": {
+        "type": "Object"
+      }
+    }
+  },
+  "bytes": "{time}:{seconds} · {label}, {via}\n{signal} · {length} bytes",
+  "@bytes": {
+    "placeholders": {
+      "time": {
+        "type": "Object"
+      },
+      "seconds": {
+        "type": "Object"
+      },
+      "label": {
+        "type": "Object"
+      },
+      "via": {
+        "type": "Object"
+      },
+      "signal": {
+        "type": "Object"
+      },
+      "length": {
+        "type": "Object"
+      }
+    }
+  },
+  "remove2": "Remove {value1}",
+  "@remove2": {
+    "placeholders": {
+      "value1": {
+        "type": "Object"
+      }
+    }
+  },
+  "move": "Move",
+  "commandsRunOnYourRadioNot": "Commands run on your radio, not over the mesh. Try \"get name\". Wi-Fi setup works only on radios built with Wi-Fi.",
+  "howMuchBackgroundNoiseYourRadio": "How much background noise your radio hears. Lower is better: a quiet channel lets weak, far-off signals through. Saved every 10 minutes while connected, at no airtime cost.",
+  "dbm2": "{noiseFloor} dBm",
+  "@dbm2": {
+    "placeholders": {
+      "noiseFloor": {
+        "type": "Object"
+      }
+    }
+  },
+  "airtimeSinceTheRadioStartedSending": "Airtime since the radio started: sending {value1}, receiving {value2}.",
+  "@airtimeSinceTheRadioStartedSending": {
+    "placeholders": {
+      "value1": {
+        "type": "Object"
+      },
+      "value2": {
+        "type": "Object"
+      }
+    }
+  },
+  "dbmMostThisRadioAllowsDBm": "{txPowerDbm} dBm (most this radio allows: {maxTxPowerDbm} dBm)",
+  "@dbmMostThisRadioAllowsDBm": {
+    "placeholders": {
+      "txPowerDbm": {
+        "type": "Object"
+      },
+      "maxTxPowerDbm": {
+        "type": "Object"
+      }
+    }
+  },
+  "theRadioRestartsAndTheApp": "The radio restarts and the app reconnects to it automatically.",
+  "dbm3": "{value1} dBm",
+  "@dbm3": {
+    "placeholders": {
+      "value1": {
+        "type": "Object"
+      }
+    }
+  },
+  "higherPowerReachesFurtherButUses": "Higher power reaches further but uses more battery. Stay within the limits for your country and licence.",
+  "everyRadioYouTalkToMust": "Every radio you talk to must use the same settings. A wrong value cuts this radio off from the mesh until it’s changed back.",
+  "thisOnlyAddsRegionsAndAllows": "This only adds regions and allows floods in them. A repeater holds a limited number, and it will say if it runs out.",
+  "onlyRepeatersThatAllowThisRegion": "Only repeaters that allow this region pass your post on. If yours don't, your posts won't get past your own radio's range. SOS and check-ins never use a region.",
+  "aRepeaterSIDIsThe": "A repeater’s ID is the first byte of its key. Only repeaters this radio knows or has heard are counted, so a free ID may still be in use further away.",
+  "isFree": "{query} is free.",
+  "@isFree": {
+    "placeholders": {
+      "query": {
+        "type": "Object"
+      }
+    }
+  },
+  "repeatersShareThisID": "{value1} repeaters share this ID",
+  "@repeatersShareThisID": {
+    "placeholders": {
+      "value1": {
+        "type": "Object"
+      }
+    }
+  },
+  "free": "{length} free",
+  "@free": {
+    "placeholders": {
+      "length": {
+        "type": "Object"
+      }
+    }
+  },
+  "db": "{value1} · {value2} dB · {value3}",
+  "@db": {
+    "placeholders": {
+      "value1": {
+        "type": "Object"
+      },
+      "value2": {
+        "type": "Object"
+      },
+      "value3": {
+        "type": "Object"
+      }
+    }
+  },
+  "upToPeopleWhoAlsoGet": "Up to {maxTripContacts} people who also get every check-in and SOS, each as a direct message, so you can see who it reached.",
+  "@upToPeopleWhoAlsoGet": {
+    "placeholders": {
+      "maxTripContacts": {
+        "type": "Object"
+      }
+    }
+  },
+  "lastCheckIn": "Last check-in: {value1}",
+  "@lastCheckIn": {
+    "placeholders": {
+      "value1": {
+        "type": "Object"
+      }
+    }
+  },
+  "nothingFromThemACheckIn": "Nothing from them (a check-in or any message) for this long.",
+  "goingSomewhereAloneSetHowOften": "Going somewhere alone? Set how often you’ll check in. When one is due the phone reminds you, and if you don’t answer, your chat is told where you were last.",
+  "nextCheckInDue": "Next check-in due {value1}",
+  "@nextCheckInDue": {
+    "placeholders": {
+      "value1": {
+        "type": "Object"
+      }
+    }
+  },
+  "minutesAfterTheReminderNeedsThe": "{value1} minutes after the reminder. Needs the radio connected.",
+  "@minutesAfterTheReminderNeedsThe": {
+    "placeholders": {
+      "value1": {
+        "type": "Object"
+      }
+    }
+  },
+  "keepHoldingForSecondsToSend": "Keep holding for {inSeconds} seconds to send.",
+  "@keepHoldingForSecondsToSend": {
+    "placeholders": {
+      "inSeconds": {
+        "type": "Object"
+      }
+    }
+  },
+  "since": "Since {value1}",
+  "@since": {
+    "placeholders": {
+      "value1": {
+        "type": "Object"
+      }
+    }
+  },
+  "answeredByItNoLongerRepeats": "Answered by {answered}. It no longer repeats.",
+  "@answeredByItNoLongerRepeats": {
+    "placeholders": {
+      "answered": {
+        "type": "Object"
+      }
+    }
+  },
+  "nextRepeatUnlessSomeoneAnswers": "Next repeat {value1}, unless someone answers.",
+  "@nextRepeatUnlessSomeoneAnswers": {
+    "placeholders": {
+      "value1": {
+        "type": "Object"
+      }
+    }
+  },
+  "iMSafe": "I'm safe",
+  "lastCheckIn2": "Last check-in: {label}, {value1}",
+  "@lastCheckIn2": {
+    "placeholders": {
+      "label": {
+        "type": "Object"
+      },
+      "value1": {
+        "type": "Object"
+      }
+    }
+  },
+  "sendAgainToMissed": "Send again to {length} missed",
+  "@sendAgainToMissed": {
+    "placeholders": {
+      "length": {
+        "type": "Object"
+      }
+    }
+  },
+  "nothingFoundFor": "Nothing found for “{searched}”.",
+  "@nothingFoundFor": {
+    "placeholders": {
+      "searched": {
+        "type": "Object"
+      }
+    }
+  },
+  "noReplyCheckThePasswordServers": "No reply. Check the password (servers stay silent when it’s wrong) and that the server is in range.",
+  "loggedInAs": "Logged in as {label}",
+  "@loggedInAs": {
+    "placeholders": {
+      "label": {
+        "type": "Object"
+      }
+    }
+  },
+  "allSavedReadingsFromAreDeleted": "All saved readings from {name} are deleted.",
+  "@allSavedReadingsFromAreDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "traceTo": "Trace to {name}",
+  "@traceTo": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "signalToNoiseForEachHop": "Signal-to-noise for each hop, out and back. Above 0 dB is comfortable; below −10 dB is close to the limit.",
+  "db2": "{value1} dB",
+  "@db2": {
+    "placeholders": {
+      "value1": {
+        "type": "Object"
+      }
+    }
+  },
+  "usesYourPhoneSGPSAnd": "Uses your phone’s GPS and sends nothing over the mesh. Recording stops if the app is closed.",
+  "points": "{length} points",
+  "@points": {
+    "placeholders": {
+      "length": {
+        "type": "Object"
+      }
+    }
+  },
+  "commandLine2": "{name}: command line",
+  "@commandLine2": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "theseRunOnSRadioIt": "These run on {name}’s radio. It only answers if they’ve allowed you; otherwise they’ll see your command as a message, and nothing comes back here.",
+  "@theseRunOnSRadioIt": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  }
 }
