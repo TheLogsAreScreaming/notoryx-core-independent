@@ -235,6 +235,48 @@ void main() {
     await settle(tester);
   }
 
+  testWidgets('a trip brief goes out and shows in the Field Log', (
+    tester,
+  ) async {
+    await openSafety(tester);
+    await addAlice(tester);
+    await tester.scrollUntilVisible(
+      find.text('Trip brief'),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settle(tester);
+    await tester.tap(find.text('Trip brief'));
+    await settle(tester);
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Going to'),
+      'Black Rock',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Back by'),
+      'Sat 6 pm',
+    );
+    await tester.pump();
+    await tester.tap(find.text('Send to main chat and trip contacts'));
+    await settle(tester);
+    const text = 'Trip brief: Going to Black Rock. Back by Sat 6 pm.';
+    expect(await sent(tester), [text, text]);
+    await tester.pump(const Duration(seconds: 5)); // the snackbar goes
+    await tester.pageBack();
+    await settle(tester);
+
+    await tester.scrollUntilVisible(
+      find.text('Field Log'),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settle(tester);
+    await tester.tap(find.text('Field Log'));
+    await settle(tester);
+    expect(find.textContaining('Sent to Alice: $text'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
   testWidgets('check-ins go to trip contacts, with who it reached', (
     tester,
   ) async {
@@ -262,11 +304,13 @@ void main() {
     await tester.pump(const Duration(seconds: 5)); // the snackbar goes
     await settle(tester);
     await tester.scrollUntilVisible(find.text('Send again to 1 missed'), 200);
-    await tester.drag(find.byType(Scrollable).first, const Offset(0, -150));
+    await tester.ensureVisible(find.text('Send again to 1 missed'));
     await settle(tester);
     await tester.tap(find.text('Send again to 1 missed'));
     await settle(tester);
     expect(await sent(tester), hasLength(3));
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, 200));
+    await settle(tester);
     expect(
       find.bySemanticsLabel('Alice: Sent, not confirmed yet'),
       findsOneWidget,

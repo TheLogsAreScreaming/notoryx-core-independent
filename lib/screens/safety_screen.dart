@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'field_log_screen.dart';
+import 'trip_brief_screen.dart';
 import '../app/connection.dart';
 import '../app/safety.dart';
 import '../data/data.dart';
@@ -298,6 +300,30 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
             ),
           ],
           const Divider(height: 40),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.map_outlined),
+            title: const Text('Trip brief'),
+            subtitle: const Text('Tell your people where you’re going'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const TripBriefScreen()),
+            ),
+          ),
+          if (ref.watch(radioKeyProvider) case final radioKey?)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.article_outlined),
+              title: const Text('Field Log'),
+              subtitle: const Text('Everything sent and received'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => FieldLogScreen(radioKey: radioKey),
+                ),
+              ),
+            ),
+          const SizedBox(height: 16),
           Text('Check-in timer', style: theme.textTheme.titleMedium),
           const SizedBox(height: 4),
           Text(

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
 import 'connection.dart';
+import 'refresh_rate.dart';
 
 /// A node's stored telemetry, oldest first.
 final telemetryHistoryProvider =
@@ -121,14 +122,14 @@ String readingText(LppReading r) => switch (r.kind) {
 /// How often the connected radio's own readings are saved while connected.
 /// They come over the cable or Bluetooth, so they cost no airtime.
 final selfTelemetryIntervalProvider = Provider<Duration>(
-  (ref) => const Duration(minutes: 30),
+  (ref) => ref.watch(refreshRateProvider).sensors,
 );
 
 /// Saves the connected radio's own readings when it connects (unless a
 /// recent one is stored) and then every [selfTelemetryIntervalProvider],
 /// so its battery history builds up on its own.
 final selfTelemetrySamplerProvider = Provider<void>((ref) {
-  final interval = ref.read(selfTelemetryIntervalProvider);
+  final interval = ref.watch(selfTelemetryIntervalProvider);
   Timer? timer;
 
   Future<void> sample(MeshSync sync) async {

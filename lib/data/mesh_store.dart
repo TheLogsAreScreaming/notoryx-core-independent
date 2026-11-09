@@ -597,6 +597,27 @@ class MeshStore {
   }
 
   /// A conversation as it is now, oldest first.
+  /// Every chat message since [since], newest first, leaving out blocked
+  /// senders and command-line traffic. Capped at [limit].
+  Future<List<Message>> fieldLog(
+    String radioKey, {
+    DateTime? since,
+    int limit = 2000,
+  }) {
+    final from = since?.millisecondsSinceEpoch ?? 0;
+    return (_db.select(_db.messages)
+          ..where(
+            (m) =>
+                m.radioKey.equals(radioKey) &
+                m.storedAt.isBiggerOrEqualValue(from) &
+                m.textType.equals(TextType.cliData.value).not() &
+                CustomExpression<bool>(notBlockedSql('')),
+          )
+          ..orderBy([(m) => OrderingTerm.desc(m.storedAt)])
+          ..limit(limit))
+        .get();
+  }
+
   Future<List<Message>> threadSnapshot(
     String radioKey,
     String thread, {

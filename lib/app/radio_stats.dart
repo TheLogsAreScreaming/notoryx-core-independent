@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/data.dart';
 import 'connection.dart';
+import 'refresh_rate.dart';
 import 'telemetry.dart' show TelemetryPoint;
 
 /// A radio's stored receiver figures, oldest first.
@@ -15,14 +16,14 @@ final radioStatsHistoryProvider =
 /// How often the connected radio's noise floor is saved. It is read over
 /// the cable or Bluetooth, so it costs no airtime.
 final radioStatsIntervalProvider = Provider<Duration>(
-  (ref) => const Duration(minutes: 10),
+  (ref) => ref.watch(refreshRateProvider).noiseFloor,
 );
 
 /// Saves the connected radio's receiver figures when it connects (unless a
 /// recent sample is stored) and then every [radioStatsIntervalProvider].
 /// Stops for the connection when the firmware has no stats.
 final radioStatsSamplerProvider = Provider<void>((ref) {
-  final interval = ref.read(radioStatsIntervalProvider);
+  final interval = ref.watch(radioStatsIntervalProvider);
   Timer? timer;
 
   Future<void> sample(MeshSync sync) async {

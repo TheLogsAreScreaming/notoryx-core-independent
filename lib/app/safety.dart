@@ -450,6 +450,13 @@ class Safety extends AsyncNotifier<SafetyState> {
     state = AsyncData(_current.copyWith(lastRecord: next));
   }
 
+  /// Sends a trip brief to the main chat and trip contacts. Returns how
+  /// many it went to.
+  Future<int> sendTripBrief(String text) async {
+    final sends = await _send(text);
+    return sends.where((s) => s.messageId != null).length;
+  }
+
   /// Tells the chat a check-in was missed. The timer stops so it isn't
   /// sent again; checking in starts it again.
   Future<void> sendMissed() async {
