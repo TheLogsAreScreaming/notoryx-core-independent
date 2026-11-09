@@ -60,6 +60,7 @@ class _TripBriefScreenState extends ConsumerState<TripBriefScreen> {
 
   Future<void> _send() async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final brief = _brief;
     setState(() => _sending = true);
     try {
@@ -70,13 +71,13 @@ class _TripBriefScreenState extends ConsumerState<TripBriefScreen> {
           .read(safetyProvider.notifier)
           .sendTripBrief(brief.text);
       messenger.showSnackBar(
-        SnackBar(content: Text('Trip brief sent to $count.')),
+        SnackBar(content: Text(l10n.tripBriefSentTo(count))),
       );
     } on SafetyException catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
     } on RadioRequestException {
       messenger.showSnackBar(
-        SnackBar(content: Text('The radio could not send it.')),
+        SnackBar(content: Text(l10n.theRadioCouldNotSendIt)),
       );
     } finally {
       if (mounted) setState(() => _sending = false);

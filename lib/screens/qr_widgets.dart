@@ -57,8 +57,9 @@ Future<void> showLinkSheet(
             label: Text(context.l10n.copyLink),
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
+              final l10n = context.l10n;
               await Clipboard.setData(ClipboardData(text: link.url));
-              messenger.showSnackBar(SnackBar(content: Text('Link copied')));
+              messenger.showSnackBar(SnackBar(content: Text(l10n.linkCopied)));
             },
           ),
         ],

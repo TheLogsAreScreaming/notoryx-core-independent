@@ -125,17 +125,18 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
     final sync = _sync();
     if (text.isEmpty || sync == null) return;
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     setState(() => _sending = true);
     try {
       await sync.sendCommand(_key, text);
       _command.clear();
     } on ArgumentError {
       messenger.showSnackBar(
-        SnackBar(content: Text('That command is too long.')),
+        SnackBar(content: Text(l10n.thatCommandIsTooLong)),
       );
     } on RadioRequestException {
       messenger.showSnackBar(
-        SnackBar(content: Text('The radio could not send it.')),
+        SnackBar(content: Text(l10n.theRadioCouldNotSendIt)),
       );
     } finally {
       if (mounted) setState(() => _sending = false);

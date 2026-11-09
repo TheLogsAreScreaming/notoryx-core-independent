@@ -789,5 +789,137 @@
       }
     }
   },
+  "radioSetToSettings": "Radio set to {name} settings.",
+  "@radioSetToSettings": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "couldNotChangeTheRadio": "Could not change the radio: {e}",
+  "@couldNotChangeTheRadio": {
+    "placeholders": {
+      "e": {
+        "type": "Object"
+      }
+    }
+  },
+  "restoreFailed": "Restore failed: {e}",
+  "@restoreFailed": {
+    "placeholders": {
+      "e": {
+        "type": "Object"
+      }
+    }
+  },
+  "backupFailed": "Backup failed: {e}",
+  "@backupFailed": {
+    "placeholders": {
+      "e": {
+        "type": "Object"
+      }
+    }
+  },
+  "connectionLogCopied": "Connection log copied",
+  "routeResetTheNextMessageFloods": "Route reset. The next message floods.",
+  "theRadioCouldNotResetThe": "The radio could not reset the route.",
+  "blocked2": "Blocked {sender}.",
+  "@blocked2": {
+    "placeholders": {
+      "sender": {
+        "type": "Object"
+      }
+    }
+  },
+  "theRadioCouldNotSendIt": "The radio could not send it.",
+  "forwardedTo": "Forwarded to {value1}.",
+  "@forwardedTo": {
+    "placeholders": {
+      "value1": {
+        "type": "Object"
+      }
+    }
+  },
+  "theRadioCouldNotSendIt2": "The radio could not send it. Hold it to try again.",
+  "fieldLogCopied": "Field Log copied",
+  "sentTo": "{title} sent to {count}.",
+  "@sentTo": {
+    "placeholders": {
+      "title": {
+        "type": "Object"
+      },
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "added": "Added {name}",
+  "@added": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "theRadioCouldNotMakeThat": "The radio could not make that change.",
+  "added2": "Added {added}.",
+  "@added2": {
+    "placeholders": {
+      "added": {
+        "type": "Object"
+      }
+    }
+  },
+  "addedOfTheRadioRefusedThe": "Added {added} of {length}. The radio refused the next one.",
+  "@addedOfTheRadioRefusedThe": {
+    "placeholders": {
+      "added": {
+        "type": "Object"
+      },
+      "length": {
+        "type": "Object"
+      }
+    }
+  },
+  "leaveOneFirst": "{e} Leave one first.",
+  "@leaveOneFirst": {
+    "placeholders": {
+      "e": {
+        "type": "Object"
+      }
+    }
+  },
+  "theRadioDidnTAnswer": "The radio didn’t answer.",
+  "couldnTReadTheRadio": "Couldn’t read the radio.",
+  "copied": "Copied {coordinates}",
+  "@copied": {
+    "placeholders": {
+      "coordinates": {
+        "type": "Object"
+      }
+    }
+  },
+  "linkCopied": "Link copied",
+  "theRadioRefusedThatSetting": "The radio refused that setting.",
+  "theRadioDidNotAnswer": "The radio did not answer.",
+  "sentCheckTheConsoleForThe": "Sent. Check the console for the repeater’s replies.",
+  "thatCommandIsTooLong": "That command is too long.",
+  "exportFailed": "Export failed: {e}",
+  "@exportFailed": {
+    "placeholders": {
+      "e": {
+        "type": "Object"
+      }
+    }
+  },
+  "tripBriefSentTo": "Trip brief sent to {count}.",
+  "@tripBriefSentTo": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
   "readAloud": "Read aloud"
 }

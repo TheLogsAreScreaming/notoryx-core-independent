@@ -29,15 +29,16 @@ Future<bool> _run(
   String? done,
 }) async {
   final messenger = ScaffoldMessenger.of(context);
+  final l10n = context.l10n;
   try {
     await action();
     if (done != null) messenger.showSnackBar(SnackBar(content: Text(done)));
     return true;
   } on ChannelsFull catch (e) {
-    messenger.showSnackBar(SnackBar(content: Text('$e Leave one first.')));
+    messenger.showSnackBar(SnackBar(content: Text(l10n.leaveOneFirst(e))));
   } on RadioRequestException {
     messenger.showSnackBar(
-      SnackBar(content: Text('The radio could not make that change.')),
+      SnackBar(content: Text(l10n.theRadioCouldNotMakeThat)),
     );
   }
   return false;
@@ -540,6 +541,7 @@ Future<void> addSeveralDiscovered(
   int room,
 ) async {
   final messenger = ScaffoldMessenger.of(context);
+  final l10n = context.l10n;
   final picked = await showDialog<List<DiscoveredData>>(
     context: context,
     builder: (_) => _AddSeveralDialog(heard: heard, room: room),
@@ -560,13 +562,11 @@ Future<void> addSeveralDiscovered(
       );
       added++;
     }
-    messenger.showSnackBar(SnackBar(content: Text('Added $added.')));
+    messenger.showSnackBar(SnackBar(content: Text(l10n.added2(added))));
   } on RadioRequestException {
     messenger.showSnackBar(
       SnackBar(
-        content: Text(
-          'Added $added of ${picked.length}. The radio refused the next one.',
-        ),
+        content: Text(l10n.addedOfTheRadioRefusedThe(added, picked.length)),
       ),
     );
   }
@@ -635,20 +635,21 @@ Future<void> _addMakingRoom(
   Future<void> Function() add,
 ) async {
   final messenger = ScaffoldMessenger.of(context);
+  final l10n = context.l10n;
   try {
     await add();
-    messenger.showSnackBar(SnackBar(content: Text('Added $name')));
+    messenger.showSnackBar(SnackBar(content: Text(l10n.added(name))));
     return;
   } on RadioRejected catch (e) {
     if (e.code != RadioErrorCode.tableFull) {
       messenger.showSnackBar(
-        SnackBar(content: Text('The radio could not make that change.')),
+        SnackBar(content: Text(l10n.theRadioCouldNotMakeThat)),
       );
       return;
     }
   } on RadioRequestException {
     messenger.showSnackBar(
-      SnackBar(content: Text('The radio could not make that change.')),
+      SnackBar(content: Text(l10n.theRadioCouldNotMakeThat)),
     );
     return;
   }

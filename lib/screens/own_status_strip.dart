@@ -29,18 +29,17 @@ class _OwnStatusStripState extends ConsumerState<OwnStatusStrip> {
     final state = ref.read(connectionProvider);
     if (state is! Connected || _reading) return;
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     setState(() => _reading = true);
     try {
       final readings = await state.sync.requestTelemetry();
       if (readings == null) {
         messenger.showSnackBar(
-          SnackBar(content: Text('The radio didn’t answer.')),
+          SnackBar(content: Text(l10n.theRadioDidnTAnswer)),
         );
       }
     } on Object {
-      messenger.showSnackBar(
-        SnackBar(content: Text('Couldn’t read the radio.')),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(l10n.couldnTReadTheRadio)));
     } finally {
       if (mounted) setState(() => _reading = false);
     }

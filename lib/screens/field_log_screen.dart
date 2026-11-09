@@ -45,9 +45,10 @@ class _FieldLogScreenState extends ConsumerState<FieldLogScreen> {
 
   Future<void> _copy() async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final lines = await _lines;
     await Clipboard.setData(ClipboardData(text: lines.reversed.join('\n')));
-    messenger.showSnackBar(SnackBar(content: Text('Field Log copied')));
+    messenger.showSnackBar(SnackBar(content: Text(l10n.fieldLogCopied)));
   }
 
   @override

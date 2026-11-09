@@ -45,11 +45,12 @@ class _ConnectionLogScreenState extends ConsumerState<ConnectionLogScreen> {
             icon: const Icon(Icons.copy),
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
+              final l10n = context.l10n;
               await Clipboard.setData(
                 ClipboardData(text: entriesFor(log.entries, _view).join('\n')),
               );
               messenger.showSnackBar(
-                SnackBar(content: Text('Connection log copied')),
+                SnackBar(content: Text(l10n.connectionLogCopied)),
               );
             },
           ),

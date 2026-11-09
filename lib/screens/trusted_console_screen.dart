@@ -32,6 +32,7 @@ class _TrustedConsoleScreenState extends ConsumerState<TrustedConsoleScreen> {
     final state = ref.read(connectionProvider);
     if (text.isEmpty || state is! Connected || _sending) return;
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     setState(() => _sending = true);
     try {
       await state.sync.sendCommand(
@@ -42,11 +43,11 @@ class _TrustedConsoleScreenState extends ConsumerState<TrustedConsoleScreen> {
       _command.clear();
     } on ArgumentError {
       messenger.showSnackBar(
-        SnackBar(content: Text('That command is too long.')),
+        SnackBar(content: Text(l10n.thatCommandIsTooLong)),
       );
     } on RadioRequestException {
       messenger.showSnackBar(
-        SnackBar(content: Text('The radio could not send it.')),
+        SnackBar(content: Text(l10n.theRadioCouldNotSendIt)),
       );
     } finally {
       if (mounted) setState(() => _sending = false);

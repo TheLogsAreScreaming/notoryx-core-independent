@@ -24,6 +24,7 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
 
   Future<void> _run(Future<void> Function() action, String done) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     setState(() => _busy = true);
     try {
       await action();
@@ -32,7 +33,7 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
     } on RadioRequestException {
       messenger.showSnackBar(
-        SnackBar(content: Text('The radio could not send it.')),
+        SnackBar(content: Text(l10n.theRadioCouldNotSendIt)),
       );
     } finally {
       if (mounted) setState(() => _busy = false);

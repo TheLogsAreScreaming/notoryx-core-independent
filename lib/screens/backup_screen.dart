@@ -38,6 +38,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
 
   Future<void> _backUp() async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     setState(() => _working = 'Encrypting…');
     try {
       final saved = await ref
@@ -58,7 +59,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
         ),
       );
     } on Object catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('Backup failed: $e')));
+      messenger.showSnackBar(SnackBar(content: Text(l10n.backupFailed(e))));
     } finally {
       if (mounted) setState(() => _working = null);
     }
@@ -66,6 +67,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
 
   Future<void> _restore() async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final service = ref.read(backupServiceProvider);
     final file = await service.pick();
     if (file == null || !mounted) return;
@@ -115,7 +117,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
     } on BackupException catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
     } on Object catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('Restore failed: $e')));
+      messenger.showSnackBar(SnackBar(content: Text(l10n.restoreFailed(e))));
     } finally {
       if (mounted) setState(() => _working = null);
     }
