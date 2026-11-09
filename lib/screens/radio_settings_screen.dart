@@ -9,6 +9,7 @@ import 'area_screen.dart';
 import 'radio_noise_screen.dart';
 import 'bots_screen.dart';
 import 'app_lock_screen.dart';
+import 'repeater_ids_screen.dart';
 import 'region_tag_tile.dart';
 import 'telemetry_screen.dart';
 import 'about_screen.dart';
@@ -377,6 +378,17 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
                   builder: (_) => const RadioConsoleScreen(),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.pin_outlined),
+              title: const Text('Repeater IDs'),
+              subtitle: const Text('Who uses an ID, and which are free'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const RepeaterIdsScreen(),
                 ),
               ),
             ),

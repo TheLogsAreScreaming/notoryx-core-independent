@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'region_setup_screen.dart';
+
 import '../app/connection.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
@@ -326,6 +328,21 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
                               )
                               .value ??
                           const [],
+                    ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        icon: const Icon(Icons.map_outlined),
+                        label: const Text('Region setup'),
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => RegionSetupScreen(
+                              send: (c) async =>
+                                  await _sync()?.sendCommand(_key, c),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                     _Console(
                       radioKey: radioKey,
