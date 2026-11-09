@@ -7,6 +7,7 @@ import '../app/contact_room.dart';
 import '../app/mesh_links.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
+import 'trusted_console_screen.dart';
 import 'channel_directory_screen.dart';
 import 'qr_widgets.dart';
 
@@ -423,12 +424,20 @@ Future<void> showContactActions(
   required Contact contact,
 }) async {
   final favourite = contact.flags & 1 == 1;
+  final isPerson = contact.type == NodeType.chat.value;
+  final remoteAllowed = contact.flags & contactFlagRemoteCommands != 0;
   final choice = await _pick(context, [
     favourite
         ? (Icons.star, 'Remove from favourites', 'favourite')
         : (Icons.star_border, 'Add to favourites', 'favourite'),
     (Icons.share_outlined, 'Share contact link', 'share'),
     (Icons.update, 'Forget last advert time', 'forget'),
+    if (isPerson) ...[
+      (Icons.terminal, 'Use their command line', 'their_cli'),
+      remoteAllowed
+          ? (Icons.lock, 'Stop them using my command line', 'allow_cli')
+          : (Icons.lock_open, 'Let them use my command line', 'allow_cli'),
+    ],
     (Icons.person_remove_outlined, 'Remove contact', 'remove'),
   ]);
   if (choice == null || !context.mounted) return;
@@ -445,6 +454,34 @@ Future<void> showContactActions(
       final sync = _syncOrNotice(context, ref);
       if (sync == null) return;
       await _run(context, () => sync.setFavourite(key, !favourite));
+    case 'their_cli':
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => TrustedConsoleScreen(contact: contact),
+        ),
+      );
+    case 'allow_cli':
+      final sync = _syncOrNotice(context, ref);
+      if (sync == null) return;
+      if (!remoteAllowed) {
+        final sure = await _confirm(
+          context,
+          'Give ${contact.name} control of your radio?',
+          'They could run any command on it from anywhere on the mesh, '
+              'including changing its settings, restarting it or turning it '
+              'off. Only allow someone you completely trust. You can stop '
+              'this here at any time.',
+          'Allow',
+        );
+        if (!sure || !context.mounted) return;
+      }
+      await _run(
+        context,
+        () => sync.setRemoteCommandsAllowed(key, allowed: !remoteAllowed),
+        done: remoteAllowed
+            ? '${contact.name} can no longer use your command line'
+            : '${contact.name} can now use your command line',
+      );
     case 'forget':
       final sync = _syncOrNotice(context, ref);
       if (sync == null) return;
