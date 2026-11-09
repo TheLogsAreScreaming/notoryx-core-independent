@@ -562,6 +562,7 @@ class _ViewingSavedBanner extends ConsumerWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(switch (ref.watch(connectionProvider)) {
+              _ when databaseSetAside => 'Earlier chats couldn’t be opened. See Radio settings → App lock.',
               ViewingSaved(radioKey: '') =>
                 'No radio yet. Connect one to start chatting.',
               ViewingSaved(:final error?) => error,

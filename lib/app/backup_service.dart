@@ -10,6 +10,7 @@ import '../data/backup.dart';
 import '../data/backup_crypto.dart';
 import 'about.dart';
 import 'connection.dart';
+import 'db_encryption_control.dart';
 import 'quick_messages.dart';
 import 'safety.dart';
 
@@ -84,6 +85,7 @@ class BackupService {
       db,
       temp: temp,
       appVersion: app.version,
+      key: await _databaseKey(),
     );
     final iterations = _ref.read(backupIterationsProvider);
     // Key stretching takes a few seconds on a phone: keep it off the UI.
@@ -109,6 +111,16 @@ class BackupService {
 
   /// Replaces everything on this device with [backup]. Only while no radio
   /// is connected, so nothing writes to the database meanwhile.
+  /// The database's key. Null when it isn't encrypted, which includes
+  /// devices without secure storage.
+  Future<String?> _databaseKey() async {
+    try {
+      return await _ref.read(dbKeyStoreProvider).read();
+    } on Object {
+      return null;
+    }
+  }
+
   Future<RestoreSummary> restore(OpenedBackup backup) async {
     final state = _ref.read(connectionProvider);
     if (state is! Disconnected && state is! ViewingSaved) {

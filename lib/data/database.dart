@@ -5,11 +5,22 @@ import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import 'db_encryption.dart';
 import 'tables.dart';
 
 export 'tables.dart';
 
 part 'database.g.dart';
+
+/// Where the app's database lives.
+Future<File> meshDatabaseFile() async {
+  final dir = await getApplicationSupportDirectory();
+  return File(p.join(dir.path, 'notoryx.sqlite'));
+}
+
+/// Whether this launch found an encrypted database with no key and set it
+/// aside.
+bool databaseSetAside = false;
 
 /// The app's on-device database.
 @DriftDatabase(
@@ -31,14 +42,23 @@ class MeshDatabase extends _$MeshDatabase {
   MeshDatabase(super.executor);
 
   /// Opens the database in the app's support folder, on a background isolate.
-  factory MeshDatabase.open() => MeshDatabase(
-    LazyDatabase(() async {
-      final dir = await getApplicationSupportDirectory();
-      return NativeDatabase.createInBackground(
-        File(p.join(dir.path, 'notoryx.sqlite')),
+  factory MeshDatabase.open({DbKeyStore keys = const SecureDbKeyStore()}) =>
+      MeshDatabase(
+        LazyDatabase(() async {
+          final file = await meshDatabaseFile();
+          final key = await prepareDatabase(
+            file,
+            keys,
+            onUnreadable: (_) => databaseSetAside = true,
+          );
+          return NativeDatabase.createInBackground(
+            file,
+            setup: key == null
+                ? null
+                : (raw) => raw.execute("PRAGMA key = '$key'"),
+          );
+        }),
       );
-    }),
-  );
 
   /// An empty database in memory, for tests.
   factory MeshDatabase.inMemory() => MeshDatabase(NativeDatabase.memory());

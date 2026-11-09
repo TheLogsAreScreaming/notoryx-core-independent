@@ -54,6 +54,7 @@ dependencies:
   pointycastle: ^4.0.0
   quick_actions: ^1.1.1
   local_auth: ^3.0.2
+  flutter_secure_storage: ^11.2.0
 
 dev_dependencies:
   flutter_test:
@@ -119,3 +120,8 @@ dependency_overrides:
   # backend needs 0.8. Only the Linux builds use dbus, and this app doesn't
   # ship for Linux, so take the newer one.
   dbus: ^0.8.0
+
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlite3mc
