@@ -255,7 +255,11 @@ class MeshStore {
 
   /// Stores a message from the radio. Returns the new row, or null when the
   /// same message was already stored (radios can deliver one twice).
-  Future<Message?> saveIncoming(String radioKey, ReplyFrame frame) async {
+  Future<Message?> saveIncoming(
+    String radioKey,
+    ReplyFrame frame, {
+    String? region,
+  }) async {
     final MessagesCompanion row;
     switch (frame) {
       case ContactMessage():
@@ -289,6 +293,7 @@ class MeshStore {
           pathLength: frame.pathLength,
           snr: frame.snr,
           dedupeKey: 'c:${frame.channel}:${frame.timestamp}:${frame.text}',
+          region: region,
         );
       default:
         return null;
@@ -310,7 +315,9 @@ class MeshStore {
     String? senderName,
     int textType = 0,
     String? authorPrefix,
+    String? region,
   }) => MessagesCompanion.insert(
+    region: Value(region),
     radioKey: radioKey,
     kind: kind,
     thread: thread,
@@ -379,6 +386,12 @@ class MeshStore {
   /// The radio accepted the message. Direct messages carry the [ackCode]
   /// their delivery confirmation will match, and how many [attempts] have
   /// been sent so far.
+  /// Records the region outgoing message [id] was scoped to.
+  Future<void> setMessageRegion(int id, String region) =>
+      (_db.update(_db.messages)..where((m) => m.id.equals(id))).write(
+        MessagesCompanion(region: Value(region)),
+      );
+
   Future<void> markSent(
     int id, {
     int? ackCode,

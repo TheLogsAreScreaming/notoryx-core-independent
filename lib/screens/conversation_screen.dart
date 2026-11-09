@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../app/blocking.dart';
 import '../app/region_tag.dart';
+import '../radio/protocol/region_scope.dart';
 import '../app/spam_filter.dart';
 import '../app/appearance.dart';
 import '../app/connection.dart';
@@ -245,10 +246,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     try {
       final target = widget.thread.substring(2);
       if (widget.isChannel) {
-        final tag = await ref.read(storeProvider).setting(regionTagSetting);
+        final tag = await ref.read(storeProvider).setting(regionSendSetting);
         await state.sync.sendChannel(
           int.parse(target),
-          withRegionTag(text, tag),
+          text,
+          region: cleanRegionName(tag),
         );
       } else {
         await state.sync.sendDirect(PublicKey.fromHex(target), text);
@@ -779,6 +781,7 @@ class _Bubble extends StatelessWidget {
 
     final details = [
       time,
+      if (message.region case final region?) '📍 $region',
       if (!mine && message.kind == MessageKind.channel)
         ?_hops(message.pathLength),
       if (mine && retrying) 'try ${message.attempts}',

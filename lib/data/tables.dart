@@ -97,6 +97,9 @@ class Messages extends Table {
   /// Room posts: the first 4 bytes of the writer's key, in hex.
   TextColumn get authorPrefix => text().nullable()();
 
+  /// Channel posts: the region it was scoped to, when known.
+  TextColumn get region => text().nullable()();
+
   /// Incoming only: identifies a message so a repeat delivery is dropped.
   TextColumn get dedupeKey => text().nullable().unique()();
 }

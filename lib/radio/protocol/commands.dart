@@ -104,6 +104,22 @@ final class SendSelfAdvert extends RadioCommand {
   }
 }
 
+/// Marks the floods that follow with a region, or clears it when [key] is
+/// null.
+final class SetFloodScope extends RadioCommand {
+  const SetFloodScope(this.key);
+
+  final Uint8List? key;
+
+  @override
+  void _write(FrameWriter out) {
+    out
+      ..u8(CommandCode.setFloodScope)
+      ..u8(0);
+    if (key case final k?) out.bytes(k);
+  }
+}
+
 /// Renames this node. The radio keeps at most 31 bytes.
 final class SetAdvertName extends RadioCommand {
   const SetAdvertName(this.name);
