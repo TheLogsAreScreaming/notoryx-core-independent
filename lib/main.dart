@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/appearance.dart';
+import 'app/bots.dart';
 import 'app/channel_cleanup.dart';
 import 'app/keep_alive.dart';
 import 'app/packet_log.dart';
@@ -96,6 +97,7 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
     ref.listen(sosWatchdogProvider, (_, _) {});
     ref.listen(tripQuietWatchdogProvider, (_, _) {});
     ref.listen(scheduledSenderProvider, (_, _) {});
+    ref.listen(botRunnerProvider, (_, _) {});
     ref.listen(channelCleanerProvider, (_, _) {});
     // Connecting closes the connect screen, and disconnecting closes any
     // open conversation. While reconnecting the chats stay open.
