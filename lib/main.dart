@@ -95,8 +95,10 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
     // Disconnecting closes any open conversation so the connect screen is
     // what's showing. While reconnecting the chats stay open.
     ref.listen(connectionProvider, (previous, next) {
-      final hadChats = previous is Connected || previous is Reconnecting;
-      final hasChats = next is Connected || next is Reconnecting;
+      bool showsChats(RadioConnectionState? s) =>
+          s is Connected || s is Reconnecting || s is ViewingSaved;
+      final hadChats = showsChats(previous);
+      final hasChats = showsChats(next);
       if (hadChats && !hasChats) {
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
@@ -111,6 +113,10 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
         radioName: radio.self.name,
       ),
       Reconnecting(:final radioKey, :final radioName) => HomeScreen(
+        radioKey: radioKey,
+        radioName: radioName,
+      ),
+      ViewingSaved(:final radioKey, :final radioName) => HomeScreen(
         radioKey: radioKey,
         radioName: radioName,
       ),

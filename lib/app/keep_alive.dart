@@ -69,7 +69,7 @@ final keepAliveProvider = Provider<BackgroundKeeper>(
 String? keepAliveText(RadioConnectionState state) => switch (state) {
   Connected(:final radio) => 'Connected to ${radio.self.name}',
   Reconnecting(:final radioName) => 'Reconnecting to $radioName',
-  Connecting() || Disconnected() => null,
+  Connecting() || Disconnected() || ViewingSaved() => null,
 };
 
 /// Holds the app in the background while a radio is connected or being
