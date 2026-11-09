@@ -3,6 +3,10 @@ import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart';
+
+import '../app/region_tag.dart';
+import '../radio/protocol/region_scope.dart';
 import '../radio/radio.dart';
 import 'database.dart';
 import 'mesh_store.dart';
@@ -91,6 +95,9 @@ typedef ConnectedRadio = ({String key, SelfInfo self, DeviceInfo device});
 /// incoming messages, applies contact pushes and records delivery acks.
 /// Sending goes through here too, so every message is stored with its status.
 class MeshSync {
+  /// Regions of posts heard on air, by `slot:timestamp`.
+  final _heardRegions = <String, String>{};
+
   MeshSync(
     this._session,
     this._store, {
@@ -745,7 +752,16 @@ class MeshSync {
 
   /// Sends to a channel slot and stores it. Channel messages have no ack, so
   /// they end at sent.
-  Future<int> sendChannel(int slot, String text, {DateTime? now}) {
+  ///
+  /// With [region] the post is scoped to it, and only repeaters allowing
+  /// that region pass it on. If the radio can't scope, it still goes out,
+  /// unscoped.
+  Future<int> sendChannel(
+    int slot,
+    String text, {
+    DateTime? now,
+    String? region,
+  }) {
     final sentAt = _seconds(now);
     final command = SendChannelText(
       channel: slot,
@@ -753,7 +769,14 @@ class MeshSync {
       timestamp: sentAt,
     );
     return _send(Threads.channel(slot), text, sentAt, command, (id) async {
-      await _session.run(command);
+      final scoped = region != null && await _setScope(regionKey(region));
+      try {
+        await _session.run(command);
+      } finally {
+        // Direct messages and SOS must never pick up the region.
+        if (scoped) await _setScope(null);
+      }
+      if (scoped) await _store.setMessageRegion(id, region);
       await _store.markSent(id);
     });
   }
@@ -802,6 +825,39 @@ class MeshSync {
     return id;
   }
 
+  /// Whether the radio accepted scope [key].
+  Future<bool> _setScope(Uint8List? key) async {
+    try {
+      await _session.run(SetFloodScope(key));
+      return true;
+    } on Object {
+      return false;
+    }
+  }
+
+  /// Remembers which region a heard post was in, so the message can be
+  /// tagged when the radio hands it over.
+  Future<void> _noteRegion(String key, RxLog log) async {
+    final regions = regionNames(
+      '${await _store.setting(regionSendSetting) ?? ''},'
+      '${await _store.setting(regionKnownSetting) ?? ''}',
+    );
+    if (regions.isEmpty) return;
+    final post = scopedPost(log.packet, regions);
+    if (post == null) return;
+    for (final channel in await _store.watchChannels(key).first) {
+      if (sha256.convert(channel.secret).bytes.first != post.channelHash) {
+        continue;
+      }
+      final time = channelPostTime(post.payload, channel.secret);
+      if (time == null) continue;
+      _heardRegions['${channel.slot}:$time'] = post.region;
+      if (_heardRegions.length > 64) {
+        _heardRegions.remove(_heardRegions.keys.first);
+      }
+    }
+  }
+
   void _handle(Object event) {
     final key = _radio?.key;
     if (key == null) {
@@ -816,8 +872,16 @@ class MeshSync {
   Future<void> _apply(String key, Object event) async {
     switch (event) {
       case ContactMessage() || ChannelMessage():
-        final stored = await _store.saveIncoming(key, event as ReplyFrame);
+        final stored = await _store.saveIncoming(
+          key,
+          event as ReplyFrame,
+          region: event is ChannelMessage
+              ? _heardRegions.remove('${event.channel}:${event.timestamp}')
+              : null,
+        );
         if (stored != null && !_incoming.isClosed) _incoming.add(stored);
+      case final RxLog log:
+        await _noteRegion(key, log);
       case NewAdvert(:final contact):
         // The radio only sends this for nodes it did NOT add, so it belongs
         // in "heard nearby", not in the contact list.

@@ -1513,6 +1513,15 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _regionMeta = const VerificationMeta('region');
+  @override
+  late final GeneratedColumn<String> region = GeneratedColumn<String>(
+    'region',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _dedupeKeyMeta = const VerificationMeta(
     'dedupeKey',
   );
@@ -1544,6 +1553,7 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
     snr,
     textType,
     authorPrefix,
+    region,
     dedupeKey,
   ];
   @override
@@ -1660,6 +1670,12 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
         ),
       );
     }
+    if (data.containsKey('region')) {
+      context.handle(
+        _regionMeta,
+        region.isAcceptableOrUnknown(data['region']!, _regionMeta),
+      );
+    }
     if (data.containsKey('dedupe_key')) {
       context.handle(
         _dedupeKeyMeta,
@@ -1747,6 +1763,10 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
         DriftSqlType.string,
         data['${effectivePrefix}author_prefix'],
       ),
+      region: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}region'],
+      ),
       dedupeKey: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}dedupe_key'],
@@ -1802,6 +1822,9 @@ class Message extends DataClass implements Insertable<Message> {
   /// Room posts: the first 4 bytes of the writer's key, in hex.
   final String? authorPrefix;
 
+  /// Channel posts: the region it was scoped to, when known.
+  final String? region;
+
   /// Incoming only: identifies a message so a repeat delivery is dropped.
   final String? dedupeKey;
   const Message({
@@ -1822,6 +1845,7 @@ class Message extends DataClass implements Insertable<Message> {
     this.snr,
     required this.textType,
     this.authorPrefix,
+    this.region,
     this.dedupeKey,
   });
   @override
@@ -1862,6 +1886,9 @@ class Message extends DataClass implements Insertable<Message> {
     if (!nullToAbsent || authorPrefix != null) {
       map['author_prefix'] = Variable<String>(authorPrefix);
     }
+    if (!nullToAbsent || region != null) {
+      map['region'] = Variable<String>(region);
+    }
     if (!nullToAbsent || dedupeKey != null) {
       map['dedupe_key'] = Variable<String>(dedupeKey);
     }
@@ -1897,6 +1924,9 @@ class Message extends DataClass implements Insertable<Message> {
       authorPrefix: authorPrefix == null && nullToAbsent
           ? const Value.absent()
           : Value(authorPrefix),
+      region: region == null && nullToAbsent
+          ? const Value.absent()
+          : Value(region),
       dedupeKey: dedupeKey == null && nullToAbsent
           ? const Value.absent()
           : Value(dedupeKey),
@@ -1930,6 +1960,7 @@ class Message extends DataClass implements Insertable<Message> {
       snr: serializer.fromJson<double?>(json['snr']),
       textType: serializer.fromJson<int>(json['textType']),
       authorPrefix: serializer.fromJson<String?>(json['authorPrefix']),
+      region: serializer.fromJson<String?>(json['region']),
       dedupeKey: serializer.fromJson<String?>(json['dedupeKey']),
     );
   }
@@ -1958,6 +1989,7 @@ class Message extends DataClass implements Insertable<Message> {
       'snr': serializer.toJson<double?>(snr),
       'textType': serializer.toJson<int>(textType),
       'authorPrefix': serializer.toJson<String?>(authorPrefix),
+      'region': serializer.toJson<String?>(region),
       'dedupeKey': serializer.toJson<String?>(dedupeKey),
     };
   }
@@ -1980,6 +2012,7 @@ class Message extends DataClass implements Insertable<Message> {
     Value<double?> snr = const Value.absent(),
     int? textType,
     Value<String?> authorPrefix = const Value.absent(),
+    Value<String?> region = const Value.absent(),
     Value<String?> dedupeKey = const Value.absent(),
   }) => Message(
     id: id ?? this.id,
@@ -1999,6 +2032,7 @@ class Message extends DataClass implements Insertable<Message> {
     snr: snr.present ? snr.value : this.snr,
     textType: textType ?? this.textType,
     authorPrefix: authorPrefix.present ? authorPrefix.value : this.authorPrefix,
+    region: region.present ? region.value : this.region,
     dedupeKey: dedupeKey.present ? dedupeKey.value : this.dedupeKey,
   );
   Message copyWithCompanion(MessagesCompanion data) {
@@ -2026,6 +2060,7 @@ class Message extends DataClass implements Insertable<Message> {
       authorPrefix: data.authorPrefix.present
           ? data.authorPrefix.value
           : this.authorPrefix,
+      region: data.region.present ? data.region.value : this.region,
       dedupeKey: data.dedupeKey.present ? data.dedupeKey.value : this.dedupeKey,
     );
   }
@@ -2050,6 +2085,7 @@ class Message extends DataClass implements Insertable<Message> {
           ..write('snr: $snr, ')
           ..write('textType: $textType, ')
           ..write('authorPrefix: $authorPrefix, ')
+          ..write('region: $region, ')
           ..write('dedupeKey: $dedupeKey')
           ..write(')'))
         .toString();
@@ -2074,6 +2110,7 @@ class Message extends DataClass implements Insertable<Message> {
     snr,
     textType,
     authorPrefix,
+    region,
     dedupeKey,
   );
   @override
@@ -2097,6 +2134,7 @@ class Message extends DataClass implements Insertable<Message> {
           other.snr == this.snr &&
           other.textType == this.textType &&
           other.authorPrefix == this.authorPrefix &&
+          other.region == this.region &&
           other.dedupeKey == this.dedupeKey);
 }
 
@@ -2118,6 +2156,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
   final Value<double?> snr;
   final Value<int> textType;
   final Value<String?> authorPrefix;
+  final Value<String?> region;
   final Value<String?> dedupeKey;
   const MessagesCompanion({
     this.id = const Value.absent(),
@@ -2137,6 +2176,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     this.snr = const Value.absent(),
     this.textType = const Value.absent(),
     this.authorPrefix = const Value.absent(),
+    this.region = const Value.absent(),
     this.dedupeKey = const Value.absent(),
   });
   MessagesCompanion.insert({
@@ -2157,6 +2197,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     this.snr = const Value.absent(),
     this.textType = const Value.absent(),
     this.authorPrefix = const Value.absent(),
+    this.region = const Value.absent(),
     this.dedupeKey = const Value.absent(),
   }) : radioKey = Value(radioKey),
        kind = Value(kind),
@@ -2184,6 +2225,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     Expression<double>? snr,
     Expression<int>? textType,
     Expression<String>? authorPrefix,
+    Expression<String>? region,
     Expression<String>? dedupeKey,
   }) {
     return RawValuesInsertable({
@@ -2204,6 +2246,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
       if (snr != null) 'snr': snr,
       if (textType != null) 'text_type': textType,
       if (authorPrefix != null) 'author_prefix': authorPrefix,
+      if (region != null) 'region': region,
       if (dedupeKey != null) 'dedupe_key': dedupeKey,
     });
   }
@@ -2226,6 +2269,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     Value<double?>? snr,
     Value<int>? textType,
     Value<String?>? authorPrefix,
+    Value<String?>? region,
     Value<String?>? dedupeKey,
   }) {
     return MessagesCompanion(
@@ -2246,6 +2290,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
       snr: snr ?? this.snr,
       textType: textType ?? this.textType,
       authorPrefix: authorPrefix ?? this.authorPrefix,
+      region: region ?? this.region,
       dedupeKey: dedupeKey ?? this.dedupeKey,
     );
   }
@@ -2308,6 +2353,9 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     if (authorPrefix.present) {
       map['author_prefix'] = Variable<String>(authorPrefix.value);
     }
+    if (region.present) {
+      map['region'] = Variable<String>(region.value);
+    }
     if (dedupeKey.present) {
       map['dedupe_key'] = Variable<String>(dedupeKey.value);
     }
@@ -2334,6 +2382,7 @@ class MessagesCompanion extends UpdateCompanion<Message> {
           ..write('snr: $snr, ')
           ..write('textType: $textType, ')
           ..write('authorPrefix: $authorPrefix, ')
+          ..write('region: $region, ')
           ..write('dedupeKey: $dedupeKey')
           ..write(')'))
         .toString();
@@ -6624,6 +6673,7 @@ typedef $$MessagesTableCreateCompanionBuilder = MessagesCompanion Function({
   Value<double?> snr,
   Value<int> textType,
   Value<String?> authorPrefix,
+  Value<String?> region,
   Value<String?> dedupeKey,
 });
 typedef $$MessagesTableUpdateCompanionBuilder = MessagesCompanion Function({
@@ -6644,6 +6694,7 @@ typedef $$MessagesTableUpdateCompanionBuilder = MessagesCompanion Function({
   Value<double?> snr,
   Value<int> textType,
   Value<String?> authorPrefix,
+  Value<String?> region,
   Value<String?> dedupeKey,
 });
 
@@ -6757,6 +6808,11 @@ class $$MessagesTableFilterComposer
 
   ColumnFilters<String> get authorPrefix => $composableBuilder(
     column: $table.authorPrefix,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get region => $composableBuilder(
+    column: $table.region,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6878,6 +6934,11 @@ class $$MessagesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get region => $composableBuilder(
+    column: $table.region,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get dedupeKey => $composableBuilder(
     column: $table.dedupeKey,
     builder: (column) => ColumnOrderings(column),
@@ -6970,6 +7031,9 @@ class $$MessagesTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get region =>
+      $composableBuilder(column: $table.region, builder: (column) => column);
+
   GeneratedColumn<String> get dedupeKey =>
       $composableBuilder(column: $table.dedupeKey, builder: (column) => column);
 
@@ -7042,6 +7106,7 @@ class $$MessagesTableTableManager
                 Value<double?> snr = const Value.absent(),
                 Value<int> textType = const Value.absent(),
                 Value<String?> authorPrefix = const Value.absent(),
+                Value<String?> region = const Value.absent(),
                 Value<String?> dedupeKey = const Value.absent(),
               }) => MessagesCompanion(
                 id: id,
@@ -7061,6 +7126,7 @@ class $$MessagesTableTableManager
                 snr: snr,
                 textType: textType,
                 authorPrefix: authorPrefix,
+                region: region,
                 dedupeKey: dedupeKey,
               ),
           createCompanionCallback:
@@ -7082,6 +7148,7 @@ class $$MessagesTableTableManager
                 Value<double?> snr = const Value.absent(),
                 Value<int> textType = const Value.absent(),
                 Value<String?> authorPrefix = const Value.absent(),
+                Value<String?> region = const Value.absent(),
                 Value<String?> dedupeKey = const Value.absent(),
               }) => MessagesCompanion.insert(
                 id: id,
@@ -7101,6 +7168,7 @@ class $$MessagesTableTableManager
                 snr: snr,
                 textType: textType,
                 authorPrefix: authorPrefix,
+                region: region,
                 dedupeKey: dedupeKey,
               ),
           withReferenceMapper: (p0) => p0

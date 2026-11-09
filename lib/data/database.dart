@@ -44,7 +44,7 @@ class MeshDatabase extends _$MeshDatabase {
   factory MeshDatabase.inMemory() => MeshDatabase(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -88,6 +88,8 @@ class MeshDatabase extends _$MeshDatabase {
         await m.createTable(trackPoints);
         await m.createIndex(trackPointsByTrack);
       }
+      // 10: the region a channel post was scoped to.
+      if (from < 10) await m.addColumn(messages, messages.region);
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
