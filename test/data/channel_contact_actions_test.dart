@@ -95,6 +95,20 @@ void main() {
     expect(await store.watchContacts(key).first, isEmpty);
   });
 
+  test('command line permission can be given and taken back', () async {
+    final alice = PublicKey(List.filled(32, 1));
+    await sync.setFavourite(alice, true);
+    await sync.setRemoteCommandsAllowed(alice, allowed: true);
+    var row = (await store.contact(key, alice.hex))!;
+    expect(row.flags & contactFlagRemoteCommands, contactFlagRemoteCommands);
+    expect(row.flags & 1, 1, reason: 'still a favourite');
+
+    await sync.setRemoteCommandsAllowed(alice, allowed: false);
+    row = (await store.contact(key, alice.hex))!;
+    expect(row.flags & contactFlagRemoteCommands, 0);
+    expect(row.flags & 1, 1);
+  });
+
   test('forgetting a last advert keeps everything else', () async {
     final alice = PublicKey(List.filled(32, 1));
     await sync.setFavourite(alice, true);

@@ -8,6 +8,7 @@ import '../app/radio_connector.dart';
 import 'appearance_screen.dart';
 import 'backup_screen.dart';
 import 'connection_log_screen.dart';
+import 'field_guide_screen.dart';
 import 'about_screen.dart';
 
 /// Finds a radio over Bluetooth, USB or Wi-Fi and connects to it.
@@ -147,6 +148,15 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
             child: Wrap(
               spacing: 8,
               children: [
+                ActionChip(
+                  avatar: const Icon(Icons.menu_book_outlined, size: 18),
+                  label: const Text('Field guide'),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const FieldGuideScreen(),
+                    ),
+                  ),
+                ),
                 ActionChip(
                   avatar: const Icon(Icons.palette_outlined, size: 18),
                   label: const Text('Appearance'),

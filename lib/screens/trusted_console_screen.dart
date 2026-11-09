@@ -1,0 +1,129 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../app/connection.dart';
+import '../data/data.dart';
+import '../radio/radio.dart';
+
+/// Runs commands on a trusted contact's radio, if they've allowed you.
+class TrustedConsoleScreen extends ConsumerStatefulWidget {
+  const TrustedConsoleScreen({required this.contact, super.key});
+
+  final Contact contact;
+
+  @override
+  ConsumerState<TrustedConsoleScreen> createState() =>
+      _TrustedConsoleScreenState();
+}
+
+class _TrustedConsoleScreenState extends ConsumerState<TrustedConsoleScreen> {
+  final _command = TextEditingController();
+  bool _sending = false;
+
+  @override
+  void dispose() {
+    _command.dispose();
+    super.dispose();
+  }
+
+  Future<void> _send() async {
+    final text = _command.text.trim();
+    final state = ref.read(connectionProvider);
+    if (text.isEmpty || state is! Connected || _sending) return;
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _sending = true);
+    try {
+      await state.sync.sendCommand(
+        PublicKey.fromHex(widget.contact.publicKey),
+        text,
+        type: TextType.cliCommand,
+      );
+      _command.clear();
+    } on ArgumentError {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('That command is too long.')),
+      );
+    } on RadioRequestException {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('The radio could not send it.')),
+      );
+    } finally {
+      if (mounted) setState(() => _sending = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final radioKey = ref.watch(radioKeyProvider);
+    final connected = ref.watch(connectionProvider) is Connected;
+    final lines = radioKey == null
+        ? const <Message>[]
+        : ref
+                  .watch(
+                    consoleProvider((
+                      radioKey: radioKey,
+                      thread: Threads.direct(widget.contact.publicKey),
+                    )),
+                  )
+                  .value ??
+              const <Message>[];
+    final theme = Theme.of(context);
+    return Scaffold(
+      appBar: AppBar(title: Text('${widget.contact.name}: command line')),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              'These run on ${widget.contact.name}’s radio. It only answers '
+              'if they’ve allowed you; otherwise they’ll see your command as '
+              'a message, and nothing comes back here.',
+              style: theme.textTheme.bodySmall,
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: lines.length,
+              itemBuilder: (_, i) => Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: SelectableText(
+                  '${lines[i].outgoing ? '> ' : ''}${lines[i].body}',
+                  style: const TextStyle(fontFamily: 'monospace'),
+                ),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _command,
+                      enabled: connected,
+                      autocorrect: false,
+                      onSubmitted: (_) => _send(),
+                      decoration: InputDecoration(
+                        labelText: connected
+                            ? 'Command'
+                            : 'Connect a radio to send commands',
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Send command',
+                    icon: const Icon(Icons.send),
+                    onPressed: connected && !_sending ? _send : null,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

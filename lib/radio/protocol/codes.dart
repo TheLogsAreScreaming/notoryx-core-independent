@@ -108,6 +108,9 @@ enum RadioErrorCode {
 }
 
 /// The kind of text in a direct message.
+/// Contact flag: this contact may run commands on the radio.
+const contactFlagRemoteCommands = 0x10;
+
 enum TextType {
   plain(0),
   cliData(1),

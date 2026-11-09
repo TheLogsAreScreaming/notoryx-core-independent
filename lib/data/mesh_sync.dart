@@ -499,7 +499,31 @@ class MeshSync {
     final key = _requireKey();
     final row = await _store.contact(key, publicKey.hex);
     if (row == null) return;
-    final flags = favourite ? row.flags | 1 : row.flags & ~1;
+    await _writeFlags(
+      row,
+      publicKey,
+      favourite ? row.flags | 1 : row.flags & ~1,
+    );
+  }
+
+  /// Lets [publicKey] run commands on this radio, or stops them.
+  Future<void> setRemoteCommandsAllowed(
+    PublicKey publicKey, {
+    required bool allowed,
+  }) async {
+    final key = _requireKey();
+    final row = await _store.contact(key, publicKey.hex);
+    if (row == null) return;
+    await _writeFlags(
+      row,
+      publicKey,
+      allowed
+          ? row.flags | contactFlagRemoteCommands
+          : row.flags & ~contactFlagRemoteCommands,
+    );
+  }
+
+  Future<void> _writeFlags(Contact row, PublicKey publicKey, int flags) async {
     await _session.run(
       AddOrUpdateContact(
         RadioContact(
@@ -681,6 +705,7 @@ class MeshSync {
     PublicKey server,
     String command, {
     DateTime? now,
+    TextType type = TextType.cliData,
   }) async {
     final key = _requireKey();
     _checkDirectText(command);
@@ -698,7 +723,7 @@ class MeshSync {
           recipient: server,
           text: command,
           timestamp: sentAt,
-          type: TextType.cliData,
+          type: type,
         ),
       );
       await _store.markSent(id, flooded: sent.flooded);
