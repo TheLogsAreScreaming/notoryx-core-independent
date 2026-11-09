@@ -345,6 +345,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
                 MaterialPageRoute<void>(builder: (_) => const BlockedScreen()),
               ),
             ),
+            const SpamFilterTile(),
             ListTile(
               leading: const Icon(Icons.info_outline),
               title: const Text('About this app'),

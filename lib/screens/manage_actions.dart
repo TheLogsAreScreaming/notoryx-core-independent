@@ -428,6 +428,7 @@ Future<void> showContactActions(
         ? (Icons.star, 'Remove from favourites', 'favourite')
         : (Icons.star_border, 'Add to favourites', 'favourite'),
     (Icons.share_outlined, 'Share contact link', 'share'),
+    (Icons.update, 'Forget last advert time', 'forget'),
     (Icons.person_remove_outlined, 'Remove contact', 'remove'),
   ]);
   if (choice == null || !context.mounted) return;
@@ -444,6 +445,14 @@ Future<void> showContactActions(
       final sync = _syncOrNotice(context, ref);
       if (sync == null) return;
       await _run(context, () => sync.setFavourite(key, !favourite));
+    case 'forget':
+      final sync = _syncOrNotice(context, ref);
+      if (sync == null) return;
+      await _run(
+        context,
+        () => sync.forgetLastAdvert(key),
+        done: 'The next advert from ${contact.name} will be accepted',
+      );
     case 'remove':
       final sync = _syncOrNotice(context, ref);
       if (sync == null) return;

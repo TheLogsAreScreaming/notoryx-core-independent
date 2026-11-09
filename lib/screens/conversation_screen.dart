@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../app/blocking.dart';
+import '../app/spam_filter.dart';
 import '../app/appearance.dart';
 import '../app/connection.dart';
 import '../app/delivery.dart';
@@ -533,9 +534,12 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     final blocked = ref.watch(blockListProvider).value ?? const BlockList();
     final directKey = widget.isChannel ? null : widget.thread.substring(2);
     final threadBlocked = directKey != null && blocked.keys.contains(directKey);
+    final repeats = ref.watch(spamFilterProvider).value == true
+        ? spamRepeats(messages, myName: selfName)
+        : const <int>{};
     final items = chatItems([
       for (final m in messages)
-        if (!blocked.blocks(m)) m,
+        if (!blocked.blocks(m) && !repeats.contains(m.id)) m,
     ], senderOf: senderOf);
 
     return Scaffold(

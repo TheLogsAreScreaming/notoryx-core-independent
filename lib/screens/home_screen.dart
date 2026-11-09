@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:quick_actions/quick_actions.dart';
 
 import '../app/connection.dart';
 import '../app/contact_room.dart';
@@ -10,6 +13,7 @@ import 'connection_log_screen.dart';
 import 'contact_cleanup_screen.dart';
 import 'area_screen.dart';
 import 'battery_banner.dart';
+import 'own_status_strip.dart';
 import 'conversation_screen.dart';
 import 'manage_actions.dart';
 import 'map_tab.dart';
@@ -37,6 +41,44 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _tab = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    if (Platform.isAndroid) _setUpShortcuts();
+  }
+
+  /// Long-press shortcuts on the app icon. Safety only opens the screen:
+  /// sending an SOS always takes the deliberate hold there.
+  void _setUpShortcuts() {
+    const actions = QuickActions();
+    actions.initialize((type) {
+      if (!mounted) return;
+      switch (type) {
+        case 'safety':
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute<void>(builder: (_) => const SafetyScreen()));
+        case 'map':
+          setState(() => _tab = 2);
+        case 'search':
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => SearchScreen(radioKey: widget.radioKey),
+            ),
+          );
+      }
+    });
+    actions
+        .setShortcutItems(const [
+          ShortcutItem(type: 'safety', localizedTitle: 'SOS and check-ins'),
+          ShortcutItem(type: 'map', localizedTitle: 'Map'),
+          ShortcutItem(type: 'search', localizedTitle: 'Search messages'),
+        ])
+        .catchError((Object e) {
+          ref.read(connectionLogProvider).add('app shortcuts: $e');
+        });
+  }
 
   /// Unread messages outside muted threads.
   int _unreadTotal() {
@@ -104,6 +146,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             _ReconnectBanner(attempt: attempt, error: error),
           const BatteryBanner(),
           const AreaBanner(),
+          if (_tab == 0)
+            OwnStatusStrip(radioKey: key, radioName: widget.radioName),
           Expanded(
             child: switch (_tab) {
               0 => _ChatsTab(radioKey: key),

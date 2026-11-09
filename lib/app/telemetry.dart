@@ -158,6 +158,29 @@ final selfTelemetrySamplerProvider = Provider<void>((ref) {
   ref.listen(connectionProvider, (_, next) => unawaited(follow(next)));
 });
 
+/// How long ago a reading at [at] was taken.
+String readingAge(DateTime at, DateTime now) {
+  final ago = now.difference(at);
+  if (ago.inMinutes < 1) return 'just now';
+  if (ago.inHours < 1) return '${ago.inMinutes} min ago';
+  if (ago.inDays < 1) return '${ago.inHours} h ago';
+  return '${ago.inDays} d ago';
+}
+
+/// The connected radio's readings as one line, like
+/// "Battery 3.91 V · Temperature 18.5°C", or null when there's nothing to
+/// show. The chip's own temperature is left out: it says little about the
+/// weather, and is still on the history screen.
+String? ownStatusText(TelemetrySample sample) {
+  final parts = [
+    for (final r in decodeLpp(sample.data))
+      if (isChartable(r.kind) &&
+          !(r.kind == LppKind.temperature && r.channel == 1))
+        '${readingLabel(r)} ${readingText(r)}',
+  ];
+  return parts.isEmpty ? null : parts.join(' · ');
+}
+
 /// Each node's newest telemetry reply, by node key.
 final latestTelemetryProvider =
     StreamProvider.family<Map<String, TelemetrySample>, String>(

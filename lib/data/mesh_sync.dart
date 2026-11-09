@@ -520,6 +520,32 @@ class MeshSync {
     await _syncContacts();
   }
 
+  /// Clears the time of [contact]'s last advert on the radio. The radio
+  /// ignores adverts older than the last one it saw, so a node whose clock
+  /// was reset stops updating until this is done.
+  Future<void> forgetLastAdvert(PublicKey publicKey) async {
+    final key = _requireKey();
+    final row = await _store.contact(key, publicKey.hex);
+    if (row == null) return;
+    await _session.run(
+      AddOrUpdateContact(
+        RadioContact(
+          publicKey: publicKey,
+          type: NodeType.fromByte(row.type),
+          flags: row.flags,
+          outPathLength: row.outPathLength,
+          outPath: row.outPath,
+          name: row.name,
+          lastAdvert: 0,
+          latitude: row.latitude,
+          longitude: row.longitude,
+          lastModified: _seconds(null),
+        ),
+      ),
+    );
+    await _syncContacts();
+  }
+
   /// Forgets the radio's route to [contact], so the next message floods and
   /// a fresh route is learned.
   Future<void> resetRoute(PublicKey contact) async {

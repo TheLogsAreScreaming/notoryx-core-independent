@@ -3,6 +3,23 @@ import 'dart:convert';
 
 import '../data/data.dart';
 
+/// Which part of the connection log to show.
+enum LogView { all, bluetooth, app }
+
+/// Whether [entry] came from the Bluetooth link rather than the app.
+bool isBluetoothEntry(String entry) {
+  final message = entry.length > 21 ? entry.substring(21) : entry;
+  return message.startsWith('BLE') ||
+      message.toLowerCase().contains('bluetooth');
+}
+
+/// The entries of [entries] that belong in [view].
+List<String> entriesFor(List<String> entries, LogView view) => switch (view) {
+  LogView.all => entries,
+  LogView.bluetooth => entries.where(isBluetoothEntry).toList(),
+  LogView.app => entries.where((e) => !isBluetoothEntry(e)).toList(),
+};
+
 /// A short record of what the connection did, kept across restarts so a
 /// problem at launch can be read afterwards. Shown on the Connection log
 /// screen, where it can be copied.

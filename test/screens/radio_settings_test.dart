@@ -95,7 +95,7 @@ void main() {
       200,
       scrollable: find.byType(Scrollable).first,
     );
-    await tester.drag(find.byType(Scrollable).first, const Offset(0, -150));
+    await tester.ensureVisible(find.text('Battery and sensor history'));
     await settle(tester);
     await tester.tap(find.text('Battery and sensor history'));
     await settle(tester);

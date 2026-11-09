@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/connection.dart';
+import '../app/connection_log.dart';
 import 'packet_log_screen.dart';
 
 /// What the connection has been doing, newest at the bottom, with a button
@@ -16,6 +17,8 @@ class ConnectionLogScreen extends ConsumerStatefulWidget {
 }
 
 class _ConnectionLogScreenState extends ConsumerState<ConnectionLogScreen> {
+  LogView _view = LogView.all;
+
   @override
   void initState() {
     super.initState();
@@ -42,7 +45,7 @@ class _ConnectionLogScreenState extends ConsumerState<ConnectionLogScreen> {
             onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
               await Clipboard.setData(
-                ClipboardData(text: log.entries.join('\n')),
+                ClipboardData(text: entriesFor(log.entries, _view).join('\n')),
               );
               messenger.showSnackBar(
                 const SnackBar(content: Text('Connection log copied')),
@@ -55,12 +58,30 @@ class _ConnectionLogScreenState extends ConsumerState<ConnectionLogScreen> {
             onPressed: log.clear,
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(56),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+            child: SegmentedButton<LogView>(
+              segments: const [
+                ButtonSegment(value: LogView.all, label: Text('All')),
+                ButtonSegment(
+                  value: LogView.bluetooth,
+                  label: Text('Bluetooth'),
+                ),
+                ButtonSegment(value: LogView.app, label: Text('App')),
+              ],
+              selected: {_view},
+              onSelectionChanged: (v) => setState(() => _view = v.first),
+            ),
+          ),
+        ),
       ),
       body: StreamBuilder<List<String>>(
         stream: log.changes,
         initialData: log.entries,
         builder: (context, snapshot) {
-          final entries = snapshot.data ?? const <String>[];
+          final entries = entriesFor(snapshot.data ?? const <String>[], _view);
           if (entries.isEmpty) {
             return const Center(child: Text('Nothing logged yet'));
           }
