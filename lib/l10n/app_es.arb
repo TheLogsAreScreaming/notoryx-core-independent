@@ -398,5 +398,7 @@
   "readAloud": "Leer en voz alta",
   "language": "Idioma",
   "phoneSetting": "Igual que el teléfono",
-  "machineTranslatedNote": "Los idiomas distintos del inglés los tradujo una IA y no los han revisado hablantes nativos. Los mensajes de SOS y de aviso de estado siempre se envían en inglés, para que cualquiera pueda leerlos."
+  "machineTranslatedNote": "Los idiomas distintos del inglés los tradujo una IA y no los han revisado hablantes nativos. Los mensajes de SOS y de aviso de estado siempre se envían en inglés, para que cualquiera pueda leerlos.",
+  "relaySosTitle": "Retransmitir mensajes SOS",
+  "relaySosSubtitle": "Cuando tu radio oye un SOS de canal directamente del remitente y ningún repetidor lo reenvía, lo envía una vez más. Desactivado por defecto."
 }

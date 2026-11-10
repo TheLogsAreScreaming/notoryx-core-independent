@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:notoryx_core/app/sos_relay.dart';
+import 'package:notoryx_core/radio/protocol/commands.dart';
 import 'package:pointycastle/export.dart';
 
 void main() {
@@ -65,6 +66,10 @@ void main() {
     final relay = SosRelay()..heard(packet(hops: 2), secrets, t0);
     relay.received(slot: 1, sentAt: sentAt, body: 'SOS - help', now: t0);
     expect(relay.due(t0.add(sosRelayWait)), isEmpty);
+  });
+
+  test('the relay command sends the packet as heard', () {
+    expect(SendRawPacket(packet()).encode(), [65, 1, ...packet()]);
   });
 
   test('ordinary posts are never relayed', () {

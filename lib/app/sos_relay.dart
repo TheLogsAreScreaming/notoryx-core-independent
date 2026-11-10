@@ -5,11 +5,17 @@
 /// Off by default. A packet is only ever relayed once, and only an SOS.
 library;
 
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/data.dart';
 import '../radio/protocol/packet_header.dart';
+import '../radio/radio.dart';
+import 'connection.dart';
+import 'safety.dart';
 import '../radio/protocol/region_scope.dart';
 
 /// How long to wait for a repeater to pass the SOS on before relaying.
@@ -106,3 +112,69 @@ final class SosRelay {
     if (_viaRepeater.length > 500) _viaRepeater.clear();
   }
 }
+
+const sosRelaySetting = 'sos_relay';
+
+/// Whether relaying is on.
+class SosRelaySwitch extends AsyncNotifier<bool> {
+  @override
+  Future<bool> build() async =>
+      await ref.read(storeProvider).setting(sosRelaySetting) == '1';
+
+  Future<void> set(bool on) async {
+    final store = ref.read(storeProvider);
+    if (on) {
+      await store.saveSetting(sosRelaySetting, '1');
+    } else {
+      await store.removeSetting(sosRelaySetting);
+    }
+    state = AsyncData(on);
+  }
+}
+
+final sosRelaySwitchProvider = AsyncNotifierProvider<SosRelaySwitch, bool>(
+  SosRelaySwitch.new,
+);
+
+/// Runs the relay while a radio is connected and the switch is on.
+final sosRelayRunnerProvider = Provider<void>((ref) {
+  final state = ref.watch(connectionProvider);
+  final on = ref.watch(sosRelaySwitchProvider).value ?? false;
+  if (state is! Connected || !on) return;
+  final relay = SosRelay();
+  final store = ref.read(storeProvider);
+  final log = ref.read(connectionLogProvider);
+  DateTime now() => ref.read(safetyClockProvider)();
+  var secrets = <int, Uint8List>{};
+  final channels = store.watchChannels(state.radio.key).listen((list) {
+    secrets = {for (final c in list) c.slot: c.secret};
+  });
+  final heard = state.sync.heard.listen(
+    (rx) => relay.heard(rx.packet, secrets, now()),
+  );
+  final incoming = state.sync.incoming.listen((m) {
+    if (m.kind != MessageKind.channel || m.outgoing) return;
+    relay.received(
+      slot: int.parse(m.thread.substring(2)),
+      sentAt: m.sentAt,
+      body: m.body,
+      now: now(),
+    );
+  });
+  final timer = Timer.periodic(const Duration(seconds: 2), (_) async {
+    for (final packet in relay.due(now())) {
+      try {
+        await state.sync.resendPacket(packet);
+        log.add('SOS relay: sent an SOS no repeater passed on');
+      } on Object catch (e) {
+        log.add('SOS relay: the radio refused ($e)');
+      }
+    }
+  });
+  ref.onDispose(() {
+    timer.cancel();
+    unawaited(channels.cancel());
+    unawaited(heard.cancel());
+    unawaited(incoming.cancel());
+  });
+});

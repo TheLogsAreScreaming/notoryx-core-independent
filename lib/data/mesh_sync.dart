@@ -514,6 +514,11 @@ class MeshSync {
   }
 
   /// Lets [publicKey] run commands on this radio, or stops them.
+  /// Sends [packet] again exactly as it was heard. Throws when the radio
+  /// refuses, which older firmware does.
+  Future<void> resendPacket(Uint8List packet) =>
+      _session.run(SendRawPacket(packet));
+
   Future<void> setRemoteCommandsAllowed(
     PublicKey publicKey, {
     required bool allowed,

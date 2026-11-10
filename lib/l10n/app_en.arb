@@ -924,5 +924,7 @@
   "readAloud": "Read aloud",
   "language": "Language",
   "phoneSetting": "Same as the phone",
-  "machineTranslatedNote": "Languages other than English were translated by AI and haven’t been checked by native speakers. SOS and check-in messages always go out in English, so anyone can read them."
+  "machineTranslatedNote": "Languages other than English were translated by AI and haven’t been checked by native speakers. SOS and check-in messages always go out in English, so anyone can read them.",
+  "relaySosTitle": "Relay SOS posts",
+  "relaySosSubtitle": "When your radio hears a channel SOS straight from the sender and no repeater passes it on, it sends it once more. Off by default."
 }
