@@ -106,6 +106,22 @@ final class SendSelfAdvert extends RadioCommand {
 
 /// Marks the floods that follow with a region, or clears it when [key] is
 /// null.
+/// Sends a whole packet as given, as if this radio had made it.
+final class SendRawPacket extends RadioCommand {
+  const SendRawPacket(this.packet, {this.priority = 1});
+
+  final Uint8List packet;
+  final int priority;
+
+  @override
+  void _write(FrameWriter out) {
+    out
+      ..u8(CommandCode.sendRawPacket)
+      ..u8(priority)
+      ..bytes(packet);
+  }
+}
+
 final class SetFloodScope extends RadioCommand {
   const SetFloodScope(this.key);
 

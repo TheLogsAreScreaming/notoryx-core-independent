@@ -34,6 +34,7 @@ abstract final class CommandCode {
   static const importContact = 18;
   static const setFloodScope = 54;
   static const getStats = 56;
+  static const sendRawPacket = 65;
   static const runCliCommand = 66;
   static const setAutoAddConfig = 58;
   static const getAutoAddConfig = 59;

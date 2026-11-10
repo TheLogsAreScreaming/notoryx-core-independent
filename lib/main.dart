@@ -10,6 +10,7 @@ import 'app/language.dart';
 import 'app/packet_log.dart';
 import 'app/radio_stats.dart';
 import 'app/safety.dart';
+import 'app/sos_relay.dart';
 import 'app/scheduled_messages.dart';
 import 'app/telemetry.dart';
 import 'app/connection.dart';
@@ -114,6 +115,7 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
     ref.listen(checkInWatchdogProvider, (_, _) {});
     ref.listen(sosWatchdogProvider, (_, _) {});
     ref.listen(tripQuietWatchdogProvider, (_, _) {});
+    ref.listen(sosRelayRunnerProvider, (_, _) {});
     ref.listen(homeWidgetSyncProvider, (_, _) {});
     ref.listen(scheduledSenderProvider, (_, _) {});
     ref.listen(botRunnerProvider, (_, _) {});

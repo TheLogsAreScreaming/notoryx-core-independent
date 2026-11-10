@@ -10,6 +10,7 @@ import '../app/safety.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
 import '../l10n/l10n.dart';
+import '../app/sos_relay.dart';
 
 /// SOS, "I'm OK" check-ins, and the check-in timer.
 class SafetyScreen extends ConsumerStatefulWidget {
@@ -372,6 +373,13 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
                 style: theme.textTheme.titleSmall,
               ),
             ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(context.l10n.relaySosTitle),
+            subtitle: Text(context.l10n.relaySosSubtitle),
+            value: ref.watch(sosRelaySwitchProvider).value ?? false,
+            onChanged: ref.read(sosRelaySwitchProvider.notifier).set,
+          ),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
             title: Text(
