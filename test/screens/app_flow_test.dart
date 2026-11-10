@@ -6,6 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/open_connect.dart';
 
+import 'package:notoryx_core/app/language.dart';
+import 'package:notoryx_core/app/safety.dart';
 import 'package:notoryx_core/app/read_aloud.dart';
 import 'package:notoryx_core/app/channel_directory.dart';
 import 'package:latlong2/latlong.dart';
@@ -420,6 +422,19 @@ void main() {
       await check(tester, 'connect');
       await cleanUp(tester);
     });
+  });
+
+  testWidgets('a chosen language changes the app, and SOS text stays English', (
+    tester,
+  ) async {
+    await tester.runAsync(
+      () => MeshStore(db).saveSetting(languageSetting, 'es'),
+    );
+    await pumpApp(tester);
+    expect(find.text('Contactos'), findsOneWidget);
+    expect(find.text('Contacts'), findsNothing);
+    expect(sosText(null), startsWith('SOS - I need help.'));
+    await cleanUp(tester);
   });
 
   testWidgets('a message can be read aloud', (tester) async {

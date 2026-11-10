@@ -921,5 +921,8 @@
       }
     }
   },
-  "readAloud": "Read aloud"
+  "readAloud": "Read aloud",
+  "language": "Language",
+  "phoneSetting": "Same as the phone",
+  "machineTranslatedNote": "Languages other than English were translated by AI and haven’t been checked by native speakers. SOS and check-in messages always go out in English, so anyone can read them."
 }
