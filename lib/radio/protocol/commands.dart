@@ -106,6 +106,60 @@ final class SendSelfAdvert extends RadioCommand {
 
 /// Marks the floods that follow with a region, or clears it when [key] is
 /// null.
+/// Starts collecting data for the radio to sign.
+final class SignStart extends RadioCommand {
+  const SignStart();
+
+  @override
+  void _write(FrameWriter out) => out.u8(CommandCode.signStart);
+}
+
+/// The next piece of data to sign.
+final class SignData extends RadioCommand {
+  const SignData(this.chunk);
+
+  final List<int> chunk;
+
+  @override
+  void _write(FrameWriter out) {
+    out
+      ..u8(CommandCode.signData)
+      ..bytes(chunk);
+  }
+}
+
+/// Signs everything sent since [SignStart] with the radio's key.
+final class SignFinish extends RadioCommand {
+  const SignFinish();
+
+  @override
+  void _write(FrameWriter out) => out.u8(CommandCode.signFinish);
+}
+
+/// A datagram on a channel, flooded.
+final class SendChannelData extends RadioCommand {
+  const SendChannelData({
+    required this.channel,
+    required this.dataType,
+    required this.payload,
+  });
+
+  final int channel;
+  final int dataType;
+  final List<int> payload;
+
+  @override
+  void _write(FrameWriter out) {
+    out
+      ..u8(CommandCode.sendChannelData)
+      ..u8(channel)
+      ..u8(0xFF) // flood
+      ..u8(dataType & 0xFF)
+      ..u8(dataType >> 8)
+      ..bytes(payload);
+  }
+}
+
 /// Sends a whole packet as given, as if this radio had made it.
 final class SendRawPacket extends RadioCommand {
   const SendRawPacket(this.packet, {this.priority = 1});

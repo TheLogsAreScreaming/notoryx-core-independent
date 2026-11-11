@@ -926,5 +926,26 @@
   "phoneSetting": "Same as the phone",
   "machineTranslatedNote": "Languages other than English were translated by AI and haven’t been checked by native speakers. SOS and check-in messages always go out in English, so anyone can read them.",
   "relaySosTitle": "Relay SOS posts",
-  "relaySosSubtitle": "When your radio hears a channel SOS straight from the sender and no repeater passes it on, it sends it once more. Off by default."
+  "relaySosSubtitle": "When your radio hears a channel SOS straight from the sender and no repeater passes it on, it sends it once more. Off by default.",
+  "signedBy": "✓ {name}",
+  "signedByKey": "✓ key {key}",
+  "signatureBad": "⚠ signature doesn’t match",
+  "signSafetyTitle": "Sign SOS and check-ins",
+  "signSafetySubtitle": "Adds your radio’s signature to channel posts, so other NOTORYX users can tell they came from you. Sends one extra small packet.",
+  "signAllTitle": "Sign all my channel posts",
+  "signAllSubtitle": "Each post sends one extra small packet.",
+  "@signedBy": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "@signedByKey": {
+    "placeholders": {
+      "key": {
+        "type": "Object"
+      }
+    }
+  }
 }

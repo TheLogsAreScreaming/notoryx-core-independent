@@ -400,5 +400,12 @@
   "phoneSetting": "Igual que el teléfono",
   "machineTranslatedNote": "Los idiomas distintos del inglés los tradujo una IA y no los han revisado hablantes nativos. Los mensajes de SOS y de aviso de estado siempre se envían en inglés, para que cualquiera pueda leerlos.",
   "relaySosTitle": "Retransmitir mensajes SOS",
-  "relaySosSubtitle": "Cuando tu radio oye un SOS de canal directamente del remitente y ningún repetidor lo reenvía, lo envía una vez más. Desactivado por defecto."
+  "relaySosSubtitle": "Cuando tu radio oye un SOS de canal directamente del remitente y ningún repetidor lo reenvía, lo envía una vez más. Desactivado por defecto.",
+  "signedBy": "✓ {name}",
+  "signedByKey": "✓ clave {key}",
+  "signatureBad": "⚠ la firma no coincide",
+  "signSafetyTitle": "Firmar SOS y avisos de estado",
+  "signSafetySubtitle": "Añade la firma de tu radio a los mensajes de canal, para que otros usuarios de NOTORYX sepan que son tuyos. Envía un paquete pequeño más.",
+  "signAllTitle": "Firmar todos mis mensajes de canal",
+  "signAllSubtitle": "Cada mensaje envía un paquete pequeño más."
 }

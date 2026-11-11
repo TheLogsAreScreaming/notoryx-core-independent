@@ -62,6 +62,16 @@ class ScriptedRadio {
   final textAttempts = <int>[];
 
   List<List<int>> _answer(List<int> frame) => switch (frame[0]) {
+    // Signing: ready for 8 KB, then a dummy signature.
+    33 => [
+      [19, 0, 0, 0x20, 0, 0],
+    ],
+    35 => [
+      [20, ...List.filled(64, 0)],
+    ],
+    34 || 62 => [
+      [0],
+    ],
     CommandCode.appStart => [
       selfInfoFrame(
         name: name,

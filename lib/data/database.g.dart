@@ -1522,6 +1522,29 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _signerMeta = const VerificationMeta('signer');
+  @override
+  late final GeneratedColumn<String> signer = GeneratedColumn<String>(
+    'signer',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _signatureValidMeta = const VerificationMeta(
+    'signatureValid',
+  );
+  @override
+  late final GeneratedColumn<bool> signatureValid = GeneratedColumn<bool>(
+    'signature_valid',
+    aliasedName,
+    true,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("signature_valid" IN (0, 1))',
+    ),
+  );
   static const VerificationMeta _dedupeKeyMeta = const VerificationMeta(
     'dedupeKey',
   );
@@ -1554,6 +1577,8 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
     textType,
     authorPrefix,
     region,
+    signer,
+    signatureValid,
     dedupeKey,
   ];
   @override
@@ -1676,6 +1701,21 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
         region.isAcceptableOrUnknown(data['region']!, _regionMeta),
       );
     }
+    if (data.containsKey('signer')) {
+      context.handle(
+        _signerMeta,
+        signer.isAcceptableOrUnknown(data['signer']!, _signerMeta),
+      );
+    }
+    if (data.containsKey('signature_valid')) {
+      context.handle(
+        _signatureValidMeta,
+        signatureValid.isAcceptableOrUnknown(
+          data['signature_valid']!,
+          _signatureValidMeta,
+        ),
+      );
+    }
     if (data.containsKey('dedupe_key')) {
       context.handle(
         _dedupeKeyMeta,
@@ -1767,6 +1807,14 @@ class $MessagesTable extends Messages with TableInfo<$MessagesTable, Message> {
         DriftSqlType.string,
         data['${effectivePrefix}region'],
       ),
+      signer: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}signer'],
+      ),
+      signatureValid: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}signature_valid'],
+      ),
       dedupeKey: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}dedupe_key'],
@@ -1825,6 +1873,12 @@ class Message extends DataClass implements Insertable<Message> {
   /// Channel posts: the region it was scoped to, when known.
   final String? region;
 
+  /// Channel posts with a signature: the signer's public key, in hex.
+  final String? signer;
+
+  /// Whether that signature checked out.
+  final bool? signatureValid;
+
   /// Incoming only: identifies a message so a repeat delivery is dropped.
   final String? dedupeKey;
   const Message({
@@ -1846,6 +1900,8 @@ class Message extends DataClass implements Insertable<Message> {
     required this.textType,
     this.authorPrefix,
     this.region,
+    this.signer,
+    this.signatureValid,
     this.dedupeKey,
   });
   @override
@@ -1889,6 +1945,12 @@ class Message extends DataClass implements Insertable<Message> {
     if (!nullToAbsent || region != null) {
       map['region'] = Variable<String>(region);
     }
+    if (!nullToAbsent || signer != null) {
+      map['signer'] = Variable<String>(signer);
+    }
+    if (!nullToAbsent || signatureValid != null) {
+      map['signature_valid'] = Variable<bool>(signatureValid);
+    }
     if (!nullToAbsent || dedupeKey != null) {
       map['dedupe_key'] = Variable<String>(dedupeKey);
     }
@@ -1927,6 +1989,12 @@ class Message extends DataClass implements Insertable<Message> {
       region: region == null && nullToAbsent
           ? const Value.absent()
           : Value(region),
+      signer: signer == null && nullToAbsent
+          ? const Value.absent()
+          : Value(signer),
+      signatureValid: signatureValid == null && nullToAbsent
+          ? const Value.absent()
+          : Value(signatureValid),
       dedupeKey: dedupeKey == null && nullToAbsent
           ? const Value.absent()
           : Value(dedupeKey),
@@ -1961,6 +2029,8 @@ class Message extends DataClass implements Insertable<Message> {
       textType: serializer.fromJson<int>(json['textType']),
       authorPrefix: serializer.fromJson<String?>(json['authorPrefix']),
       region: serializer.fromJson<String?>(json['region']),
+      signer: serializer.fromJson<String?>(json['signer']),
+      signatureValid: serializer.fromJson<bool?>(json['signatureValid']),
       dedupeKey: serializer.fromJson<String?>(json['dedupeKey']),
     );
   }
@@ -1990,6 +2060,8 @@ class Message extends DataClass implements Insertable<Message> {
       'textType': serializer.toJson<int>(textType),
       'authorPrefix': serializer.toJson<String?>(authorPrefix),
       'region': serializer.toJson<String?>(region),
+      'signer': serializer.toJson<String?>(signer),
+      'signatureValid': serializer.toJson<bool?>(signatureValid),
       'dedupeKey': serializer.toJson<String?>(dedupeKey),
     };
   }
@@ -2013,6 +2085,8 @@ class Message extends DataClass implements Insertable<Message> {
     int? textType,
     Value<String?> authorPrefix = const Value.absent(),
     Value<String?> region = const Value.absent(),
+    Value<String?> signer = const Value.absent(),
+    Value<bool?> signatureValid = const Value.absent(),
     Value<String?> dedupeKey = const Value.absent(),
   }) => Message(
     id: id ?? this.id,
@@ -2033,6 +2107,10 @@ class Message extends DataClass implements Insertable<Message> {
     textType: textType ?? this.textType,
     authorPrefix: authorPrefix.present ? authorPrefix.value : this.authorPrefix,
     region: region.present ? region.value : this.region,
+    signer: signer.present ? signer.value : this.signer,
+    signatureValid: signatureValid.present
+        ? signatureValid.value
+        : this.signatureValid,
     dedupeKey: dedupeKey.present ? dedupeKey.value : this.dedupeKey,
   );
   Message copyWithCompanion(MessagesCompanion data) {
@@ -2061,6 +2139,10 @@ class Message extends DataClass implements Insertable<Message> {
           ? data.authorPrefix.value
           : this.authorPrefix,
       region: data.region.present ? data.region.value : this.region,
+      signer: data.signer.present ? data.signer.value : this.signer,
+      signatureValid: data.signatureValid.present
+          ? data.signatureValid.value
+          : this.signatureValid,
       dedupeKey: data.dedupeKey.present ? data.dedupeKey.value : this.dedupeKey,
     );
   }
@@ -2086,13 +2168,15 @@ class Message extends DataClass implements Insertable<Message> {
           ..write('textType: $textType, ')
           ..write('authorPrefix: $authorPrefix, ')
           ..write('region: $region, ')
+          ..write('signer: $signer, ')
+          ..write('signatureValid: $signatureValid, ')
           ..write('dedupeKey: $dedupeKey')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     radioKey,
     kind,
@@ -2111,8 +2195,10 @@ class Message extends DataClass implements Insertable<Message> {
     textType,
     authorPrefix,
     region,
+    signer,
+    signatureValid,
     dedupeKey,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2135,6 +2221,8 @@ class Message extends DataClass implements Insertable<Message> {
           other.textType == this.textType &&
           other.authorPrefix == this.authorPrefix &&
           other.region == this.region &&
+          other.signer == this.signer &&
+          other.signatureValid == this.signatureValid &&
           other.dedupeKey == this.dedupeKey);
 }
 
@@ -2157,6 +2245,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
   final Value<int> textType;
   final Value<String?> authorPrefix;
   final Value<String?> region;
+  final Value<String?> signer;
+  final Value<bool?> signatureValid;
   final Value<String?> dedupeKey;
   const MessagesCompanion({
     this.id = const Value.absent(),
@@ -2177,6 +2267,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     this.textType = const Value.absent(),
     this.authorPrefix = const Value.absent(),
     this.region = const Value.absent(),
+    this.signer = const Value.absent(),
+    this.signatureValid = const Value.absent(),
     this.dedupeKey = const Value.absent(),
   });
   MessagesCompanion.insert({
@@ -2198,6 +2290,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     this.textType = const Value.absent(),
     this.authorPrefix = const Value.absent(),
     this.region = const Value.absent(),
+    this.signer = const Value.absent(),
+    this.signatureValid = const Value.absent(),
     this.dedupeKey = const Value.absent(),
   }) : radioKey = Value(radioKey),
        kind = Value(kind),
@@ -2226,6 +2320,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     Expression<int>? textType,
     Expression<String>? authorPrefix,
     Expression<String>? region,
+    Expression<String>? signer,
+    Expression<bool>? signatureValid,
     Expression<String>? dedupeKey,
   }) {
     return RawValuesInsertable({
@@ -2247,6 +2343,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
       if (textType != null) 'text_type': textType,
       if (authorPrefix != null) 'author_prefix': authorPrefix,
       if (region != null) 'region': region,
+      if (signer != null) 'signer': signer,
+      if (signatureValid != null) 'signature_valid': signatureValid,
       if (dedupeKey != null) 'dedupe_key': dedupeKey,
     });
   }
@@ -2270,6 +2368,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     Value<int>? textType,
     Value<String?>? authorPrefix,
     Value<String?>? region,
+    Value<String?>? signer,
+    Value<bool?>? signatureValid,
     Value<String?>? dedupeKey,
   }) {
     return MessagesCompanion(
@@ -2291,6 +2391,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
       textType: textType ?? this.textType,
       authorPrefix: authorPrefix ?? this.authorPrefix,
       region: region ?? this.region,
+      signer: signer ?? this.signer,
+      signatureValid: signatureValid ?? this.signatureValid,
       dedupeKey: dedupeKey ?? this.dedupeKey,
     );
   }
@@ -2356,6 +2458,12 @@ class MessagesCompanion extends UpdateCompanion<Message> {
     if (region.present) {
       map['region'] = Variable<String>(region.value);
     }
+    if (signer.present) {
+      map['signer'] = Variable<String>(signer.value);
+    }
+    if (signatureValid.present) {
+      map['signature_valid'] = Variable<bool>(signatureValid.value);
+    }
     if (dedupeKey.present) {
       map['dedupe_key'] = Variable<String>(dedupeKey.value);
     }
@@ -2383,6 +2491,8 @@ class MessagesCompanion extends UpdateCompanion<Message> {
           ..write('textType: $textType, ')
           ..write('authorPrefix: $authorPrefix, ')
           ..write('region: $region, ')
+          ..write('signer: $signer, ')
+          ..write('signatureValid: $signatureValid, ')
           ..write('dedupeKey: $dedupeKey')
           ..write(')'))
         .toString();
@@ -6674,6 +6784,8 @@ typedef $$MessagesTableCreateCompanionBuilder = MessagesCompanion Function({
   Value<int> textType,
   Value<String?> authorPrefix,
   Value<String?> region,
+  Value<String?> signer,
+  Value<bool?> signatureValid,
   Value<String?> dedupeKey,
 });
 typedef $$MessagesTableUpdateCompanionBuilder = MessagesCompanion Function({
@@ -6695,6 +6807,8 @@ typedef $$MessagesTableUpdateCompanionBuilder = MessagesCompanion Function({
   Value<int> textType,
   Value<String?> authorPrefix,
   Value<String?> region,
+  Value<String?> signer,
+  Value<bool?> signatureValid,
   Value<String?> dedupeKey,
 });
 
@@ -6813,6 +6927,16 @@ class $$MessagesTableFilterComposer
 
   ColumnFilters<String> get region => $composableBuilder(
     column: $table.region,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get signer => $composableBuilder(
+    column: $table.signer,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get signatureValid => $composableBuilder(
+    column: $table.signatureValid,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6939,6 +7063,16 @@ class $$MessagesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get signer => $composableBuilder(
+    column: $table.signer,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get signatureValid => $composableBuilder(
+    column: $table.signatureValid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get dedupeKey => $composableBuilder(
     column: $table.dedupeKey,
     builder: (column) => ColumnOrderings(column),
@@ -7034,6 +7168,14 @@ class $$MessagesTableAnnotationComposer
   GeneratedColumn<String> get region =>
       $composableBuilder(column: $table.region, builder: (column) => column);
 
+  GeneratedColumn<String> get signer =>
+      $composableBuilder(column: $table.signer, builder: (column) => column);
+
+  GeneratedColumn<bool> get signatureValid => $composableBuilder(
+    column: $table.signatureValid,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get dedupeKey =>
       $composableBuilder(column: $table.dedupeKey, builder: (column) => column);
 
@@ -7107,6 +7249,8 @@ class $$MessagesTableTableManager
                 Value<int> textType = const Value.absent(),
                 Value<String?> authorPrefix = const Value.absent(),
                 Value<String?> region = const Value.absent(),
+                Value<String?> signer = const Value.absent(),
+                Value<bool?> signatureValid = const Value.absent(),
                 Value<String?> dedupeKey = const Value.absent(),
               }) => MessagesCompanion(
                 id: id,
@@ -7127,6 +7271,8 @@ class $$MessagesTableTableManager
                 textType: textType,
                 authorPrefix: authorPrefix,
                 region: region,
+                signer: signer,
+                signatureValid: signatureValid,
                 dedupeKey: dedupeKey,
               ),
           createCompanionCallback:
@@ -7149,6 +7295,8 @@ class $$MessagesTableTableManager
                 Value<int> textType = const Value.absent(),
                 Value<String?> authorPrefix = const Value.absent(),
                 Value<String?> region = const Value.absent(),
+                Value<String?> signer = const Value.absent(),
+                Value<bool?> signatureValid = const Value.absent(),
                 Value<String?> dedupeKey = const Value.absent(),
               }) => MessagesCompanion.insert(
                 id: id,
@@ -7169,6 +7317,8 @@ class $$MessagesTableTableManager
                 textType: textType,
                 authorPrefix: authorPrefix,
                 region: region,
+                signer: signer,
+                signatureValid: signatureValid,
                 dedupeKey: dedupeKey,
               ),
           withReferenceMapper: (p0) => p0

@@ -34,6 +34,10 @@ abstract final class CommandCode {
   static const importContact = 18;
   static const setFloodScope = 54;
   static const getStats = 56;
+  static const signStart = 33;
+  static const signData = 34;
+  static const signFinish = 35;
+  static const sendChannelData = 62;
   static const sendRawPacket = 65;
   static const runCliCommand = 66;
   static const setAutoAddConfig = 58;
@@ -66,6 +70,8 @@ abstract final class ResponseCode {
   static const contactMessageV3 = 16;
   static const channelMessageV3 = 17;
   static const channelInfo = 18;
+  static const signStart = 19;
+  static const signature = 20;
   static const stats = 24;
   static const autoAddConfig = 25;
   static const channelData = 27;

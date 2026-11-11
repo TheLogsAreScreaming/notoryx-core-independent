@@ -386,6 +386,24 @@ class MeshStore {
   /// The radio accepted the message. Direct messages carry the [ackCode]
   /// their delivery confirmation will match, and how many [attempts] have
   /// been sent so far.
+  /// The channel post in [slot] sent at [sentAt], if stored.
+  Future<Message?> channelPostAt(String radioKey, int slot, int sentAt) =>
+      (_db.select(_db.messages)
+            ..where(
+              (m) =>
+                  m.radioKey.equals(radioKey) &
+                  m.thread.equals(Threads.channel(slot)) &
+                  m.sentAt.equals(sentAt),
+            )
+            ..limit(1))
+          .getSingleOrNull();
+
+  /// Records who signed message [id], and whether it checked out.
+  Future<void> setSignature(int id, String signer, {required bool valid}) =>
+      (_db.update(_db.messages)..where((m) => m.id.equals(id))).write(
+        MessagesCompanion(signer: Value(signer), signatureValid: Value(valid)),
+      );
+
   /// Records the region outgoing message [id] was scoped to.
   Future<void> setMessageRegion(int id, String region) =>
       (_db.update(_db.messages)..where((m) => m.id.equals(id))).write(

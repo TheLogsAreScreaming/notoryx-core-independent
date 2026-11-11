@@ -7,6 +7,7 @@ import 'package:crypto/crypto.dart';
 
 import '../app/region_tag.dart';
 import '../radio/protocol/region_scope.dart';
+import '../radio/protocol/signed_post.dart';
 import '../radio/radio.dart';
 import 'database.dart';
 import 'mesh_store.dart';
@@ -766,6 +767,7 @@ class MeshSync {
     String text, {
     DateTime? now,
     String? region,
+    bool signed = false,
   }) {
     final sentAt = _seconds(now);
     final command = SendChannelText(
@@ -783,6 +785,15 @@ class MeshSync {
       }
       if (scoped) await _store.setMessageRegion(id, region);
       await _store.markSent(id);
+      // The post is out. Signing follows on its own, so it never holds up
+      // an SOS, and a failed signature can't make the post look unsent.
+      if (signed) {
+        unawaited(
+          _signPost(id, slot, sentAt, text).catchError((Object e) {
+            if (!_errors.isClosed) _errors.add(e);
+          }),
+        );
+      }
     });
   }
 
@@ -828,6 +839,73 @@ class MeshSync {
       rethrow;
     }
     return id;
+  }
+
+  /// Has the radio sign [data] with its own key.
+  Future<Uint8List> sign(List<int> data) async {
+    await _session.request<SignStartReply>(const SignStart());
+    for (var i = 0; i < data.length; i += 128) {
+      final end = math.min(i + 128, data.length);
+      await _session.run(SignData(data.sublist(i, end)));
+    }
+    return (await _session.request<SignatureReply>(const SignFinish()))
+        .signature;
+  }
+
+  Future<void> _signPost(int id, int slot, int sentAt, String text) async {
+    final radio = _radio;
+    if (radio == null) return;
+    final channel = [
+      for (final c in await _store.watchChannels(radio.key).first)
+        if (c.slot == slot) c,
+    ].firstOrNull;
+    if (channel == null) return;
+    final signature = await sign(
+      signedBytes(
+        channelSecret: channel.secret,
+        sentAt: sentAt,
+        post: '${radio.self.name}: $text',
+      ),
+    );
+    await _session.run(
+      SendChannelData(
+        channel: slot,
+        dataType: signedPostDataType,
+        payload: encodePostSignature((
+          sentAt: sentAt,
+          signer: radio.self.publicKey.bytes,
+          signature: signature,
+        )),
+      ),
+    );
+    await _store.setSignature(id, radio.self.publicKey.hex, valid: true);
+  }
+
+  /// Signatures that arrived before their post, by `slot:sentAt`.
+  final _pendingSignatures = <String, PostSignature>{};
+
+  Future<void> _checkSignature(String key, int slot, PostSignature s) async {
+    final post = await _store.channelPostAt(key, slot, s.sentAt);
+    if (post == null) {
+      _pendingSignatures['$slot:${s.sentAt}'] = s;
+      if (_pendingSignatures.length > 64) {
+        _pendingSignatures.remove(_pendingSignatures.keys.first);
+      }
+      return;
+    }
+    final channel = [
+      for (final c in await _store.watchChannels(key).first)
+        if (c.slot == slot) c,
+    ].firstOrNull;
+    if (channel == null) return;
+    final text = post.senderName == null
+        ? post.body
+        : '${post.senderName}: ${post.body}';
+    final valid = verifyPostSignature(
+      s,
+      signedBytes(channelSecret: channel.secret, sentAt: s.sentAt, post: text),
+    );
+    await _store.setSignature(post.id, toHex(s.signer), valid: valid);
   }
 
   /// Whether the radio accepted scope [key].
@@ -885,6 +963,18 @@ class MeshSync {
               : null,
         );
         if (stored != null && !_incoming.isClosed) _incoming.add(stored);
+        if (event is ChannelMessage) {
+          final waiting = _pendingSignatures.remove(
+            '${event.channel}:${event.timestamp}',
+          );
+          if (waiting != null) {
+            await _checkSignature(key, event.channel, waiting);
+          }
+        }
+      case ChannelData(:final channel, :final dataType, :final payload)
+          when dataType == signedPostDataType:
+        final s = decodePostSignature(payload);
+        if (s != null) await _checkSignature(key, channel, s);
       case final RxLog log:
         await _noteRegion(key, log);
       case NewAdvert(:final contact):
