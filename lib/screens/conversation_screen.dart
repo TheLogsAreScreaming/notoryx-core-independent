@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../app/blocking.dart';
 import '../app/chat_send.dart';
+import '../app/post_signing.dart';
 import '../app/safety.dart';
 import '../app/scheduled_messages.dart';
 import '../app/region_tag.dart';
@@ -255,6 +256,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
           int.parse(target),
           text,
           region: cleanRegionName(tag),
+          signed: (await ref.read(postSigningProvider.future)).all,
         );
       } else {
         await state.sync.sendDirect(PublicKey.fromHex(target), text);
@@ -368,6 +370,22 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
         );
     _clearBox();
     messenger.showSnackBar(SnackBar(content: Text(l10n.scheduled)));
+  }
+
+  /// How a post's signature reads: who signed it, or a warning.
+  String? _signerLabel(
+    BuildContext context,
+    Message message,
+    List<Contact> contacts,
+  ) {
+    final signer = message.signer;
+    if (signer == null) return null;
+    if (message.signatureValid != true) return context.l10n.signatureBad;
+    if (message.outgoing) return null;
+    for (final c in contacts) {
+      if (c.publicKey == signer) return context.l10n.signedBy(c.name);
+    }
+    return context.l10n.signedByKey(signer.substring(0, 8).toUpperCase());
   }
 
   void _clearBox() {
@@ -746,6 +764,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                           body: item.replyText ?? message.body,
                           showSender: widget.isChannel,
                           author: _authorName(message.authorPrefix, contacts),
+                          signedBy: _signerLabel(context, message, contacts),
                           replyTo: replyTo == null
                               ? null
                               : (name: senderOf(replyTo), body: replyTo.body),
@@ -857,6 +876,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
 class _Bubble extends StatelessWidget {
   const _Bubble({
     required this.message,
+    this.signedBy,
     required this.body,
     required this.showSender,
     this.retrying = false,
@@ -882,6 +902,9 @@ class _Bubble extends StatelessWidget {
   final void Function(MeshLink link)? onAddLink;
 
   final Message message;
+
+  /// "✓ Name" for a signed post, or a warning when it doesn't check out.
+  final String? signedBy;
 
   /// The text shown: a reply's leading mention is left off.
   final String body;
@@ -913,6 +936,7 @@ class _Bubble extends StatelessWidget {
     final details = [
       time,
       if (message.region case final region?) '📍 $region',
+      ?signedBy,
       if (!mine && message.kind == MessageKind.channel)
         ?_hops(message.pathLength),
       if (mine && retrying) 'try ${message.attempts}',

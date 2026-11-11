@@ -297,6 +297,21 @@ final class ChannelMessage extends ReplyFrame {
 }
 
 /// A binary datagram received on a channel.
+/// The radio is ready to sign up to [maxLength] bytes.
+final class SignStartReply extends ReplyFrame {
+  const SignStartReply(this.maxLength);
+
+  final int maxLength;
+}
+
+/// An Ed25519 signature by the radio's own key.
+final class SignatureReply extends ReplyFrame {
+  SignatureReply(List<int> signature)
+    : signature = Uint8List.fromList(signature);
+
+  final Uint8List signature;
+}
+
 final class ChannelData extends ReplyFrame {
   ChannelData({
     required this.channel,
@@ -494,6 +509,8 @@ RadioFrame decodeFrame(List<int> frame) {
         usedKb: r.remaining >= 8 ? r.u32() : null,
         totalKb: r.remaining >= 4 ? r.u32() : null,
       ),
+      ResponseCode.signStart => SignStartReply((r..skip(1)).u32()),
+      ResponseCode.signature => SignatureReply(r.bytes(64)),
       ResponseCode.stats => _stats(r),
       ResponseCode.channelInfo => ChannelInfo(
         index: r.u8(),

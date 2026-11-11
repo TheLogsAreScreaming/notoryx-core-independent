@@ -5,6 +5,10 @@ import 'package:notoryx_core/data/data.dart';
 /// added, newest first.
 Future<void> rollBackTo(MeshDatabase db, int version) async {
   final steps = <int, List<String>>{
+    11: [
+      'ALTER TABLE messages DROP COLUMN signer',
+      'ALTER TABLE messages DROP COLUMN signature_valid',
+    ],
     10: ['ALTER TABLE messages DROP COLUMN region'],
     9: ['DROP TABLE track_points', 'DROP TABLE tracks'],
     8: ['DROP TABLE radio_stats_samples'],

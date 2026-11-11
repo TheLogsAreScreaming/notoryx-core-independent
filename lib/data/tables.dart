@@ -100,6 +100,12 @@ class Messages extends Table {
   /// Channel posts: the region it was scoped to, when known.
   TextColumn get region => text().nullable()();
 
+  /// Channel posts with a signature: the signer's public key, in hex.
+  TextColumn get signer => text().nullable()();
+
+  /// Whether that signature checked out.
+  BoolColumn get signatureValid => boolean().nullable()();
+
   /// Incoming only: identifies a message so a repeat delivery is dropped.
   TextColumn get dedupeKey => text().nullable().unique()();
 }

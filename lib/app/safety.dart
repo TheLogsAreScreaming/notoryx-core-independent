@@ -14,6 +14,7 @@ import '../radio/radio.dart';
 import 'connection.dart';
 import 'notifications.dart';
 import 'position.dart';
+import 'post_signing.dart';
 
 // Setting keys.
 const safetyTargetSetting = 'safety_target';
@@ -505,7 +506,11 @@ class Safety extends AsyncNotifier<SafetyState> {
       final id = thread.substring(2);
       try {
         final messageId = thread.startsWith('c:')
-            ? await state.sync.sendChannel(int.parse(id), text)
+            ? await state.sync.sendChannel(
+                int.parse(id),
+                text,
+                signed: (await ref.read(postSigningProvider.future)).safety,
+              )
             : await state.sync.sendDirect(PublicKey.fromHex(id), text);
         sends.add((thread: thread, messageId: messageId));
       } on RadioRequestException catch (e) {
