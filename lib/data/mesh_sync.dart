@@ -148,6 +148,9 @@ class MeshSync {
   /// out. Sending reports its own errors to the caller instead.
   Stream<Object> get errors => _errors.stream;
 
+  /// The radio session, for one-off exchanges like discover pings.
+  RadioSession get session => _session;
+
   /// Messages from other people, as each one is stored for the first time.
   Stream<Message> get incoming => _incoming.stream;
 

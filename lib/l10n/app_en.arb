@@ -947,5 +947,23 @@
         "type": "Object"
       }
     }
+  },
+  "wardrive": "Wardrive",
+  "wardriveIntro": "Pings the repeaters within one hop as you move, and maps which answered and how well, both ways. Uses your phone’s GPS and a little airtime for each ping.",
+  "startWardrive": "Start",
+  "stopWardrive": "Stop",
+  "pingEvery": "Ping every",
+  "savedDrives": "Saved drives",
+  "noDrivesYet": "No drives yet.",
+  "deleteDrive": "Delete drive",
+  "wardrivePings": "{count} pings",
+  "wardriveLegend": "Green: strong both ways. Amber: usable. Red: barely. Grey: nobody answered.",
+  "connectToStartWardrive": "Connect a radio to start.",
+  "@wardrivePings": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
   }
 }

@@ -407,5 +407,16 @@
   "signSafetyTitle": "Firmar SOS y avisos de estado",
   "signSafetySubtitle": "Añade la firma de tu radio a los mensajes de canal, para que otros usuarios de NOTORYX sepan que son tuyos. Envía un paquete pequeño más.",
   "signAllTitle": "Firmar todos mis mensajes de canal",
-  "signAllSubtitle": "Cada mensaje envía un paquete pequeño más."
+  "signAllSubtitle": "Cada mensaje envía un paquete pequeño más.",
+  "wardrive": "Rastreo",
+  "wardriveIntro": "Hace ping a los repetidores a un salto mientras te mueves, y muestra en el mapa cuáles respondieron y con qué señal, en ambos sentidos. Usa el GPS del teléfono y un poco de tiempo de aire en cada ping.",
+  "startWardrive": "Empezar",
+  "stopWardrive": "Detener",
+  "pingEvery": "Ping cada",
+  "savedDrives": "Recorridos guardados",
+  "noDrivesYet": "Aún no hay recorridos.",
+  "deleteDrive": "Eliminar recorrido",
+  "wardrivePings": "{count} pings",
+  "wardriveLegend": "Verde: buena señal en ambos sentidos. Ámbar: utilizable. Rojo: muy débil. Gris: nadie respondió.",
+  "connectToStartWardrive": "Conecta una radio para empezar."
 }

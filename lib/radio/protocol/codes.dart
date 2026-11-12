@@ -38,6 +38,7 @@ abstract final class CommandCode {
   static const signData = 34;
   static const signFinish = 35;
   static const sendChannelData = 62;
+  static const sendControlData = 55;
   static const sendRawPacket = 65;
   static const runCliCommand = 66;
   static const setAutoAddConfig = 58;
@@ -93,6 +94,7 @@ abstract final class PushCode {
   static const telemetryResponse = 0x8B;
   static const contactDeleted = 0x8F;
   static const contactsFull = 0x90;
+  static const controlData = 0x8E;
 }
 
 /// Reasons carried by a [ResponseCode.error] frame.
