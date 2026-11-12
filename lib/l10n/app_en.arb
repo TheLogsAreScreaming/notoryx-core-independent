@@ -1037,5 +1037,33 @@
         "type": "Object"
       }
     }
+  },
+  "coverage": "Coverage",
+  "coverageIntro": "Every wardrive ping, grouped into hexagons about 250 m across and coloured by the best two-way link heard there. Pick a repeater to see where it heard you.",
+  "allRepeaters": "All repeaters",
+  "noCoverageYet": "No wardrive pings yet. Go for a wardrive first.",
+  "lineOfSight": "Line of sight",
+  "lineOfSightIntro": "A quick check using the curve of the earth. It doesn’t know about hills, buildings or trees.",
+  "yourAntennaHeight": "Your antenna (m)",
+  "otherAntennaHeight": "Other antenna (m)",
+  "distanceKm": "Distance (km)",
+  "withinHorizon": "Within the radio horizon of {horizon} km. Keep about {clear} m clear around the middle of the path.",
+  "beyondHorizon": "Beyond the radio horizon of {horizon} km. Higher antennas, or a repeater between, would be needed.",
+  "@withinHorizon": {
+    "placeholders": {
+      "horizon": {
+        "type": "Object"
+      },
+      "clear": {
+        "type": "Object"
+      }
+    }
+  },
+  "@beyondHorizon": {
+    "placeholders": {
+      "horizon": {
+        "type": "Object"
+      }
+    }
   }
 }
