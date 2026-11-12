@@ -455,5 +455,16 @@
   "mqttPasswordNotSaved": "Guardado, pero este dispositivo no puede guardar la contraseña de forma segura, así que no se conservó.",
   "mqttConnected": "Conectado · {sent} paquetes enviados",
   "mqttNotConnected": "No conectado",
-  "mqttError": "No se pudo conectar: {error}"
+  "mqttError": "No se pudo conectar: {error}",
+  "coverage": "Cobertura",
+  "coverageIntro": "Cada ping de rastreo, agrupado en hexágonos de unos 250 m y coloreado según el mejor enlace en ambos sentidos oído allí. Elige un repetidor para ver dónde te oyó.",
+  "allRepeaters": "Todos los repetidores",
+  "noCoverageYet": "Aún no hay pings de rastreo. Haz primero un rastreo.",
+  "lineOfSight": "Línea de visión",
+  "lineOfSightIntro": "Una comprobación rápida con la curvatura de la tierra. No tiene en cuenta colinas, edificios ni árboles.",
+  "yourAntennaHeight": "Tu antena (m)",
+  "otherAntennaHeight": "La otra antena (m)",
+  "distanceKm": "Distancia (km)",
+  "withinHorizon": "Dentro del horizonte de radio de {horizon} km. Deja libres unos {clear} m alrededor del centro del trayecto.",
+  "beyondHorizon": "Más allá del horizonte de radio de {horizon} km. Harían falta antenas más altas o un repetidor en medio."
 }
