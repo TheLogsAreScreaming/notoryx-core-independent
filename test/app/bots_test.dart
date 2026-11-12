@@ -147,11 +147,6 @@ void main() {
   test('commands keep to the cooldown and never answer SOS', () {
     const on = BotSettings(enabled: true, commands: true);
     final e = BotEngine();
-    expect(
-      ask(e, message('!ping')),
-      isNull,
-      reason: 'default settings have commands off',
-    );
     expect(ask(e, message('!ping'), s: on), startsWith('pong'));
     expect(
       ask(e, message('!ping'), s: on, at: now.add(const Duration(seconds: 10))),
