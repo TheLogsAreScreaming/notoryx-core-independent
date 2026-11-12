@@ -439,5 +439,21 @@
   "heardTimesNoSnr": "Oído {count} veces",
   "noPathsYet": "Aún no se han oído rutas. Deja la app conectada un rato.",
   "clearPaths": "Borrar rutas",
-  "you": "tú"
+  "you": "tú",
+  "mqttBridge": "Puente MQTT",
+  "mqttBridgeSubtitle": "Comparte con un servidor los paquetes que oye tu radio",
+  "mqttWarning": "Envía al servidor de abajo cada paquete que oye tu radio: mensajes cifrados que no puede leer, y anuncios públicos con nombres, claves y las posiciones que la gente decidió compartir. Cualquiera que pueda leer ese servidor los verá. Tus propios mensajes nunca se envían de forma legible.",
+  "mqttEnabled": "Enviar paquetes",
+  "mqttHost": "Servidor",
+  "mqttPort": "Puerto",
+  "mqttTls": "Usar TLS",
+  "mqttUsername": "Usuario",
+  "mqttPassword": "Contraseña",
+  "mqttTopic": "Tema",
+  "mqttTopicHelp": "{radio} se sustituye por la clave pública de tu radio.",
+  "mqttSaved": "Guardado.",
+  "mqttPasswordNotSaved": "Guardado, pero este dispositivo no puede guardar la contraseña de forma segura, así que no se conservó.",
+  "mqttConnected": "Conectado · {sent} paquetes enviados",
+  "mqttNotConnected": "No conectado",
+  "mqttError": "No se pudo conectar: {error}"
 }

@@ -1037,5 +1037,42 @@
         "type": "Object"
       }
     }
+  },
+  "mqttBridge": "MQTT bridge",
+  "mqttBridgeSubtitle": "Share the packets your radio hears with a server",
+  "mqttWarning": "Sends every packet your radio hears to the server below: encrypted messages it can’t read, plus public adverts with names, keys and any positions people chose to share. Anyone who can read that server sees them. Your own messages are never sent in readable form.",
+  "mqttEnabled": "Send packets",
+  "mqttHost": "Server",
+  "mqttPort": "Port",
+  "mqttTls": "Use TLS",
+  "mqttUsername": "Username",
+  "mqttPassword": "Password",
+  "mqttTopic": "Topic",
+  "mqttTopicHelp": "{radio} becomes your radio’s public key.",
+  "mqttSaved": "Saved.",
+  "mqttPasswordNotSaved": "Saved, but this device can’t store the password securely, so it wasn’t kept.",
+  "mqttConnected": "Connected · {sent} packets sent",
+  "mqttNotConnected": "Not connected",
+  "mqttError": "Couldn’t connect: {error}",
+  "@mqttConnected": {
+    "placeholders": {
+      "sent": {
+        "type": "Object"
+      }
+    }
+  },
+  "@mqttError": {
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "@mqttTopicHelp": {
+    "placeholders": {
+      "radio": {
+        "type": "String"
+      }
+    }
   }
 }

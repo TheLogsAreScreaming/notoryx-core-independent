@@ -14,6 +14,7 @@ import 'app/sos_relay.dart';
 import 'app/scheduled_messages.dart';
 import 'app/telemetry.dart';
 import 'app/connection.dart';
+import 'app/mqtt_bridge.dart';
 import 'app/network_scan.dart';
 import 'app/path_graph.dart';
 import 'app/notifications.dart';
@@ -120,6 +121,7 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
     ref.listen(sosRelayRunnerProvider, (_, _) {});
     ref.listen(scanRestoreProvider, (_, _) {});
     ref.listen(pathRecorderProvider, (_, _) {});
+    ref.listen(mqttBridgeProvider, (_, _) {});
     ref.listen(homeWidgetSyncProvider, (_, _) {});
     ref.listen(scheduledSenderProvider, (_, _) {});
     ref.listen(botRunnerProvider, (_, _) {});
