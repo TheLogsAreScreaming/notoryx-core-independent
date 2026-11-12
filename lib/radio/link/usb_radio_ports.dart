@@ -23,16 +23,39 @@ final class UsbRadioPort {
   final Future<SerialByteChannel> Function() _open;
 }
 
-/// Lists and opens USB serial ports. Android only for now: iOS apps can't
-/// open USB serial devices, and macOS needs its own serial backend (the
-/// libserialport plugin doesn't build on current Android tooling and bundles
-/// LGPL code).
+/// Lists and opens USB serial ports: on Android through the USB plugin, on
+/// macOS and Linux through the serial device files (no plugin, so no LGPL
+/// libserialport). iOS apps can't open USB serial devices, and Windows COM
+/// ports need timeouts plain file access can't set, so neither is offered.
 abstract final class UsbRadioPorts {
-  static bool get isSupported => Platform.isAndroid;
+  static bool get isSupported =>
+      Platform.isAndroid || Platform.isMacOS || Platform.isLinux;
 
   static Future<List<UsbRadioPort>> list() async {
     if (Platform.isAndroid) return _androidPorts();
+    if (Platform.isMacOS || Platform.isLinux) return _ttyPorts();
     return const [];
+  }
+
+  static Future<List<UsbRadioPort>> _ttyPorts() async {
+    final names = <String>[];
+    try {
+      await for (final e in Directory('/dev').list()) {
+        final name = e.path.split('/').last;
+        if (isRadioTty(name)) names.add(name);
+      }
+    } on FileSystemException {
+      return const [];
+    }
+    names.sort();
+    return [
+      for (final name in names)
+        UsbRadioPort._(
+          '/dev/$name',
+          ttyLabel(name),
+          () => _TtyChannel.open('/dev/$name'),
+        ),
+    ];
   }
 
   /// Opens [port] at the MeshCore baud rate and returns a link over it.
@@ -120,6 +143,80 @@ final class _AndroidUsbChannel implements SerialByteChannel {
     await _detach?.cancel();
     await _input.cancel();
     await _port.close();
+    await _bytes.close();
+  }
+}
+
+/// Whether device file [name] is a USB serial port a radio could be on.
+/// Bluetooth and debug ports are left out.
+bool isRadioTty(String name) => RegExp(
+  r'^(cu\.(usbmodem|usbserial|SLAB_USBtoUART|wchusbserial)|ttyACM|ttyUSB)',
+).hasMatch(name);
+
+/// "USB serial (usbmodem14101)" for [name].
+String ttyLabel(String name) =>
+    'USB serial (${name.replaceFirst(RegExp(r'^cu\.'), '')})';
+
+/// The `stty` arguments that set [path] to the radio's speed with no line
+/// processing, so binary frames pass through untouched.
+List<String> sttyArgs(String path, {required bool macOS}) => [
+  macOS ? '-f' : '-F',
+  path,
+  '$meshCoreBaudRate',
+  'raw',
+  '-echo',
+  'clocal',
+  'min',
+  '1',
+  'time',
+  '0',
+];
+
+/// A serial port on macOS or Linux, through its device file.
+final class _TtyChannel implements SerialByteChannel {
+  _TtyChannel(this._writer, Stream<List<int>> reads) {
+    _sub = reads.listen(
+      (chunk) => _bytes.add(Uint8List.fromList(chunk)),
+      onError: (Object e) => unawaited(close()),
+      onDone: () => unawaited(close()),
+    );
+  }
+
+  static Future<SerialByteChannel> open(String path) async {
+    final stty = await Process.run(
+      'stty',
+      sttyArgs(path, macOS: Platform.isMacOS),
+    );
+    if (stty.exitCode != 0) {
+      throw FileSystemException(
+        'Could not set up the port: ${stty.stderr}',
+        path,
+      );
+    }
+    final writer = await File(path).open(mode: FileMode.writeOnlyAppend);
+    return _TtyChannel(writer, File(path).openRead());
+  }
+
+  final RandomAccessFile _writer;
+  final _bytes = StreamController<Uint8List>();
+  late final StreamSubscription<List<int>> _sub;
+  bool _closed = false;
+
+  @override
+  Stream<Uint8List> get input => _bytes.stream;
+
+  @override
+  Future<void> write(Uint8List bytes) async {
+    await _writer.writeFrom(bytes);
+    await _writer.flush();
+  }
+
+  @override
+  Future<void> close() async {
+    if (_closed) return;
+    _closed = true;
+    await _sub.cancel();
+    await _writer.close();
     await _bytes.close();
   }
 }
