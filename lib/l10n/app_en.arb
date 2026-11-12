@@ -968,5 +968,48 @@
   },
   "botCommandsTitle": "Answer commands",
   "botCommandsSubtitle": "!ping, !trace, !sun, !moon, !dice and !help, in direct messages and in the channels ticked below. !sun uses your radio’s position.",
-  "botCommandChannels": "Channels that get command answers"
+  "botCommandChannels": "Channels that get command answers",
+  "networkScan": "Network scan",
+  "networkScanIntro": "A radio only hears networks on its exact settings. This switches yours to each preset in its band in turn, asks nearby repeaters to answer, and then switches back. It takes about {minutes} min, and messages sent to you meanwhile may be missed.",
+  "startScan": "Start scan",
+  "cancelScan": "Cancel",
+  "scanProgress": "Checked {done} of {total}",
+  "noRepeatersHeard": "No repeaters answered",
+  "repeatersHeard": "{count} answered: {names}",
+  "scanFailed": "The scan stopped: {error}. Your settings were put back.",
+  "findNetworksNearby": "Find networks nearby",
+  "@networkScanIntro": {
+    "placeholders": {
+      "minutes": {
+        "type": "Object"
+      }
+    }
+  },
+  "@scanProgress": {
+    "placeholders": {
+      "done": {
+        "type": "Object"
+      },
+      "total": {
+        "type": "Object"
+      }
+    }
+  },
+  "@repeatersHeard": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      },
+      "names": {
+        "type": "Object"
+      }
+    }
+  },
+  "@scanFailed": {
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  }
 }

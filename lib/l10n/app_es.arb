@@ -421,5 +421,14 @@
   "connectToStartWardrive": "Conecta una radio para empezar.",
   "botCommandsTitle": "Responder a comandos",
   "botCommandsSubtitle": "!ping, !trace, !sun, !moon, !dice y !help, en mensajes directos y en los canales marcados abajo. !sun usa la posición de tu radio.",
-  "botCommandChannels": "Canales que reciben respuestas a comandos"
+  "botCommandChannels": "Canales que reciben respuestas a comandos",
+  "networkScan": "Búsqueda de redes",
+  "networkScanIntro": "Una radio solo oye redes con sus mismos ajustes exactos. Esto cambia la tuya a cada ajuste de su banda, pide a los repetidores cercanos que respondan y luego la devuelve a como estaba. Tarda unos {minutes} min, y puedes perderte mensajes que te envíen mientras tanto.",
+  "startScan": "Empezar búsqueda",
+  "cancelScan": "Cancelar",
+  "scanProgress": "Revisados {done} de {total}",
+  "noRepeatersHeard": "Ningún repetidor respondió",
+  "repeatersHeard": "{count} respondieron: {names}",
+  "scanFailed": "La búsqueda se detuvo: {error}. Se restauraron tus ajustes.",
+  "findNetworksNearby": "Buscar redes cercanas"
 }
