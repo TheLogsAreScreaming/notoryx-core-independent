@@ -60,6 +60,7 @@ dependencies:
   flutter_secure_storage: ^11.2.0
   flutter_tts: ^4.2.5
   ed25519_edwards: ^0.3.2
+  mqtt_client: ^10.14.0
 
 dev_dependencies:
   flutter_test:
