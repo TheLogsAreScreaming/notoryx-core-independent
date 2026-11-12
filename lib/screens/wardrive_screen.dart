@@ -7,6 +7,7 @@ import '../app/connection.dart';
 import '../app/wardrive.dart';
 import '../l10n/l10n.dart';
 import 'map_tab.dart' show mapTilesProvider;
+import 'coverage_screen.dart';
 
 /// The colour for a ping's best two-way link.
 Color wardriveColor(double? best) => switch (best) {
@@ -40,7 +41,18 @@ class _WardriveScreenState extends ConsumerState<WardriveScreen> {
         : ref.watch(wardrivePointsProvider(shown)).value ?? const [];
     final coords = [for (final p in points) LatLng(p.latitude, p.longitude)];
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.wardrive)),
+      appBar: AppBar(
+        title: Text(context.l10n.wardrive),
+        actions: [
+          IconButton(
+            tooltip: context.l10n.coverage,
+            icon: const Icon(Icons.hexagon_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const CoverageScreen()),
+            ),
+          ),
+        ],
+      ),
       body: ListView(
         children: [
           Padding(
