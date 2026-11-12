@@ -120,4 +120,54 @@ void main() {
     expect(back.rules.single.reply, 'pong {name}');
     expect(BotSettings.fromJson('nonsense').enabled, isFalse);
   });
+
+  test('commands answer in direct chats, and only ticked channels', () {
+    const on = BotSettings(enabled: true, commands: true, commandChannels: {2});
+    expect(ask(BotEngine(), message('!moon'), s: on), contains('lit'));
+    expect(
+      ask(
+        BotEngine(),
+        message('!moon', on: 'c:1', kind: MessageKind.channel),
+        s: on,
+      ),
+      isNull,
+    );
+    expect(
+      ask(
+        BotEngine(),
+        message('!moon', on: 'c:2', kind: MessageKind.channel),
+        s: on,
+      ),
+      contains('lit'),
+    );
+    const off = BotSettings(enabled: true);
+    expect(ask(BotEngine(), message('!moon'), s: off), isNull);
+  });
+
+  test('commands keep to the cooldown and never answer SOS', () {
+    const on = BotSettings(enabled: true, commands: true);
+    final e = BotEngine();
+    expect(
+      ask(e, message('!ping')),
+      isNull,
+      reason: 'default settings have commands off',
+    );
+    expect(ask(e, message('!ping'), s: on), startsWith('pong'));
+    expect(
+      ask(e, message('!ping'), s: on, at: now.add(const Duration(seconds: 10))),
+      isNull,
+    );
+    expect(ask(BotEngine(), message('!ping SOS'), s: on), isNull);
+  });
+
+  test('command settings survive saving', () {
+    const s = BotSettings(
+      enabled: true,
+      commands: true,
+      commandChannels: {3, 5},
+    );
+    final back = BotSettings.fromJson(s.toJson());
+    expect(back.commands, isTrue);
+    expect(back.commandChannels, {3, 5});
+  });
 }

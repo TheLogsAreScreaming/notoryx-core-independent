@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/bots.dart';
 import '../data/data.dart';
 import '../l10n/l10n.dart';
+import '../app/connection.dart';
 
 /// Turns automatic replies on and off, and edits their rules.
 class BotsScreen extends ConsumerWidget {
@@ -28,6 +29,7 @@ class BotsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final radioKey = ref.watch(radioKeyProvider) ?? '';
     final settings = ref.watch(botsProvider).value ?? const BotSettings();
     final notifier = ref.read(botsProvider.notifier);
     return Scaffold(
@@ -52,6 +54,25 @@ class BotsScreen extends ConsumerWidget {
               context.l10n.everyReplyUsesAirtimeOtherPeople(botHourlyLimit),
             ),
           ),
+          SwitchListTile(
+            title: Text(context.l10n.botCommandsTitle),
+            subtitle: Text(context.l10n.botCommandsSubtitle),
+            value: settings.commands,
+            onChanged: notifier.setCommands,
+          ),
+          if (settings.commands) ...[
+            ListTile(title: Text(context.l10n.botCommandChannels)),
+            for (final c
+                in ref.watch(channelsProvider(radioKey)).value ?? const [])
+              if (c.name.isNotEmpty)
+                CheckboxListTile(
+                  title: Text(c.name),
+                  value: settings.commandChannels.contains(c.slot),
+                  onChanged: (on) =>
+                      notifier.setCommandChannel(c.slot, on ?? false),
+                ),
+          ],
+          const Divider(),
           if (settings.rules.isEmpty)
             ListTile(
               title: Text(context.l10n.noRulesYet),

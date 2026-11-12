@@ -4,11 +4,13 @@ library;
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/data.dart';
 import 'blocking.dart';
+import 'bot_commands.dart';
 import 'chat_send.dart';
 import 'connection.dart';
 import 'notifications.dart';
@@ -25,6 +27,10 @@ const botMaxAge = Duration(minutes: 10);
 
 const botDirectCooldown = Duration(minutes: 1);
 const botChannelCooldown = Duration(minutes: 5);
+
+/// Between command answers on one channel, so a busy channel can't turn
+/// the bot into a flood.
+const botChannelCommandCooldown = Duration(minutes: 1);
 
 /// How long a rule with no trigger (an away message) stays quiet per chat.
 const botAwayCooldown = Duration(hours: 1);
@@ -68,7 +74,12 @@ final class BotRule {
 }
 
 final class BotSettings {
-  const BotSettings({this.enabled = false, this.rules = const []});
+  const BotSettings({
+    this.enabled = false,
+    this.rules = const [],
+    this.commands = false,
+    this.commandChannels = const {},
+  });
 
   factory BotSettings.fromJson(String? raw) {
     if (raw == null) return const BotSettings();
@@ -80,6 +91,11 @@ final class BotSettings {
           for (final r in json['rules']! as List<Object?>)
             BotRule.fromJson(r! as Map<String, Object?>),
         ],
+        commands: json['commands'] == true,
+        commandChannels: {
+          for (final c in (json['commandChannels'] as List<Object?>?) ?? [])
+            if (c is int) c,
+        },
       );
     } on Object {
       return const BotSettings();
@@ -89,9 +105,28 @@ final class BotSettings {
   final bool enabled;
   final List<BotRule> rules;
 
+  /// Whether `!ping` and the other commands are answered: always in direct
+  /// messages, and on channels only in [commandChannels] (by slot).
+  final bool commands;
+  final Set<int> commandChannels;
+
+  BotSettings copyWith({
+    bool? enabled,
+    List<BotRule>? rules,
+    bool? commands,
+    Set<int>? commandChannels,
+  }) => BotSettings(
+    enabled: enabled ?? this.enabled,
+    rules: rules ?? this.rules,
+    commands: commands ?? this.commands,
+    commandChannels: commandChannels ?? this.commandChannels,
+  );
+
   String toJson() => jsonEncode({
     'enabled': enabled,
     'rules': [for (final r in rules) r.toJson()],
+    'commands': commands,
+    'commandChannels': [...commandChannels],
   });
 }
 
@@ -114,6 +149,8 @@ final class BotEngine {
     required String senderName,
     required bool blocked,
     required DateTime now,
+    ({double lat, double lon})? position,
+    math.Random? random,
   }) {
     if (!settings.enabled || m.outgoing || blocked || m.textType != 0) {
       return null;
@@ -128,6 +165,29 @@ final class BotEngine {
       (t) => now.difference(t) >= const Duration(hours: 1),
     );
     if (_sentTimes.length >= botHourlyLimit) return null;
+
+    if (settings.commands && m.body.trimLeft().startsWith('!')) {
+      final slot = isChannel ? int.tryParse(m.thread.substring(2)) : null;
+      if (isChannel && !settings.commandChannels.contains(slot)) return null;
+      final key = 'cmd:${m.thread}';
+      final last = _lastSent[key];
+      final wait = isChannel ? botChannelCommandCooldown : botDirectCooldown;
+      if (last != null && now.difference(last) < wait) return null;
+      final reply = botCommandReply(
+        m.body,
+        pathLength: m.pathLength,
+        snr: m.snr,
+        now: now,
+        position: position,
+        random: random,
+      );
+      if (reply == null || utf8.encode(reply).length > maxDirectTextBytes) {
+        return null;
+      }
+      _lastSent[key] = now;
+      _sentTimes.add(now);
+      return reply;
+    }
 
     for (final rule in settings.rules) {
       if (rule.isAway ? isChannel : isChannel && !rule.onChannels) continue;
@@ -173,7 +233,21 @@ class Bots extends AsyncNotifier<BotSettings> {
   }
 
   Future<void> setEnabled(bool on) async =>
-      _save(BotSettings(enabled: on, rules: (await future).rules));
+      _save((await future).copyWith(enabled: on));
+
+  Future<void> setCommands(bool on) async =>
+      _save((await future).copyWith(commands: on));
+
+  Future<void> setCommandChannel(int slot, bool on) async {
+    final s = await future;
+    await _save(
+      s.copyWith(
+        commandChannels:
+            on ? {...s.commandChannels, slot} : {...s.commandChannels}
+              ..remove(slot),
+      ),
+    );
+  }
 
   Future<void> addRule({
     required String trigger,
@@ -182,8 +256,7 @@ class Bots extends AsyncNotifier<BotSettings> {
   }) async {
     final s = await future;
     await _save(
-      BotSettings(
-        enabled: s.enabled,
+      s.copyWith(
         rules: [
           ...s.rules,
           BotRule(
@@ -200,8 +273,7 @@ class Bots extends AsyncNotifier<BotSettings> {
   Future<void> removeRule(int id) async {
     final s = await future;
     await _save(
-      BotSettings(
-        enabled: s.enabled,
+      s.copyWith(
         rules: [
           for (final r in s.rules)
             if (r.id != id) r,
@@ -232,6 +304,16 @@ final botRunnerProvider = Provider<void>((ref) {
       senderName: name,
       blocked: blocks.blocks(m),
       now: ref.read(safetyClockProvider)(),
+      position: switch ((
+        state.radio.self.latitude,
+        state.radio.self.longitude,
+      )) {
+        (final double lat, final double lon) when lat != 0 || lon != 0 => (
+          lat: lat,
+          lon: lon,
+        ),
+        _ => null,
+      },
     );
     if (reply == null) return;
     try {
