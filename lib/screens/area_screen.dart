@@ -5,6 +5,7 @@ import '../presets/area_preset.dart';
 import '../presets/area_presets_provider.dart';
 import 'community_presets_screen.dart';
 import '../l10n/l10n.dart';
+import 'network_scan_screen.dart';
 
 /// "Phoenix, Arizona uses…" with Not now and Review, shown when the radio
 /// isn't on its area's settings.
@@ -185,6 +186,17 @@ class AreaScreen extends ConsumerWidget {
                   child: Text(context.l10n.reviewSettings(active.name)),
                 ),
               ),
+            ListTile(
+              leading: const Icon(Icons.radar),
+              title: Text(context.l10n.networkScan),
+              subtitle: Text(context.l10n.findNetworksNearby),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const NetworkScanScreen(),
+                ),
+              ),
+            ),
             ListTile(
               leading: const Icon(Icons.public),
               title: Text(context.l10n.communityPresets),
