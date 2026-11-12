@@ -418,5 +418,8 @@
   "deleteDrive": "Eliminar recorrido",
   "wardrivePings": "{count} pings",
   "wardriveLegend": "Verde: buena señal en ambos sentidos. Ámbar: utilizable. Rojo: muy débil. Gris: nadie respondió.",
-  "connectToStartWardrive": "Conecta una radio para empezar."
+  "connectToStartWardrive": "Conecta una radio para empezar.",
+  "botCommandsTitle": "Responder a comandos",
+  "botCommandsSubtitle": "!ping, !trace, !sun, !moon, !dice y !help, en mensajes directos y en los canales marcados abajo. !sun usa la posición de tu radio.",
+  "botCommandChannels": "Canales que reciben respuestas a comandos"
 }
