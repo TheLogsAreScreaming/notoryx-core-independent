@@ -19,6 +19,7 @@ import 'radio_console_screen.dart';
 import 'backup_screen.dart';
 import 'blocked_screen.dart';
 import '../l10n/l10n.dart';
+import 'path_graph_screen.dart';
 
 /// Standard LoRa bandwidths the firmware accepts, in kHz.
 const loraBandwidths = [
@@ -376,6 +377,17 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
                   builder: (_) => const RadioConsoleScreen(),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.account_tree_outlined),
+              title: Text(context.l10n.pathGraph),
+              subtitle: Text(context.l10n.pathGraphSubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const PathGraphScreen(),
                 ),
               ),
             ),

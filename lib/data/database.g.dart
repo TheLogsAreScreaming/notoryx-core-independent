@@ -6163,6 +6163,458 @@ class WardriveHitsCompanion extends UpdateCompanion<WardriveHit> {
   }
 }
 
+class $HeardPathsTable extends HeardPaths
+    with TableInfo<$HeardPathsTable, HeardPathRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $HeardPathsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _radioKeyMeta = const VerificationMeta(
+    'radioKey',
+  );
+  @override
+  late final GeneratedColumn<String> radioKey = GeneratedColumn<String>(
+    'radio_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _hopsMeta = const VerificationMeta('hops');
+  @override
+  late final GeneratedColumn<String> hops = GeneratedColumn<String>(
+    'hops',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _hashBytesMeta = const VerificationMeta(
+    'hashBytes',
+  );
+  @override
+  late final GeneratedColumn<int> hashBytes = GeneratedColumn<int>(
+    'hash_bytes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _countMeta = const VerificationMeta('count');
+  @override
+  late final GeneratedColumn<int> count = GeneratedColumn<int>(
+    'count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lastSnrMeta = const VerificationMeta(
+    'lastSnr',
+  );
+  @override
+  late final GeneratedColumn<double> lastSnr = GeneratedColumn<double>(
+    'last_snr',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastAtMeta = const VerificationMeta('lastAt');
+  @override
+  late final GeneratedColumn<int> lastAt = GeneratedColumn<int>(
+    'last_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    radioKey,
+    hops,
+    hashBytes,
+    count,
+    lastSnr,
+    lastAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'heard_paths';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<HeardPathRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('radio_key')) {
+      context.handle(
+        _radioKeyMeta,
+        radioKey.isAcceptableOrUnknown(data['radio_key']!, _radioKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_radioKeyMeta);
+    }
+    if (data.containsKey('hops')) {
+      context.handle(
+        _hopsMeta,
+        hops.isAcceptableOrUnknown(data['hops']!, _hopsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_hopsMeta);
+    }
+    if (data.containsKey('hash_bytes')) {
+      context.handle(
+        _hashBytesMeta,
+        hashBytes.isAcceptableOrUnknown(data['hash_bytes']!, _hashBytesMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_hashBytesMeta);
+    }
+    if (data.containsKey('count')) {
+      context.handle(
+        _countMeta,
+        count.isAcceptableOrUnknown(data['count']!, _countMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_countMeta);
+    }
+    if (data.containsKey('last_snr')) {
+      context.handle(
+        _lastSnrMeta,
+        lastSnr.isAcceptableOrUnknown(data['last_snr']!, _lastSnrMeta),
+      );
+    }
+    if (data.containsKey('last_at')) {
+      context.handle(
+        _lastAtMeta,
+        lastAt.isAcceptableOrUnknown(data['last_at']!, _lastAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lastAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {radioKey, hops},
+  ];
+  @override
+  HeardPathRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return HeardPathRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      radioKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}radio_key'],
+      )!,
+      hops: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}hops'],
+      )!,
+      hashBytes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}hash_bytes'],
+      )!,
+      count: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}count'],
+      )!,
+      lastSnr: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}last_snr'],
+      ),
+      lastAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}last_at'],
+      )!,
+    );
+  }
+
+  @override
+  $HeardPathsTable createAlias(String alias) {
+    return $HeardPathsTable(attachedDatabase, alias);
+  }
+}
+
+class HeardPathRow extends DataClass implements Insertable<HeardPathRow> {
+  final int id;
+  final String radioKey;
+
+  /// Hop hashes in hex, oldest first, joined by '>'.
+  final String hops;
+  final int hashBytes;
+  final int count;
+
+  /// The last hop's SNR the last time it was heard, in dB.
+  final double? lastSnr;
+
+  /// Unix milliseconds.
+  final int lastAt;
+  const HeardPathRow({
+    required this.id,
+    required this.radioKey,
+    required this.hops,
+    required this.hashBytes,
+    required this.count,
+    this.lastSnr,
+    required this.lastAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['radio_key'] = Variable<String>(radioKey);
+    map['hops'] = Variable<String>(hops);
+    map['hash_bytes'] = Variable<int>(hashBytes);
+    map['count'] = Variable<int>(count);
+    if (!nullToAbsent || lastSnr != null) {
+      map['last_snr'] = Variable<double>(lastSnr);
+    }
+    map['last_at'] = Variable<int>(lastAt);
+    return map;
+  }
+
+  HeardPathsCompanion toCompanion(bool nullToAbsent) {
+    return HeardPathsCompanion(
+      id: Value(id),
+      radioKey: Value(radioKey),
+      hops: Value(hops),
+      hashBytes: Value(hashBytes),
+      count: Value(count),
+      lastSnr: lastSnr == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSnr),
+      lastAt: Value(lastAt),
+    );
+  }
+
+  factory HeardPathRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return HeardPathRow(
+      id: serializer.fromJson<int>(json['id']),
+      radioKey: serializer.fromJson<String>(json['radioKey']),
+      hops: serializer.fromJson<String>(json['hops']),
+      hashBytes: serializer.fromJson<int>(json['hashBytes']),
+      count: serializer.fromJson<int>(json['count']),
+      lastSnr: serializer.fromJson<double?>(json['lastSnr']),
+      lastAt: serializer.fromJson<int>(json['lastAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'radioKey': serializer.toJson<String>(radioKey),
+      'hops': serializer.toJson<String>(hops),
+      'hashBytes': serializer.toJson<int>(hashBytes),
+      'count': serializer.toJson<int>(count),
+      'lastSnr': serializer.toJson<double?>(lastSnr),
+      'lastAt': serializer.toJson<int>(lastAt),
+    };
+  }
+
+  HeardPathRow copyWith({
+    int? id,
+    String? radioKey,
+    String? hops,
+    int? hashBytes,
+    int? count,
+    Value<double?> lastSnr = const Value.absent(),
+    int? lastAt,
+  }) => HeardPathRow(
+    id: id ?? this.id,
+    radioKey: radioKey ?? this.radioKey,
+    hops: hops ?? this.hops,
+    hashBytes: hashBytes ?? this.hashBytes,
+    count: count ?? this.count,
+    lastSnr: lastSnr.present ? lastSnr.value : this.lastSnr,
+    lastAt: lastAt ?? this.lastAt,
+  );
+  HeardPathRow copyWithCompanion(HeardPathsCompanion data) {
+    return HeardPathRow(
+      id: data.id.present ? data.id.value : this.id,
+      radioKey: data.radioKey.present ? data.radioKey.value : this.radioKey,
+      hops: data.hops.present ? data.hops.value : this.hops,
+      hashBytes: data.hashBytes.present ? data.hashBytes.value : this.hashBytes,
+      count: data.count.present ? data.count.value : this.count,
+      lastSnr: data.lastSnr.present ? data.lastSnr.value : this.lastSnr,
+      lastAt: data.lastAt.present ? data.lastAt.value : this.lastAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HeardPathRow(')
+          ..write('id: $id, ')
+          ..write('radioKey: $radioKey, ')
+          ..write('hops: $hops, ')
+          ..write('hashBytes: $hashBytes, ')
+          ..write('count: $count, ')
+          ..write('lastSnr: $lastSnr, ')
+          ..write('lastAt: $lastAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, radioKey, hops, hashBytes, count, lastSnr, lastAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is HeardPathRow &&
+          other.id == this.id &&
+          other.radioKey == this.radioKey &&
+          other.hops == this.hops &&
+          other.hashBytes == this.hashBytes &&
+          other.count == this.count &&
+          other.lastSnr == this.lastSnr &&
+          other.lastAt == this.lastAt);
+}
+
+class HeardPathsCompanion extends UpdateCompanion<HeardPathRow> {
+  final Value<int> id;
+  final Value<String> radioKey;
+  final Value<String> hops;
+  final Value<int> hashBytes;
+  final Value<int> count;
+  final Value<double?> lastSnr;
+  final Value<int> lastAt;
+  const HeardPathsCompanion({
+    this.id = const Value.absent(),
+    this.radioKey = const Value.absent(),
+    this.hops = const Value.absent(),
+    this.hashBytes = const Value.absent(),
+    this.count = const Value.absent(),
+    this.lastSnr = const Value.absent(),
+    this.lastAt = const Value.absent(),
+  });
+  HeardPathsCompanion.insert({
+    this.id = const Value.absent(),
+    required String radioKey,
+    required String hops,
+    required int hashBytes,
+    required int count,
+    this.lastSnr = const Value.absent(),
+    required int lastAt,
+  }) : radioKey = Value(radioKey),
+       hops = Value(hops),
+       hashBytes = Value(hashBytes),
+       count = Value(count),
+       lastAt = Value(lastAt);
+  static Insertable<HeardPathRow> custom({
+    Expression<int>? id,
+    Expression<String>? radioKey,
+    Expression<String>? hops,
+    Expression<int>? hashBytes,
+    Expression<int>? count,
+    Expression<double>? lastSnr,
+    Expression<int>? lastAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (radioKey != null) 'radio_key': radioKey,
+      if (hops != null) 'hops': hops,
+      if (hashBytes != null) 'hash_bytes': hashBytes,
+      if (count != null) 'count': count,
+      if (lastSnr != null) 'last_snr': lastSnr,
+      if (lastAt != null) 'last_at': lastAt,
+    });
+  }
+
+  HeardPathsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? radioKey,
+    Value<String>? hops,
+    Value<int>? hashBytes,
+    Value<int>? count,
+    Value<double?>? lastSnr,
+    Value<int>? lastAt,
+  }) {
+    return HeardPathsCompanion(
+      id: id ?? this.id,
+      radioKey: radioKey ?? this.radioKey,
+      hops: hops ?? this.hops,
+      hashBytes: hashBytes ?? this.hashBytes,
+      count: count ?? this.count,
+      lastSnr: lastSnr ?? this.lastSnr,
+      lastAt: lastAt ?? this.lastAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (radioKey.present) {
+      map['radio_key'] = Variable<String>(radioKey.value);
+    }
+    if (hops.present) {
+      map['hops'] = Variable<String>(hops.value);
+    }
+    if (hashBytes.present) {
+      map['hash_bytes'] = Variable<int>(hashBytes.value);
+    }
+    if (count.present) {
+      map['count'] = Variable<int>(count.value);
+    }
+    if (lastSnr.present) {
+      map['last_snr'] = Variable<double>(lastSnr.value);
+    }
+    if (lastAt.present) {
+      map['last_at'] = Variable<int>(lastAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HeardPathsCompanion(')
+          ..write('id: $id, ')
+          ..write('radioKey: $radioKey, ')
+          ..write('hops: $hops, ')
+          ..write('hashBytes: $hashBytes, ')
+          ..write('count: $count, ')
+          ..write('lastSnr: $lastSnr, ')
+          ..write('lastAt: $lastAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$MeshDatabase extends GeneratedDatabase {
   _$MeshDatabase(QueryExecutor e) : super(e);
   $MeshDatabaseManager get managers => $MeshDatabaseManager(this);
@@ -6183,6 +6635,7 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
   late final $WardrivesTable wardrives = $WardrivesTable(this);
   late final $WardrivePingsTable wardrivePings = $WardrivePingsTable(this);
   late final $WardriveHitsTable wardriveHits = $WardriveHitsTable(this);
+  late final $HeardPathsTable heardPaths = $HeardPathsTable(this);
   late final Index messagesByThread = Index(
     'messages_by_thread',
     'CREATE INDEX messages_by_thread ON messages (radio_key, thread, id)',
@@ -6230,6 +6683,7 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
     wardrives,
     wardrivePings,
     wardriveHits,
+    heardPaths,
     messagesByThread,
     messagesByAck,
     telemetryByNode,
@@ -11574,6 +12028,245 @@ typedef $$WardriveHitsTableProcessedTableManager =
       WardriveHit,
       PrefetchHooks Function({bool ping})
     >;
+typedef $$HeardPathsTableCreateCompanionBuilder = HeardPathsCompanion Function({
+  Value<int> id,
+  required String radioKey,
+  required String hops,
+  required int hashBytes,
+  required int count,
+  Value<double?> lastSnr,
+  required int lastAt,
+});
+typedef $$HeardPathsTableUpdateCompanionBuilder = HeardPathsCompanion Function({
+  Value<int> id,
+  Value<String> radioKey,
+  Value<String> hops,
+  Value<int> hashBytes,
+  Value<int> count,
+  Value<double?> lastSnr,
+  Value<int> lastAt,
+});
+
+class $$HeardPathsTableFilterComposer
+    extends Composer<_$MeshDatabase, $HeardPathsTable> {
+  $$HeardPathsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get radioKey => $composableBuilder(
+    column: $table.radioKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get hops => $composableBuilder(
+    column: $table.hops,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get hashBytes => $composableBuilder(
+    column: $table.hashBytes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get count => $composableBuilder(
+    column: $table.count,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get lastSnr => $composableBuilder(
+    column: $table.lastSnr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lastAt => $composableBuilder(
+    column: $table.lastAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$HeardPathsTableOrderingComposer
+    extends Composer<_$MeshDatabase, $HeardPathsTable> {
+  $$HeardPathsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get radioKey => $composableBuilder(
+    column: $table.radioKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get hops => $composableBuilder(
+    column: $table.hops,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get hashBytes => $composableBuilder(
+    column: $table.hashBytes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get count => $composableBuilder(
+    column: $table.count,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get lastSnr => $composableBuilder(
+    column: $table.lastSnr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lastAt => $composableBuilder(
+    column: $table.lastAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$HeardPathsTableAnnotationComposer
+    extends Composer<_$MeshDatabase, $HeardPathsTable> {
+  $$HeardPathsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get radioKey =>
+      $composableBuilder(column: $table.radioKey, builder: (column) => column);
+
+  GeneratedColumn<String> get hops =>
+      $composableBuilder(column: $table.hops, builder: (column) => column);
+
+  GeneratedColumn<int> get hashBytes =>
+      $composableBuilder(column: $table.hashBytes, builder: (column) => column);
+
+  GeneratedColumn<int> get count =>
+      $composableBuilder(column: $table.count, builder: (column) => column);
+
+  GeneratedColumn<double> get lastSnr =>
+      $composableBuilder(column: $table.lastSnr, builder: (column) => column);
+
+  GeneratedColumn<int> get lastAt =>
+      $composableBuilder(column: $table.lastAt, builder: (column) => column);
+}
+
+class $$HeardPathsTableTableManager
+    extends
+        RootTableManager<
+          _$MeshDatabase,
+          $HeardPathsTable,
+          HeardPathRow,
+          $$HeardPathsTableFilterComposer,
+          $$HeardPathsTableOrderingComposer,
+          $$HeardPathsTableAnnotationComposer,
+          $$HeardPathsTableCreateCompanionBuilder,
+          $$HeardPathsTableUpdateCompanionBuilder,
+          (
+            HeardPathRow,
+            BaseReferences<_$MeshDatabase, $HeardPathsTable, HeardPathRow>,
+          ),
+          HeardPathRow,
+          PrefetchHooks Function()
+        > {
+  $$HeardPathsTableTableManager(_$MeshDatabase db, $HeardPathsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$HeardPathsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$HeardPathsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$HeardPathsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> radioKey = const Value.absent(),
+                Value<String> hops = const Value.absent(),
+                Value<int> hashBytes = const Value.absent(),
+                Value<int> count = const Value.absent(),
+                Value<double?> lastSnr = const Value.absent(),
+                Value<int> lastAt = const Value.absent(),
+              }) => HeardPathsCompanion(
+                id: id,
+                radioKey: radioKey,
+                hops: hops,
+                hashBytes: hashBytes,
+                count: count,
+                lastSnr: lastSnr,
+                lastAt: lastAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String radioKey,
+                required String hops,
+                required int hashBytes,
+                required int count,
+                Value<double?> lastSnr = const Value.absent(),
+                required int lastAt,
+              }) => HeardPathsCompanion.insert(
+                id: id,
+                radioKey: radioKey,
+                hops: hops,
+                hashBytes: hashBytes,
+                count: count,
+                lastSnr: lastSnr,
+                lastAt: lastAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$HeardPathsTable, HeardPathRow>(table),
+                  BaseReferences<
+                    _$MeshDatabase,
+                    $HeardPathsTable,
+                    HeardPathRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$HeardPathsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$MeshDatabase,
+      $HeardPathsTable,
+      HeardPathRow,
+      $$HeardPathsTableFilterComposer,
+      $$HeardPathsTableOrderingComposer,
+      $$HeardPathsTableAnnotationComposer,
+      $$HeardPathsTableCreateCompanionBuilder,
+      $$HeardPathsTableUpdateCompanionBuilder,
+      (
+        HeardPathRow,
+        BaseReferences<_$MeshDatabase, $HeardPathsTable, HeardPathRow>,
+      ),
+      HeardPathRow,
+      PrefetchHooks Function()
+    >;
 
 class $MeshDatabaseManager {
   final _$MeshDatabase _db;
@@ -11606,4 +12299,6 @@ class $MeshDatabaseManager {
       $$WardrivePingsTableTableManager(_db, _db.wardrivePings);
   $$WardriveHitsTableTableManager get wardriveHits =>
       $$WardriveHitsTableTableManager(_db, _db.wardriveHits);
+  $$HeardPathsTableTableManager get heardPaths =>
+      $$HeardPathsTableTableManager(_db, _db.heardPaths);
 }

@@ -430,5 +430,14 @@
   "noRepeatersHeard": "Ningún repetidor respondió",
   "repeatersHeard": "{count} respondieron: {names}",
   "scanFailed": "La búsqueda se detuvo: {error}. Se restauraron tus ajustes.",
-  "findNetworksNearby": "Buscar redes cercanas"
+  "findNetworksNearby": "Buscar redes cercanas",
+  "pathGraph": "Mapa de rutas",
+  "pathGraphSubtitle": "Rutas oídas y los repetidores que oyes directamente",
+  "pathGraphIntro": "Se crea con las rutas de los paquetes por inundación que oye tu radio mientras la app está conectada. Cada repetidor que oyes directamente aparece con las cadenas de repetidores que hay detrás. Un ID corto puede pertenecer a más de un repetidor.",
+  "heardDirectly": "Repetidores que oyes directamente",
+  "heardTimes": "Oído {count} veces · media {snr} dB",
+  "heardTimesNoSnr": "Oído {count} veces",
+  "noPathsYet": "Aún no se han oído rutas. Deja la app conectada un rato.",
+  "clearPaths": "Borrar rutas",
+  "you": "tú"
 }

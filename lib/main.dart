@@ -15,6 +15,7 @@ import 'app/scheduled_messages.dart';
 import 'app/telemetry.dart';
 import 'app/connection.dart';
 import 'app/network_scan.dart';
+import 'app/path_graph.dart';
 import 'app/notifications.dart';
 import 'l10n/l10n.dart';
 import 'screens/app_lock_screen.dart';
@@ -118,6 +119,7 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
     ref.listen(tripQuietWatchdogProvider, (_, _) {});
     ref.listen(sosRelayRunnerProvider, (_, _) {});
     ref.listen(scanRestoreProvider, (_, _) {});
+    ref.listen(pathRecorderProvider, (_, _) {});
     ref.listen(homeWidgetSyncProvider, (_, _) {});
     ref.listen(scheduledSenderProvider, (_, _) {});
     ref.listen(botRunnerProvider, (_, _) {});
