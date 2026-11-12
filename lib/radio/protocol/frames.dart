@@ -448,6 +448,22 @@ final class RxLog extends PushFrame {
   final Uint8List packet;
 }
 
+/// A zero-hop control packet the radio heard, such as a repeater answering
+/// a discover ping.
+final class ControlData extends PushFrame {
+  ControlData({
+    required this.snr,
+    required this.rssi,
+    required this.pathLength,
+    required List<int> payload,
+  }) : payload = Uint8List.fromList(payload);
+
+  final double snr;
+  final int rssi;
+  final int pathLength;
+  final Uint8List payload;
+}
+
 /// The radio dropped a contact to make room for a new one.
 final class ContactDeleted extends PushFrame {
   const ContactDeleted(this.publicKey);
@@ -555,6 +571,12 @@ RadioFrame decodeFrame(List<int> frame) {
         PublicKey(r.bytes(publicKeySize)),
       ),
       PushCode.contactsFull => const ContactsFull(),
+      PushCode.controlData => ControlData(
+        snr: r.i8() / 4,
+        rssi: r.i8(),
+        pathLength: r.u8(),
+        payload: r.restBytes(),
+      ),
       _ => UnknownFrame(bytes),
     };
   } on FormatException catch (e) {

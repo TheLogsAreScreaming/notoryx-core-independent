@@ -13,6 +13,8 @@ import 'node_details.dart';
 import 'track_log_screen.dart';
 import '../app/position.dart';
 import '../l10n/l10n.dart';
+import '../app/wardrive.dart';
+import 'wardrive_screen.dart';
 
 export '../app/position.dart' show phonePositionProvider;
 
@@ -210,6 +212,21 @@ class _MapTabState extends ConsumerState<MapTab> {
                   onPressed: () => _map.move(radio, 13),
                   child: const Icon(Icons.router),
                 ),
+              const SizedBox(height: 8),
+              FloatingActionButton.small(
+                heroTag: 'map-wardrive',
+                tooltip: context.l10n.wardrive,
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const WardriveScreen(),
+                  ),
+                ),
+                child: Icon(
+                  ref.watch(wardriveProvider) == null
+                      ? Icons.cell_tower
+                      : Icons.radio_button_on,
+                ),
+              ),
               const SizedBox(height: 8),
               FloatingActionButton.small(
                 heroTag: 'map-track',

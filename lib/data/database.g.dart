@@ -5112,6 +5112,1057 @@ class TrackPointsCompanion extends UpdateCompanion<TrackPoint> {
   }
 }
 
+class $WardrivesTable extends Wardrives
+    with TableInfo<$WardrivesTable, WardriveRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WardrivesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startedAtMeta = const VerificationMeta(
+    'startedAt',
+  );
+  @override
+  late final GeneratedColumn<int> startedAt = GeneratedColumn<int>(
+    'started_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endedAtMeta = const VerificationMeta(
+    'endedAt',
+  );
+  @override
+  late final GeneratedColumn<int> endedAt = GeneratedColumn<int>(
+    'ended_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, startedAt, endedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'wardrives';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WardriveRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(
+        _startedAtMeta,
+        startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startedAtMeta);
+    }
+    if (data.containsKey('ended_at')) {
+      context.handle(
+        _endedAtMeta,
+        endedAt.isAcceptableOrUnknown(data['ended_at']!, _endedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  WardriveRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WardriveRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      startedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}started_at'],
+      )!,
+      endedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ended_at'],
+      ),
+    );
+  }
+
+  @override
+  $WardrivesTable createAlias(String alias) {
+    return $WardrivesTable(attachedDatabase, alias);
+  }
+}
+
+class WardriveRow extends DataClass implements Insertable<WardriveRow> {
+  final int id;
+  final String name;
+
+  /// Unix milliseconds.
+  final int startedAt;
+  final int? endedAt;
+  const WardriveRow({
+    required this.id,
+    required this.name,
+    required this.startedAt,
+    this.endedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['started_at'] = Variable<int>(startedAt);
+    if (!nullToAbsent || endedAt != null) {
+      map['ended_at'] = Variable<int>(endedAt);
+    }
+    return map;
+  }
+
+  WardrivesCompanion toCompanion(bool nullToAbsent) {
+    return WardrivesCompanion(
+      id: Value(id),
+      name: Value(name),
+      startedAt: Value(startedAt),
+      endedAt: endedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endedAt),
+    );
+  }
+
+  factory WardriveRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WardriveRow(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      startedAt: serializer.fromJson<int>(json['startedAt']),
+      endedAt: serializer.fromJson<int?>(json['endedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'startedAt': serializer.toJson<int>(startedAt),
+      'endedAt': serializer.toJson<int?>(endedAt),
+    };
+  }
+
+  WardriveRow copyWith({
+    int? id,
+    String? name,
+    int? startedAt,
+    Value<int?> endedAt = const Value.absent(),
+  }) => WardriveRow(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    startedAt: startedAt ?? this.startedAt,
+    endedAt: endedAt.present ? endedAt.value : this.endedAt,
+  );
+  WardriveRow copyWithCompanion(WardrivesCompanion data) {
+    return WardriveRow(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      endedAt: data.endedAt.present ? data.endedAt.value : this.endedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WardriveRow(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, startedAt, endedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WardriveRow &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.startedAt == this.startedAt &&
+          other.endedAt == this.endedAt);
+}
+
+class WardrivesCompanion extends UpdateCompanion<WardriveRow> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<int> startedAt;
+  final Value<int?> endedAt;
+  const WardrivesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.endedAt = const Value.absent(),
+  });
+  WardrivesCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required int startedAt,
+    this.endedAt = const Value.absent(),
+  }) : name = Value(name),
+       startedAt = Value(startedAt);
+  static Insertable<WardriveRow> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<int>? startedAt,
+    Expression<int>? endedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (startedAt != null) 'started_at': startedAt,
+      if (endedAt != null) 'ended_at': endedAt,
+    });
+  }
+
+  WardrivesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<int>? startedAt,
+    Value<int?>? endedAt,
+  }) {
+    return WardrivesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<int>(startedAt.value);
+    }
+    if (endedAt.present) {
+      map['ended_at'] = Variable<int>(endedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WardrivesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $WardrivePingsTable extends WardrivePings
+    with TableInfo<$WardrivePingsTable, WardrivePing> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WardrivePingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _driveMeta = const VerificationMeta('drive');
+  @override
+  late final GeneratedColumn<int> drive = GeneratedColumn<int>(
+    'drive',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES wardrives (id)',
+    ),
+  );
+  static const VerificationMeta _atMeta = const VerificationMeta('at');
+  @override
+  late final GeneratedColumn<int> at = GeneratedColumn<int>(
+    'at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _latitudeMeta = const VerificationMeta(
+    'latitude',
+  );
+  @override
+  late final GeneratedColumn<double> latitude = GeneratedColumn<double>(
+    'latitude',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _longitudeMeta = const VerificationMeta(
+    'longitude',
+  );
+  @override
+  late final GeneratedColumn<double> longitude = GeneratedColumn<double>(
+    'longitude',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, drive, at, latitude, longitude];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'wardrive_pings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WardrivePing> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('drive')) {
+      context.handle(
+        _driveMeta,
+        drive.isAcceptableOrUnknown(data['drive']!, _driveMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_driveMeta);
+    }
+    if (data.containsKey('at')) {
+      context.handle(_atMeta, at.isAcceptableOrUnknown(data['at']!, _atMeta));
+    } else if (isInserting) {
+      context.missing(_atMeta);
+    }
+    if (data.containsKey('latitude')) {
+      context.handle(
+        _latitudeMeta,
+        latitude.isAcceptableOrUnknown(data['latitude']!, _latitudeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_latitudeMeta);
+    }
+    if (data.containsKey('longitude')) {
+      context.handle(
+        _longitudeMeta,
+        longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_longitudeMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  WardrivePing map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WardrivePing(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      drive: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}drive'],
+      )!,
+      at: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}at'],
+      )!,
+      latitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}latitude'],
+      )!,
+      longitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}longitude'],
+      )!,
+    );
+  }
+
+  @override
+  $WardrivePingsTable createAlias(String alias) {
+    return $WardrivePingsTable(attachedDatabase, alias);
+  }
+}
+
+class WardrivePing extends DataClass implements Insertable<WardrivePing> {
+  final int id;
+  final int drive;
+
+  /// Unix milliseconds.
+  final int at;
+  final double latitude;
+  final double longitude;
+  const WardrivePing({
+    required this.id,
+    required this.drive,
+    required this.at,
+    required this.latitude,
+    required this.longitude,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['drive'] = Variable<int>(drive);
+    map['at'] = Variable<int>(at);
+    map['latitude'] = Variable<double>(latitude);
+    map['longitude'] = Variable<double>(longitude);
+    return map;
+  }
+
+  WardrivePingsCompanion toCompanion(bool nullToAbsent) {
+    return WardrivePingsCompanion(
+      id: Value(id),
+      drive: Value(drive),
+      at: Value(at),
+      latitude: Value(latitude),
+      longitude: Value(longitude),
+    );
+  }
+
+  factory WardrivePing.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WardrivePing(
+      id: serializer.fromJson<int>(json['id']),
+      drive: serializer.fromJson<int>(json['drive']),
+      at: serializer.fromJson<int>(json['at']),
+      latitude: serializer.fromJson<double>(json['latitude']),
+      longitude: serializer.fromJson<double>(json['longitude']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'drive': serializer.toJson<int>(drive),
+      'at': serializer.toJson<int>(at),
+      'latitude': serializer.toJson<double>(latitude),
+      'longitude': serializer.toJson<double>(longitude),
+    };
+  }
+
+  WardrivePing copyWith({
+    int? id,
+    int? drive,
+    int? at,
+    double? latitude,
+    double? longitude,
+  }) => WardrivePing(
+    id: id ?? this.id,
+    drive: drive ?? this.drive,
+    at: at ?? this.at,
+    latitude: latitude ?? this.latitude,
+    longitude: longitude ?? this.longitude,
+  );
+  WardrivePing copyWithCompanion(WardrivePingsCompanion data) {
+    return WardrivePing(
+      id: data.id.present ? data.id.value : this.id,
+      drive: data.drive.present ? data.drive.value : this.drive,
+      at: data.at.present ? data.at.value : this.at,
+      latitude: data.latitude.present ? data.latitude.value : this.latitude,
+      longitude: data.longitude.present ? data.longitude.value : this.longitude,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WardrivePing(')
+          ..write('id: $id, ')
+          ..write('drive: $drive, ')
+          ..write('at: $at, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, drive, at, latitude, longitude);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WardrivePing &&
+          other.id == this.id &&
+          other.drive == this.drive &&
+          other.at == this.at &&
+          other.latitude == this.latitude &&
+          other.longitude == this.longitude);
+}
+
+class WardrivePingsCompanion extends UpdateCompanion<WardrivePing> {
+  final Value<int> id;
+  final Value<int> drive;
+  final Value<int> at;
+  final Value<double> latitude;
+  final Value<double> longitude;
+  const WardrivePingsCompanion({
+    this.id = const Value.absent(),
+    this.drive = const Value.absent(),
+    this.at = const Value.absent(),
+    this.latitude = const Value.absent(),
+    this.longitude = const Value.absent(),
+  });
+  WardrivePingsCompanion.insert({
+    this.id = const Value.absent(),
+    required int drive,
+    required int at,
+    required double latitude,
+    required double longitude,
+  }) : drive = Value(drive),
+       at = Value(at),
+       latitude = Value(latitude),
+       longitude = Value(longitude);
+  static Insertable<WardrivePing> custom({
+    Expression<int>? id,
+    Expression<int>? drive,
+    Expression<int>? at,
+    Expression<double>? latitude,
+    Expression<double>? longitude,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (drive != null) 'drive': drive,
+      if (at != null) 'at': at,
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
+    });
+  }
+
+  WardrivePingsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? drive,
+    Value<int>? at,
+    Value<double>? latitude,
+    Value<double>? longitude,
+  }) {
+    return WardrivePingsCompanion(
+      id: id ?? this.id,
+      drive: drive ?? this.drive,
+      at: at ?? this.at,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (drive.present) {
+      map['drive'] = Variable<int>(drive.value);
+    }
+    if (at.present) {
+      map['at'] = Variable<int>(at.value);
+    }
+    if (latitude.present) {
+      map['latitude'] = Variable<double>(latitude.value);
+    }
+    if (longitude.present) {
+      map['longitude'] = Variable<double>(longitude.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WardrivePingsCompanion(')
+          ..write('id: $id, ')
+          ..write('drive: $drive, ')
+          ..write('at: $at, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $WardriveHitsTable extends WardriveHits
+    with TableInfo<$WardriveHitsTable, WardriveHit> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WardriveHitsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _pingMeta = const VerificationMeta('ping');
+  @override
+  late final GeneratedColumn<int> ping = GeneratedColumn<int>(
+    'ping',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES wardrive_pings (id)',
+    ),
+  );
+  static const VerificationMeta _repeaterKeyMeta = const VerificationMeta(
+    'repeaterKey',
+  );
+  @override
+  late final GeneratedColumn<String> repeaterKey = GeneratedColumn<String>(
+    'repeater_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _heardUsMeta = const VerificationMeta(
+    'heardUs',
+  );
+  @override
+  late final GeneratedColumn<double> heardUs = GeneratedColumn<double>(
+    'heard_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _weHeardMeta = const VerificationMeta(
+    'weHeard',
+  );
+  @override
+  late final GeneratedColumn<double> weHeard = GeneratedColumn<double>(
+    'we_heard',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _rssiMeta = const VerificationMeta('rssi');
+  @override
+  late final GeneratedColumn<int> rssi = GeneratedColumn<int>(
+    'rssi',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    ping,
+    repeaterKey,
+    heardUs,
+    weHeard,
+    rssi,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'wardrive_hits';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WardriveHit> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('ping')) {
+      context.handle(
+        _pingMeta,
+        ping.isAcceptableOrUnknown(data['ping']!, _pingMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_pingMeta);
+    }
+    if (data.containsKey('repeater_key')) {
+      context.handle(
+        _repeaterKeyMeta,
+        repeaterKey.isAcceptableOrUnknown(
+          data['repeater_key']!,
+          _repeaterKeyMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_repeaterKeyMeta);
+    }
+    if (data.containsKey('heard_us')) {
+      context.handle(
+        _heardUsMeta,
+        heardUs.isAcceptableOrUnknown(data['heard_us']!, _heardUsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_heardUsMeta);
+    }
+    if (data.containsKey('we_heard')) {
+      context.handle(
+        _weHeardMeta,
+        weHeard.isAcceptableOrUnknown(data['we_heard']!, _weHeardMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_weHeardMeta);
+    }
+    if (data.containsKey('rssi')) {
+      context.handle(
+        _rssiMeta,
+        rssi.isAcceptableOrUnknown(data['rssi']!, _rssiMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_rssiMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  WardriveHit map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WardriveHit(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      ping: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ping'],
+      )!,
+      repeaterKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}repeater_key'],
+      )!,
+      heardUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}heard_us'],
+      )!,
+      weHeard: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}we_heard'],
+      )!,
+      rssi: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}rssi'],
+      )!,
+    );
+  }
+
+  @override
+  $WardriveHitsTable createAlias(String alias) {
+    return $WardriveHitsTable(attachedDatabase, alias);
+  }
+}
+
+class WardriveHit extends DataClass implements Insertable<WardriveHit> {
+  final int id;
+  final int ping;
+  final String repeaterKey;
+
+  /// dB: how well the repeater heard us, and we heard it.
+  final double heardUs;
+  final double weHeard;
+  final int rssi;
+  const WardriveHit({
+    required this.id,
+    required this.ping,
+    required this.repeaterKey,
+    required this.heardUs,
+    required this.weHeard,
+    required this.rssi,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['ping'] = Variable<int>(ping);
+    map['repeater_key'] = Variable<String>(repeaterKey);
+    map['heard_us'] = Variable<double>(heardUs);
+    map['we_heard'] = Variable<double>(weHeard);
+    map['rssi'] = Variable<int>(rssi);
+    return map;
+  }
+
+  WardriveHitsCompanion toCompanion(bool nullToAbsent) {
+    return WardriveHitsCompanion(
+      id: Value(id),
+      ping: Value(ping),
+      repeaterKey: Value(repeaterKey),
+      heardUs: Value(heardUs),
+      weHeard: Value(weHeard),
+      rssi: Value(rssi),
+    );
+  }
+
+  factory WardriveHit.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WardriveHit(
+      id: serializer.fromJson<int>(json['id']),
+      ping: serializer.fromJson<int>(json['ping']),
+      repeaterKey: serializer.fromJson<String>(json['repeaterKey']),
+      heardUs: serializer.fromJson<double>(json['heardUs']),
+      weHeard: serializer.fromJson<double>(json['weHeard']),
+      rssi: serializer.fromJson<int>(json['rssi']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'ping': serializer.toJson<int>(ping),
+      'repeaterKey': serializer.toJson<String>(repeaterKey),
+      'heardUs': serializer.toJson<double>(heardUs),
+      'weHeard': serializer.toJson<double>(weHeard),
+      'rssi': serializer.toJson<int>(rssi),
+    };
+  }
+
+  WardriveHit copyWith({
+    int? id,
+    int? ping,
+    String? repeaterKey,
+    double? heardUs,
+    double? weHeard,
+    int? rssi,
+  }) => WardriveHit(
+    id: id ?? this.id,
+    ping: ping ?? this.ping,
+    repeaterKey: repeaterKey ?? this.repeaterKey,
+    heardUs: heardUs ?? this.heardUs,
+    weHeard: weHeard ?? this.weHeard,
+    rssi: rssi ?? this.rssi,
+  );
+  WardriveHit copyWithCompanion(WardriveHitsCompanion data) {
+    return WardriveHit(
+      id: data.id.present ? data.id.value : this.id,
+      ping: data.ping.present ? data.ping.value : this.ping,
+      repeaterKey: data.repeaterKey.present
+          ? data.repeaterKey.value
+          : this.repeaterKey,
+      heardUs: data.heardUs.present ? data.heardUs.value : this.heardUs,
+      weHeard: data.weHeard.present ? data.weHeard.value : this.weHeard,
+      rssi: data.rssi.present ? data.rssi.value : this.rssi,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WardriveHit(')
+          ..write('id: $id, ')
+          ..write('ping: $ping, ')
+          ..write('repeaterKey: $repeaterKey, ')
+          ..write('heardUs: $heardUs, ')
+          ..write('weHeard: $weHeard, ')
+          ..write('rssi: $rssi')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, ping, repeaterKey, heardUs, weHeard, rssi);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WardriveHit &&
+          other.id == this.id &&
+          other.ping == this.ping &&
+          other.repeaterKey == this.repeaterKey &&
+          other.heardUs == this.heardUs &&
+          other.weHeard == this.weHeard &&
+          other.rssi == this.rssi);
+}
+
+class WardriveHitsCompanion extends UpdateCompanion<WardriveHit> {
+  final Value<int> id;
+  final Value<int> ping;
+  final Value<String> repeaterKey;
+  final Value<double> heardUs;
+  final Value<double> weHeard;
+  final Value<int> rssi;
+  const WardriveHitsCompanion({
+    this.id = const Value.absent(),
+    this.ping = const Value.absent(),
+    this.repeaterKey = const Value.absent(),
+    this.heardUs = const Value.absent(),
+    this.weHeard = const Value.absent(),
+    this.rssi = const Value.absent(),
+  });
+  WardriveHitsCompanion.insert({
+    this.id = const Value.absent(),
+    required int ping,
+    required String repeaterKey,
+    required double heardUs,
+    required double weHeard,
+    required int rssi,
+  }) : ping = Value(ping),
+       repeaterKey = Value(repeaterKey),
+       heardUs = Value(heardUs),
+       weHeard = Value(weHeard),
+       rssi = Value(rssi);
+  static Insertable<WardriveHit> custom({
+    Expression<int>? id,
+    Expression<int>? ping,
+    Expression<String>? repeaterKey,
+    Expression<double>? heardUs,
+    Expression<double>? weHeard,
+    Expression<int>? rssi,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (ping != null) 'ping': ping,
+      if (repeaterKey != null) 'repeater_key': repeaterKey,
+      if (heardUs != null) 'heard_us': heardUs,
+      if (weHeard != null) 'we_heard': weHeard,
+      if (rssi != null) 'rssi': rssi,
+    });
+  }
+
+  WardriveHitsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? ping,
+    Value<String>? repeaterKey,
+    Value<double>? heardUs,
+    Value<double>? weHeard,
+    Value<int>? rssi,
+  }) {
+    return WardriveHitsCompanion(
+      id: id ?? this.id,
+      ping: ping ?? this.ping,
+      repeaterKey: repeaterKey ?? this.repeaterKey,
+      heardUs: heardUs ?? this.heardUs,
+      weHeard: weHeard ?? this.weHeard,
+      rssi: rssi ?? this.rssi,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (ping.present) {
+      map['ping'] = Variable<int>(ping.value);
+    }
+    if (repeaterKey.present) {
+      map['repeater_key'] = Variable<String>(repeaterKey.value);
+    }
+    if (heardUs.present) {
+      map['heard_us'] = Variable<double>(heardUs.value);
+    }
+    if (weHeard.present) {
+      map['we_heard'] = Variable<double>(weHeard.value);
+    }
+    if (rssi.present) {
+      map['rssi'] = Variable<int>(rssi.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WardriveHitsCompanion(')
+          ..write('id: $id, ')
+          ..write('ping: $ping, ')
+          ..write('repeaterKey: $repeaterKey, ')
+          ..write('heardUs: $heardUs, ')
+          ..write('weHeard: $weHeard, ')
+          ..write('rssi: $rssi')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$MeshDatabase extends GeneratedDatabase {
   _$MeshDatabase(QueryExecutor e) : super(e);
   $MeshDatabaseManager get managers => $MeshDatabaseManager(this);
@@ -5129,6 +6180,9 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
       $RadioStatsSamplesTable(this);
   late final $TracksTable tracks = $TracksTable(this);
   late final $TrackPointsTable trackPoints = $TrackPointsTable(this);
+  late final $WardrivesTable wardrives = $WardrivesTable(this);
+  late final $WardrivePingsTable wardrivePings = $WardrivePingsTable(this);
+  late final $WardriveHitsTable wardriveHits = $WardriveHitsTable(this);
   late final Index messagesByThread = Index(
     'messages_by_thread',
     'CREATE INDEX messages_by_thread ON messages (radio_key, thread, id)',
@@ -5149,6 +6203,14 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
     'track_points_by_track',
     'CREATE INDEX track_points_by_track ON track_points (track, id)',
   );
+  late final Index wardrivePingsByDrive = Index(
+    'wardrive_pings_by_drive',
+    'CREATE INDEX wardrive_pings_by_drive ON wardrive_pings (drive, id)',
+  );
+  late final Index wardriveHitsByPing = Index(
+    'wardrive_hits_by_ping',
+    'CREATE INDEX wardrive_hits_by_ping ON wardrive_hits (ping)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -5165,11 +6227,16 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
     radioStatsSamples,
     tracks,
     trackPoints,
+    wardrives,
+    wardrivePings,
+    wardriveHits,
     messagesByThread,
     messagesByAck,
     telemetryByNode,
     radioStatsByRadio,
     trackPointsByTrack,
+    wardrivePingsByDrive,
+    wardriveHitsByPing,
   ];
 }
 
@@ -9498,6 +10565,1015 @@ typedef $$TrackPointsTableProcessedTableManager =
       TrackPoint,
       PrefetchHooks Function({bool track})
     >;
+typedef $$WardrivesTableCreateCompanionBuilder = WardrivesCompanion Function({
+  Value<int> id,
+  required String name,
+  required int startedAt,
+  Value<int?> endedAt,
+});
+typedef $$WardrivesTableUpdateCompanionBuilder = WardrivesCompanion Function({
+  Value<int> id,
+  Value<String> name,
+  Value<int> startedAt,
+  Value<int?> endedAt,
+});
+
+final class $$WardrivesTableReferences
+    extends BaseReferences<_$MeshDatabase, $WardrivesTable, WardriveRow> {
+  $$WardrivesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$WardrivePingsTable, List<WardrivePing>>
+  _wardrivePingsRefsTable(_$MeshDatabase db) => MultiTypedResultKey.fromTable(
+    db.wardrivePings,
+    aliasName: 'wardrives__id__wardrive_pings__drive',
+  );
+
+  $$WardrivePingsTableProcessedTableManager get wardrivePingsRefs {
+    final manager = $$WardrivePingsTableTableManager(
+      $_db,
+      $_db.wardrivePings,
+    ).filter((f) => f.drive.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_wardrivePingsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$WardrivesTableFilterComposer
+    extends Composer<_$MeshDatabase, $WardrivesTable> {
+  $$WardrivesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> wardrivePingsRefs(
+    Expression<bool> Function($$WardrivePingsTableFilterComposer f) f,
+  ) {
+    final $$WardrivePingsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.wardrivePings,
+      getReferencedColumn: (t) => t.drive,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$WardrivePingsTableFilterComposer(
+            $db: $db,
+            $table: $db.wardrivePings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$WardrivesTableOrderingComposer
+    extends Composer<_$MeshDatabase, $WardrivesTable> {
+  $$WardrivesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$WardrivesTableAnnotationComposer
+    extends Composer<_$MeshDatabase, $WardrivesTable> {
+  $$WardrivesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get endedAt =>
+      $composableBuilder(column: $table.endedAt, builder: (column) => column);
+
+  Expression<T> wardrivePingsRefs<T extends Object>(
+    Expression<T> Function($$WardrivePingsTableAnnotationComposer a) f,
+  ) {
+    final $$WardrivePingsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.wardrivePings,
+      getReferencedColumn: (t) => t.drive,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$WardrivePingsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.wardrivePings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$WardrivesTableTableManager
+    extends
+        RootTableManager<
+          _$MeshDatabase,
+          $WardrivesTable,
+          WardriveRow,
+          $$WardrivesTableFilterComposer,
+          $$WardrivesTableOrderingComposer,
+          $$WardrivesTableAnnotationComposer,
+          $$WardrivesTableCreateCompanionBuilder,
+          $$WardrivesTableUpdateCompanionBuilder,
+          (WardriveRow, $$WardrivesTableReferences),
+          WardriveRow,
+          PrefetchHooks Function({bool wardrivePingsRefs})
+        > {
+  $$WardrivesTableTableManager(_$MeshDatabase db, $WardrivesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WardrivesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WardrivesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WardrivesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> startedAt = const Value.absent(),
+                Value<int?> endedAt = const Value.absent(),
+              }) => WardrivesCompanion(
+                id: id,
+                name: name,
+                startedAt: startedAt,
+                endedAt: endedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required int startedAt,
+                Value<int?> endedAt = const Value.absent(),
+              }) => WardrivesCompanion.insert(
+                id: id,
+                name: name,
+                startedAt: startedAt,
+                endedAt: endedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$WardrivesTable, WardriveRow>(table),
+                  $$WardrivesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({wardrivePingsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (wardrivePingsRefs) db.wardrivePings,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (wardrivePingsRefs)
+                    await $_getPrefetchedDataByColumns<
+                      WardriveRow,
+                      $WardrivesTable,
+                      WardrivePing,
+                      $WardrivePingsTable
+                    >(
+                      currentTable: table,
+                      referencedTable: $$WardrivesTableReferences
+                          ._wardrivePingsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$WardrivesTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).wardrivePingsRefs,
+                      currentColumn: 'id',
+                      referencedColumn: 'drive',
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$WardrivesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$MeshDatabase,
+      $WardrivesTable,
+      WardriveRow,
+      $$WardrivesTableFilterComposer,
+      $$WardrivesTableOrderingComposer,
+      $$WardrivesTableAnnotationComposer,
+      $$WardrivesTableCreateCompanionBuilder,
+      $$WardrivesTableUpdateCompanionBuilder,
+      (WardriveRow, $$WardrivesTableReferences),
+      WardriveRow,
+      PrefetchHooks Function({bool wardrivePingsRefs})
+    >;
+typedef $$WardrivePingsTableCreateCompanionBuilder =
+    WardrivePingsCompanion Function({
+      Value<int> id,
+      required int drive,
+      required int at,
+      required double latitude,
+      required double longitude,
+    });
+typedef $$WardrivePingsTableUpdateCompanionBuilder =
+    WardrivePingsCompanion Function({
+      Value<int> id,
+      Value<int> drive,
+      Value<int> at,
+      Value<double> latitude,
+      Value<double> longitude,
+    });
+
+final class $$WardrivePingsTableReferences
+    extends BaseReferences<_$MeshDatabase, $WardrivePingsTable, WardrivePing> {
+  $$WardrivePingsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $WardrivesTable _driveTable(_$MeshDatabase db) =>
+      db.wardrives.createAlias('wardrive_pings__drive__wardrives__id');
+
+  $$WardrivesTableProcessedTableManager get drive {
+    final $_column = $_itemColumn<int>('drive')!;
+
+    final manager = $$WardrivesTableTableManager(
+      $_db,
+      $_db.wardrives,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_driveTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$WardriveHitsTable, List<WardriveHit>>
+  _wardriveHitsRefsTable(_$MeshDatabase db) => MultiTypedResultKey.fromTable(
+    db.wardriveHits,
+    aliasName: 'wardrive_pings__id__wardrive_hits__ping',
+  );
+
+  $$WardriveHitsTableProcessedTableManager get wardriveHitsRefs {
+    final manager = $$WardriveHitsTableTableManager(
+      $_db,
+      $_db.wardriveHits,
+    ).filter((f) => f.ping.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_wardriveHitsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$WardrivePingsTableFilterComposer
+    extends Composer<_$MeshDatabase, $WardrivePingsTable> {
+  $$WardrivePingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get at => $composableBuilder(
+    column: $table.at,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get latitude => $composableBuilder(
+    column: $table.latitude,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get longitude => $composableBuilder(
+    column: $table.longitude,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$WardrivesTableFilterComposer get drive {
+    final $$WardrivesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.drive,
+      referencedTable: $db.wardrives,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$WardrivesTableFilterComposer(
+            $db: $db,
+            $table: $db.wardrives,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> wardriveHitsRefs(
+    Expression<bool> Function($$WardriveHitsTableFilterComposer f) f,
+  ) {
+    final $$WardriveHitsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.wardriveHits,
+      getReferencedColumn: (t) => t.ping,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$WardriveHitsTableFilterComposer(
+            $db: $db,
+            $table: $db.wardriveHits,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$WardrivePingsTableOrderingComposer
+    extends Composer<_$MeshDatabase, $WardrivePingsTable> {
+  $$WardrivePingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get at => $composableBuilder(
+    column: $table.at,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get latitude => $composableBuilder(
+    column: $table.latitude,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get longitude => $composableBuilder(
+    column: $table.longitude,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$WardrivesTableOrderingComposer get drive {
+    final $$WardrivesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.drive,
+      referencedTable: $db.wardrives,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$WardrivesTableOrderingComposer(
+            $db: $db,
+            $table: $db.wardrives,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$WardrivePingsTableAnnotationComposer
+    extends Composer<_$MeshDatabase, $WardrivePingsTable> {
+  $$WardrivePingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get at =>
+      $composableBuilder(column: $table.at, builder: (column) => column);
+
+  GeneratedColumn<double> get latitude =>
+      $composableBuilder(column: $table.latitude, builder: (column) => column);
+
+  GeneratedColumn<double> get longitude =>
+      $composableBuilder(column: $table.longitude, builder: (column) => column);
+
+  $$WardrivesTableAnnotationComposer get drive {
+    final $$WardrivesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.drive,
+      referencedTable: $db.wardrives,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$WardrivesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.wardrives,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> wardriveHitsRefs<T extends Object>(
+    Expression<T> Function($$WardriveHitsTableAnnotationComposer a) f,
+  ) {
+    final $$WardriveHitsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.wardriveHits,
+      getReferencedColumn: (t) => t.ping,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$WardriveHitsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.wardriveHits,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$WardrivePingsTableTableManager
+    extends
+        RootTableManager<
+          _$MeshDatabase,
+          $WardrivePingsTable,
+          WardrivePing,
+          $$WardrivePingsTableFilterComposer,
+          $$WardrivePingsTableOrderingComposer,
+          $$WardrivePingsTableAnnotationComposer,
+          $$WardrivePingsTableCreateCompanionBuilder,
+          $$WardrivePingsTableUpdateCompanionBuilder,
+          (WardrivePing, $$WardrivePingsTableReferences),
+          WardrivePing,
+          PrefetchHooks Function({bool drive, bool wardriveHitsRefs})
+        > {
+  $$WardrivePingsTableTableManager(_$MeshDatabase db, $WardrivePingsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WardrivePingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WardrivePingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WardrivePingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> drive = const Value.absent(),
+                Value<int> at = const Value.absent(),
+                Value<double> latitude = const Value.absent(),
+                Value<double> longitude = const Value.absent(),
+              }) => WardrivePingsCompanion(
+                id: id,
+                drive: drive,
+                at: at,
+                latitude: latitude,
+                longitude: longitude,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int drive,
+                required int at,
+                required double latitude,
+                required double longitude,
+              }) => WardrivePingsCompanion.insert(
+                id: id,
+                drive: drive,
+                at: at,
+                latitude: latitude,
+                longitude: longitude,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$WardrivePingsTable, WardrivePing>(table),
+                  $$WardrivePingsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({drive = false, wardriveHitsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (wardriveHitsRefs) db.wardriveHits],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (drive) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.drive,
+                        referencedTable: $$WardrivePingsTableReferences
+                            ._driveTable(db),
+                        referencedColumn: $$WardrivePingsTableReferences
+                            ._driveTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (wardriveHitsRefs)
+                    await $_getPrefetchedDataByColumns<
+                      WardrivePing,
+                      $WardrivePingsTable,
+                      WardriveHit,
+                      $WardriveHitsTable
+                    >(
+                      currentTable: table,
+                      referencedTable: $$WardrivePingsTableReferences
+                          ._wardriveHitsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$WardrivePingsTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).wardriveHitsRefs,
+                      currentColumn: 'id',
+                      referencedColumn: 'ping',
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$WardrivePingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$MeshDatabase,
+      $WardrivePingsTable,
+      WardrivePing,
+      $$WardrivePingsTableFilterComposer,
+      $$WardrivePingsTableOrderingComposer,
+      $$WardrivePingsTableAnnotationComposer,
+      $$WardrivePingsTableCreateCompanionBuilder,
+      $$WardrivePingsTableUpdateCompanionBuilder,
+      (WardrivePing, $$WardrivePingsTableReferences),
+      WardrivePing,
+      PrefetchHooks Function({bool drive, bool wardriveHitsRefs})
+    >;
+typedef $$WardriveHitsTableCreateCompanionBuilder =
+    WardriveHitsCompanion Function({
+      Value<int> id,
+      required int ping,
+      required String repeaterKey,
+      required double heardUs,
+      required double weHeard,
+      required int rssi,
+    });
+typedef $$WardriveHitsTableUpdateCompanionBuilder =
+    WardriveHitsCompanion Function({
+      Value<int> id,
+      Value<int> ping,
+      Value<String> repeaterKey,
+      Value<double> heardUs,
+      Value<double> weHeard,
+      Value<int> rssi,
+    });
+
+final class $$WardriveHitsTableReferences
+    extends BaseReferences<_$MeshDatabase, $WardriveHitsTable, WardriveHit> {
+  $$WardriveHitsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $WardrivePingsTable _pingTable(_$MeshDatabase db) =>
+      db.wardrivePings.createAlias('wardrive_hits__ping__wardrive_pings__id');
+
+  $$WardrivePingsTableProcessedTableManager get ping {
+    final $_column = $_itemColumn<int>('ping')!;
+
+    final manager = $$WardrivePingsTableTableManager(
+      $_db,
+      $_db.wardrivePings,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_pingTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$WardriveHitsTableFilterComposer
+    extends Composer<_$MeshDatabase, $WardriveHitsTable> {
+  $$WardriveHitsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get repeaterKey => $composableBuilder(
+    column: $table.repeaterKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get heardUs => $composableBuilder(
+    column: $table.heardUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get weHeard => $composableBuilder(
+    column: $table.weHeard,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get rssi => $composableBuilder(
+    column: $table.rssi,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$WardrivePingsTableFilterComposer get ping {
+    final $$WardrivePingsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ping,
+      referencedTable: $db.wardrivePings,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$WardrivePingsTableFilterComposer(
+            $db: $db,
+            $table: $db.wardrivePings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$WardriveHitsTableOrderingComposer
+    extends Composer<_$MeshDatabase, $WardriveHitsTable> {
+  $$WardriveHitsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get repeaterKey => $composableBuilder(
+    column: $table.repeaterKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get heardUs => $composableBuilder(
+    column: $table.heardUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get weHeard => $composableBuilder(
+    column: $table.weHeard,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get rssi => $composableBuilder(
+    column: $table.rssi,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$WardrivePingsTableOrderingComposer get ping {
+    final $$WardrivePingsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ping,
+      referencedTable: $db.wardrivePings,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$WardrivePingsTableOrderingComposer(
+            $db: $db,
+            $table: $db.wardrivePings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$WardriveHitsTableAnnotationComposer
+    extends Composer<_$MeshDatabase, $WardriveHitsTable> {
+  $$WardriveHitsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get repeaterKey => $composableBuilder(
+    column: $table.repeaterKey,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get heardUs =>
+      $composableBuilder(column: $table.heardUs, builder: (column) => column);
+
+  GeneratedColumn<double> get weHeard =>
+      $composableBuilder(column: $table.weHeard, builder: (column) => column);
+
+  GeneratedColumn<int> get rssi =>
+      $composableBuilder(column: $table.rssi, builder: (column) => column);
+
+  $$WardrivePingsTableAnnotationComposer get ping {
+    final $$WardrivePingsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ping,
+      referencedTable: $db.wardrivePings,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$WardrivePingsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.wardrivePings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$WardriveHitsTableTableManager
+    extends
+        RootTableManager<
+          _$MeshDatabase,
+          $WardriveHitsTable,
+          WardriveHit,
+          $$WardriveHitsTableFilterComposer,
+          $$WardriveHitsTableOrderingComposer,
+          $$WardriveHitsTableAnnotationComposer,
+          $$WardriveHitsTableCreateCompanionBuilder,
+          $$WardriveHitsTableUpdateCompanionBuilder,
+          (WardriveHit, $$WardriveHitsTableReferences),
+          WardriveHit,
+          PrefetchHooks Function({bool ping})
+        > {
+  $$WardriveHitsTableTableManager(_$MeshDatabase db, $WardriveHitsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WardriveHitsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WardriveHitsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WardriveHitsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> ping = const Value.absent(),
+                Value<String> repeaterKey = const Value.absent(),
+                Value<double> heardUs = const Value.absent(),
+                Value<double> weHeard = const Value.absent(),
+                Value<int> rssi = const Value.absent(),
+              }) => WardriveHitsCompanion(
+                id: id,
+                ping: ping,
+                repeaterKey: repeaterKey,
+                heardUs: heardUs,
+                weHeard: weHeard,
+                rssi: rssi,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int ping,
+                required String repeaterKey,
+                required double heardUs,
+                required double weHeard,
+                required int rssi,
+              }) => WardriveHitsCompanion.insert(
+                id: id,
+                ping: ping,
+                repeaterKey: repeaterKey,
+                heardUs: heardUs,
+                weHeard: weHeard,
+                rssi: rssi,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$WardriveHitsTable, WardriveHit>(table),
+                  $$WardriveHitsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({ping = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (ping) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.ping,
+                        referencedTable: $$WardriveHitsTableReferences
+                            ._pingTable(db),
+                        referencedColumn: $$WardriveHitsTableReferences
+                            ._pingTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$WardriveHitsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$MeshDatabase,
+      $WardriveHitsTable,
+      WardriveHit,
+      $$WardriveHitsTableFilterComposer,
+      $$WardriveHitsTableOrderingComposer,
+      $$WardriveHitsTableAnnotationComposer,
+      $$WardriveHitsTableCreateCompanionBuilder,
+      $$WardriveHitsTableUpdateCompanionBuilder,
+      (WardriveHit, $$WardriveHitsTableReferences),
+      WardriveHit,
+      PrefetchHooks Function({bool ping})
+    >;
 
 class $MeshDatabaseManager {
   final _$MeshDatabase _db;
@@ -9524,4 +11600,10 @@ class $MeshDatabaseManager {
       $$TracksTableTableManager(_db, _db.tracks);
   $$TrackPointsTableTableManager get trackPoints =>
       $$TrackPointsTableTableManager(_db, _db.trackPoints);
+  $$WardrivesTableTableManager get wardrives =>
+      $$WardrivesTableTableManager(_db, _db.wardrives);
+  $$WardrivePingsTableTableManager get wardrivePings =>
+      $$WardrivePingsTableTableManager(_db, _db.wardrivePings);
+  $$WardriveHitsTableTableManager get wardriveHits =>
+      $$WardriveHitsTableTableManager(_db, _db.wardriveHits);
 }

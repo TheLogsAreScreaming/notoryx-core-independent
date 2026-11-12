@@ -215,3 +215,39 @@ class TrackPoints extends Table {
   /// Metres above sea level, when the phone knows.
   RealColumn get altitude => real().nullable()();
 }
+
+/// A wardrive: pings sent while moving.
+@DataClassName('WardriveRow')
+class Wardrives extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text()();
+
+  /// Unix milliseconds.
+  IntColumn get startedAt => integer()();
+  IntColumn get endedAt => integer().nullable()();
+}
+
+/// One ping on a [Wardrives] row, where the phone was.
+@TableIndex(name: 'wardrive_pings_by_drive', columns: {#drive, #id})
+class WardrivePings extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get drive => integer().references(Wardrives, #id)();
+
+  /// Unix milliseconds.
+  IntColumn get at => integer()();
+  RealColumn get latitude => real()();
+  RealColumn get longitude => real()();
+}
+
+/// A repeater that answered a [WardrivePings] row.
+@TableIndex(name: 'wardrive_hits_by_ping', columns: {#ping})
+class WardriveHits extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get ping => integer().references(WardrivePings, #id)();
+  TextColumn get repeaterKey => text()();
+
+  /// dB: how well the repeater heard us, and we heard it.
+  RealColumn get heardUs => real()();
+  RealColumn get weHeard => real()();
+  IntColumn get rssi => integer()();
+}

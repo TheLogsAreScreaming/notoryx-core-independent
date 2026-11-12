@@ -106,6 +106,20 @@ final class SendSelfAdvert extends RadioCommand {
 
 /// Marks the floods that follow with a region, or clears it when [key] is
 /// null.
+/// A zero-hop control packet, such as a repeater discover ping.
+final class SendControlData extends RadioCommand {
+  const SendControlData(this.payload);
+
+  final List<int> payload;
+
+  @override
+  void _write(FrameWriter out) {
+    out
+      ..u8(CommandCode.sendControlData)
+      ..bytes(payload);
+  }
+}
+
 /// Starts collecting data for the radio to sign.
 final class SignStart extends RadioCommand {
   const SignStart();

@@ -36,6 +36,9 @@ bool databaseSetAside = false;
     RadioStatsSamples,
     Tracks,
     TrackPoints,
+    Wardrives,
+    WardrivePings,
+    WardriveHits,
   ],
 )
 class MeshDatabase extends _$MeshDatabase {
@@ -64,7 +67,7 @@ class MeshDatabase extends _$MeshDatabase {
   factory MeshDatabase.inMemory() => MeshDatabase(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -114,6 +117,14 @@ class MeshDatabase extends _$MeshDatabase {
       if (from < 11) {
         await m.addColumn(messages, messages.signer);
         await m.addColumn(messages, messages.signatureValid);
+      }
+      // 12: wardrives.
+      if (from < 12) {
+        await m.createTable(wardrives);
+        await m.createTable(wardrivePings);
+        await m.createTable(wardriveHits);
+        await m.createIndex(wardrivePingsByDrive);
+        await m.createIndex(wardriveHitsByPing);
       }
     },
     beforeOpen: (details) async {
