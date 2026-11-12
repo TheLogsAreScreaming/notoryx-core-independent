@@ -407,5 +407,8 @@
   "signSafetyTitle": "Firmar SOS y avisos de estado",
   "signSafetySubtitle": "Añade la firma de tu radio a los mensajes de canal, para que otros usuarios de NOTORYX sepan que son tuyos. Envía un paquete pequeño más.",
   "signAllTitle": "Firmar todos mis mensajes de canal",
-  "signAllSubtitle": "Cada mensaje envía un paquete pequeño más."
+  "signAllSubtitle": "Cada mensaje envía un paquete pequeño más.",
+  "botCommandsTitle": "Responder a comandos",
+  "botCommandsSubtitle": "!ping, !trace, !sun, !moon, !dice y !help, en mensajes directos y en los canales marcados abajo. !sun usa la posición de tu radio.",
+  "botCommandChannels": "Canales que reciben respuestas a comandos"
 }

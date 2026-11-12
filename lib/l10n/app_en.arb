@@ -947,5 +947,8 @@
         "type": "Object"
       }
     }
-  }
+  },
+  "botCommandsTitle": "Answer commands",
+  "botCommandsSubtitle": "!ping, !trace, !sun, !moon, !dice and !help, in direct messages and in the channels ticked below. !sun uses your radio’s position.",
+  "botCommandChannels": "Channels that get command answers"
 }
