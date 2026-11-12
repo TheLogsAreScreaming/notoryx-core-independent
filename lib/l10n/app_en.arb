@@ -1011,5 +1011,31 @@
         "type": "Object"
       }
     }
+  },
+  "pathGraph": "Path graph",
+  "pathGraphSubtitle": "Routes heard, and the repeaters you hear directly",
+  "pathGraphIntro": "Built from the paths on flooded packets your radio hears while the app is connected. Each repeater you hear directly is listed with the chains of repeaters behind it. Short IDs can belong to more than one repeater.",
+  "heardDirectly": "Repeaters you hear directly",
+  "heardTimes": "Heard {count}× · average {snr} dB",
+  "heardTimesNoSnr": "Heard {count}×",
+  "noPathsYet": "No paths heard yet. Leave the app connected for a while.",
+  "clearPaths": "Clear paths",
+  "you": "you",
+  "@heardTimes": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      },
+      "snr": {
+        "type": "Object"
+      }
+    }
+  },
+  "@heardTimesNoSnr": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
   }
 }

@@ -39,6 +39,7 @@ bool databaseSetAside = false;
     Wardrives,
     WardrivePings,
     WardriveHits,
+    HeardPaths,
   ],
 )
 class MeshDatabase extends _$MeshDatabase {
@@ -67,7 +68,7 @@ class MeshDatabase extends _$MeshDatabase {
   factory MeshDatabase.inMemory() => MeshDatabase(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -126,6 +127,8 @@ class MeshDatabase extends _$MeshDatabase {
         await m.createIndex(wardrivePingsByDrive);
         await m.createIndex(wardriveHitsByPing);
       }
+      // 13: repeater paths heard.
+      if (from < 13) await m.createTable(heardPaths);
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');

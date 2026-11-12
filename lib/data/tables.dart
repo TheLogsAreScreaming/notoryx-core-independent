@@ -251,3 +251,26 @@ class WardriveHits extends Table {
   RealColumn get weHeard => real()();
   IntColumn get rssi => integer()();
 }
+
+/// A distinct repeater path heard on flooded packets.
+@DataClassName('HeardPathRow')
+class HeardPaths extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get radioKey => text()();
+
+  /// Hop hashes in hex, oldest first, joined by '>'.
+  TextColumn get hops => text()();
+  IntColumn get hashBytes => integer()();
+  IntColumn get count => integer()();
+
+  /// The last hop's SNR the last time it was heard, in dB.
+  RealColumn get lastSnr => real().nullable()();
+
+  /// Unix milliseconds.
+  IntColumn get lastAt => integer()();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {radioKey, hops},
+  ];
+}
