@@ -17,6 +17,7 @@ import '../app/appearance.dart';
 import '../app/connection.dart';
 import '../app/delivery.dart';
 import '../app/notifications.dart';
+import '../app/link_preview.dart';
 import '../app/mesh_links.dart';
 import '../app/position.dart';
 import '../app/read_aloud.dart';
@@ -29,6 +30,7 @@ import 'position_map_screen.dart';
 import 'quick_messages_screen.dart';
 import 'scheduled_screen.dart';
 import '../l10n/l10n.dart';
+import 'link_preview_card.dart';
 
 /// One direct or channel conversation with a box to reply.
 class ConversationScreen extends ConsumerStatefulWidget {
@@ -1013,6 +1015,11 @@ class _Bubble extends StatelessWidget {
                       ],
                     ],
                   ),
+                  if (firstWebLink(body) case final url?)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: LinkPreviewCard(url: url),
+                    ),
                   if (onShowPosition != null || link != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 4),

@@ -466,5 +466,10 @@
   "otherAntennaHeight": "La otra antena (m)",
   "distanceKm": "Distancia (km)",
   "withinHorizon": "Dentro del horizonte de radio de {horizon} km. Deja libres unos {clear} m alrededor del centro del trayecto.",
-  "beyondHorizon": "Más allá del horizonte de radio de {horizon} km. Harían falta antenas más altas o un repetidor en medio."
+  "beyondHorizon": "Más allá del horizonte de radio de {horizon} km. Harían falta antenas más altas o un repetidor en medio.",
+  "showPreview": "Ver vista previa",
+  "noPreview": "No hay vista previa de este enlace",
+  "loadingPreview": "Cargando vista previa…",
+  "linkPreviewsAuto": "Cargar vistas previas automáticamente",
+  "linkPreviewsAutoSubtitle": "Desactivado: toca Ver vista previa en un enlace. Cargar una vista previa contacta con esa web, que ve tu dirección de internet."
 }

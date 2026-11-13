@@ -1102,5 +1102,10 @@
         "type": "Object"
       }
     }
-  }
+  },
+  "showPreview": "Show preview",
+  "noPreview": "No preview for this link",
+  "loadingPreview": "Loading preview…",
+  "linkPreviewsAuto": "Load link previews automatically",
+  "linkPreviewsAutoSubtitle": "Off: tap Show preview on a link. Loading a preview contacts that website, which sees your internet address."
 }
