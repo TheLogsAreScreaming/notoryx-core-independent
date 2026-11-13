@@ -482,5 +482,14 @@
   "sendingPhoto": "Enviando la foto…",
   "photoArriving": "Llegando la foto: {have} de {count}",
   "photoWaiting": "Foto: esperando sus partes",
-  "photoChannelsOnly": "Las fotos solo se pueden enviar en canales."
+  "photoChannelsOnly": "Las fotos solo se pueden enviar en canales.",
+  "translate": "Traducir",
+  "translating": "Traduciendo…",
+  "alreadyInLanguage": "Este mensaje ya está en tu idioma.",
+  "cantTranslate": "Este idioma no se puede traducir en este dispositivo.",
+  "downloadModelsTitle": "¿Descargar modelos de traducción?",
+  "downloadModelsBody": "Necesita el modelo de {languages}, unos 30 MB cada uno, que se descarga una vez de Google. Después, la traducción se hace en este teléfono y los mensajes no salen de él.",
+  "download": "Descargar",
+  "translationFailed": "No se pudo traducir.",
+  "translationTitle": "Traducción ({from} → {to})"
 }

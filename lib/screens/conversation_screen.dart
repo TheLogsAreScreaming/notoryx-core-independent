@@ -23,6 +23,7 @@ import '../app/mesh_links.dart';
 import '../app/position.dart';
 import '../app/read_aloud.dart';
 import '../app/reactions.dart';
+import '../app/translate.dart';
 import '../app/shared_items.dart';
 import '../data/data.dart';
 import '../radio/protocol/mesh_photo.dart';
@@ -296,6 +297,82 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     }
   }
 
+  /// Translates [text] into the app's language on the phone, downloading
+  /// models first if the person agrees.
+  Future<void> _translate(String text) async {
+    final translator = ref.read(translatorProvider);
+    if (translator == null) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    final to = Localizations.localeOf(context).languageCode;
+    try {
+      final from = await translator.detect(text);
+      var plan = await planTranslation(translator, from: from, to: to);
+      if (!mounted) return;
+      if (plan is NeedsModels) {
+        final ok = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(l10n.downloadModelsTitle),
+            content: Text(
+              l10n.downloadModelsBody(
+                plan is NeedsModels
+                    ? plan.codes.map((c) => c.toUpperCase()).join(', ')
+                    : '',
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(l10n.cancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(l10n.download),
+              ),
+            ],
+          ),
+        );
+        if (ok != true) return;
+        messenger.showSnackBar(SnackBar(content: Text(l10n.translating)));
+        for (final code in plan.codes) {
+          if (!await translator.download(code)) throw StateError('download');
+        }
+        plan = const Ready();
+      }
+      switch (plan) {
+        case AlreadyInLanguage():
+          messenger.showSnackBar(
+            SnackBar(content: Text(l10n.alreadyInLanguage)),
+          );
+        case Unsupported():
+          messenger.showSnackBar(SnackBar(content: Text(l10n.cantTranslate)));
+        case NeedsModels():
+          break;
+        case Ready():
+          final result = await translator.translate(text, from: from!, to: to);
+          if (!mounted) return;
+          await showDialog<void>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(
+                l10n.translationTitle(from.toUpperCase(), to.toUpperCase()),
+              ),
+              content: SelectableText(result),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.close),
+                ),
+              ],
+            ),
+          );
+      }
+    } on Object {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.translationFailed)));
+    }
+  }
+
   /// When this app last sent a photo, to keep to one every 5 minutes.
   static DateTime? _lastPhoto;
 
@@ -526,6 +603,12 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                 onTap: () => Navigator.pop(context, 'reply'),
               ),
             ],
+            if (ref.read(translatorProvider) != null)
+              ListTile(
+                leading: const Icon(Icons.translate),
+                title: Text(context.l10n.translate),
+                onTap: () => Navigator.pop(context, 'translate'),
+              ),
             ListTile(
               leading: const Icon(Icons.volume_up_outlined),
               title: Text(context.l10n.readAloud),
@@ -574,6 +657,10 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     if (!mounted || action == null) return;
     if (action.startsWith('react:')) {
       await _send(reactionText(action.substring(6), message.body));
+      return;
+    }
+    if (action == 'translate') {
+      await _translate(message.body);
       return;
     }
     if (action == 'read') {
