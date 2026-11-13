@@ -1107,5 +1107,31 @@
   "noPreview": "No preview for this link",
   "loadingPreview": "Loading preview…",
   "linkPreviewsAuto": "Load link previews automatically",
-  "linkPreviewsAutoSubtitle": "Off: tap Show preview on a link. Loading a preview contacts that website, which sees your internet address."
+  "linkPreviewsAutoSubtitle": "Off: tap Show preview on a link. Loading a preview contacts that website, which sees your internet address.",
+  "translate": "Translate",
+  "translating": "Translating…",
+  "alreadyInLanguage": "This message is already in your language.",
+  "cantTranslate": "This language can’t be translated on this device.",
+  "downloadModelsTitle": "Download translation models?",
+  "downloadModelsBody": "Needs the {languages} model, about 30 MB each, downloaded once from Google. After that, translation happens on this phone and messages never leave it.",
+  "download": "Download",
+  "translationFailed": "Couldn’t translate that.",
+  "translationTitle": "Translation ({from} → {to})",
+  "@downloadModelsBody": {
+    "placeholders": {
+      "languages": {
+        "type": "Object"
+      }
+    }
+  },
+  "@translationTitle": {
+    "placeholders": {
+      "from": {
+        "type": "Object"
+      },
+      "to": {
+        "type": "Object"
+      }
+    }
+  }
 }

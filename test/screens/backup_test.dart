@@ -73,6 +73,14 @@ void main() {
     }
   }
 
+  /// Settles until [finder] shows, for steps that run real key stretching
+  /// and so take longer on a busy machine. Gives up after about 15 s.
+  Future<void> settleUntil(WidgetTester tester, Finder finder) async {
+    for (var i = 0; i < 30 && finder.evaluate().isEmpty; i++) {
+      await settle(tester);
+    }
+  }
+
   Future<String?> quick(WidgetTester tester) => tester
       .runAsync(() => MeshStore(db).setting('quick_messages'))
       .then((v) => v);
@@ -178,6 +186,10 @@ void main() {
     );
     await tester.tap(find.text('Open'));
     await settle(tester);
+    await settleUntil(
+      tester,
+      find.text('Wrong password, or the file has been changed.'),
+    );
     expect(
       find.text('Wrong password, or the file has been changed.'),
       findsOneWidget,
@@ -194,10 +206,12 @@ void main() {
     );
     await tester.tap(find.text('Open'));
     await settle(tester);
+    await settleUntil(tester, find.text('Replace everything on this device?'));
     expect(find.text('Replace everything on this device?'), findsOneWidget);
     expect(find.textContaining('(app 0.1.0-test.16)'), findsOneWidget);
     await tester.tap(find.text('Replace'));
     await settle(tester);
+    await settleUntil(tester, find.textContaining('Restored'));
     expect(
       find.textContaining('Restored 0 messages from 0 radios.'),
       findsOneWidget,
