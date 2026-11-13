@@ -1,6 +1,6 @@
 # NOTORYX Independent privacy policy
 
-NOTORYX Independent is a client for MeshCore LoRa radios. It has no accounts, and its developer runs no server that receives your data. It contains no advertising, analytics or crash-reporting SDK.
+NOTORYX Independent is a client for MeshCore LoRa radios. It has no accounts. Its developer receives data only if you turn on the optional Community moderation feature and send a report or appeal. It contains no advertising, analytics or crash-reporting SDK.
 
 ## Stored on your phone
 Messages, contacts, channels, telemetry, recorded tracks and settings are kept in the app's private storage. Android's own device backup may include this data if you have backup turned on; your Android and Google settings control that. Encrypted backup files are created only when you make one, and are saved where you choose.
@@ -10,6 +10,7 @@ Messages, contacts, channels, telemetry, recorded tracks and settings are kept i
 - **Map tiles:** when you view the map, the app downloads tiles from OpenStreetMap's servers, which receive your IP address and the areas requested.
 - **Area presets:** the app can download a list of regional radio settings from GitHub, which receives your IP address.
 - **Radio over Wi-Fi:** if you connect to a radio by address, the app talks directly to that address.
+- **Community moderation:** off unless you turn it on (Radio settings → Community moderation). While it is on, the app downloads the moderators' advisory ban list (node IDs and case numbers only) from sentinel-relay.meshmayhem.org every few hours. When you report a node, it sends that node's public key or channel name, its name, the reason you pick, your optional note and, if you leave it ticked, the one message you reported (at most 280 characters). An appeal sends the case number, your statement and any contact you give. NOTORYX moderators read reports and appeals; your own name, key and location are not sent with a report, but the relay receives your IP address. Turning it off deletes the downloaded list and any unsent reports.
 - **Sharing and export:** files and text leave the app only when you share or save them yourself.
 
 ## Permissions

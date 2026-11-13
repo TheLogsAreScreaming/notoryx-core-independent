@@ -18,6 +18,8 @@ import '../app/channel_cleanup.dart';
 import 'radio_console_screen.dart';
 import 'backup_screen.dart';
 import 'blocked_screen.dart';
+import '../app/sentinel.dart';
+import 'sentinel_screen.dart';
 import '../l10n/l10n.dart';
 import 'path_graph_screen.dart';
 import 'mqtt_screen.dart';
@@ -351,6 +353,22 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
               ),
             ),
             const SpamFilterTile(),
+            ListTile(
+              key: const ValueKey('settings-sentinel'),
+              leading: const Icon(Icons.shield_outlined),
+              title: Text(context.l10n.sntTitle),
+              subtitle: Text(context.l10n.sntToolSubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => SentinelPage(
+                    sentinel: ref.read(sentinelProvider),
+                    selfKey: self.publicKey.hex,
+                    selfName: self.name,
+                  ),
+                ),
+              ),
+            ),
             ListTile(
               leading: const Icon(Icons.info_outline),
               title: Text(context.l10n.aboutThisApp),

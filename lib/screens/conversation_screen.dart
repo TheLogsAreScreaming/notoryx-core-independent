@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../app/blocking.dart';
+import '../app/sentinel.dart';
 import '../app/chat_send.dart';
 import '../app/post_signing.dart';
 import '../app/safety.dart';
@@ -28,6 +29,7 @@ import '../app/shared_items.dart';
 import '../data/data.dart';
 import '../radio/protocol/mesh_photo.dart';
 import '../radio/radio.dart';
+import 'sentinel_screen.dart';
 import 'manage_actions.dart';
 import 'position_map_screen.dart';
 import 'quick_messages_screen.dart';
@@ -620,6 +622,15 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                 title: Text(context.l10n.forward),
                 onTap: () => Navigator.pop(context, 'forward'),
               ),
+            if (!message.outgoing &&
+                (message.kind == MessageKind.direct ||
+                    (message.senderName ?? '').trim().isNotEmpty))
+              ListTile(
+                key: const ValueKey('message-sentinel-report'),
+                leading: const Icon(Icons.flag_outlined),
+                title: Text(context.l10n.sntReport),
+                onTap: () => Navigator.pop(context, 'report'),
+              ),
             if (!message.outgoing)
               ListTile(
                 leading: const Icon(Icons.block),
@@ -681,6 +692,19 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     }
     if (action == 'reply') {
       setState(() => _replyTo = (message: message, name: sender));
+      return;
+    }
+    if (action == 'report') {
+      final direct = message.kind == MessageKind.direct;
+      await showSentinelReportSheet(
+        context,
+        sentinel: ref.read(sentinelProvider),
+        nodeId: direct
+            ? message.thread.substring(2).toLowerCase()
+            : sentinelNameId(message.senderName ?? ''),
+        nodeName: sender,
+        messageExcerpt: message.body,
+      );
       return;
     }
     if (action == 'block') {
@@ -857,9 +881,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     final repeats = ref.watch(spamFilterProvider).value == true
         ? spamRepeats(messages, myName: selfName)
         : const <int>{};
+    final sentinel = ref.watch(sentinelProvider);
     final items = chatItems([
       for (final m in messages)
-        if (!blocked.blocks(m) && !repeats.contains(m.id)) m,
+        if (!blocked.blocks(m) && !repeats.contains(m.id) && !sentinel.hides(m))
+          m,
     ], senderOf: senderOf);
 
     return Scaffold(
@@ -929,6 +955,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                         ),
                         child: _Bubble(
                           message: message,
+                          flagged: sentinel.banForMessage(message),
                           body: item.replyText ?? message.body,
                           showSender: widget.isChannel,
                           author: _authorName(message.authorPrefix, contacts),
@@ -1045,6 +1072,7 @@ class _Bubble extends StatelessWidget {
   const _Bubble({
     required this.message,
     this.signedBy,
+    this.flagged,
     required this.body,
     required this.showSender,
     this.retrying = false,
@@ -1077,6 +1105,9 @@ class _Bubble extends StatelessWidget {
   /// The text shown: a reply's leading mention is left off.
   final String body;
   final bool showSender;
+
+  /// The moderators' ban on the sender, shown as a label (advisory).
+  final SentinelBan? flagged;
   final bool retrying;
   final VoidCallback? onLongPress;
 
@@ -1136,6 +1167,11 @@ class _Bubble extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (flagged case final ban?)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 2),
+                      child: SentinelFlag(ban),
+                    ),
                   if (mentionsMe)
                     Row(
                       mainAxisSize: MainAxisSize.min,
