@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
@@ -24,6 +25,7 @@ import '../app/read_aloud.dart';
 import '../app/reactions.dart';
 import '../app/shared_items.dart';
 import '../data/data.dart';
+import '../radio/protocol/mesh_photo.dart';
 import '../radio/radio.dart';
 import 'manage_actions.dart';
 import 'position_map_screen.dart';
@@ -31,6 +33,7 @@ import 'quick_messages_screen.dart';
 import 'scheduled_screen.dart';
 import '../l10n/l10n.dart';
 import 'link_preview_card.dart';
+import 'mesh_photo_view.dart';
 
 /// One direct or channel conversation with a box to reply.
 class ConversationScreen extends ConsumerStatefulWidget {
@@ -151,6 +154,13 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
               subtitle: Text(context.l10n.fromThePhoneOrElseThe),
               onTap: () => Navigator.pop(context, 'position'),
             ),
+            if (widget.isChannel)
+              ListTile(
+                leading: const Icon(Icons.photo_outlined),
+                title: Text(context.l10n.photo),
+                subtitle: Text(context.l10n.photoSubtitle),
+                onTap: () => Navigator.pop(context, 'photo'),
+              ),
             ListTile(
               leading: const Icon(Icons.contact_page_outlined),
               title: Text(context.l10n.aContact),
@@ -163,6 +173,10 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     );
     if (!mounted || choice == null) return;
     final messenger = ScaffoldMessenger.of(context);
+    if (choice == 'photo') {
+      await _sendPhoto();
+      return;
+    }
     if (choice == 'position') {
       LatLng? here;
       try {
@@ -279,6 +293,71 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
       );
     } finally {
       if (mounted) setState(() => _sending = false);
+    }
+  }
+
+  /// When this app last sent a photo, to keep to one every 5 minutes.
+  static DateTime? _lastPhoto;
+
+  /// Picks a picture, shrinks it for the mesh, shows what it costs, and
+  /// sends it on this channel if the person agrees.
+  Future<void> _sendPhoto() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    if (!widget.isChannel) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.photoChannelsOnly)));
+      return;
+    }
+    final last = _lastPhoto;
+    if (last != null &&
+        DateTime.now().difference(last) < const Duration(minutes: 5)) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.photoWait)));
+      return;
+    }
+    final file = await FilePicker.pickFile(type: FileType.image);
+    if (file == null || !mounted) return;
+    final source = await file.readAsBytes();
+    final jpg = encodeMeshPhoto(source);
+    if (!mounted) return;
+    if (jpg == null) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.photoNotImage)));
+      return;
+    }
+    final packets = photoChunks(0, jpg).length;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.sendPhotoTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.memory(jpg, width: 192, filterQuality: FilterQuality.medium),
+            const SizedBox(height: 12),
+            Text(l10n.sendPhotoBody(jpg.length, packets)),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.send),
+          ),
+        ],
+      ),
+    );
+    final state = ref.read(connectionProvider);
+    if (ok != true || state is! Connected) return;
+    _lastPhoto = DateTime.now();
+    messenger.showSnackBar(SnackBar(content: Text(l10n.sendingPhoto)));
+    try {
+      await state.sync.sendPhoto(int.parse(widget.thread.substring(2)), jpg);
+    } on Object {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.theRadioCouldNotSendIt)),
+      );
     }
   }
 
@@ -997,7 +1076,10 @@ class _Bubble extends StatelessWidget {
                     ),
                   if (replyTo case final quoted?)
                     _Quote(name: quoted.name, body: quoted.body),
-                  Text(body),
+                  if (photoIdIn(body) case final id?)
+                    MeshPhotoView(id: id)
+                  else
+                    Text(body),
                   const SizedBox(height: 2),
                   Row(
                     mainAxisSize: MainAxisSize.min,

@@ -69,10 +69,10 @@ List<Uint8List> photoChunks(int id, Uint8List jpeg) {
   ];
 }
 
-typedef PhotoChunk = ({int id, int index, int count, Uint8List data});
+typedef PhotoPiece = ({int id, int index, int count, Uint8List data});
 
 /// [payload] as a photo chunk, or null.
-PhotoChunk? parsePhotoChunk(Uint8List payload) {
+PhotoPiece? parsePhotoChunk(Uint8List payload) {
   if (payload.length <= _headerBytes) return null;
   for (var i = 0; i < 3; i++) {
     if (payload[i] != _magic[i]) return null;

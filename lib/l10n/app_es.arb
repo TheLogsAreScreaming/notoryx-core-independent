@@ -471,5 +471,16 @@
   "noPreview": "No hay vista previa de este enlace",
   "loadingPreview": "Cargando vista previa…",
   "linkPreviewsAuto": "Cargar vistas previas automáticamente",
-  "linkPreviewsAutoSubtitle": "Desactivado: toca Ver vista previa en un enlace. Cargar una vista previa contacta con esa web, que ve tu dirección de internet."
+  "linkPreviewsAutoSubtitle": "Desactivado: toca Ver vista previa en un enlace. Cargar una vista previa contacta con esa web, que ve tu dirección de internet.",
+  "photo": "Foto",
+  "photoSubtitle": "Una imagen diminuta en blanco y negro, enviada por la malla",
+  "sendPhotoTitle": "¿Enviar esta foto?",
+  "sendPhotoBody": "{bytes} bytes en {packets} paquetes. Cada repetidor reenvía cada paquete, así que usa tanto tiempo de aire como {packets} mensajes. Como mucho, una foto cada 5 minutos.",
+  "photoTooBig": "No se pudo reducir esa imagen lo suficiente para enviarla.",
+  "photoNotImage": "Ese archivo no es una imagen que esta app pueda leer.",
+  "photoWait": "Espera unos minutos antes de enviar otra foto.",
+  "sendingPhoto": "Enviando la foto…",
+  "photoArriving": "Llegando la foto: {have} de {count}",
+  "photoWaiting": "Foto: esperando sus partes",
+  "photoChannelsOnly": "Las fotos solo se pueden enviar en canales."
 }
