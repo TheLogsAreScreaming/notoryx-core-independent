@@ -16,6 +16,7 @@ import 'app/telemetry.dart';
 import 'app/connection.dart';
 import 'app/mqtt_bridge.dart';
 import 'app/network_scan.dart';
+import 'app/zone_alerts.dart';
 import 'app/path_graph.dart';
 import 'app/notifications.dart';
 import 'l10n/l10n.dart';
@@ -89,7 +90,8 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
   }
 
   void _openChat(ChatLink chat) {
-    if (!mounted) return;
+    // Alerts about no one chat (your own radio) just bring the app up.
+    if (!mounted || chat.thread.isEmpty) return;
     if (ref.read(radioKeyProvider) case null || '') {
       _pendingChat = chat; // opened once the chats are showing
       return;
@@ -121,6 +123,7 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
     ref.listen(sosRelayRunnerProvider, (_, _) {});
     ref.listen(scanRestoreProvider, (_, _) {});
     ref.listen(pathRecorderProvider, (_, _) {});
+    ref.listen(zoneWatcherProvider, (_, _) {});
     ref.listen(mqttBridgeProvider, (_, _) {});
     ref.listen(homeWidgetSyncProvider, (_, _) {});
     ref.listen(scheduledSenderProvider, (_, _) {});

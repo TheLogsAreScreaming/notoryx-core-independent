@@ -1,4 +1,6 @@
+import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:notoryx_core/screens/network_diagram.dart';
 import 'package:notoryx_core/app/path_graph.dart';
 import 'package:notoryx_core/data/data.dart';
 
@@ -13,6 +15,49 @@ HeardPathRow path(String hops, int count, double? snr) => HeardPathRow(
 );
 
 void main() {
+  test('network: repeaters on rings by hops, links weighted by packets', () {
+    final net = pathNetwork([
+      path('a1>b2', 3, null), // a1 two hops out, b2 next to you
+      path('c3>b2', 1, null),
+      path('b2', 2, null),
+    ]);
+    expect(net.nodes['b2'], (ring: 1, relayed: 6));
+    expect(net.nodes['a1'], (ring: 2, relayed: 3));
+    expect(net.nodes['c3']!.ring, 2);
+    expect(net.nodes[networkSelf]!.ring, 0);
+    expect(net.links[('b2', networkSelf)], 6);
+    expect(net.links[('a1', 'b2')], 3);
+    expect(net.links[('c3', 'b2')], 1);
+    expect(pathNetwork(const []).nodes.keys, [networkSelf]);
+  });
+
+  test('network keeps only the busiest repeaters, and their links', () {
+    final net = pathNetwork([
+      for (var i = 0; i < 20; i++)
+        path('${i.toRadixString(16)}0>ff', i + 1, null),
+    ], maxNodes: 5);
+    expect(net.nodes, hasLength(6));
+    expect(net.nodes.containsKey('ff'), isTrue);
+    for (final (a, b) in net.links.keys) {
+      expect(net.nodes.containsKey(a), isTrue);
+      expect(net.nodes.containsKey(b), isTrue);
+    }
+  });
+
+  test('network layout: you centred, rings at even steps, tappable', () {
+    final net = pathNetwork([path('a1>b2', 3, null), path('b2', 2, null)]);
+    final layout = layoutNetwork(net, const Size(300, 300));
+    expect(layout.centers[networkSelf], const Offset(150, 150));
+    for (final MapEntry(:key, :value) in net.nodes.entries) {
+      expect(
+        (layout.centers[key]! - layout.center).distance,
+        closeTo(layout.gap * value.ring, .001),
+      );
+    }
+    expect(layout.hit(layout.centers['a1']!), 'a1');
+    expect(layout.hit(const Offset(-40, -40)), isNull);
+  });
+
   test('groups paths by the repeater heard directly, most heard first', () {
     final direct = directRepeaters([
       path('aa>bb', 3, 4),
