@@ -9,6 +9,7 @@ import 'conversation_screen.dart';
 import 'manage_actions.dart';
 import 'server_screen.dart';
 import 'telemetry_screen.dart';
+import 'route_screen.dart';
 import 'trace_screen.dart';
 import '../l10n/l10n.dart';
 
@@ -218,6 +219,26 @@ Future<void> showNodeDetails(
                         await Navigator.of(context).push(
                           MaterialPageRoute<void>(
                             builder: (_) => TraceScreen(contact: row),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                if (node.isContact)
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.alt_route),
+                    label: Text(context.l10n.routeButton),
+                    onPressed: () async {
+                      Navigator.pop(sheet);
+                      final key = ref.read(radioKeyProvider);
+                      if (key == null) return;
+                      final row = await ref
+                          .read(storeProvider)
+                          .contact(key, node.publicKey);
+                      if (row != null && context.mounted) {
+                        await Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => RouteScreen(contact: row),
                           ),
                         );
                       }

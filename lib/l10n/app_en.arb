@@ -1221,5 +1221,146 @@
   "sntAppealTooMany": "Too many appeals. Try again in a minute.",
   "sntFailed": "Couldn't reach the moderation service. Try again later.",
   "showImage": "Show image",
-  "imageUnavailable": "Couldn’t load that image"
+  "imageUnavailable": "Couldn’t load that image",
+  "routeButton": "Route",
+  "routeYou": "You",
+  "routeTo": "Route to {name}",
+  "@routeTo": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "routeIntro": "Each hop on the way to {name}, and how well each link works. Measure the route to see the signal both ways.",
+  "@routeIntro": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "routeFloods": "No route yet: messages to {name} flood the whole mesh. The first reply teaches your radio a route.",
+  "@routeFloods": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "routeDirect": "{name} is in range directly, with no repeater in between.",
+  "@routeDirect": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "measureEachHop": "Measure each hop",
+  "measuringRoute": "Measuring the route…",
+  "routeMeasureFailed": "The measurement didn’t come back. A hop may be out of reach or switched off.",
+  "routeCannotMeasure": "This route can’t be measured: there’s no repeater on it to pass the measurement back.",
+  "linkGood": "Good",
+  "linkFair": "Fair",
+  "linkPoor": "Poor",
+  "linkNotMeasured": "Not measured",
+  "outAndBack": "out {out}, back {back}",
+  "@outAndBack": {
+    "placeholders": {
+      "out": {
+        "type": "Object"
+      },
+      "back": {
+        "type": "Object"
+      }
+    }
+  },
+  "linkSemantics": "Link from {from} to {to}: {quality}, {signal}",
+  "@linkSemantics": {
+    "placeholders": {
+      "from": {
+        "type": "Object"
+      },
+      "to": {
+        "type": "Object"
+      },
+      "quality": {
+        "type": "Object"
+      },
+      "signal": {
+        "type": "Object"
+      }
+    }
+  },
+  "thisMessageFlooded": "This message went out by flooding the mesh.",
+  "thisMessageUsedTheRoute": "This message went out along the route below.",
+  "thisMessageFloodedHops": "This message reached you by flood, over {hops} hops.",
+  "@thisMessageFloodedHops": {
+    "placeholders": {
+      "hops": {
+        "type": "Object"
+      }
+    }
+  },
+  "thisMessageCameByRoute": "This message reached you along a stored route.",
+  "lastHopHeardAt": "The last hop was heard at {snr} dB.",
+  "@lastHopHeardAt": {
+    "placeholders": {
+      "snr": {
+        "type": "Object"
+      }
+    }
+  },
+  "chooseARoute": "Choose a route",
+  "routeOptionsIntro": "Ways through the mesh, rated from what your radio has heard and measured. Higher is more likely to get through.",
+  "routeInUseNow": "In use now",
+  "routeHeardOnTheMesh": "Heard on the mesh",
+  "floodTheMesh": "Flood the mesh",
+  "floodSubtitle": "Almost always arrives, but uses everyone’s airtime. The reply teaches your radio a new route.",
+  "directNoRepeaters": "Direct, no repeaters",
+  "routeReliability": "Reliability {score} of 100",
+  "@routeReliability": {
+    "placeholders": {
+      "score": {
+        "type": "Object"
+      }
+    }
+  },
+  "linksSeenWorking": "{seen} of {links} links seen working",
+  "@linksSeenWorking": {
+    "placeholders": {
+      "seen": {
+        "type": "Object"
+      },
+      "links": {
+        "type": "Object"
+      }
+    }
+  },
+  "weakestLink": "Weakest link: {quality}",
+  "@weakestLink": {
+    "placeholders": {
+      "quality": {
+        "type": "Object"
+      }
+    }
+  },
+  "suggestedRoute": "Suggested: more reliable than the route in use",
+  "useThisRoute": "Use this route",
+  "routeSaved": "Route saved. The next message goes this way.",
+  "routeSaveFailed": "The radio couldn’t save the route.",
+  "buildYourOwnRoute": "Build your own route",
+  "buildRouteIntro": "Pick repeaters in order, the one nearest you first.",
+  "addHop": "Add hop",
+  "removeHop": "Remove {name}",
+  "@removeHop": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "pickARepeater": "Pick a repeater",
+  "noRepeatersKnownYet": "No repeaters known yet. Add repeaters as contacts, or leave the radio connected for a while so it hears the mesh.",
+  "routeTooLong": "That route is too long for the radio."
 }

@@ -594,6 +594,43 @@ class MeshSync {
     await _syncContacts();
   }
 
+  /// Sets the route the radio uses for direct messages to [contact]:
+  /// [path] is the hop hashes, nearest repeater first, each [hashBytes]
+  /// long (1 to 3). An empty [path] means a direct neighbour.
+  Future<void> setRoute(
+    PublicKey contact,
+    List<int> path, {
+    required int hashBytes,
+  }) async {
+    if (hashBytes < 1 || hashBytes > 3 || path.length % hashBytes != 0) {
+      throw ArgumentError.value(path, 'path');
+    }
+    final hops = path.length ~/ hashBytes;
+    if (hops >= 64 || path.length > maxPathSize) {
+      throw ArgumentError.value(path, 'path', 'too long');
+    }
+    final key = _requireKey();
+    final row = await _store.contact(key, contact.hex);
+    if (row == null) throw ArgumentError.value(contact.hex, 'contact');
+    await _session.run(
+      AddOrUpdateContact(
+        RadioContact(
+          publicKey: contact,
+          type: NodeType.fromByte(row.type),
+          flags: row.flags,
+          outPathLength: ((hashBytes - 1) << 6) | hops,
+          outPath: path,
+          name: row.name,
+          lastAdvert: row.lastAdvert,
+          latitude: row.latitude,
+          longitude: row.longitude,
+          lastModified: _seconds(null),
+        ),
+      ),
+    );
+    await _syncContacts();
+  }
+
   /// Sends this radio's advert so others can find it: to neighbours only,
   /// or flooded across the mesh.
   Future<void> sendAdvert({bool flood = false}) =>

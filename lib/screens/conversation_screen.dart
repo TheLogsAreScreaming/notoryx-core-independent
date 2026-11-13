@@ -33,6 +33,7 @@ import 'sentinel_screen.dart';
 import 'manage_actions.dart';
 import 'position_map_screen.dart';
 import 'quick_messages_screen.dart';
+import 'route_screen.dart';
 import 'scheduled_screen.dart';
 import '../l10n/l10n.dart';
 import 'link_preview_card.dart';
@@ -769,7 +770,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
         ref.read(connectionProvider) is Connected;
     final messenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
-    final reset = await showDialog<bool>(
+    final choice = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(report.headline),
@@ -794,20 +795,33 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
           ),
         ),
         actions: [
+          if (contact != null)
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'route'),
+              child: Text(context.l10n.routeButton),
+            ),
           if (canReset)
             TextButton(
-              onPressed: () => Navigator.pop(context, true),
+              onPressed: () => Navigator.pop(context, 'reset'),
               child: Text(context.l10n.resetRoute),
             ),
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(context),
             child: Text(context.l10n.close),
           ),
         ],
       ),
     );
+    if (choice == 'route' && contact != null && mounted) {
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => RouteScreen(contact: contact, message: message),
+        ),
+      );
+      return;
+    }
     final state = ref.read(connectionProvider);
-    if (reset != true || contact == null || state is! Connected) return;
+    if (choice != 'reset' || contact == null || state is! Connected) return;
     try {
       await state.sync.resetRoute(PublicKey.fromHex(contact.publicKey));
       messenger.showSnackBar(
