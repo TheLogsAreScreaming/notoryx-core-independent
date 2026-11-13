@@ -6615,6 +6615,362 @@ class HeardPathsCompanion extends UpdateCompanion<HeardPathRow> {
   }
 }
 
+class $PhotoChunksTable extends PhotoChunks
+    with TableInfo<$PhotoChunksTable, PhotoChunk> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PhotoChunksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _radioKeyMeta = const VerificationMeta(
+    'radioKey',
+  );
+  @override
+  late final GeneratedColumn<String> radioKey = GeneratedColumn<String>(
+    'radio_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _photoIdMeta = const VerificationMeta(
+    'photoId',
+  );
+  @override
+  late final GeneratedColumn<int> photoId = GeneratedColumn<int>(
+    'photo_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idxMeta = const VerificationMeta('idx');
+  @override
+  late final GeneratedColumn<int> idx = GeneratedColumn<int>(
+    'idx',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _countMeta = const VerificationMeta('count');
+  @override
+  late final GeneratedColumn<int> count = GeneratedColumn<int>(
+    'count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dataMeta = const VerificationMeta('data');
+  @override
+  late final GeneratedColumn<Uint8List> data = GeneratedColumn<Uint8List>(
+    'data',
+    aliasedName,
+    false,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [radioKey, photoId, idx, count, data];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'photo_chunks';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PhotoChunk> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('radio_key')) {
+      context.handle(
+        _radioKeyMeta,
+        radioKey.isAcceptableOrUnknown(data['radio_key']!, _radioKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_radioKeyMeta);
+    }
+    if (data.containsKey('photo_id')) {
+      context.handle(
+        _photoIdMeta,
+        photoId.isAcceptableOrUnknown(data['photo_id']!, _photoIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_photoIdMeta);
+    }
+    if (data.containsKey('idx')) {
+      context.handle(
+        _idxMeta,
+        idx.isAcceptableOrUnknown(data['idx']!, _idxMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_idxMeta);
+    }
+    if (data.containsKey('count')) {
+      context.handle(
+        _countMeta,
+        count.isAcceptableOrUnknown(data['count']!, _countMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_countMeta);
+    }
+    if (data.containsKey('data')) {
+      context.handle(
+        _dataMeta,
+        this.data.isAcceptableOrUnknown(data['data']!, _dataMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dataMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {radioKey, photoId, idx};
+  @override
+  PhotoChunk map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PhotoChunk(
+      radioKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}radio_key'],
+      )!,
+      photoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}photo_id'],
+      )!,
+      idx: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}idx'],
+      )!,
+      count: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}count'],
+      )!,
+      data: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}data'],
+      )!,
+    );
+  }
+
+  @override
+  $PhotoChunksTable createAlias(String alias) {
+    return $PhotoChunksTable(attachedDatabase, alias);
+  }
+}
+
+class PhotoChunk extends DataClass implements Insertable<PhotoChunk> {
+  final String radioKey;
+  final int photoId;
+  final int idx;
+  final int count;
+  final Uint8List data;
+  const PhotoChunk({
+    required this.radioKey,
+    required this.photoId,
+    required this.idx,
+    required this.count,
+    required this.data,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['radio_key'] = Variable<String>(radioKey);
+    map['photo_id'] = Variable<int>(photoId);
+    map['idx'] = Variable<int>(idx);
+    map['count'] = Variable<int>(count);
+    map['data'] = Variable<Uint8List>(data);
+    return map;
+  }
+
+  PhotoChunksCompanion toCompanion(bool nullToAbsent) {
+    return PhotoChunksCompanion(
+      radioKey: Value(radioKey),
+      photoId: Value(photoId),
+      idx: Value(idx),
+      count: Value(count),
+      data: Value(data),
+    );
+  }
+
+  factory PhotoChunk.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PhotoChunk(
+      radioKey: serializer.fromJson<String>(json['radioKey']),
+      photoId: serializer.fromJson<int>(json['photoId']),
+      idx: serializer.fromJson<int>(json['idx']),
+      count: serializer.fromJson<int>(json['count']),
+      data: serializer.fromJson<Uint8List>(json['data']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'radioKey': serializer.toJson<String>(radioKey),
+      'photoId': serializer.toJson<int>(photoId),
+      'idx': serializer.toJson<int>(idx),
+      'count': serializer.toJson<int>(count),
+      'data': serializer.toJson<Uint8List>(data),
+    };
+  }
+
+  PhotoChunk copyWith({
+    String? radioKey,
+    int? photoId,
+    int? idx,
+    int? count,
+    Uint8List? data,
+  }) => PhotoChunk(
+    radioKey: radioKey ?? this.radioKey,
+    photoId: photoId ?? this.photoId,
+    idx: idx ?? this.idx,
+    count: count ?? this.count,
+    data: data ?? this.data,
+  );
+  PhotoChunk copyWithCompanion(PhotoChunksCompanion data) {
+    return PhotoChunk(
+      radioKey: data.radioKey.present ? data.radioKey.value : this.radioKey,
+      photoId: data.photoId.present ? data.photoId.value : this.photoId,
+      idx: data.idx.present ? data.idx.value : this.idx,
+      count: data.count.present ? data.count.value : this.count,
+      data: data.data.present ? data.data.value : this.data,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PhotoChunk(')
+          ..write('radioKey: $radioKey, ')
+          ..write('photoId: $photoId, ')
+          ..write('idx: $idx, ')
+          ..write('count: $count, ')
+          ..write('data: $data')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(radioKey, photoId, idx, count, $driftBlobEquality.hash(data));
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PhotoChunk &&
+          other.radioKey == this.radioKey &&
+          other.photoId == this.photoId &&
+          other.idx == this.idx &&
+          other.count == this.count &&
+          $driftBlobEquality.equals(other.data, this.data));
+}
+
+class PhotoChunksCompanion extends UpdateCompanion<PhotoChunk> {
+  final Value<String> radioKey;
+  final Value<int> photoId;
+  final Value<int> idx;
+  final Value<int> count;
+  final Value<Uint8List> data;
+  final Value<int> rowid;
+  const PhotoChunksCompanion({
+    this.radioKey = const Value.absent(),
+    this.photoId = const Value.absent(),
+    this.idx = const Value.absent(),
+    this.count = const Value.absent(),
+    this.data = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PhotoChunksCompanion.insert({
+    required String radioKey,
+    required int photoId,
+    required int idx,
+    required int count,
+    required Uint8List data,
+    this.rowid = const Value.absent(),
+  }) : radioKey = Value(radioKey),
+       photoId = Value(photoId),
+       idx = Value(idx),
+       count = Value(count),
+       data = Value(data);
+  static Insertable<PhotoChunk> custom({
+    Expression<String>? radioKey,
+    Expression<int>? photoId,
+    Expression<int>? idx,
+    Expression<int>? count,
+    Expression<Uint8List>? data,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (radioKey != null) 'radio_key': radioKey,
+      if (photoId != null) 'photo_id': photoId,
+      if (idx != null) 'idx': idx,
+      if (count != null) 'count': count,
+      if (data != null) 'data': data,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PhotoChunksCompanion copyWith({
+    Value<String>? radioKey,
+    Value<int>? photoId,
+    Value<int>? idx,
+    Value<int>? count,
+    Value<Uint8List>? data,
+    Value<int>? rowid,
+  }) {
+    return PhotoChunksCompanion(
+      radioKey: radioKey ?? this.radioKey,
+      photoId: photoId ?? this.photoId,
+      idx: idx ?? this.idx,
+      count: count ?? this.count,
+      data: data ?? this.data,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (radioKey.present) {
+      map['radio_key'] = Variable<String>(radioKey.value);
+    }
+    if (photoId.present) {
+      map['photo_id'] = Variable<int>(photoId.value);
+    }
+    if (idx.present) {
+      map['idx'] = Variable<int>(idx.value);
+    }
+    if (count.present) {
+      map['count'] = Variable<int>(count.value);
+    }
+    if (data.present) {
+      map['data'] = Variable<Uint8List>(data.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PhotoChunksCompanion(')
+          ..write('radioKey: $radioKey, ')
+          ..write('photoId: $photoId, ')
+          ..write('idx: $idx, ')
+          ..write('count: $count, ')
+          ..write('data: $data, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$MeshDatabase extends GeneratedDatabase {
   _$MeshDatabase(QueryExecutor e) : super(e);
   $MeshDatabaseManager get managers => $MeshDatabaseManager(this);
@@ -6636,6 +6992,7 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
   late final $WardrivePingsTable wardrivePings = $WardrivePingsTable(this);
   late final $WardriveHitsTable wardriveHits = $WardriveHitsTable(this);
   late final $HeardPathsTable heardPaths = $HeardPathsTable(this);
+  late final $PhotoChunksTable photoChunks = $PhotoChunksTable(this);
   late final Index messagesByThread = Index(
     'messages_by_thread',
     'CREATE INDEX messages_by_thread ON messages (radio_key, thread, id)',
@@ -6684,6 +7041,7 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
     wardrivePings,
     wardriveHits,
     heardPaths,
+    photoChunks,
     messagesByThread,
     messagesByAck,
     telemetryByNode,
@@ -12267,6 +12625,215 @@ typedef $$HeardPathsTableProcessedTableManager =
       HeardPathRow,
       PrefetchHooks Function()
     >;
+typedef $$PhotoChunksTableCreateCompanionBuilder =
+    PhotoChunksCompanion Function({
+      required String radioKey,
+      required int photoId,
+      required int idx,
+      required int count,
+      required Uint8List data,
+      Value<int> rowid,
+    });
+typedef $$PhotoChunksTableUpdateCompanionBuilder =
+    PhotoChunksCompanion Function({
+      Value<String> radioKey,
+      Value<int> photoId,
+      Value<int> idx,
+      Value<int> count,
+      Value<Uint8List> data,
+      Value<int> rowid,
+    });
+
+class $$PhotoChunksTableFilterComposer
+    extends Composer<_$MeshDatabase, $PhotoChunksTable> {
+  $$PhotoChunksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get radioKey => $composableBuilder(
+    column: $table.radioKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get photoId => $composableBuilder(
+    column: $table.photoId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get idx => $composableBuilder(
+    column: $table.idx,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get count => $composableBuilder(
+    column: $table.count,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get data => $composableBuilder(
+    column: $table.data,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PhotoChunksTableOrderingComposer
+    extends Composer<_$MeshDatabase, $PhotoChunksTable> {
+  $$PhotoChunksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get radioKey => $composableBuilder(
+    column: $table.radioKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get photoId => $composableBuilder(
+    column: $table.photoId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get idx => $composableBuilder(
+    column: $table.idx,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get count => $composableBuilder(
+    column: $table.count,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get data => $composableBuilder(
+    column: $table.data,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PhotoChunksTableAnnotationComposer
+    extends Composer<_$MeshDatabase, $PhotoChunksTable> {
+  $$PhotoChunksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get radioKey =>
+      $composableBuilder(column: $table.radioKey, builder: (column) => column);
+
+  GeneratedColumn<int> get photoId =>
+      $composableBuilder(column: $table.photoId, builder: (column) => column);
+
+  GeneratedColumn<int> get idx =>
+      $composableBuilder(column: $table.idx, builder: (column) => column);
+
+  GeneratedColumn<int> get count =>
+      $composableBuilder(column: $table.count, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get data =>
+      $composableBuilder(column: $table.data, builder: (column) => column);
+}
+
+class $$PhotoChunksTableTableManager
+    extends
+        RootTableManager<
+          _$MeshDatabase,
+          $PhotoChunksTable,
+          PhotoChunk,
+          $$PhotoChunksTableFilterComposer,
+          $$PhotoChunksTableOrderingComposer,
+          $$PhotoChunksTableAnnotationComposer,
+          $$PhotoChunksTableCreateCompanionBuilder,
+          $$PhotoChunksTableUpdateCompanionBuilder,
+          (
+            PhotoChunk,
+            BaseReferences<_$MeshDatabase, $PhotoChunksTable, PhotoChunk>,
+          ),
+          PhotoChunk,
+          PrefetchHooks Function()
+        > {
+  $$PhotoChunksTableTableManager(_$MeshDatabase db, $PhotoChunksTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PhotoChunksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PhotoChunksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PhotoChunksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> radioKey = const Value.absent(),
+                Value<int> photoId = const Value.absent(),
+                Value<int> idx = const Value.absent(),
+                Value<int> count = const Value.absent(),
+                Value<Uint8List> data = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PhotoChunksCompanion(
+                radioKey: radioKey,
+                photoId: photoId,
+                idx: idx,
+                count: count,
+                data: data,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String radioKey,
+                required int photoId,
+                required int idx,
+                required int count,
+                required Uint8List data,
+                Value<int> rowid = const Value.absent(),
+              }) => PhotoChunksCompanion.insert(
+                radioKey: radioKey,
+                photoId: photoId,
+                idx: idx,
+                count: count,
+                data: data,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PhotoChunksTable, PhotoChunk>(table),
+                  BaseReferences<_$MeshDatabase, $PhotoChunksTable, PhotoChunk>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PhotoChunksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$MeshDatabase,
+      $PhotoChunksTable,
+      PhotoChunk,
+      $$PhotoChunksTableFilterComposer,
+      $$PhotoChunksTableOrderingComposer,
+      $$PhotoChunksTableAnnotationComposer,
+      $$PhotoChunksTableCreateCompanionBuilder,
+      $$PhotoChunksTableUpdateCompanionBuilder,
+      (
+        PhotoChunk,
+        BaseReferences<_$MeshDatabase, $PhotoChunksTable, PhotoChunk>,
+      ),
+      PhotoChunk,
+      PrefetchHooks Function()
+    >;
 
 class $MeshDatabaseManager {
   final _$MeshDatabase _db;
@@ -12301,4 +12868,6 @@ class $MeshDatabaseManager {
       $$WardriveHitsTableTableManager(_db, _db.wardriveHits);
   $$HeardPathsTableTableManager get heardPaths =>
       $$HeardPathsTableTableManager(_db, _db.heardPaths);
+  $$PhotoChunksTableTableManager get photoChunks =>
+      $$PhotoChunksTableTableManager(_db, _db.photoChunks);
 }
