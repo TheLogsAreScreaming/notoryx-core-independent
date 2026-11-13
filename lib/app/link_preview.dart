@@ -7,6 +7,7 @@ library;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -142,4 +143,53 @@ class LinkPreviewsAuto extends AsyncNotifier<bool> {
 
 final linkPreviewsAutoProvider = AsyncNotifierProvider<LinkPreviewsAuto, bool>(
   LinkPreviewsAuto.new,
+);
+
+/// Largest image loaded from a link, in bytes.
+const maxLinkImageBytes = 3 * 1024 * 1024;
+
+/// Whether [url] points straight at a picture or GIF.
+bool isImageLink(String url) {
+  final path = Uri.tryParse(url)?.path.toLowerCase() ?? '';
+  return RegExp(r'\.(gif|png|jpe?g|webp)$').hasMatch(path);
+}
+
+/// The picture at [url], or null if it isn't one, is too big, or fails.
+Future<Uint8List?> fetchLinkImage(Uri url) async {
+  if (url.scheme != 'https' && url.scheme != 'http') return null;
+  final client = HttpClient()
+    ..connectionTimeout = const Duration(seconds: 5)
+    ..userAgent = 'NOTORYX-Independent link preview';
+  try {
+    final request = await client
+        .getUrl(url)
+        .timeout(const Duration(seconds: 5));
+    request.maxRedirects = 3;
+    final response = await request.close().timeout(const Duration(seconds: 10));
+    final type = response.headers.contentType;
+    if (response.statusCode != 200 ||
+        type == null ||
+        type.primaryType != 'image') {
+      return null;
+    }
+    if (response.contentLength > maxLinkImageBytes) return null;
+    final bytes = BytesBuilder();
+    await for (final chunk in response.timeout(const Duration(seconds: 15))) {
+      bytes.add(chunk);
+      if (bytes.length > maxLinkImageBytes) return null;
+    }
+    return bytes.toBytes();
+  } on Object {
+    return null;
+  } finally {
+    client.close(force: true);
+  }
+}
+
+final linkImageFetcherProvider = Provider<Future<Uint8List?> Function(Uri)>(
+  (ref) => fetchLinkImage,
+);
+
+final linkImageProvider = FutureProvider.family<Uint8List?, String>(
+  (ref, url) => ref.read(linkImageFetcherProvider)(Uri.parse(url)),
 );

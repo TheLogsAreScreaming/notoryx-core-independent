@@ -1219,5 +1219,7 @@
   "sntAppealUnknown": "No MeshCore case has that number.",
   "sntAppealNotOpen": "That case has no active ban, or an appeal is already waiting.",
   "sntAppealTooMany": "Too many appeals. Try again in a minute.",
-  "sntFailed": "Couldn't reach the moderation service. Try again later."
+  "sntFailed": "Couldn't reach the moderation service. Try again later.",
+  "showImage": "Show image",
+  "imageUnavailable": "Couldn’t load that image"
 }
