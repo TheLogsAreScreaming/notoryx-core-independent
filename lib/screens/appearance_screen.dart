@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/appearance.dart';
 import '../l10n/l10n.dart';
 import '../app/language.dart';
+import '../app/link_preview.dart';
 
 /// Pick a theme and the size of chat text.
 class AppearanceScreen extends ConsumerWidget {
@@ -19,6 +20,13 @@ class AppearanceScreen extends ConsumerWidget {
       body: ListView(
         children: [
           const _LanguageTile(),
+          SwitchListTile(
+            secondary: const Icon(Icons.link),
+            title: Text(context.l10n.linkPreviewsAuto),
+            subtitle: Text(context.l10n.linkPreviewsAutoSubtitle),
+            value: ref.watch(linkPreviewsAutoProvider).value ?? false,
+            onChanged: ref.read(linkPreviewsAutoProvider.notifier).set,
+          ),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
