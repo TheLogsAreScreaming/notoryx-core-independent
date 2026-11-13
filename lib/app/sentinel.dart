@@ -26,8 +26,11 @@ const sentinelNetwork = 'meshcore';
 
 /// One HTTP exchange with the relay. Swapped out in tests.
 typedef SentinelResponse = ({int status, String body});
-typedef SentinelTransport =
-    Future<SentinelResponse> Function(String method, Uri url, String? body);
+typedef SentinelTransport = Future<SentinelResponse> Function(
+  String method,
+  Uri url,
+  String? body,
+);
 
 Future<SentinelResponse> _ioTransport(
   String method,
@@ -43,7 +46,10 @@ Future<SentinelResponse> _ioTransport(
       req.add(utf8.encode(body));
     }
     final res = await req.close();
-    return (status: res.statusCode, body: await res.transform(utf8.decoder).join());
+    return (
+      status: res.statusCode,
+      body: await res.transform(utf8.decoder).join(),
+    );
   } finally {
     client.close(force: true);
   }
@@ -130,9 +136,7 @@ class SentinelReport {
     final nodeId = json['nodeId'];
     final reason = json['reason'];
     final ref = json['externalRef'];
-    if (nodeId is! String ||
-        reason is! String ||
-        ref is! String) {
+    if (nodeId is! String || reason is! String || ref is! String) {
       return null;
     }
     final name = json['nodeName'];
@@ -418,13 +422,20 @@ class SentinelService extends ChangeNotifier {
     _syncing = true;
     _notify();
     try {
-      final res = await _transport('GET', _uri('decisions'), null).timeout(_timeout);
+      final res = await _transport(
+        'GET',
+        _uri('decisions'),
+        null,
+      ).timeout(_timeout);
       if (res.status != 200) return false;
       final body = jsonDecode(res.body);
       if (body is! Map || body['bans'] is! List) return false;
       _bans = _index(body['bans'] as List);
       _syncedAt = _now();
-      await _set(prefBans, jsonEncode([for (final b in _bans.values) b.toJson()]));
+      await _set(
+        prefBans,
+        jsonEncode([for (final b in _bans.values) b.toJson()]),
+      );
       await _set(prefSynced, _syncedAt!.toUtc().toIso8601String());
       return true;
     } on Object {
@@ -475,7 +486,11 @@ class SentinelService extends ChangeNotifier {
 
   Future<SentinelReportOutcome> _send(SentinelReport r) async {
     try {
-      final res = await _transport('POST', _uri('reports'), jsonEncode(r.toWire())).timeout(_timeout);
+      final res = await _transport(
+        'POST',
+        _uri('reports'),
+        jsonEncode(r.toWire()),
+      ).timeout(_timeout);
       if (res.status == 200 || res.status == 201) {
         final body = jsonDecode(res.body);
         final ref = body is Map ? body['caseRef'] : null;

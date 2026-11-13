@@ -805,9 +805,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     final sentinel = ref.watch(sentinelProvider);
     final items = chatItems([
       for (final m in messages)
-        if (!blocked.blocks(m) &&
-            !repeats.contains(m.id) &&
-            !sentinel.hides(m))
+        if (!blocked.blocks(m) && !repeats.contains(m.id) && !sentinel.hides(m))
           m,
     ], senderOf: senderOf);
 

@@ -152,7 +152,9 @@ class _ReportSheetState extends State<_ReportSheet> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 2, 16, 4),
               child: Text(
-                widget.nodeId.length > 20 ? '${widget.nodeId.substring(0, 16)}…' : widget.nodeId,
+                widget.nodeId.length > 20
+                    ? '${widget.nodeId.substring(0, 16)}…'
+                    : widget.nodeId,
                 style: type.bodySmall,
               ),
             ),
