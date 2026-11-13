@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:notoryx_core/app/zone_alerts.dart';
+import 'package:notoryx_core/screens/zone_alerts_screen.dart';
 
 import '../support/open_connect.dart';
 
@@ -252,6 +254,31 @@ void main() {
     await settle(tester);
     expect(find.text('No messages yet'), findsOneWidget);
     expect(find.widgetWithText(AppBar, 'Alice'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
+  testWidgets('a zone is added from the map around the phone', (tester) async {
+    await connect(tester);
+    await tester.tap(find.text('Map'));
+    await settle(tester);
+    await tester.tap(find.byKey(const Key('map-zones')));
+    await settle(tester);
+    expect(find.textContaining('No zones yet'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('zone-add')));
+    await settle(tester);
+    await tester.enterText(find.byKey(const Key('zone-name')), 'Camp');
+    await tester.tap(find.byKey(const Key('zone-save')));
+    await settle(tester);
+    expect(find.text('Camp'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('zones-on')));
+    await settle(tester);
+    final saved = await tester.runAsync(
+      () => ProviderScope.containerOf(
+        tester.element(find.byType(ZoneAlertsScreen)),
+      ).read(storeProvider).setting(ZoneSettings.key),
+    );
+    expect(ZoneSettings.decode(saved).enabled, isTrue);
+    expect(ZoneSettings.decode(saved).zones.single.lat, 46.5);
     await cleanUp(tester);
   });
 

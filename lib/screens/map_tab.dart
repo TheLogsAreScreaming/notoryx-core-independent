@@ -10,6 +10,7 @@ import '../app/track_log.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
 import 'node_details.dart';
+import 'zone_alerts_screen.dart';
 import 'track_log_screen.dart';
 import '../app/position.dart';
 import '../l10n/l10n.dart';
@@ -212,6 +213,18 @@ class _MapTabState extends ConsumerState<MapTab> {
                   onPressed: () => _map.move(radio, 13),
                   child: const Icon(Icons.router),
                 ),
+              const SizedBox(height: 8),
+              FloatingActionButton.small(
+                key: const Key('map-zones'),
+                heroTag: 'map-zones',
+                tooltip: context.l10n.zoneAlerts,
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const ZoneAlertsScreen(),
+                  ),
+                ),
+                child: const Icon(Icons.radar),
+              ),
               const SizedBox(height: 8),
               FloatingActionButton.small(
                 heroTag: 'map-wardrive',

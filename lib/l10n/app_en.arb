@@ -1221,5 +1221,109 @@
   "sntAppealTooMany": "Too many appeals. Try again in a minute.",
   "sntFailed": "Couldn't reach the moderation service. Try again later.",
   "showImage": "Show image",
-  "imageUnavailable": "Couldn’t load that image"
+  "imageUnavailable": "Couldn’t load that image",
+  "zoneAlerts": "Zone & trail alerts",
+  "zoneAlertsOn": "Alerts on",
+  "zoneAlertsHint": "Uses positions from adverts your radio hears, so an alert is only as fresh as the last advert.",
+  "zoneWatchFavourites": "Favourites only",
+  "zoneWatchFavouritesHint": "Off: every person with a position",
+  "zoneWatchRadio": "My radio too",
+  "zones": "Zones",
+  "zonesNone": "No zones yet. Add one around camp, a trailhead or a meeting point.",
+  "zoneAdd": "Add zone",
+  "zoneEdit": "Edit zone",
+  "zoneName": "Name",
+  "zoneDefaultName": "Zone",
+  "zoneCentre": "Centre",
+  "zoneCentreRadio": "My radio's position",
+  "zoneCentrePhone": "My phone's location",
+  "zoneNoCentre": "No position to centre a zone on. Give your radio a position, turn on location, or wait for a contact's position.",
+  "zoneRadius": "Radius: {distance}",
+  "@zoneRadius": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "zoneOnEnter": "Entering",
+  "zoneOnLeave": "Leaving",
+  "zoneOnBoth": "Both",
+  "zoneDelete": "Delete {name}",
+  "@zoneDelete": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "zonesFull": "You can keep up to {count} zones.",
+  "@zonesFull": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trailWatch": "Trail",
+  "trailWatchHint": "Pick a recorded track. Anyone watched who goes farther from it than the limit gets one alert.",
+  "trailNone": "No trail watched",
+  "trailLimit": "Off the trail after {distance}",
+  "@trailLimit": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "zoneEnteredTitle": "Entered {zone}",
+  "@zoneEnteredTitle": {
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      }
+    }
+  },
+  "zoneEnteredBody": "{name} is inside {zone}.",
+  "@zoneEnteredBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "zone": {
+        "type": "String"
+      }
+    }
+  },
+  "zoneLeftTitle": "Left {zone}",
+  "@zoneLeftTitle": {
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      }
+    }
+  },
+  "zoneLeftBody": "{name} has left {zone}.",
+  "@zoneLeftBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "zone": {
+        "type": "String"
+      }
+    }
+  },
+  "offTrailTitle": "Off the trail",
+  "offTrailBody": "{name} is {distance} from the trail.",
+  "@offTrailBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  }
 }
