@@ -386,6 +386,32 @@ class MeshStore {
   /// The radio accepted the message. Direct messages carry the [ackCode]
   /// their delivery confirmation will match, and how many [attempts] have
   /// been sent so far.
+  /// Stores one piece of a mesh photo. A repeat is ignored.
+  Future<void> savePhotoChunk(
+    String radioKey,
+    int photoId,
+    int index,
+    int count,
+    List<int> data,
+  ) => _db
+      .into(_db.photoChunks)
+      .insert(
+        PhotoChunksCompanion.insert(
+          radioKey: radioKey,
+          photoId: photoId,
+          idx: index,
+          count: count,
+          data: Uint8List.fromList(data),
+        ),
+        mode: InsertMode.insertOrIgnore,
+      );
+
+  Stream<List<PhotoChunk>> watchPhoto(String radioKey, int photoId) =>
+      (_db.select(_db.photoChunks)..where(
+            (c) => c.radioKey.equals(radioKey) & c.photoId.equals(photoId),
+          ))
+          .watch();
+
   /// The channel post in [slot] sent at [sentAt], if stored.
   Future<Message?> channelPostAt(String radioKey, int slot, int sentAt) =>
       (_db.select(_db.messages)

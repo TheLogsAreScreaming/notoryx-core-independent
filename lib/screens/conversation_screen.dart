@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../app/blocking.dart';
+import '../app/sentinel.dart';
 import '../app/chat_send.dart';
 import '../app/post_signing.dart';
 import '../app/safety.dart';
@@ -22,15 +24,19 @@ import '../app/mesh_links.dart';
 import '../app/position.dart';
 import '../app/read_aloud.dart';
 import '../app/reactions.dart';
+import '../app/translate.dart';
 import '../app/shared_items.dart';
 import '../data/data.dart';
+import '../radio/protocol/mesh_photo.dart';
 import '../radio/radio.dart';
+import 'sentinel_screen.dart';
 import 'manage_actions.dart';
 import 'position_map_screen.dart';
 import 'quick_messages_screen.dart';
 import 'scheduled_screen.dart';
 import '../l10n/l10n.dart';
 import 'link_preview_card.dart';
+import 'mesh_photo_view.dart';
 
 /// One direct or channel conversation with a box to reply.
 class ConversationScreen extends ConsumerStatefulWidget {
@@ -151,6 +157,13 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
               subtitle: Text(context.l10n.fromThePhoneOrElseThe),
               onTap: () => Navigator.pop(context, 'position'),
             ),
+            if (widget.isChannel)
+              ListTile(
+                leading: const Icon(Icons.photo_outlined),
+                title: Text(context.l10n.photo),
+                subtitle: Text(context.l10n.photoSubtitle),
+                onTap: () => Navigator.pop(context, 'photo'),
+              ),
             ListTile(
               leading: const Icon(Icons.contact_page_outlined),
               title: Text(context.l10n.aContact),
@@ -163,6 +176,10 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     );
     if (!mounted || choice == null) return;
     final messenger = ScaffoldMessenger.of(context);
+    if (choice == 'photo') {
+      await _sendPhoto();
+      return;
+    }
     if (choice == 'position') {
       LatLng? here;
       try {
@@ -279,6 +296,147 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
       );
     } finally {
       if (mounted) setState(() => _sending = false);
+    }
+  }
+
+  /// Translates [text] into the app's language on the phone, downloading
+  /// models first if the person agrees.
+  Future<void> _translate(String text) async {
+    final translator = ref.read(translatorProvider);
+    if (translator == null) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    final to = Localizations.localeOf(context).languageCode;
+    try {
+      final from = await translator.detect(text);
+      var plan = await planTranslation(translator, from: from, to: to);
+      if (!mounted) return;
+      if (plan is NeedsModels) {
+        final ok = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(l10n.downloadModelsTitle),
+            content: Text(
+              l10n.downloadModelsBody(
+                plan is NeedsModels
+                    ? plan.codes.map((c) => c.toUpperCase()).join(', ')
+                    : '',
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(l10n.cancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(l10n.download),
+              ),
+            ],
+          ),
+        );
+        if (ok != true) return;
+        messenger.showSnackBar(SnackBar(content: Text(l10n.translating)));
+        for (final code in plan.codes) {
+          if (!await translator.download(code)) throw StateError('download');
+        }
+        plan = const Ready();
+      }
+      switch (plan) {
+        case AlreadyInLanguage():
+          messenger.showSnackBar(
+            SnackBar(content: Text(l10n.alreadyInLanguage)),
+          );
+        case Unsupported():
+          messenger.showSnackBar(SnackBar(content: Text(l10n.cantTranslate)));
+        case NeedsModels():
+          break;
+        case Ready():
+          final result = await translator.translate(text, from: from!, to: to);
+          if (!mounted) return;
+          await showDialog<void>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(
+                l10n.translationTitle(from.toUpperCase(), to.toUpperCase()),
+              ),
+              content: SelectableText(result),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.close),
+                ),
+              ],
+            ),
+          );
+      }
+    } on Object {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.translationFailed)));
+    }
+  }
+
+  /// When this app last sent a photo, to keep to one every 5 minutes.
+  static DateTime? _lastPhoto;
+
+  /// Picks a picture, shrinks it for the mesh, shows what it costs, and
+  /// sends it on this channel if the person agrees.
+  Future<void> _sendPhoto() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    if (!widget.isChannel) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.photoChannelsOnly)));
+      return;
+    }
+    final last = _lastPhoto;
+    if (last != null &&
+        DateTime.now().difference(last) < const Duration(minutes: 5)) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.photoWait)));
+      return;
+    }
+    final file = await FilePicker.pickFile(type: FileType.image);
+    if (file == null || !mounted) return;
+    final source = await file.readAsBytes();
+    final jpg = encodeMeshPhoto(source);
+    if (!mounted) return;
+    if (jpg == null) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.photoNotImage)));
+      return;
+    }
+    final packets = photoChunks(0, jpg).length;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.sendPhotoTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.memory(jpg, width: 192, filterQuality: FilterQuality.medium),
+            const SizedBox(height: 12),
+            Text(l10n.sendPhotoBody(jpg.length, packets)),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.send),
+          ),
+        ],
+      ),
+    );
+    final state = ref.read(connectionProvider);
+    if (ok != true || state is! Connected) return;
+    _lastPhoto = DateTime.now();
+    messenger.showSnackBar(SnackBar(content: Text(l10n.sendingPhoto)));
+    try {
+      await state.sync.sendPhoto(int.parse(widget.thread.substring(2)), jpg);
+    } on Object {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.theRadioCouldNotSendIt)),
+      );
     }
   }
 
@@ -447,6 +605,12 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                 onTap: () => Navigator.pop(context, 'reply'),
               ),
             ],
+            if (ref.read(translatorProvider) != null)
+              ListTile(
+                leading: const Icon(Icons.translate),
+                title: Text(context.l10n.translate),
+                onTap: () => Navigator.pop(context, 'translate'),
+              ),
             ListTile(
               leading: const Icon(Icons.volume_up_outlined),
               title: Text(context.l10n.readAloud),
@@ -457,6 +621,15 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                 leading: const Icon(Icons.forward),
                 title: Text(context.l10n.forward),
                 onTap: () => Navigator.pop(context, 'forward'),
+              ),
+            if (!message.outgoing &&
+                (message.kind == MessageKind.direct ||
+                    (message.senderName ?? '').trim().isNotEmpty))
+              ListTile(
+                key: const ValueKey('message-sentinel-report'),
+                leading: const Icon(Icons.flag_outlined),
+                title: Text(context.l10n.sntReport),
+                onTap: () => Navigator.pop(context, 'report'),
               ),
             if (!message.outgoing)
               ListTile(
@@ -497,6 +670,10 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
       await _send(reactionText(action.substring(6), message.body));
       return;
     }
+    if (action == 'translate') {
+      await _translate(message.body);
+      return;
+    }
     if (action == 'read') {
       try {
         await ref.read(speakerProvider)(
@@ -515,6 +692,19 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     }
     if (action == 'reply') {
       setState(() => _replyTo = (message: message, name: sender));
+      return;
+    }
+    if (action == 'report') {
+      final direct = message.kind == MessageKind.direct;
+      await showSentinelReportSheet(
+        context,
+        sentinel: ref.read(sentinelProvider),
+        nodeId: direct
+            ? message.thread.substring(2).toLowerCase()
+            : sentinelNameId(message.senderName ?? ''),
+        nodeName: sender,
+        messageExcerpt: message.body,
+      );
       return;
     }
     if (action == 'block') {
@@ -691,9 +881,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     final repeats = ref.watch(spamFilterProvider).value == true
         ? spamRepeats(messages, myName: selfName)
         : const <int>{};
+    final sentinel = ref.watch(sentinelProvider);
     final items = chatItems([
       for (final m in messages)
-        if (!blocked.blocks(m) && !repeats.contains(m.id)) m,
+        if (!blocked.blocks(m) && !repeats.contains(m.id) && !sentinel.hides(m))
+          m,
     ], senderOf: senderOf);
 
     return Scaffold(
@@ -763,6 +955,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                         ),
                         child: _Bubble(
                           message: message,
+                          flagged: sentinel.banForMessage(message),
                           body: item.replyText ?? message.body,
                           showSender: widget.isChannel,
                           author: _authorName(message.authorPrefix, contacts),
@@ -879,6 +1072,7 @@ class _Bubble extends StatelessWidget {
   const _Bubble({
     required this.message,
     this.signedBy,
+    this.flagged,
     required this.body,
     required this.showSender,
     this.retrying = false,
@@ -911,6 +1105,9 @@ class _Bubble extends StatelessWidget {
   /// The text shown: a reply's leading mention is left off.
   final String body;
   final bool showSender;
+
+  /// The moderators' ban on the sender, shown as a label (advisory).
+  final SentinelBan? flagged;
   final bool retrying;
   final VoidCallback? onLongPress;
 
@@ -970,6 +1167,11 @@ class _Bubble extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (flagged case final ban?)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 2),
+                      child: SentinelFlag(ban),
+                    ),
                   if (mentionsMe)
                     Row(
                       mainAxisSize: MainAxisSize.min,
@@ -997,7 +1199,10 @@ class _Bubble extends StatelessWidget {
                     ),
                   if (replyTo case final quoted?)
                     _Quote(name: quoted.name, body: quoted.body),
-                  Text(body),
+                  if (photoIdIn(body) case final id?)
+                    MeshPhotoView(id: id)
+                  else
+                    Text(body),
                   const SizedBox(height: 2),
                   Row(
                     mainAxisSize: MainAxisSize.min,

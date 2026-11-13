@@ -274,3 +274,15 @@ class HeardPaths extends Table {
     {radioKey, hops},
   ];
 }
+
+/// One received piece of a mesh photo.
+class PhotoChunks extends Table {
+  TextColumn get radioKey => text()();
+  IntColumn get photoId => integer()();
+  IntColumn get idx => integer()();
+  IntColumn get count => integer()();
+  BlobColumn get data => blob()();
+
+  @override
+  Set<Column> get primaryKey => {radioKey, photoId, idx};
+}

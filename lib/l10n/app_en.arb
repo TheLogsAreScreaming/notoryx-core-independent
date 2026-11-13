@@ -1108,7 +1108,118 @@
   "loadingPreview": "Loading preview…",
   "linkPreviewsAuto": "Load link previews automatically",
   "linkPreviewsAutoSubtitle": "Off: tap Show preview on a link. Loading a preview contacts that website, which sees your internet address.",
+  "photo": "Photo",
+  "photoSubtitle": "A tiny black-and-white picture, sent over the mesh",
+  "sendPhotoTitle": "Send this photo?",
+  "sendPhotoBody": "{bytes} bytes in {packets} packets. Every repeater passes on every packet, so this uses about as much airtime as {packets} messages. One photo every 5 minutes at most.",
+  "photoTooBig": "That picture couldn’t be made small enough to send.",
+  "photoNotImage": "That file isn’t a picture this app can read.",
+  "photoWait": "Please wait a few minutes before sending another photo.",
+  "sendingPhoto": "Sending the photo…",
+  "photoArriving": "Photo arriving: {have} of {count}",
+  "photoWaiting": "Photo: waiting for its pieces",
+  "photoChannelsOnly": "Photos can only be sent on channels.",
+  "@sendPhotoBody": {
+    "placeholders": {
+      "bytes": {
+        "type": "Object"
+      },
+      "packets": {
+        "type": "Object"
+      }
+    }
+  },
+  "@photoArriving": {
+    "placeholders": {
+      "have": {
+        "type": "Object"
+      },
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "translate": "Translate",
+  "translating": "Translating…",
+  "alreadyInLanguage": "This message is already in your language.",
+  "cantTranslate": "This language can’t be translated on this device.",
+  "downloadModelsTitle": "Download translation models?",
+  "downloadModelsBody": "Needs the {languages} model, about 30 MB each, downloaded once from Google. After that, translation happens on this phone and messages never leave it.",
+  "download": "Download",
+  "translationFailed": "Couldn’t translate that.",
+  "translationTitle": "Translation ({from} → {to})",
+  "@downloadModelsBody": {
+    "placeholders": {
+      "languages": {
+        "type": "Object"
+      }
+    }
+  },
+  "@translationTitle": {
+    "placeholders": {
+      "from": {
+        "type": "Object"
+      },
+      "to": {
+        "type": "Object"
+      }
+    }
+  },
+  "sntTitle": "Community moderation",
+  "sntToolSubtitle": "Report spam to NOTORYX moderators and see flagged nodes",
+  "sntIntro": "Reports go to NOTORYX moderators, who review each one by hand. Approved bans come back as an advisory list: flagged nodes get a label, and nothing on the mesh is blocked.",
+  "sntEnable": "Use community moderation",
+  "sntEnableSub": "Off by default. While it is off, NOTORYX never contacts the moderation service.",
+  "sntHide": "Hide messages from flagged senders",
+  "sntHideSub": "Channel messages only. You can turn this off at any time.",
+  "sntSynced": "Ban list updated {time}",
+  "@sntSynced": {"placeholders": {"time": {"type": "String"}}},
+  "sntNeverSynced": "Ban list not downloaded yet",
+  "sntFlaggedCount": "Flagged nodes: {count}",
+  "@sntFlaggedCount": {"placeholders": {"count": {"type": "int"}}},
+  "sntQueued": "Reports waiting to send: {count}",
+  "@sntQueued": {"placeholders": {"count": {"type": "int"}}},
+  "sntRefresh": "Update now",
+  "sntYourNode": "Your node",
+  "sntYourNodeClear": "Your node is not flagged.",
+  "sntYourNodeFlagged": "Your node is flagged (case {caseRef}). If this is a mistake, you can appeal.",
+  "@sntYourNodeFlagged": {"placeholders": {"caseRef": {"type": "String"}}},
+  "sntYourNodeUnknown": "Connect a radio to check your node.",
+  "sntAppealPending": "Your appeal is being reviewed.",
+  "sntAppeal": "Appeal",
+  "sntAppealOther": "Appeal a case by number",
+  "sntYourReports": "Your recent reports",
+  "sntReport": "Report to moderators",
+  "sntReportTitle": "Report {name}",
+  "@sntReportTitle": {"placeholders": {"name": {"type": "String"}}},
+  "sntReasonSpam": "Spam or advertising",
+  "sntReasonFlooding": "Flooding the mesh",
+  "sntReasonAbuse": "Harassment or abuse",
+  "sntReasonImpersonation": "Impersonation",
+  "sntReasonOther": "Other",
+  "sntNote": "Details (optional)",
+  "sntIncludeMessage": "Include this message",
+  "sntSends": "Sends the node's ID and name, your reason and, if ticked, this message. Not your name, key or location.",
+  "sntSend": "Send report",
+  "sntSent": "Report sent ({caseRef})",
+  "@sntSent": {"placeholders": {"caseRef": {"type": "String"}}},
+  "sntQueuedOne": "No connection. The report will be sent later.",
+  "sntRejected": "Report not accepted: {message}",
+  "@sntRejected": {"placeholders": {"message": {"type": "String"}}},
+  "sntOffPrompt": "Turn on community moderation?",
+  "sntTurnOn": "Turn on",
+  "sntFlagged": "Flagged",
+  "sntFlaggedHint": "Flagged by NOTORYX moderators (case {caseRef}). Advisory only.",
+  "@sntFlaggedHint": {"placeholders": {"caseRef": {"type": "String"}}},
+  "sntCaseRef": "Case number (SNT-1234)",
+  "sntStatement": "Why should the ban be lifted?",
+  "sntContact": "Contact (optional, only moderators see it)",
+  "sntAppealSend": "Send appeal",
+  "sntAppealReceived": "Appeal sent. A moderator will review it.",
+  "sntAppealUnknown": "No MeshCore case has that number.",
+  "sntAppealNotOpen": "That case has no active ban, or an appeal is already waiting.",
+  "sntAppealTooMany": "Too many appeals. Try again in a minute.",
+  "sntFailed": "Couldn't reach the moderation service. Try again later.",
   "showImage": "Show image",
-  "imageUnavailable": "Couldn’t load that image",
-  "photo": "Photo"
+  "imageUnavailable": "Couldn’t load that image"
 }
