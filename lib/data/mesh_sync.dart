@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 
 import '../app/region_tag.dart';
+import '../radio/protocol/mesh_photo.dart';
 import '../radio/protocol/region_scope.dart';
 import '../radio/protocol/signed_post.dart';
 import '../radio/radio.dart';
@@ -844,6 +845,34 @@ class MeshSync {
     return id;
   }
 
+  /// Sends [jpeg] to channel [slot]: a caption post first, then the pieces,
+  /// [gap] apart so they don't crowd the channel. The photo is stored here
+  /// too, so it shows in this chat.
+  Future<void> sendPhoto(
+    int slot,
+    Uint8List jpeg, {
+    Duration gap = const Duration(milliseconds: 1500),
+  }) async {
+    final key = _requireKey();
+    final id = newPhotoId();
+    final chunks = photoChunks(id, jpeg);
+    for (final c in chunks) {
+      final p = parsePhotoChunk(c)!;
+      await _store.savePhotoChunk(key, id, p.index, p.count, p.data);
+    }
+    await sendChannel(slot, photoCaption(id));
+    for (final c in chunks) {
+      await Future<void>.delayed(gap);
+      await _session.run(
+        SendChannelData(
+          channel: slot,
+          dataType: signedPostDataType,
+          payload: c,
+        ),
+      );
+    }
+  }
+
   /// Has the radio sign [data] with its own key.
   Future<Uint8List> sign(List<int> data) async {
     await _session.request<SignStartReply>(const SignStart());
@@ -974,6 +1003,11 @@ class MeshSync {
             await _checkSignature(key, event.channel, waiting);
           }
         }
+      case ChannelData(:final dataType, :final payload)
+          when dataType == signedPostDataType &&
+              parsePhotoChunk(payload) != null:
+        final c = parsePhotoChunk(payload)!;
+        await _store.savePhotoChunk(key, c.id, c.index, c.count, c.data);
       case ChannelData(:final channel, :final dataType, :final payload)
           when dataType == signedPostDataType:
         final s = decodePostSignature(payload);

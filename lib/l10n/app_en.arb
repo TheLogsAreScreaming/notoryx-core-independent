@@ -1108,6 +1108,37 @@
   "loadingPreview": "Loading preview…",
   "linkPreviewsAuto": "Load link previews automatically",
   "linkPreviewsAutoSubtitle": "Off: tap Show preview on a link. Loading a preview contacts that website, which sees your internet address.",
+  "photo": "Photo",
+  "photoSubtitle": "A tiny black-and-white picture, sent over the mesh",
+  "sendPhotoTitle": "Send this photo?",
+  "sendPhotoBody": "{bytes} bytes in {packets} packets. Every repeater passes on every packet, so this uses about as much airtime as {packets} messages. One photo every 5 minutes at most.",
+  "photoTooBig": "That picture couldn’t be made small enough to send.",
+  "photoNotImage": "That file isn’t a picture this app can read.",
+  "photoWait": "Please wait a few minutes before sending another photo.",
+  "sendingPhoto": "Sending the photo…",
+  "photoArriving": "Photo arriving: {have} of {count}",
+  "photoWaiting": "Photo: waiting for its pieces",
+  "photoChannelsOnly": "Photos can only be sent on channels.",
+  "@sendPhotoBody": {
+    "placeholders": {
+      "bytes": {
+        "type": "Object"
+      },
+      "packets": {
+        "type": "Object"
+      }
+    }
+  },
+  "@photoArriving": {
+    "placeholders": {
+      "have": {
+        "type": "Object"
+      },
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
   "translate": "Translate",
   "translating": "Translating…",
   "alreadyInLanguage": "This message is already in your language.",
