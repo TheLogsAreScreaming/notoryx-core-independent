@@ -471,5 +471,8 @@
   "noPreview": "No hay vista previa de este enlace",
   "loadingPreview": "Cargando vista previa…",
   "linkPreviewsAuto": "Cargar vistas previas automáticamente",
-  "linkPreviewsAutoSubtitle": "Desactivado: toca Ver vista previa en un enlace. Cargar una vista previa contacta con esa web, que ve tu dirección de internet."
+  "linkPreviewsAutoSubtitle": "Desactivado: toca Ver vista previa en un enlace. Cargar una vista previa contacta con esa web, que ve tu dirección de internet.",
+  "showImage": "Ver imagen",
+  "imageUnavailable": "No se pudo cargar la imagen",
+  "photo": "Foto"
 }

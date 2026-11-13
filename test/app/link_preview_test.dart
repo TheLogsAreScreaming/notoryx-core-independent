@@ -51,4 +51,16 @@ void main() {
   test('only web addresses are fetched', () async {
     expect(await fetchLinkPreview(Uri.parse('file:///etc/passwd')), isNull);
   });
+
+  test('picture and GIF links are recognised by their path', () {
+    expect(isImageLink('https://x.y/cat.GIF'), isTrue);
+    expect(isImageLink('https://x.y/a/b.jpeg?size=large'), isTrue);
+    expect(isImageLink('https://x.y/photo.webp'), isTrue);
+    expect(isImageLink('https://x.y/page.html'), isFalse);
+    expect(isImageLink('https://x.y/gif'), isFalse);
+  });
+
+  test('only web addresses are fetched for images too', () async {
+    expect(await fetchLinkImage(Uri.parse('file:///etc/hosts')), isNull);
+  });
 }

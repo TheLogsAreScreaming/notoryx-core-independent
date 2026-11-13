@@ -21,14 +21,46 @@ class _LinkPreviewCardState extends ConsumerState<LinkPreviewCard> {
   @override
   Widget build(BuildContext context) {
     final auto = ref.watch(linkPreviewsAutoProvider).value ?? false;
+    final image = isImageLink(widget.url);
     if (!auto && !_asked) {
       return ActionChip(
-        avatar: const Icon(Icons.link, size: 18),
-        label: Text(context.l10n.showPreview),
+        avatar: Icon(image ? Icons.image_outlined : Icons.link, size: 18),
+        label: Text(image ? context.l10n.showImage : context.l10n.showPreview),
         onPressed: () => setState(() => _asked = true),
       );
     }
     final theme = Theme.of(context);
+    if (image) {
+      return switch (ref.watch(linkImageProvider(widget.url))) {
+        AsyncData(value: final bytes?) => Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 220, maxWidth: 260),
+              child: Image.memory(
+                bytes,
+                fit: BoxFit.contain,
+                gaplessPlayback: true,
+                semanticLabel: context.l10n.photo,
+                errorBuilder: (_, _, _) => Text(
+                  context.l10n.imageUnavailable,
+                  style: theme.textTheme.bodySmall,
+                ),
+              ),
+            ),
+          ),
+        ),
+        AsyncLoading() => Text(
+          context.l10n.loadingPreview,
+          style: theme.textTheme.bodySmall,
+        ),
+        _ => Text(
+          context.l10n.imageUnavailable,
+          style: theme.textTheme.bodySmall,
+        ),
+      };
+    }
     return switch (ref.watch(linkPreviewProvider(widget.url))) {
       AsyncData(value: final p?) => Card(
         margin: const EdgeInsets.only(top: 4),
