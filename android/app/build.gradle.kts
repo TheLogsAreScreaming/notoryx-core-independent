@@ -41,7 +41,9 @@ android {
         // `--target-platform android-arm64` only limits Flutter's own code.
         // Plugins (ML Kit translation, the QR scanner) still pack native code
         // for every chip type, which doubled the phone-only download. The
-        // release workflow passes `-P notoryx-abi=arm64-v8a` for that build.
+        // release workflow passes `-P notoryx-abi=arm64-v8a` for that build,
+        // plus `-P disable-abi-filtering=true`, or Flutter's Gradle plugin
+        // clears this filter and puts all three chip types back.
         (project.findProperty("notoryx-abi") as String?)?.let { abi ->
             ndk { abiFilters += abi }
         }
