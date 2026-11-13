@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quick_actions/quick_actions.dart';
 
+import '../app/favourites_view.dart';
 import '../app/connection.dart';
 import '../app/contact_room.dart';
 import '../app/quick_messages.dart';
@@ -432,20 +433,46 @@ class _ContactsTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final contacts = ref.watch(contactsProvider(radioKey)).value ?? const [];
-    final heard = ref.watch(discoveredProvider(radioKey)).value ?? const [];
+    final favouritesOnly = ref.watch(favouritesOnlyProvider).value ?? false;
+    final heard = favouritesOnly
+        ? const <DiscoveredData>[]
+        : ref.watch(discoveredProvider(radioKey)).value ?? const [];
     if (contacts.isEmpty && heard.isEmpty) {
       return const _Empty('No contacts on this radio');
     }
     // Favourites first, each group by name (the store already sorts by name).
     final sorted = [
-      ...contacts.where((c) => c.flags & 1 == 1),
-      ...contacts.where((c) => c.flags & 1 == 0),
+      ...contacts.where(isFavourite),
+      if (!favouritesOnly) ...contacts.where((c) => !isFavourite(c)),
     ];
     final state = ref.watch(connectionProvider);
     final max = state is Connected ? state.radio.device.maxContacts : null;
     return ListView(
       padding: const EdgeInsets.only(bottom: 88), // room for the + button
       children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+          child: Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: FilterChip(
+              key: const Key('favourites-only'),
+              avatar: Icon(favouritesOnly ? Icons.star : Icons.star_outline),
+              showCheckmark: false,
+              label: Text(context.l10n.favouritesOnly),
+              selected: favouritesOnly,
+              onSelected: (on) =>
+                  setFavouritesOnly(ref.read(storeProvider), on),
+            ),
+          ),
+        ),
+        if (favouritesOnly && sorted.isEmpty)
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              context.l10n.noFavouritesYet,
+              textAlign: TextAlign.center,
+            ),
+          ),
         if (max != null && max > 0)
           ContactMeterBar(
             meter: ContactMeter(contacts.length, max),

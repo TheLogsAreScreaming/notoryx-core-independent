@@ -37,6 +37,14 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // `flutter build apk --target-platform android-arm64` only limits
+        // Flutter's own code. Plugins (ML Kit translation, the QR scanner)
+        // still pack native code for every chip type, which doubled the
+        // phone-only download. Keep just the one that was asked for.
+        if (project.findProperty("target-platform") == "android-arm64") {
+            ndk { abiFilters += "arm64-v8a" }
+        }
     }
 
     signingConfigs {
