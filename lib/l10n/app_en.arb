@@ -1221,5 +1221,33 @@
   "sntAppealTooMany": "Too many appeals. Try again in a minute.",
   "sntFailed": "Couldn't reach the moderation service. Try again later.",
   "showImage": "Show image",
-  "imageUnavailable": "Couldn’t load that image"
+  "imageUnavailable": "Couldn’t load that image",
+  "pathViewList": "List",
+  "pathViewNetwork": "Network",
+  "networkHint": "You're in the middle and each ring is one more hop. Thicker lines carried more packets; bigger dots relayed more. Tap a dot for its numbers.",
+  "networkDot": "{name}: usually {hops} hops away, relayed {count} packets",
+  "@networkDot": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "hops": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "networkSemantics": "Network diagram: {count} repeaters on {rings} rings around you.",
+  "@networkSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "rings": {
+        "type": "int"
+      }
+    }
+  }
 }
