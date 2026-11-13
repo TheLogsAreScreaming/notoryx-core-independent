@@ -540,5 +540,8 @@
   "sntAppealTooMany": "Demasiadas apelaciones. Inténtalo de nuevo en un minuto.",
   "sntFailed": "No se pudo contactar con el servicio de moderación. Inténtalo más tarde.",
   "showImage": "Ver imagen",
-  "imageUnavailable": "No se pudo cargar la imagen"
+  "imageUnavailable": "No se pudo cargar la imagen",
+  "favouritesOnly": "Solo favoritos",
+  "showEveryone": "Mostrar a todos",
+  "noFavouritesYet": "Aún no hay favoritos. Mantén pulsado un contacto y elige Añadir a favoritos para que aparezca aquí."
 }

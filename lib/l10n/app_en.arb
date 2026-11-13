@@ -1221,5 +1221,8 @@
   "sntAppealTooMany": "Too many appeals. Try again in a minute.",
   "sntFailed": "Couldn't reach the moderation service. Try again later.",
   "showImage": "Show image",
-  "imageUnavailable": "Couldn’t load that image"
+  "imageUnavailable": "Couldn’t load that image",
+  "favouritesOnly": "Favourites only",
+  "showEveryone": "Show everyone",
+  "noFavouritesYet": "No favourites yet. Long-press a contact and choose Add to favourites to keep them here."
 }
