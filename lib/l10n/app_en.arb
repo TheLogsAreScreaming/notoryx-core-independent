@@ -985,6 +985,80 @@
       }
     }
   },
+  "nearbyRepeaterTest": "Nearby repeater test",
+  "nearbyRepeaterTestSubtitle": "One tap: which repeaters can hear you right now",
+  "nearbyRepeaterTestIntro": "Asks every repeater within one hop to answer, then lists who did and how well the signal gets through each way. It sends one short packet and changes nothing.",
+  "testForRepeaters": "Test for repeaters",
+  "testAgain": "Test again",
+  "listeningForRepeaters": "Listening for answers. Repeaters wait a moment at random so they don’t all reply at once.",
+  "repeaterTestFailed": "The radio couldn’t send the test. Try again.",
+  "noRepeatersAnswered": "No repeaters answered",
+  "noRepeatersAnsweredHint": "None in range, or they run older firmware that doesn’t answer. Try somewhere higher, or with the antenna upright.",
+  "repeatersAnswered": "{count, plural, =1{1 repeater answered} other{{count} repeaters answered}}",
+  "@repeatersAnswered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "testedAt": "Tested at {time}",
+  "@testedAt": {
+    "placeholders": {
+      "time": {
+        "type": "Object"
+      }
+    }
+  },
+  "signalStrong": "Strong",
+  "signalUsable": "Usable",
+  "signalWeak": "Weak",
+  "unknownRepeater": "Unknown repeater",
+  "responderSemantics": "{name}, {quality} signal. It heard you at {heardUs} dB, you heard it at {weHeard} dB, signal strength {rssi} dBm.",
+  "@responderSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      },
+      "quality": {
+        "type": "Object"
+      },
+      "heardUs": {
+        "type": "Object"
+      },
+      "weHeard": {
+        "type": "Object"
+      },
+      "rssi": {
+        "type": "Object"
+      }
+    }
+  },
+  "heardYouAt": "heard you {snr} dB",
+  "@heardYouAt": {
+    "placeholders": {
+      "snr": {
+        "type": "Object"
+      }
+    }
+  },
+  "youHeardItAt": "you heard it {snr} dB",
+  "@youHeardItAt": {
+    "placeholders": {
+      "snr": {
+        "type": "Object"
+      }
+    }
+  },
+  "rssiValue": "{rssi} dBm",
+  "@rssiValue": {
+    "placeholders": {
+      "rssi": {
+        "type": "Object"
+      }
+    }
+  },
+  "notAContact": "Not a contact",
   "@scanProgress": {
     "placeholders": {
       "done": {
@@ -1221,79 +1295,5 @@
   "sntAppealTooMany": "Too many appeals. Try again in a minute.",
   "sntFailed": "Couldn't reach the moderation service. Try again later.",
   "showImage": "Show image",
-  "imageUnavailable": "Couldn’t load that image",
-  "nearbyRepeaterTest": "Nearby repeater test",
-  "nearbyRepeaterTestSubtitle": "One tap: which repeaters can hear you right now",
-  "nearbyRepeaterTestIntro": "Asks every repeater within one hop to answer, then lists who did and how well the signal gets through each way. It sends one short packet and changes nothing.",
-  "testForRepeaters": "Test for repeaters",
-  "testAgain": "Test again",
-  "listeningForRepeaters": "Listening for answers. Repeaters wait a moment at random so they don’t all reply at once.",
-  "repeaterTestFailed": "The radio couldn’t send the test. Try again.",
-  "noRepeatersAnswered": "No repeaters answered",
-  "noRepeatersAnsweredHint": "None in range, or they run older firmware that doesn’t answer. Try somewhere higher, or with the antenna upright.",
-  "repeatersAnswered": "{count, plural, =1{1 repeater answered} other{{count} repeaters answered}}",
-  "@repeatersAnswered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "testedAt": "Tested at {time}",
-  "@testedAt": {
-    "placeholders": {
-      "time": {
-        "type": "Object"
-      }
-    }
-  },
-  "signalStrong": "Strong",
-  "signalUsable": "Usable",
-  "signalWeak": "Weak",
-  "unknownRepeater": "Unknown repeater",
-  "responderSemantics": "{name}, {quality} signal. It heard you at {heardUs} dB, you heard it at {weHeard} dB, signal strength {rssi} dBm.",
-  "@responderSemantics": {
-    "placeholders": {
-      "name": {
-        "type": "Object"
-      },
-      "quality": {
-        "type": "Object"
-      },
-      "heardUs": {
-        "type": "Object"
-      },
-      "weHeard": {
-        "type": "Object"
-      },
-      "rssi": {
-        "type": "Object"
-      }
-    }
-  },
-  "heardYouAt": "heard you {snr} dB",
-  "@heardYouAt": {
-    "placeholders": {
-      "snr": {
-        "type": "Object"
-      }
-    }
-  },
-  "youHeardItAt": "you heard it {snr} dB",
-  "@youHeardItAt": {
-    "placeholders": {
-      "snr": {
-        "type": "Object"
-      }
-    }
-  },
-  "rssiValue": "{rssi} dBm",
-  "@rssiValue": {
-    "placeholders": {
-      "rssi": {
-        "type": "Object"
-      }
-    }
-  },
-  "notAContact": "Not a contact"
+  "imageUnavailable": "Couldn’t load that image"
 }
