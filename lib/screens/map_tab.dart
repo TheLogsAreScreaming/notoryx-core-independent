@@ -3,6 +3,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../app/contact_room.dart' show isFavourite;
+import '../app/favourites_view.dart';
 import '../app/connection.dart';
 import '../app/map_cache.dart';
 import '../app/telemetry.dart';
@@ -82,11 +84,14 @@ class _MapTabState extends ConsumerState<MapTab> {
   Widget build(BuildContext context) {
     final contacts =
         ref.watch(contactsProvider(widget.radioKey)).value ?? const [];
-    final heard =
-        ref.watch(discoveredProvider(widget.radioKey)).value ?? const [];
+    final favouritesOnly = ref.watch(favouritesOnlyProvider).value ?? false;
+    final heard = favouritesOnly
+        ? const <DiscoveredData>[]
+        : ref.watch(discoveredProvider(widget.radioKey)).value ?? const [];
     final nodes = [
       for (final c in contacts)
-        if (c.latitude != null) nodeFromContact(c),
+        if (c.latitude != null && (!favouritesOnly || isFavourite(c)))
+          nodeFromContact(c),
       for (final d in heard)
         if (d.latitude != null) nodeFromDiscovered(d),
     ];
@@ -224,6 +229,17 @@ class _MapTabState extends ConsumerState<MapTab> {
                   ),
                 ),
                 child: const Icon(Icons.radar),
+              ),
+              const SizedBox(height: 8),
+              FloatingActionButton.small(
+                key: const Key('map-favourites-only'),
+                heroTag: 'map-favourites',
+                tooltip: favouritesOnly
+                    ? context.l10n.showEveryone
+                    : context.l10n.favouritesOnly,
+                onPressed: () =>
+                    setFavouritesOnly(ref.read(storeProvider), !favouritesOnly),
+                child: Icon(favouritesOnly ? Icons.star : Icons.star_outline),
               ),
               const SizedBox(height: 8),
               FloatingActionButton.small(

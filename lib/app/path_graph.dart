@@ -121,3 +121,54 @@ final heardPathsProvider = StreamProvider.family<List<HeardPathRow>, String>((
 
 Future<void> clearHeardPaths(MeshDatabase db, String radioKey) =>
     (db.delete(db.heardPaths)..where((p) => p.radioKey.equals(radioKey))).go();
+
+/// Id of the middle of the network diagram: this radio.
+const networkSelf = '';
+
+/// Every heard path combined into rings around you: each repeater on the
+/// ring for how many hops it most often is from you, links between
+/// adjacent hops weighted by how many packets took them.
+typedef PathNetwork = ({
+  Map<String, ({int ring, int relayed})> nodes,
+  Map<(String, String), int> links,
+});
+
+PathNetwork pathNetwork(List<HeardPathRow> paths, {int maxNodes = 40}) {
+  final votes = <String, Map<int, int>>{};
+  final relayed = <String, int>{};
+  final links = <(String, String), int>{};
+  for (final p in paths) {
+    final hops = pathHops(p.hops);
+    for (var i = 0; i < hops.length; i++) {
+      final depth = hops.length - i;
+      final v = votes[hops[i]] ??= {};
+      v[depth] = (v[depth] ?? 0) + p.count;
+      relayed[hops[i]] = (relayed[hops[i]] ?? 0) + p.count;
+      final next = i + 1 < hops.length ? hops[i + 1] : networkSelf;
+      links[(hops[i], next)] = (links[(hops[i], next)] ?? 0) + p.count;
+    }
+  }
+  final keep =
+      (relayed.keys.toList()
+            ..sort((a, b) => relayed[b]!.compareTo(relayed[a]!)))
+          .take(maxNodes)
+          .toSet();
+  return (
+    nodes: {
+      networkSelf: (ring: 0, relayed: 0),
+      for (final id in keep)
+        id: (
+          ring: votes[id]!.entries
+              .reduce((a, b) => b.value > a.value ? b : a)
+              .key,
+          relayed: relayed[id]!,
+        ),
+    },
+    links: {
+      for (final e in links.entries)
+        if ((keep.contains(e.key.$1) || e.key.$1 == networkSelf) &&
+            (keep.contains(e.key.$2) || e.key.$2 == networkSelf))
+          e.key: e.value,
+    },
+  );
+}

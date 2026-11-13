@@ -282,6 +282,23 @@ void main() {
     await cleanUp(tester);
   });
 
+  testWidgets('favourites only hides everyone you have not starred', (
+    tester,
+  ) async {
+    await connect(tester);
+    await tester.tap(find.text('Contacts'));
+    await settle(tester);
+    expect(find.text('Alice'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('favourites-only')));
+    await settle(tester);
+    expect(find.text('Alice'), findsNothing);
+    expect(find.textContaining('No favourites yet'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('favourites-only')));
+    await settle(tester);
+    expect(find.text('Alice'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
   testWidgets('a refused direct message can be sent again', (tester) async {
     await connect(tester);
     await tester.tap(find.text('Contacts'));
