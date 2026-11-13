@@ -22,6 +22,7 @@ import '../app/sentinel.dart';
 import 'sentinel_screen.dart';
 import '../l10n/l10n.dart';
 import 'path_graph_screen.dart';
+import 'repeater_test_screen.dart';
 import 'mqtt_screen.dart';
 
 /// Standard LoRa bandwidths the firmware accepts, in kHz.
@@ -406,6 +407,17 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(builder: (_) => const MqttScreen()),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.cell_tower),
+              title: Text(context.l10n.nearbyRepeaterTest),
+              subtitle: Text(context.l10n.nearbyRepeaterTestSubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const RepeaterTestScreen(),
+                ),
               ),
             ),
             ListTile(
