@@ -120,6 +120,32 @@ final class SendControlData extends RadioCommand {
   }
 }
 
+/// Asks for the radio's identity private key.
+final class ExportPrivateKey extends RadioCommand {
+  const ExportPrivateKey();
+
+  @override
+  void _write(FrameWriter out) => out.u8(CommandCode.exportPrivateKey);
+}
+
+/// Gives the radio a new identity: a 64-byte private key.
+final class ImportPrivateKey extends RadioCommand {
+  ImportPrivateKey(List<int> key) : key = List.unmodifiable(key) {
+    if (key.length != 64) {
+      throw ArgumentError.value(key.length, 'key', 'must be 64 bytes');
+    }
+  }
+
+  final List<int> key;
+
+  @override
+  void _write(FrameWriter out) {
+    out
+      ..u8(CommandCode.importPrivateKey)
+      ..bytes(key);
+  }
+}
+
 /// Starts collecting data for the radio to sign.
 final class SignStart extends RadioCommand {
   const SignStart();

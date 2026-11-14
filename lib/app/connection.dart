@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -218,6 +219,19 @@ class ConnectionController extends Notifier<RadioConnectionState> {
     _retry?.cancel();
     _tryReconnect(current, _generation);
   }
+
+  /// The connected radio's identity private key, for a backup. Throws when
+  /// there is no radio or its firmware has key export turned off.
+  Future<Uint8List> exportIdentityKey() {
+    final current = state;
+    if (current is! Connected) throw StateError('No radio is connected.');
+    return current.sync.exportIdentityKey();
+  }
+
+  /// Gives the connected radio the identity in [key] (64 bytes), then shows
+  /// its settings as read back.
+  Future<void> importIdentityKey(List<int> key) =>
+      changeRadio([ImportPrivateKey(key)]);
 
   /// Changes the connected radio's LoRa settings. Throws when there is no
   /// radio or it refuses the settings.

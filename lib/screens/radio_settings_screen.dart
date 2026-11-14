@@ -17,6 +17,7 @@ import 'appearance_screen.dart';
 import '../app/channel_cleanup.dart';
 import 'radio_console_screen.dart';
 import 'backup_screen.dart';
+import 'identity_key_screen.dart';
 import 'blocked_screen.dart';
 import '../app/sentinel.dart';
 import 'sentinel_screen.dart';
@@ -336,6 +337,18 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
                     name: self.name,
                     isSelf: true,
                   ),
+                ),
+              ),
+            ),
+            ListTile(
+              key: const ValueKey('settings-identity-key'),
+              leading: const Icon(Icons.key),
+              title: Text(context.l10n.identityKey),
+              subtitle: Text(context.l10n.identityKeySubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const IdentityKeyScreen(),
                 ),
               ),
             ),
