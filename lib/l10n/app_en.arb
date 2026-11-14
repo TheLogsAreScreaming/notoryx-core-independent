@@ -2034,5 +2034,80 @@
       }
     }
   },
-  "less": "Less"
+  "less": "Less",
+  "observerReach": "Observer reach",
+  "observerReachSubtitle": "Which listening stations heard this radio",
+  "observerReachExplainer": "Observers are listening stations that report the packets they hear to an analyzer server. Observer reach asks {host} which observers heard this radio directly in the last few days, and which repeaters it links with. To ask, it sends this radio's public key. Your messages, contacts and private key are never sent.",
+  "@observerReachExplainer": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "observerReachSwitch": "Ask the analyzer server",
+  "observerReachOffNote": "Off. Nothing is sent until you turn this on.",
+  "observerReachSends": "On. Sends this radio's public key to {host} when you check.",
+  "@observerReachSends": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "reachServer": "Analyzer server (https)",
+  "reachServerInvalid": "Use an https address, e.g. https://analyzer.example.org",
+  "reachCheckNow": "Check now",
+  "reachChecking": "Checking…",
+  "reachHeardBy": "{count, plural, =0{No observer heard it directly in the last {days} days} =1{Heard directly by 1 observer in the last {days} days} other{Heard directly by {count} observers in the last {days} days}}",
+  "@reachHeardBy": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "reachPackets": "{count, plural, =1{1 packet} other{{count} packets}}",
+  "@reachPackets": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reachAverageSnr": "average SNR {snr} dB",
+  "@reachAverageSnr": {
+    "placeholders": {
+      "snr": {
+        "type": "String"
+      }
+    }
+  },
+  "reachKmAway": "{km} km away",
+  "@reachKmAway": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "reachLinks": "Repeaters it links with",
+  "reachNoLinks": "No linked repeaters seen.",
+  "reachLinkCounts": "It heard them {weHear} times, they heard it {theyHear} times",
+  "@reachLinkCounts": {
+    "placeholders": {
+      "weHear": {
+        "type": "int"
+      },
+      "theyHear": {
+        "type": "int"
+      }
+    }
+  },
+  "reachOneWay": "one way only",
+  "reachUnknown": "The server has no record of this radio: none of its observers has heard it yet.",
+  "reachFailed": "Couldn't get an answer from the server. Check the address and your internet connection, then try again."
 }
