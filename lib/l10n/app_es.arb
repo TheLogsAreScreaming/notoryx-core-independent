@@ -678,5 +678,18 @@
   "keyBackupNotConnected": "Conecta primero una radio.",
   "keyBackupTurnedOff": "El firmware de esta radio tiene desactivada la copia de la clave.",
   "keyBackupNoAnswer": "La radio no respondió. Inténtalo de nuevo.",
-  "keyBackupRefused": "La radio lo rechazó. Revisa la clave e inténtalo de nuevo."
+  "keyBackupRefused": "La radio lo rechazó. Revisa la clave e inténtalo de nuevo.",
+  "repeaterNames": "Nombres de repetidores",
+  "repeaterNamesSubtitle": "Búsqueda en línea y memoria de ID compartidos",
+  "lookUpUnknownIdsOnline": "Buscar ID desconocidos en línea",
+  "lookUpUnknownIdsOnlineDetail": "Solo envía los ID cortos de repetidores al servidor de abajo. Un nombre se muestra solo si ese repetidor está a tu alcance de radio o el servidor está seguro. Desactivado por defecto.",
+  "lookupServer": "Servidor de búsqueda (https)",
+  "foundOnline": "{name} (en línea)",
+  "sharedIdMemoryExplainer": "Varios repetidores pueden compartir un ID corto. Cuando las posiciones muestran cuál es, la app recuerda esa elección y la vuelve a usar si no hay posición o si dos están casi igual de cerca.",
+  "rememberPicksFor": "Recordar elecciones durante",
+  "daysShort": "{days} d",
+  "tieMargin": "Margen de empate",
+  "tieMarginDetail": "Cuánto deben parecerse (en %) las distancias de dos repetidores para que decida la elección recordada. 0 solo empates exactos; hasta 20; 5 por defecto. Las elecciones no usadas en los días indicados se olvidan.",
+  "forgetPicks": "Olvidar elecciones recordadas ({count})",
+  "less": "Menos"
 }

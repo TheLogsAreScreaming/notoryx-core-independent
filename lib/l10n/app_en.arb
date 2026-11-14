@@ -1694,5 +1694,39 @@
   "keyBackupNotConnected": "Connect a radio first.",
   "keyBackupTurnedOff": "This radio's firmware has key backup turned off.",
   "keyBackupNoAnswer": "The radio didn't answer. Try again.",
-  "keyBackupRefused": "The radio refused. Check the key and try again."
+  "keyBackupRefused": "The radio refused. Check the key and try again.",
+  "repeaterNames": "Repeater names",
+  "repeaterNamesSubtitle": "Online lookup and shared-ID memory",
+  "lookUpUnknownIdsOnline": "Look up unknown IDs online",
+  "lookUpUnknownIdsOnlineDetail": "Sends only the short repeater IDs to the server below. A name is shown only if that repeater is within radio range of you, or the server is sure. Off by default.",
+  "lookupServer": "Lookup server (https)",
+  "foundOnline": "{name} (online)",
+  "@foundOnline": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sharedIdMemoryExplainer": "Several repeaters can share a short ID. When positions show which one it is, the app remembers that pick and uses it again when there's no position to go on, or two of them are about equally close.",
+  "rememberPicksFor": "Remember picks for",
+  "daysShort": "{days} d",
+  "@daysShort": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "tieMargin": "Tie margin",
+  "tieMarginDetail": "How close two repeaters' distances must be (in %) for the remembered pick to decide. 0 means only exact ties; up to 20; 5 by default. Picks not used again within the days above are forgotten.",
+  "forgetPicks": "Forget remembered picks ({count})",
+  "@forgetPicks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "less": "Less"
 }

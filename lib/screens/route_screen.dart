@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/connection.dart';
+import '../app/hop_names.dart';
 import '../app/path_graph.dart';
 import '../app/route_planner.dart';
 import '../app/trace.dart';
@@ -109,7 +110,19 @@ class _RouteScreenState extends ConsumerState<RouteScreen> {
         if (NodeType.fromByte(c.type) case NodeType.repeater || NodeType.room)
           (name: c.name, publicKey: c.publicKey),
     ];
-    String name(String hash) => hopName(hash, repeaters);
+    final hints = hopHints(
+      ref,
+      radioKey,
+      onlineLabel: context.l10n.foundOnline,
+    );
+    final unknown = <String>{};
+    String name(String hash) {
+      final named = hopName(hash, repeaters, hints: hints);
+      if (named == hash.toUpperCase()) unknown.add(hash);
+      return named;
+    }
+
+    afterNamingHops(ref, unknown, hints);
 
     final trace = _traceRoute == contact.outPathLength ? _trace : null;
     final hops = routeHops(contact);
