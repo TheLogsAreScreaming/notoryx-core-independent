@@ -1360,6 +1360,95 @@
     }
   },
   "journalButton": "Journal",
+  "timeline": "Timeline",
+  "timelineSubtitle": "Messages, new nodes, signal changes and positions in one feed",
+  "timelineRefresh": "Refresh timeline",
+  "timelineDay": "Today",
+  "timelineWeek": "7 days",
+  "timelineMonth": "30 days",
+  "timelineSearch": "Search the timeline",
+  "timelineMessages": "Messages",
+  "timelineNewNodes": "New nodes",
+  "timelineSignal": "Signal changes",
+  "timelinePositions": "Positions",
+  "timelineError": "The timeline couldn’t be loaded.",
+  "timelineEmpty": "Nothing happened in this time yet.",
+  "timelineNoMatches": "Nothing matches the filters.",
+  "timelineYouSent": "You wrote in {chat}",
+  "@timelineYouSent": {
+    "placeholders": {
+      "chat": {
+        "type": "Object"
+      }
+    }
+  },
+  "timelineReceived": "{sender} in {chat}",
+  "@timelineReceived": {
+    "placeholders": {
+      "sender": {
+        "type": "Object"
+      },
+      "chat": {
+        "type": "Object"
+      }
+    }
+  },
+  "timelineFirstHeard": "{name} heard for the first time",
+  "@timelineFirstHeard": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "timelineNewNodeHint": "Open its journal page",
+  "timelineSignalUp": "{name} came in stronger",
+  "@timelineSignalUp": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "timelineSignalDown": "{name} got weaker",
+  "@timelineSignalDown": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "timelineSignalDetail": "From about {from} dB to {to} dB",
+  "@timelineSignalDetail": {
+    "placeholders": {
+      "from": {
+        "type": "Object"
+      },
+      "to": {
+        "type": "Object"
+      }
+    }
+  },
+  "timelineSharedPosition": "{name} shared a position in {chat}",
+  "@timelineSharedPosition": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      },
+      "chat": {
+        "type": "Object"
+      }
+    }
+  },
+  "timelineNewPlace": "{name} advertised a new place",
+  "@timelineNewPlace": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "timelineYou": "You",
   "pathGraphSubtitle": "Routes heard, and the repeaters you hear directly",
   "pathGraphIntro": "Built from the paths on flooded packets your radio hears while the app is connected. Each repeater you hear directly is listed with the chains of repeaters behind it. Short IDs can belong to more than one repeater.",
   "heardDirectly": "Repeaters you hear directly",
