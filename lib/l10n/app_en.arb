@@ -1190,6 +1190,176 @@
     }
   },
   "pathGraph": "Path graph",
+  "nodeJournal": "Node journal",
+  "nodeJournalSubtitle": "Every node ever heard, with behaviour labels, tags and notes",
+  "journalNoRadio": "Connect a radio, or open a saved one, to see its journal.",
+  "journalIntro": "{count, plural, =1{1 node heard. Logged automatically from adverts.} other{{count} nodes heard. Logged automatically from adverts.}}",
+  "@journalIntro": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "journalSearch": "Search names, keys and notes",
+  "journalEmpty": "Nothing heard yet. Nodes appear here as their adverts are heard.",
+  "journalNoMatches": "No nodes match.",
+  "journalLastHeard": "heard {ago}",
+  "@journalLastHeard": {
+    "placeholders": {
+      "ago": {
+        "type": "Object"
+      }
+    }
+  },
+  "journalNodeGone": "This node is no longer in the journal.",
+  "journalForget": "Forget this node",
+  "journalForgetTitle": "Forget this node?",
+  "journalForgetBody": "Its history, tags and note are deleted. It comes back as new if it’s heard again.",
+  "journalFirstLast": "First heard {first}, last heard {last}, {count} times in all.",
+  "@journalFirstLast": {
+    "placeholders": {
+      "first": {
+        "type": "Object"
+      },
+      "last": {
+        "type": "Object"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "journalSnrRange": "Signal {min} to {max} dB, last {last} dB.",
+  "@journalSnrRange": {
+    "placeholders": {
+      "min": {
+        "type": "Object"
+      },
+      "max": {
+        "type": "Object"
+      },
+      "last": {
+        "type": "Object"
+      }
+    }
+  },
+  "journalLabels": "Behaviour",
+  "journalNoLabels": "Not enough history for a label yet.",
+  "journalTags": "Your tags and note",
+  "journalAddTag": "Add tag",
+  "journalTag": "Tag",
+  "journalRemoveTag": "Remove tag {tag}",
+  "@journalRemoveTag": {
+    "placeholders": {
+      "tag": {
+        "type": "Object"
+      }
+    }
+  },
+  "journalNote": "Note",
+  "journalConfidence": "{percent}% sure",
+  "@journalConfidence": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "journalTypeRepeater": "Repeater",
+  "journalTypeRoom": "Room server",
+  "journalTypeSensor": "Sensor",
+  "journalTypeCompanion": "Companion radio",
+  "behaviourAlwaysOn": "Always-on repeater",
+  "behaviourRegular": "Regular",
+  "behaviourRoamer": "Roamer",
+  "behaviourRarelyHeard": "Rarely heard",
+  "behaviourNewArrival": "New arrival",
+  "behaviourGoneQuiet": "Gone quiet",
+  "evidenceHeardOnDays": "Heard on {days} of the last {window} days",
+  "@evidenceHeardOnDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "window": {
+        "type": "int"
+      }
+    }
+  },
+  "evidenceTypicalGap": "Usually heard again within {hours} h",
+  "@evidenceTypicalGap": {
+    "placeholders": {
+      "hours": {
+        "type": "Object"
+      }
+    }
+  },
+  "evidenceInfrastructure": "Advertises as a repeater or room server",
+  "evidencePositionSpread": "Positions up to {km} km apart, from {places} places",
+  "@evidencePositionSpread": {
+    "placeholders": {
+      "km": {
+        "type": "Object"
+      },
+      "places": {
+        "type": "int"
+      }
+    }
+  },
+  "evidenceHeardTimes": "Heard {times} times in {days} days",
+  "@evidenceHeardTimes": {
+    "placeholders": {
+      "times": {
+        "type": "int"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "evidenceFirstHeard": "First heard {hours} h ago",
+  "@evidenceFirstHeard": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "evidenceLastHeard": "Last heard {days} days ago",
+  "@evidenceLastHeard": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "agoJustNow": "just now",
+  "agoMinutes": "{count} min ago",
+  "@agoMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "agoHours": "{count} h ago",
+  "@agoHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "agoDays": "{count} d ago",
+  "@agoDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "journalButton": "Journal",
   "pathGraphSubtitle": "Routes heard, and the repeaters you hear directly",
   "pathGraphIntro": "Built from the paths on flooded packets your radio hears while the app is connected. Each repeater you hear directly is listed with the chains of repeaters behind it. Short IDs can belong to more than one repeater.",
   "heardDirectly": "Repeaters you hear directly",

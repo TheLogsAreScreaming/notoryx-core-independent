@@ -9,6 +9,7 @@ import 'conversation_screen.dart';
 import 'manage_actions.dart';
 import 'server_screen.dart';
 import 'telemetry_screen.dart';
+import 'node_journal_screen.dart';
 import 'route_screen.dart';
 import 'trace_screen.dart';
 import '../l10n/l10n.dart';
@@ -244,6 +245,23 @@ Future<void> showNodeDetails(
                       }
                     },
                   ),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.menu_book_outlined),
+                  label: Text(context.l10n.journalButton),
+                  onPressed: () {
+                    final key = ref.read(radioKeyProvider);
+                    if (key == null) return;
+                    Navigator.pop(sheet);
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => JournalNodeScreen(
+                          radioKey: key,
+                          nodeKey: node.publicKey.toLowerCase(),
+                        ),
+                      ),
+                    );
+                  },
+                ),
                 if (node.isContact)
                   OutlinedButton.icon(
                     icon: const Icon(Icons.sensors),
