@@ -23,6 +23,7 @@ import 'package:notoryx_core/main.dart';
 import 'package:notoryx_core/screens/map_tab.dart';
 import 'package:notoryx_core/presets/area_presets_provider.dart';
 import 'package:notoryx_core/radio/radio.dart';
+import 'package:notoryx_core/app/area_messages.dart' show areaMessagesSetting;
 
 import '../support/fake_radio_link.dart';
 import '../support/radio_frames.dart';
@@ -219,6 +220,67 @@ void main() {
     expect(find.text('heading down'), findsOneWidget);
     expect(find.byIcon(Icons.check), findsOneWidget, reason: 'sent tick');
     expect(link.sent.last[0], CommandCode.sendChannelText);
+    await cleanUp(tester);
+  });
+
+  Future<void> areaOptionOn(WidgetTester tester) => tester.runAsync(
+    () =>
+        MeshStore(db)
+            .saveSetting(areaMessagesSetting, '{"on":true,"radius":8}'),
+  );
+
+  testWidgets('area-limited post on flood-corridor firmware', (tester) async {
+    final semantics = tester.ensureSemantics();
+    radioSetup = (r) => r
+      ..areaLimits = true
+      ..latitude = 47.6
+      ..longitude = -122.3;
+    await areaOptionOn(tester);
+    await connect(tester);
+    await tester.tap(find.text('#trail'));
+    await settle(tester);
+
+    const offTip = 'Sending to everyone: tap to limit to 50 km around you';
+    expect(find.byTooltip(offTip), findsOneWidget);
+    await tester.tap(find.byTooltip(offTip));
+    await settle(tester);
+    const onTip = 'Limited to 50 km around you: tap to send to everyone';
+    expect(
+      tester.getSemantics(find.byKey(const ValueKey('area-toggle'))),
+      isSemantics(tooltip: onTip, isSelected: true, isButton: true),
+    );
+
+    await tester.enterText(find.byType(TextField), 'trail closed');
+    await tester.tap(find.byTooltip('Send'));
+    await settle(tester);
+    expect(find.text('trail closed'), findsOneWidget);
+    expect(link.sent.last[0], CommandCode.sendChannelTextInArea);
+    await cleanUp(tester);
+    semantics.dispose();
+  });
+
+  testWidgets('stock firmware: the area button is off and posts go normally', (
+    tester,
+  ) async {
+    radioSetup = (r) => r
+      ..latitude = 47.6
+      ..longitude = -122.3;
+    await areaOptionOn(tester);
+    await connect(tester);
+    await tester.tap(find.text('#trail'));
+    await settle(tester);
+
+    final toggle = find.byTooltip('Area limits need flood-corridor firmware');
+    expect(toggle, findsOneWidget);
+    await tester.tap(toggle);
+    await tester.enterText(find.byType(TextField), 'heading down');
+    await tester.tap(find.byTooltip('Send'));
+    await settle(tester);
+    expect(link.sent.last[0], CommandCode.sendChannelText);
+    expect(
+      link.sent.where((f) => f[0] == CommandCode.sendChannelTextInArea),
+      isEmpty,
+    );
     await cleanUp(tester);
   });
 

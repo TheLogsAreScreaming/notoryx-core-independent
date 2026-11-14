@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'area_limit.dart';
 import 'bytes.dart';
 import 'codes.dart';
 import 'contact.dart';
@@ -379,6 +380,55 @@ final class SendChannelText extends RadioCommand {
       ..u32(timestamp)
       ..string(text);
   }
+}
+
+/// Sends text to a channel slot limited to [circles] (flood-corridor
+/// firmware only). The radio replies OK, or "unsupported" on stock firmware.
+final class SendChannelTextInArea extends RadioCommand {
+  SendChannelTextInArea({
+    required this.channel,
+    required this.text,
+    required this.timestamp,
+    required this.circles,
+    this.flags = 0,
+  }) {
+    if (circles.isEmpty || circles.length > maxAreaCircles) {
+      throw ArgumentError.value(circles.length, 'circles', '1 to 8');
+    }
+  }
+
+  final int channel;
+  final String text;
+  final int timestamp;
+  final List<AreaCircle> circles;
+
+  /// [areaFlagFailClosed] and [areaFlagDestination].
+  final int flags;
+
+  @override
+  void _write(FrameWriter out) {
+    out
+      ..u8(CommandCode.sendChannelTextInArea)
+      ..u8(TextType.plain.value)
+      ..u8(channel)
+      ..u32(timestamp)
+      ..string(text);
+    for (final c in circles) {
+      out.u32(c.encode());
+    }
+    out
+      ..u8(circles.length)
+      ..u8(flags & (areaFlagFailClosed | areaFlagDestination));
+  }
+}
+
+/// Asks for the region name area-limited posts use. Answered only by
+/// flood-corridor firmware.
+final class GetAreaRegion extends RadioCommand {
+  const GetAreaRegion();
+
+  @override
+  void _write(FrameWriter out) => out.u8(CommandCode.getAreaRegion);
 }
 
 final class GetChannel extends RadioCommand {

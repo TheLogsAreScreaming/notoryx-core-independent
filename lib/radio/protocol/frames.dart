@@ -223,6 +223,14 @@ final class ChannelInfo extends ReplyFrame {
 }
 
 /// The radio's auto-add settings, the reply to [CommandCode.getAutoAddConfig].
+/// The region name area-limited posts use; empty means the firmware's
+/// default.
+final class AreaRegionReply extends ReplyFrame {
+  const AreaRegionReply(this.name);
+
+  final String name;
+}
+
 final class AutoAddConfigReply extends ReplyFrame {
   const AutoAddConfigReply({required this.flags, required this.maxHops});
 
@@ -551,6 +559,7 @@ RadioFrame decodeFrame(List<int> frame) {
       ResponseCode.channelMessageV3 => _channelMessage(r, snr: _snr(r)),
       ResponseCode.channelData => _channelData(r),
       ResponseCode.cliReply => CliReply(r.rest()),
+      ResponseCode.areaRegion => AreaRegionReply(r.rest()),
       PushCode.advert => AdvertHeard(PublicKey(r.bytes(publicKeySize))),
       PushCode.newAdvert => NewAdvert(_contact(r)),
       PushCode.pathUpdated => PathUpdated(PublicKey(r.bytes(publicKeySize))),

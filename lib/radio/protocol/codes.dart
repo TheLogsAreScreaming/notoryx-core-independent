@@ -45,6 +45,13 @@ abstract final class CommandCode {
   static const runCliCommand = 66;
   static const setAutoAddConfig = 58;
   static const getAutoAddConfig = 59;
+
+  /// Area-limited channel text (flood-corridor firmware only).
+  static const sendChannelTextInArea = 53;
+
+  /// Asks for the area-limit region name; stock firmware says unsupported,
+  /// which is how support is detected.
+  static const getAreaRegion = 69;
 }
 
 /// First byte of a direct reply to a command.
@@ -80,6 +87,9 @@ abstract final class ResponseCode {
   static const autoAddConfig = 25;
   static const channelData = 27;
   static const cliReply = 29;
+
+  /// Reply to [CommandCode.getAreaRegion].
+  static const areaRegion = 31;
 }
 
 /// First byte of a notification the radio sends on its own.

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../app/area_messages.dart';
 import '../app/blocking.dart';
 import '../app/sentinel.dart';
 import '../app/chat_send.dart';
@@ -29,6 +30,7 @@ import '../app/shared_items.dart';
 import '../data/data.dart';
 import '../radio/protocol/mesh_photo.dart';
 import '../radio/radio.dart';
+import 'area_messages_screen.dart' show areaKmLabel;
 import 'sentinel_screen.dart';
 import 'manage_actions.dart';
 import 'position_map_screen.dart';
@@ -60,6 +62,10 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     with WidgetsBindingObserver {
   final _text = TextEditingController();
   bool _sending = false;
+
+  /// Whether the next channel posts are limited to the area around the
+  /// radio (experimental; only when the option is on).
+  bool _inArea = false;
   late final OpenThread _openThread;
   late final MeshStore _store;
 
@@ -248,6 +254,18 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     }
   }
 
+  /// The circle to limit this post to, or null to send it normally: the
+  /// option is off, not chosen here, the firmware can't, or the radio has no
+  /// position.
+  List<AreaCircle>? _areaFor(Connected state) {
+    final settings = ref.read(areaMessagesProvider);
+    if (!_inArea || !settings.on) return null;
+    if (ref.read(areaSupportProvider).value != AreaSupport.supported) {
+      return null;
+    }
+    return areaAround(state.radio.self, settings.radiusCode);
+  }
+
   void _markRead() {
     final radioKey = ref.read(radioKeyProvider);
     if (radioKey == null || !ref.read(foregroundCheckProvider)()) return;
@@ -277,6 +295,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
           text,
           region: cleanRegionName(tag),
           signed: (await ref.read(postSigningProvider.future)).all,
+          area: _areaFor(state),
         );
       } else {
         await state.sync.sendDirect(PublicKey.fromHex(target), text);
@@ -844,6 +863,39 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     return 'Member $prefix';
   }
 
+  /// The "limit to area" toggle beside the box, when the experimental
+  /// option is on. Disabled, with the reason as its tooltip, when the
+  /// firmware can't or the radio has no position.
+  Widget? _areaToggle(bool canReply, RadioConnectionState connection) {
+    final settings = ref.watch(areaMessagesProvider);
+    if (!settings.on) return null;
+    final l = context.l10n;
+    final support = ref.watch(areaSupportProvider).value;
+    final circle = connection is Connected
+        ? areaAround(connection.radio.self, settings.radiusCode)
+        : null;
+    final km = areaKmLabel(settings.radiusKm);
+    final usable = support == AreaSupport.supported && circle != null;
+    final on = _inArea && usable;
+    final tooltip = switch (support) {
+      AreaSupport.unsupported => l.areaNotOnThisFirmware,
+      AreaSupport.unknown || null => l.areaSupportUnknown,
+      AreaSupport.supported when circle == null => l.areaNeedsPosition,
+      _ => on ? l.areaLimitOn(km) : l.areaLimitOff(km),
+    };
+    // isSelected tells screen readers whether the limit is on.
+    return IconButton(
+      key: const ValueKey('area-toggle'),
+      tooltip: tooltip,
+      isSelected: on,
+      onPressed: canReply && !_sending && usable
+          ? () => setState(() => _inArea = !_inArea)
+          : null,
+      icon: const Icon(Icons.public),
+      selectedIcon: const Icon(Icons.radar),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final radioKey = ref.watch(radioKeyProvider);
@@ -1039,6 +1091,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                     onPressed: canReply && !_sending ? _pickQuick : null,
                     icon: const Icon(Icons.bolt),
                   ),
+                  if (widget.isChannel) ?_areaToggle(canReply, connection),
                   IconButton(
                     tooltip: context.l10n.sharePositionOrContact,
                     onPressed: canReply && !_sending
@@ -1054,7 +1107,13 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                       minLines: 1,
                       maxLines: 4,
                       decoration: InputDecoration(
-                        hintText: canReply
+                        hintText: canReply && _inArea
+                            ? context.l10n.areaMessageHint(
+                                areaKmLabel(
+                                  ref.watch(areaMessagesProvider).radiusKm,
+                                ),
+                              )
+                            : canReply
                             ? 'Message'
                             : connected
                             ? 'Add this sender as a contact to reply'
