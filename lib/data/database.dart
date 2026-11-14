@@ -41,6 +41,8 @@ bool databaseSetAside = false;
     WardriveHits,
     HeardPaths,
     PhotoChunks,
+    JournalNodes,
+    JournalSightings,
   ],
 )
 class MeshDatabase extends _$MeshDatabase {
@@ -69,7 +71,7 @@ class MeshDatabase extends _$MeshDatabase {
   factory MeshDatabase.inMemory() => MeshDatabase(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 14;
+  int get schemaVersion => 15;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -132,6 +134,12 @@ class MeshDatabase extends _$MeshDatabase {
       if (from < 13) await m.createTable(heardPaths);
       // 14: pieces of mesh photos.
       if (from < 14) await m.createTable(photoChunks);
+      // 15: node journal.
+      if (from < 15) {
+        await m.createTable(journalNodes);
+        await m.createTable(journalSightings);
+        await m.createIndex(journalSightingsByNode);
+      }
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');

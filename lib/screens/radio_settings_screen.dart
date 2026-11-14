@@ -23,6 +23,8 @@ import 'blocked_screen.dart';
 import '../app/sentinel.dart';
 import 'sentinel_screen.dart';
 import '../l10n/l10n.dart';
+import 'node_journal_screen.dart';
+import 'timeline_screen.dart';
 import 'path_graph_screen.dart';
 import 'repeater_test_screen.dart';
 import 'mqtt_screen.dart';
@@ -453,6 +455,26 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
                 MaterialPageRoute<void>(
                   builder: (_) => const PathGraphScreen(),
                 ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.menu_book_outlined),
+              title: Text(context.l10n.nodeJournal),
+              subtitle: Text(context.l10n.nodeJournalSubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const NodeJournalScreen(),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.view_timeline_outlined),
+              title: Text(context.l10n.timeline),
+              subtitle: Text(context.l10n.timelineSubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const TimelineScreen()),
               ),
             ),
             ListTile(

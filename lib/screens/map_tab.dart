@@ -7,11 +7,13 @@ import '../app/contact_room.dart' show isFavourite;
 import '../app/favourites_view.dart';
 import '../app/connection.dart';
 import '../app/map_cache.dart';
+import '../app/map_packs.dart';
 import '../app/telemetry.dart';
 import '../app/track_log.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
 import 'node_details.dart';
+import 'map_packs_screen.dart';
 import 'zone_alerts_screen.dart';
 import 'track_log_screen.dart';
 import '../app/position.dart';
@@ -27,11 +29,15 @@ final mapTilesProvider = Provider<Widget?>((ref) {
   // Wait for the saved tiles: the first tile layer fixes where they live.
   final cache = ref.watch(mapCacheProvider).value;
   if (cache == null) return null;
+  final network = NetworkTileProvider(cachingProvider: cache);
+  // An offline map pack in use is drawn first, online tiles fill the rest.
+  final pack = ref.watch(activeMapPackPathProvider).value;
   return TileLayer(
+    key: ValueKey(pack),
     urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     userAgentPackageName: 'com.bastionmesh.notoryx_core',
     maxZoom: 19,
-    tileProvider: NetworkTileProvider(cachingProvider: cache),
+    tileProvider: pack == null ? network : MapPackTileProvider(pack, network),
   );
 });
 
@@ -218,6 +224,18 @@ class _MapTabState extends ConsumerState<MapTab> {
                   onPressed: () => _map.move(radio, 13),
                   child: const Icon(Icons.router),
                 ),
+              const SizedBox(height: 8),
+              FloatingActionButton.small(
+                key: const Key('map-packs'),
+                heroTag: 'map-packs',
+                tooltip: context.l10n.offlineMapPacks,
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const MapPacksScreen(),
+                  ),
+                ),
+                child: const Icon(Icons.layers_outlined),
+              ),
               const SizedBox(height: 8),
               FloatingActionButton.small(
                 key: const Key('map-zones'),

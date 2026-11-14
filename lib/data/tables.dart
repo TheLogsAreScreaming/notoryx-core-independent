@@ -286,3 +286,48 @@ class PhotoChunks extends Table {
   @override
   Set<Column> get primaryKey => {radioKey, photoId, idx};
 }
+
+/// The node journal: every node this radio has heard, kept even after it
+/// leaves the contact list. Tags and a note are the user's own.
+@DataClassName('JournalNode')
+class JournalNodes extends Table {
+  TextColumn get radioKey => text()();
+
+  /// The node's public key, hex.
+  TextColumn get nodeKey => text()();
+  TextColumn get name => text()();
+
+  /// `NodeType.value`.
+  IntColumn get type => integer()();
+
+  /// Unix milliseconds.
+  IntColumn get firstHeard => integer()();
+  IntColumn get lastHeard => integer()();
+  IntColumn get heardCount => integer()();
+
+  /// The user's tags, joined by newlines.
+  TextColumn get tags => text().withDefault(const Constant(''))();
+  TextColumn get note => text().withDefault(const Constant(''))();
+
+  @override
+  Set<Column> get primaryKey => {radioKey, nodeKey};
+}
+
+/// One time a journal node was heard: when, how well, how many hops away
+/// and where it said it was. The newest few hundred per node are kept.
+@TableIndex(name: 'journal_sightings_by_node', columns: {#radioKey, #nodeKey})
+@DataClassName('JournalSighting')
+class JournalSightings extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get radioKey => text()();
+  TextColumn get nodeKey => text()();
+
+  /// Unix milliseconds.
+  IntColumn get at => integer()();
+  RealColumn get snr => real().nullable()();
+
+  /// Repeaters between it and this radio; 0 for heard directly.
+  IntColumn get hops => integer().nullable()();
+  RealColumn get latitude => real().nullable()();
+  RealColumn get longitude => real().nullable()();
+}
