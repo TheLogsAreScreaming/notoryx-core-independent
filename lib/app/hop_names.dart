@@ -52,6 +52,9 @@ class HopNames {
   /// Names found online by short ID (lower-case hex).
   final Map<String, String> found;
 
+  /// Whether a pick was made or changed since the last save.
+  bool unsaved = false;
+
   HopNames copyWith({
     bool? online,
     String? server,
@@ -186,7 +189,14 @@ String hopName(
         if (m.metres <= hopRangeMetres) m,
     ];
     String pick(String key) {
-      names.ties[id] = (key: key, at: hints.now.millisecondsSinceEpoch);
+      final old = names.ties[id];
+      final at = hints.now.millisecondsSinceEpoch;
+      if (old == null ||
+          old.key != key ||
+          at - old.at > Duration.millisecondsPerHour) {
+        names.ties[id] = (key: key, at: at);
+        names.unsaved = true;
+      }
       return byKey[key]!.name;
     }
 
@@ -411,7 +421,10 @@ HopHints hopHints(
 void afterNamingHops(WidgetRef ref, Set<String> unknown, HopHints hints) {
   final notifier = ref.read(hopNamesProvider.notifier);
   WidgetsBinding.instance.addPostFrameCallback((_) {
-    notifier.picksChanged();
+    if (hints.names.unsaved) {
+      hints.names.unsaved = false;
+      notifier.picksChanged();
+    }
     if (unknown.isNotEmpty) notifier.want(unknown, near: hints.you);
   });
 }
