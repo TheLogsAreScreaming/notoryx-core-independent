@@ -18,6 +18,7 @@ import '../app/channel_cleanup.dart';
 import 'radio_console_screen.dart';
 import 'backup_screen.dart';
 import 'hop_names_screen.dart';
+import 'observer_reach_screen.dart';
 import 'identity_key_screen.dart';
 import 'blocked_screen.dart';
 import '../app/sentinel.dart';
@@ -349,6 +350,21 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(builder: (_) => const HopNamesScreen()),
+              ),
+            ),
+            ListTile(
+              key: const ValueKey('settings-observer-reach'),
+              leading: const Icon(Icons.cell_tower),
+              title: Text(context.l10n.observerReach),
+              subtitle: Text(context.l10n.observerReachSubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => ObserverReachScreen(
+                    nodeKey: self.publicKey.hex,
+                    name: self.name,
+                  ),
+                ),
               ),
             ),
             ListTile(
