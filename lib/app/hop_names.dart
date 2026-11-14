@@ -393,11 +393,6 @@ HopHints hopHints(
       positions[c.publicKey.toLowerCase()] = p;
     }
   }
-  for (final d in ref.watch(discoveredProvider(radioKey)).value ?? const []) {
-    if (at(d.latitude, d.longitude) case final p?) {
-      positions.putIfAbsent(d.publicKey.toLowerCase(), () => p);
-    }
-  }
   final state = ref.watch(connectionProvider);
   return HopHints(
     names: ref.watch(hopNamesProvider),
