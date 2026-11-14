@@ -6971,6 +6971,1060 @@ class PhotoChunksCompanion extends UpdateCompanion<PhotoChunk> {
   }
 }
 
+class $JournalNodesTable extends JournalNodes
+    with TableInfo<$JournalNodesTable, JournalNode> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $JournalNodesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _radioKeyMeta = const VerificationMeta(
+    'radioKey',
+  );
+  @override
+  late final GeneratedColumn<String> radioKey = GeneratedColumn<String>(
+    'radio_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nodeKeyMeta = const VerificationMeta(
+    'nodeKey',
+  );
+  @override
+  late final GeneratedColumn<String> nodeKey = GeneratedColumn<String>(
+    'node_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<int> type = GeneratedColumn<int>(
+    'type',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _firstHeardMeta = const VerificationMeta(
+    'firstHeard',
+  );
+  @override
+  late final GeneratedColumn<int> firstHeard = GeneratedColumn<int>(
+    'first_heard',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lastHeardMeta = const VerificationMeta(
+    'lastHeard',
+  );
+  @override
+  late final GeneratedColumn<int> lastHeard = GeneratedColumn<int>(
+    'last_heard',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _heardCountMeta = const VerificationMeta(
+    'heardCount',
+  );
+  @override
+  late final GeneratedColumn<int> heardCount = GeneratedColumn<int>(
+    'heard_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _tagsMeta = const VerificationMeta('tags');
+  @override
+  late final GeneratedColumn<String> tags = GeneratedColumn<String>(
+    'tags',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    radioKey,
+    nodeKey,
+    name,
+    type,
+    firstHeard,
+    lastHeard,
+    heardCount,
+    tags,
+    note,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'journal_nodes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<JournalNode> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('radio_key')) {
+      context.handle(
+        _radioKeyMeta,
+        radioKey.isAcceptableOrUnknown(data['radio_key']!, _radioKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_radioKeyMeta);
+    }
+    if (data.containsKey('node_key')) {
+      context.handle(
+        _nodeKeyMeta,
+        nodeKey.isAcceptableOrUnknown(data['node_key']!, _nodeKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nodeKeyMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+        _typeMeta,
+        type.isAcceptableOrUnknown(data['type']!, _typeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_typeMeta);
+    }
+    if (data.containsKey('first_heard')) {
+      context.handle(
+        _firstHeardMeta,
+        firstHeard.isAcceptableOrUnknown(data['first_heard']!, _firstHeardMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_firstHeardMeta);
+    }
+    if (data.containsKey('last_heard')) {
+      context.handle(
+        _lastHeardMeta,
+        lastHeard.isAcceptableOrUnknown(data['last_heard']!, _lastHeardMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lastHeardMeta);
+    }
+    if (data.containsKey('heard_count')) {
+      context.handle(
+        _heardCountMeta,
+        heardCount.isAcceptableOrUnknown(data['heard_count']!, _heardCountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_heardCountMeta);
+    }
+    if (data.containsKey('tags')) {
+      context.handle(
+        _tagsMeta,
+        tags.isAcceptableOrUnknown(data['tags']!, _tagsMeta),
+      );
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {radioKey, nodeKey};
+  @override
+  JournalNode map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return JournalNode(
+      radioKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}radio_key'],
+      )!,
+      nodeKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}node_key'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      type: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}type'],
+      )!,
+      firstHeard: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}first_heard'],
+      )!,
+      lastHeard: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}last_heard'],
+      )!,
+      heardCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}heard_count'],
+      )!,
+      tags: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tags'],
+      )!,
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      )!,
+    );
+  }
+
+  @override
+  $JournalNodesTable createAlias(String alias) {
+    return $JournalNodesTable(attachedDatabase, alias);
+  }
+}
+
+class JournalNode extends DataClass implements Insertable<JournalNode> {
+  final String radioKey;
+
+  /// The node's public key, hex.
+  final String nodeKey;
+  final String name;
+
+  /// `NodeType.value`.
+  final int type;
+
+  /// Unix milliseconds.
+  final int firstHeard;
+  final int lastHeard;
+  final int heardCount;
+
+  /// The user's tags, joined by newlines.
+  final String tags;
+  final String note;
+  const JournalNode({
+    required this.radioKey,
+    required this.nodeKey,
+    required this.name,
+    required this.type,
+    required this.firstHeard,
+    required this.lastHeard,
+    required this.heardCount,
+    required this.tags,
+    required this.note,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['radio_key'] = Variable<String>(radioKey);
+    map['node_key'] = Variable<String>(nodeKey);
+    map['name'] = Variable<String>(name);
+    map['type'] = Variable<int>(type);
+    map['first_heard'] = Variable<int>(firstHeard);
+    map['last_heard'] = Variable<int>(lastHeard);
+    map['heard_count'] = Variable<int>(heardCount);
+    map['tags'] = Variable<String>(tags);
+    map['note'] = Variable<String>(note);
+    return map;
+  }
+
+  JournalNodesCompanion toCompanion(bool nullToAbsent) {
+    return JournalNodesCompanion(
+      radioKey: Value(radioKey),
+      nodeKey: Value(nodeKey),
+      name: Value(name),
+      type: Value(type),
+      firstHeard: Value(firstHeard),
+      lastHeard: Value(lastHeard),
+      heardCount: Value(heardCount),
+      tags: Value(tags),
+      note: Value(note),
+    );
+  }
+
+  factory JournalNode.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return JournalNode(
+      radioKey: serializer.fromJson<String>(json['radioKey']),
+      nodeKey: serializer.fromJson<String>(json['nodeKey']),
+      name: serializer.fromJson<String>(json['name']),
+      type: serializer.fromJson<int>(json['type']),
+      firstHeard: serializer.fromJson<int>(json['firstHeard']),
+      lastHeard: serializer.fromJson<int>(json['lastHeard']),
+      heardCount: serializer.fromJson<int>(json['heardCount']),
+      tags: serializer.fromJson<String>(json['tags']),
+      note: serializer.fromJson<String>(json['note']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'radioKey': serializer.toJson<String>(radioKey),
+      'nodeKey': serializer.toJson<String>(nodeKey),
+      'name': serializer.toJson<String>(name),
+      'type': serializer.toJson<int>(type),
+      'firstHeard': serializer.toJson<int>(firstHeard),
+      'lastHeard': serializer.toJson<int>(lastHeard),
+      'heardCount': serializer.toJson<int>(heardCount),
+      'tags': serializer.toJson<String>(tags),
+      'note': serializer.toJson<String>(note),
+    };
+  }
+
+  JournalNode copyWith({
+    String? radioKey,
+    String? nodeKey,
+    String? name,
+    int? type,
+    int? firstHeard,
+    int? lastHeard,
+    int? heardCount,
+    String? tags,
+    String? note,
+  }) => JournalNode(
+    radioKey: radioKey ?? this.radioKey,
+    nodeKey: nodeKey ?? this.nodeKey,
+    name: name ?? this.name,
+    type: type ?? this.type,
+    firstHeard: firstHeard ?? this.firstHeard,
+    lastHeard: lastHeard ?? this.lastHeard,
+    heardCount: heardCount ?? this.heardCount,
+    tags: tags ?? this.tags,
+    note: note ?? this.note,
+  );
+  JournalNode copyWithCompanion(JournalNodesCompanion data) {
+    return JournalNode(
+      radioKey: data.radioKey.present ? data.radioKey.value : this.radioKey,
+      nodeKey: data.nodeKey.present ? data.nodeKey.value : this.nodeKey,
+      name: data.name.present ? data.name.value : this.name,
+      type: data.type.present ? data.type.value : this.type,
+      firstHeard: data.firstHeard.present
+          ? data.firstHeard.value
+          : this.firstHeard,
+      lastHeard: data.lastHeard.present ? data.lastHeard.value : this.lastHeard,
+      heardCount: data.heardCount.present
+          ? data.heardCount.value
+          : this.heardCount,
+      tags: data.tags.present ? data.tags.value : this.tags,
+      note: data.note.present ? data.note.value : this.note,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('JournalNode(')
+          ..write('radioKey: $radioKey, ')
+          ..write('nodeKey: $nodeKey, ')
+          ..write('name: $name, ')
+          ..write('type: $type, ')
+          ..write('firstHeard: $firstHeard, ')
+          ..write('lastHeard: $lastHeard, ')
+          ..write('heardCount: $heardCount, ')
+          ..write('tags: $tags, ')
+          ..write('note: $note')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    radioKey,
+    nodeKey,
+    name,
+    type,
+    firstHeard,
+    lastHeard,
+    heardCount,
+    tags,
+    note,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is JournalNode &&
+          other.radioKey == this.radioKey &&
+          other.nodeKey == this.nodeKey &&
+          other.name == this.name &&
+          other.type == this.type &&
+          other.firstHeard == this.firstHeard &&
+          other.lastHeard == this.lastHeard &&
+          other.heardCount == this.heardCount &&
+          other.tags == this.tags &&
+          other.note == this.note);
+}
+
+class JournalNodesCompanion extends UpdateCompanion<JournalNode> {
+  final Value<String> radioKey;
+  final Value<String> nodeKey;
+  final Value<String> name;
+  final Value<int> type;
+  final Value<int> firstHeard;
+  final Value<int> lastHeard;
+  final Value<int> heardCount;
+  final Value<String> tags;
+  final Value<String> note;
+  final Value<int> rowid;
+  const JournalNodesCompanion({
+    this.radioKey = const Value.absent(),
+    this.nodeKey = const Value.absent(),
+    this.name = const Value.absent(),
+    this.type = const Value.absent(),
+    this.firstHeard = const Value.absent(),
+    this.lastHeard = const Value.absent(),
+    this.heardCount = const Value.absent(),
+    this.tags = const Value.absent(),
+    this.note = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  JournalNodesCompanion.insert({
+    required String radioKey,
+    required String nodeKey,
+    required String name,
+    required int type,
+    required int firstHeard,
+    required int lastHeard,
+    required int heardCount,
+    this.tags = const Value.absent(),
+    this.note = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : radioKey = Value(radioKey),
+       nodeKey = Value(nodeKey),
+       name = Value(name),
+       type = Value(type),
+       firstHeard = Value(firstHeard),
+       lastHeard = Value(lastHeard),
+       heardCount = Value(heardCount);
+  static Insertable<JournalNode> custom({
+    Expression<String>? radioKey,
+    Expression<String>? nodeKey,
+    Expression<String>? name,
+    Expression<int>? type,
+    Expression<int>? firstHeard,
+    Expression<int>? lastHeard,
+    Expression<int>? heardCount,
+    Expression<String>? tags,
+    Expression<String>? note,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (radioKey != null) 'radio_key': radioKey,
+      if (nodeKey != null) 'node_key': nodeKey,
+      if (name != null) 'name': name,
+      if (type != null) 'type': type,
+      if (firstHeard != null) 'first_heard': firstHeard,
+      if (lastHeard != null) 'last_heard': lastHeard,
+      if (heardCount != null) 'heard_count': heardCount,
+      if (tags != null) 'tags': tags,
+      if (note != null) 'note': note,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  JournalNodesCompanion copyWith({
+    Value<String>? radioKey,
+    Value<String>? nodeKey,
+    Value<String>? name,
+    Value<int>? type,
+    Value<int>? firstHeard,
+    Value<int>? lastHeard,
+    Value<int>? heardCount,
+    Value<String>? tags,
+    Value<String>? note,
+    Value<int>? rowid,
+  }) {
+    return JournalNodesCompanion(
+      radioKey: radioKey ?? this.radioKey,
+      nodeKey: nodeKey ?? this.nodeKey,
+      name: name ?? this.name,
+      type: type ?? this.type,
+      firstHeard: firstHeard ?? this.firstHeard,
+      lastHeard: lastHeard ?? this.lastHeard,
+      heardCount: heardCount ?? this.heardCount,
+      tags: tags ?? this.tags,
+      note: note ?? this.note,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (radioKey.present) {
+      map['radio_key'] = Variable<String>(radioKey.value);
+    }
+    if (nodeKey.present) {
+      map['node_key'] = Variable<String>(nodeKey.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<int>(type.value);
+    }
+    if (firstHeard.present) {
+      map['first_heard'] = Variable<int>(firstHeard.value);
+    }
+    if (lastHeard.present) {
+      map['last_heard'] = Variable<int>(lastHeard.value);
+    }
+    if (heardCount.present) {
+      map['heard_count'] = Variable<int>(heardCount.value);
+    }
+    if (tags.present) {
+      map['tags'] = Variable<String>(tags.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('JournalNodesCompanion(')
+          ..write('radioKey: $radioKey, ')
+          ..write('nodeKey: $nodeKey, ')
+          ..write('name: $name, ')
+          ..write('type: $type, ')
+          ..write('firstHeard: $firstHeard, ')
+          ..write('lastHeard: $lastHeard, ')
+          ..write('heardCount: $heardCount, ')
+          ..write('tags: $tags, ')
+          ..write('note: $note, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $JournalSightingsTable extends JournalSightings
+    with TableInfo<$JournalSightingsTable, JournalSighting> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $JournalSightingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _radioKeyMeta = const VerificationMeta(
+    'radioKey',
+  );
+  @override
+  late final GeneratedColumn<String> radioKey = GeneratedColumn<String>(
+    'radio_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nodeKeyMeta = const VerificationMeta(
+    'nodeKey',
+  );
+  @override
+  late final GeneratedColumn<String> nodeKey = GeneratedColumn<String>(
+    'node_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _atMeta = const VerificationMeta('at');
+  @override
+  late final GeneratedColumn<int> at = GeneratedColumn<int>(
+    'at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _snrMeta = const VerificationMeta('snr');
+  @override
+  late final GeneratedColumn<double> snr = GeneratedColumn<double>(
+    'snr',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _hopsMeta = const VerificationMeta('hops');
+  @override
+  late final GeneratedColumn<int> hops = GeneratedColumn<int>(
+    'hops',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _latitudeMeta = const VerificationMeta(
+    'latitude',
+  );
+  @override
+  late final GeneratedColumn<double> latitude = GeneratedColumn<double>(
+    'latitude',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _longitudeMeta = const VerificationMeta(
+    'longitude',
+  );
+  @override
+  late final GeneratedColumn<double> longitude = GeneratedColumn<double>(
+    'longitude',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    radioKey,
+    nodeKey,
+    at,
+    snr,
+    hops,
+    latitude,
+    longitude,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'journal_sightings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<JournalSighting> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('radio_key')) {
+      context.handle(
+        _radioKeyMeta,
+        radioKey.isAcceptableOrUnknown(data['radio_key']!, _radioKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_radioKeyMeta);
+    }
+    if (data.containsKey('node_key')) {
+      context.handle(
+        _nodeKeyMeta,
+        nodeKey.isAcceptableOrUnknown(data['node_key']!, _nodeKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nodeKeyMeta);
+    }
+    if (data.containsKey('at')) {
+      context.handle(_atMeta, at.isAcceptableOrUnknown(data['at']!, _atMeta));
+    } else if (isInserting) {
+      context.missing(_atMeta);
+    }
+    if (data.containsKey('snr')) {
+      context.handle(
+        _snrMeta,
+        snr.isAcceptableOrUnknown(data['snr']!, _snrMeta),
+      );
+    }
+    if (data.containsKey('hops')) {
+      context.handle(
+        _hopsMeta,
+        hops.isAcceptableOrUnknown(data['hops']!, _hopsMeta),
+      );
+    }
+    if (data.containsKey('latitude')) {
+      context.handle(
+        _latitudeMeta,
+        latitude.isAcceptableOrUnknown(data['latitude']!, _latitudeMeta),
+      );
+    }
+    if (data.containsKey('longitude')) {
+      context.handle(
+        _longitudeMeta,
+        longitude.isAcceptableOrUnknown(data['longitude']!, _longitudeMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  JournalSighting map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return JournalSighting(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      radioKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}radio_key'],
+      )!,
+      nodeKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}node_key'],
+      )!,
+      at: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}at'],
+      )!,
+      snr: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}snr'],
+      ),
+      hops: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}hops'],
+      ),
+      latitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}latitude'],
+      ),
+      longitude: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}longitude'],
+      ),
+    );
+  }
+
+  @override
+  $JournalSightingsTable createAlias(String alias) {
+    return $JournalSightingsTable(attachedDatabase, alias);
+  }
+}
+
+class JournalSighting extends DataClass implements Insertable<JournalSighting> {
+  final int id;
+  final String radioKey;
+  final String nodeKey;
+
+  /// Unix milliseconds.
+  final int at;
+  final double? snr;
+
+  /// Repeaters between it and this radio; 0 for heard directly.
+  final int? hops;
+  final double? latitude;
+  final double? longitude;
+  const JournalSighting({
+    required this.id,
+    required this.radioKey,
+    required this.nodeKey,
+    required this.at,
+    this.snr,
+    this.hops,
+    this.latitude,
+    this.longitude,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['radio_key'] = Variable<String>(radioKey);
+    map['node_key'] = Variable<String>(nodeKey);
+    map['at'] = Variable<int>(at);
+    if (!nullToAbsent || snr != null) {
+      map['snr'] = Variable<double>(snr);
+    }
+    if (!nullToAbsent || hops != null) {
+      map['hops'] = Variable<int>(hops);
+    }
+    if (!nullToAbsent || latitude != null) {
+      map['latitude'] = Variable<double>(latitude);
+    }
+    if (!nullToAbsent || longitude != null) {
+      map['longitude'] = Variable<double>(longitude);
+    }
+    return map;
+  }
+
+  JournalSightingsCompanion toCompanion(bool nullToAbsent) {
+    return JournalSightingsCompanion(
+      id: Value(id),
+      radioKey: Value(radioKey),
+      nodeKey: Value(nodeKey),
+      at: Value(at),
+      snr: snr == null && nullToAbsent ? const Value.absent() : Value(snr),
+      hops: hops == null && nullToAbsent ? const Value.absent() : Value(hops),
+      latitude: latitude == null && nullToAbsent
+          ? const Value.absent()
+          : Value(latitude),
+      longitude: longitude == null && nullToAbsent
+          ? const Value.absent()
+          : Value(longitude),
+    );
+  }
+
+  factory JournalSighting.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return JournalSighting(
+      id: serializer.fromJson<int>(json['id']),
+      radioKey: serializer.fromJson<String>(json['radioKey']),
+      nodeKey: serializer.fromJson<String>(json['nodeKey']),
+      at: serializer.fromJson<int>(json['at']),
+      snr: serializer.fromJson<double?>(json['snr']),
+      hops: serializer.fromJson<int?>(json['hops']),
+      latitude: serializer.fromJson<double?>(json['latitude']),
+      longitude: serializer.fromJson<double?>(json['longitude']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'radioKey': serializer.toJson<String>(radioKey),
+      'nodeKey': serializer.toJson<String>(nodeKey),
+      'at': serializer.toJson<int>(at),
+      'snr': serializer.toJson<double?>(snr),
+      'hops': serializer.toJson<int?>(hops),
+      'latitude': serializer.toJson<double?>(latitude),
+      'longitude': serializer.toJson<double?>(longitude),
+    };
+  }
+
+  JournalSighting copyWith({
+    int? id,
+    String? radioKey,
+    String? nodeKey,
+    int? at,
+    Value<double?> snr = const Value.absent(),
+    Value<int?> hops = const Value.absent(),
+    Value<double?> latitude = const Value.absent(),
+    Value<double?> longitude = const Value.absent(),
+  }) => JournalSighting(
+    id: id ?? this.id,
+    radioKey: radioKey ?? this.radioKey,
+    nodeKey: nodeKey ?? this.nodeKey,
+    at: at ?? this.at,
+    snr: snr.present ? snr.value : this.snr,
+    hops: hops.present ? hops.value : this.hops,
+    latitude: latitude.present ? latitude.value : this.latitude,
+    longitude: longitude.present ? longitude.value : this.longitude,
+  );
+  JournalSighting copyWithCompanion(JournalSightingsCompanion data) {
+    return JournalSighting(
+      id: data.id.present ? data.id.value : this.id,
+      radioKey: data.radioKey.present ? data.radioKey.value : this.radioKey,
+      nodeKey: data.nodeKey.present ? data.nodeKey.value : this.nodeKey,
+      at: data.at.present ? data.at.value : this.at,
+      snr: data.snr.present ? data.snr.value : this.snr,
+      hops: data.hops.present ? data.hops.value : this.hops,
+      latitude: data.latitude.present ? data.latitude.value : this.latitude,
+      longitude: data.longitude.present ? data.longitude.value : this.longitude,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('JournalSighting(')
+          ..write('id: $id, ')
+          ..write('radioKey: $radioKey, ')
+          ..write('nodeKey: $nodeKey, ')
+          ..write('at: $at, ')
+          ..write('snr: $snr, ')
+          ..write('hops: $hops, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, radioKey, nodeKey, at, snr, hops, latitude, longitude);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is JournalSighting &&
+          other.id == this.id &&
+          other.radioKey == this.radioKey &&
+          other.nodeKey == this.nodeKey &&
+          other.at == this.at &&
+          other.snr == this.snr &&
+          other.hops == this.hops &&
+          other.latitude == this.latitude &&
+          other.longitude == this.longitude);
+}
+
+class JournalSightingsCompanion extends UpdateCompanion<JournalSighting> {
+  final Value<int> id;
+  final Value<String> radioKey;
+  final Value<String> nodeKey;
+  final Value<int> at;
+  final Value<double?> snr;
+  final Value<int?> hops;
+  final Value<double?> latitude;
+  final Value<double?> longitude;
+  const JournalSightingsCompanion({
+    this.id = const Value.absent(),
+    this.radioKey = const Value.absent(),
+    this.nodeKey = const Value.absent(),
+    this.at = const Value.absent(),
+    this.snr = const Value.absent(),
+    this.hops = const Value.absent(),
+    this.latitude = const Value.absent(),
+    this.longitude = const Value.absent(),
+  });
+  JournalSightingsCompanion.insert({
+    this.id = const Value.absent(),
+    required String radioKey,
+    required String nodeKey,
+    required int at,
+    this.snr = const Value.absent(),
+    this.hops = const Value.absent(),
+    this.latitude = const Value.absent(),
+    this.longitude = const Value.absent(),
+  }) : radioKey = Value(radioKey),
+       nodeKey = Value(nodeKey),
+       at = Value(at);
+  static Insertable<JournalSighting> custom({
+    Expression<int>? id,
+    Expression<String>? radioKey,
+    Expression<String>? nodeKey,
+    Expression<int>? at,
+    Expression<double>? snr,
+    Expression<int>? hops,
+    Expression<double>? latitude,
+    Expression<double>? longitude,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (radioKey != null) 'radio_key': radioKey,
+      if (nodeKey != null) 'node_key': nodeKey,
+      if (at != null) 'at': at,
+      if (snr != null) 'snr': snr,
+      if (hops != null) 'hops': hops,
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
+    });
+  }
+
+  JournalSightingsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? radioKey,
+    Value<String>? nodeKey,
+    Value<int>? at,
+    Value<double?>? snr,
+    Value<int?>? hops,
+    Value<double?>? latitude,
+    Value<double?>? longitude,
+  }) {
+    return JournalSightingsCompanion(
+      id: id ?? this.id,
+      radioKey: radioKey ?? this.radioKey,
+      nodeKey: nodeKey ?? this.nodeKey,
+      at: at ?? this.at,
+      snr: snr ?? this.snr,
+      hops: hops ?? this.hops,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (radioKey.present) {
+      map['radio_key'] = Variable<String>(radioKey.value);
+    }
+    if (nodeKey.present) {
+      map['node_key'] = Variable<String>(nodeKey.value);
+    }
+    if (at.present) {
+      map['at'] = Variable<int>(at.value);
+    }
+    if (snr.present) {
+      map['snr'] = Variable<double>(snr.value);
+    }
+    if (hops.present) {
+      map['hops'] = Variable<int>(hops.value);
+    }
+    if (latitude.present) {
+      map['latitude'] = Variable<double>(latitude.value);
+    }
+    if (longitude.present) {
+      map['longitude'] = Variable<double>(longitude.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('JournalSightingsCompanion(')
+          ..write('id: $id, ')
+          ..write('radioKey: $radioKey, ')
+          ..write('nodeKey: $nodeKey, ')
+          ..write('at: $at, ')
+          ..write('snr: $snr, ')
+          ..write('hops: $hops, ')
+          ..write('latitude: $latitude, ')
+          ..write('longitude: $longitude')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$MeshDatabase extends GeneratedDatabase {
   _$MeshDatabase(QueryExecutor e) : super(e);
   $MeshDatabaseManager get managers => $MeshDatabaseManager(this);
@@ -6993,6 +8047,10 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
   late final $WardriveHitsTable wardriveHits = $WardriveHitsTable(this);
   late final $HeardPathsTable heardPaths = $HeardPathsTable(this);
   late final $PhotoChunksTable photoChunks = $PhotoChunksTable(this);
+  late final $JournalNodesTable journalNodes = $JournalNodesTable(this);
+  late final $JournalSightingsTable journalSightings = $JournalSightingsTable(
+    this,
+  );
   late final Index messagesByThread = Index(
     'messages_by_thread',
     'CREATE INDEX messages_by_thread ON messages (radio_key, thread, id)',
@@ -7021,6 +8079,10 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
     'wardrive_hits_by_ping',
     'CREATE INDEX wardrive_hits_by_ping ON wardrive_hits (ping)',
   );
+  late final Index journalSightingsByNode = Index(
+    'journal_sightings_by_node',
+    'CREATE INDEX journal_sightings_by_node ON journal_sightings (radio_key, node_key)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -7042,6 +8104,8 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
     wardriveHits,
     heardPaths,
     photoChunks,
+    journalNodes,
+    journalSightings,
     messagesByThread,
     messagesByAck,
     telemetryByNode,
@@ -7049,6 +8113,7 @@ abstract class _$MeshDatabase extends GeneratedDatabase {
     trackPointsByTrack,
     wardrivePingsByDrive,
     wardriveHitsByPing,
+    journalSightingsByNode,
   ];
 }
 
@@ -12834,6 +13899,561 @@ typedef $$PhotoChunksTableProcessedTableManager =
       PhotoChunk,
       PrefetchHooks Function()
     >;
+typedef $$JournalNodesTableCreateCompanionBuilder =
+    JournalNodesCompanion Function({
+      required String radioKey,
+      required String nodeKey,
+      required String name,
+      required int type,
+      required int firstHeard,
+      required int lastHeard,
+      required int heardCount,
+      Value<String> tags,
+      Value<String> note,
+      Value<int> rowid,
+    });
+typedef $$JournalNodesTableUpdateCompanionBuilder =
+    JournalNodesCompanion Function({
+      Value<String> radioKey,
+      Value<String> nodeKey,
+      Value<String> name,
+      Value<int> type,
+      Value<int> firstHeard,
+      Value<int> lastHeard,
+      Value<int> heardCount,
+      Value<String> tags,
+      Value<String> note,
+      Value<int> rowid,
+    });
+
+class $$JournalNodesTableFilterComposer
+    extends Composer<_$MeshDatabase, $JournalNodesTable> {
+  $$JournalNodesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get radioKey => $composableBuilder(
+    column: $table.radioKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nodeKey => $composableBuilder(
+    column: $table.nodeKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get firstHeard => $composableBuilder(
+    column: $table.firstHeard,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lastHeard => $composableBuilder(
+    column: $table.lastHeard,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get heardCount => $composableBuilder(
+    column: $table.heardCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tags => $composableBuilder(
+    column: $table.tags,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$JournalNodesTableOrderingComposer
+    extends Composer<_$MeshDatabase, $JournalNodesTable> {
+  $$JournalNodesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get radioKey => $composableBuilder(
+    column: $table.radioKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nodeKey => $composableBuilder(
+    column: $table.nodeKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get firstHeard => $composableBuilder(
+    column: $table.firstHeard,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lastHeard => $composableBuilder(
+    column: $table.lastHeard,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get heardCount => $composableBuilder(
+    column: $table.heardCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tags => $composableBuilder(
+    column: $table.tags,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$JournalNodesTableAnnotationComposer
+    extends Composer<_$MeshDatabase, $JournalNodesTable> {
+  $$JournalNodesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get radioKey =>
+      $composableBuilder(column: $table.radioKey, builder: (column) => column);
+
+  GeneratedColumn<String> get nodeKey =>
+      $composableBuilder(column: $table.nodeKey, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<int> get firstHeard => $composableBuilder(
+    column: $table.firstHeard,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get lastHeard =>
+      $composableBuilder(column: $table.lastHeard, builder: (column) => column);
+
+  GeneratedColumn<int> get heardCount => $composableBuilder(
+    column: $table.heardCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get tags =>
+      $composableBuilder(column: $table.tags, builder: (column) => column);
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+}
+
+class $$JournalNodesTableTableManager
+    extends
+        RootTableManager<
+          _$MeshDatabase,
+          $JournalNodesTable,
+          JournalNode,
+          $$JournalNodesTableFilterComposer,
+          $$JournalNodesTableOrderingComposer,
+          $$JournalNodesTableAnnotationComposer,
+          $$JournalNodesTableCreateCompanionBuilder,
+          $$JournalNodesTableUpdateCompanionBuilder,
+          (
+            JournalNode,
+            BaseReferences<_$MeshDatabase, $JournalNodesTable, JournalNode>,
+          ),
+          JournalNode,
+          PrefetchHooks Function()
+        > {
+  $$JournalNodesTableTableManager(_$MeshDatabase db, $JournalNodesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$JournalNodesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$JournalNodesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$JournalNodesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> radioKey = const Value.absent(),
+                Value<String> nodeKey = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> type = const Value.absent(),
+                Value<int> firstHeard = const Value.absent(),
+                Value<int> lastHeard = const Value.absent(),
+                Value<int> heardCount = const Value.absent(),
+                Value<String> tags = const Value.absent(),
+                Value<String> note = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => JournalNodesCompanion(
+                radioKey: radioKey,
+                nodeKey: nodeKey,
+                name: name,
+                type: type,
+                firstHeard: firstHeard,
+                lastHeard: lastHeard,
+                heardCount: heardCount,
+                tags: tags,
+                note: note,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String radioKey,
+                required String nodeKey,
+                required String name,
+                required int type,
+                required int firstHeard,
+                required int lastHeard,
+                required int heardCount,
+                Value<String> tags = const Value.absent(),
+                Value<String> note = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => JournalNodesCompanion.insert(
+                radioKey: radioKey,
+                nodeKey: nodeKey,
+                name: name,
+                type: type,
+                firstHeard: firstHeard,
+                lastHeard: lastHeard,
+                heardCount: heardCount,
+                tags: tags,
+                note: note,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$JournalNodesTable, JournalNode>(table),
+                  BaseReferences<
+                    _$MeshDatabase,
+                    $JournalNodesTable,
+                    JournalNode
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$JournalNodesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$MeshDatabase,
+      $JournalNodesTable,
+      JournalNode,
+      $$JournalNodesTableFilterComposer,
+      $$JournalNodesTableOrderingComposer,
+      $$JournalNodesTableAnnotationComposer,
+      $$JournalNodesTableCreateCompanionBuilder,
+      $$JournalNodesTableUpdateCompanionBuilder,
+      (
+        JournalNode,
+        BaseReferences<_$MeshDatabase, $JournalNodesTable, JournalNode>,
+      ),
+      JournalNode,
+      PrefetchHooks Function()
+    >;
+typedef $$JournalSightingsTableCreateCompanionBuilder =
+    JournalSightingsCompanion Function({
+      Value<int> id,
+      required String radioKey,
+      required String nodeKey,
+      required int at,
+      Value<double?> snr,
+      Value<int?> hops,
+      Value<double?> latitude,
+      Value<double?> longitude,
+    });
+typedef $$JournalSightingsTableUpdateCompanionBuilder =
+    JournalSightingsCompanion Function({
+      Value<int> id,
+      Value<String> radioKey,
+      Value<String> nodeKey,
+      Value<int> at,
+      Value<double?> snr,
+      Value<int?> hops,
+      Value<double?> latitude,
+      Value<double?> longitude,
+    });
+
+class $$JournalSightingsTableFilterComposer
+    extends Composer<_$MeshDatabase, $JournalSightingsTable> {
+  $$JournalSightingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get radioKey => $composableBuilder(
+    column: $table.radioKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nodeKey => $composableBuilder(
+    column: $table.nodeKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get at => $composableBuilder(
+    column: $table.at,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get snr => $composableBuilder(
+    column: $table.snr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get hops => $composableBuilder(
+    column: $table.hops,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get latitude => $composableBuilder(
+    column: $table.latitude,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get longitude => $composableBuilder(
+    column: $table.longitude,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$JournalSightingsTableOrderingComposer
+    extends Composer<_$MeshDatabase, $JournalSightingsTable> {
+  $$JournalSightingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get radioKey => $composableBuilder(
+    column: $table.radioKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nodeKey => $composableBuilder(
+    column: $table.nodeKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get at => $composableBuilder(
+    column: $table.at,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get snr => $composableBuilder(
+    column: $table.snr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get hops => $composableBuilder(
+    column: $table.hops,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get latitude => $composableBuilder(
+    column: $table.latitude,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get longitude => $composableBuilder(
+    column: $table.longitude,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$JournalSightingsTableAnnotationComposer
+    extends Composer<_$MeshDatabase, $JournalSightingsTable> {
+  $$JournalSightingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get radioKey =>
+      $composableBuilder(column: $table.radioKey, builder: (column) => column);
+
+  GeneratedColumn<String> get nodeKey =>
+      $composableBuilder(column: $table.nodeKey, builder: (column) => column);
+
+  GeneratedColumn<int> get at =>
+      $composableBuilder(column: $table.at, builder: (column) => column);
+
+  GeneratedColumn<double> get snr =>
+      $composableBuilder(column: $table.snr, builder: (column) => column);
+
+  GeneratedColumn<int> get hops =>
+      $composableBuilder(column: $table.hops, builder: (column) => column);
+
+  GeneratedColumn<double> get latitude =>
+      $composableBuilder(column: $table.latitude, builder: (column) => column);
+
+  GeneratedColumn<double> get longitude =>
+      $composableBuilder(column: $table.longitude, builder: (column) => column);
+}
+
+class $$JournalSightingsTableTableManager
+    extends
+        RootTableManager<
+          _$MeshDatabase,
+          $JournalSightingsTable,
+          JournalSighting,
+          $$JournalSightingsTableFilterComposer,
+          $$JournalSightingsTableOrderingComposer,
+          $$JournalSightingsTableAnnotationComposer,
+          $$JournalSightingsTableCreateCompanionBuilder,
+          $$JournalSightingsTableUpdateCompanionBuilder,
+          (
+            JournalSighting,
+            BaseReferences<
+              _$MeshDatabase,
+              $JournalSightingsTable,
+              JournalSighting
+            >,
+          ),
+          JournalSighting,
+          PrefetchHooks Function()
+        > {
+  $$JournalSightingsTableTableManager(
+    _$MeshDatabase db,
+    $JournalSightingsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$JournalSightingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$JournalSightingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$JournalSightingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> radioKey = const Value.absent(),
+                Value<String> nodeKey = const Value.absent(),
+                Value<int> at = const Value.absent(),
+                Value<double?> snr = const Value.absent(),
+                Value<int?> hops = const Value.absent(),
+                Value<double?> latitude = const Value.absent(),
+                Value<double?> longitude = const Value.absent(),
+              }) => JournalSightingsCompanion(
+                id: id,
+                radioKey: radioKey,
+                nodeKey: nodeKey,
+                at: at,
+                snr: snr,
+                hops: hops,
+                latitude: latitude,
+                longitude: longitude,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String radioKey,
+                required String nodeKey,
+                required int at,
+                Value<double?> snr = const Value.absent(),
+                Value<int?> hops = const Value.absent(),
+                Value<double?> latitude = const Value.absent(),
+                Value<double?> longitude = const Value.absent(),
+              }) => JournalSightingsCompanion.insert(
+                id: id,
+                radioKey: radioKey,
+                nodeKey: nodeKey,
+                at: at,
+                snr: snr,
+                hops: hops,
+                latitude: latitude,
+                longitude: longitude,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$JournalSightingsTable, JournalSighting>(table),
+                  BaseReferences<
+                    _$MeshDatabase,
+                    $JournalSightingsTable,
+                    JournalSighting
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$JournalSightingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$MeshDatabase,
+      $JournalSightingsTable,
+      JournalSighting,
+      $$JournalSightingsTableFilterComposer,
+      $$JournalSightingsTableOrderingComposer,
+      $$JournalSightingsTableAnnotationComposer,
+      $$JournalSightingsTableCreateCompanionBuilder,
+      $$JournalSightingsTableUpdateCompanionBuilder,
+      (
+        JournalSighting,
+        BaseReferences<_$MeshDatabase, $JournalSightingsTable, JournalSighting>,
+      ),
+      JournalSighting,
+      PrefetchHooks Function()
+    >;
 
 class $MeshDatabaseManager {
   final _$MeshDatabase _db;
@@ -12870,4 +14490,8 @@ class $MeshDatabaseManager {
       $$HeardPathsTableTableManager(_db, _db.heardPaths);
   $$PhotoChunksTableTableManager get photoChunks =>
       $$PhotoChunksTableTableManager(_db, _db.photoChunks);
+  $$JournalNodesTableTableManager get journalNodes =>
+      $$JournalNodesTableTableManager(_db, _db.journalNodes);
+  $$JournalSightingsTableTableManager get journalSightings =>
+      $$JournalSightingsTableTableManager(_db, _db.journalSightings);
 }

@@ -2,6 +2,7 @@
 /// returns, and the byte-stream framing used over USB and TCP.
 library;
 
+export 'protocol/advert_data.dart';
 export 'protocol/bytes.dart' show toHex, fromHex;
 export 'protocol/codes.dart';
 export 'protocol/commands.dart';
