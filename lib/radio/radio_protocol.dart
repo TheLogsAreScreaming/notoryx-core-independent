@@ -3,6 +3,7 @@
 library;
 
 export 'protocol/advert_data.dart';
+export 'protocol/area_limit.dart';
 export 'protocol/bytes.dart' show toHex, fromHex;
 export 'protocol/codes.dart';
 export 'protocol/commands.dart';

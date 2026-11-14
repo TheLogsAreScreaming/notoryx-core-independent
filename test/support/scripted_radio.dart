@@ -51,6 +51,10 @@ class ScriptedRadio {
   final getContactsSince = <int?>[];
   bool refuseText = false;
 
+  /// Whether the firmware supports area-limited posts (flood corridor).
+  /// Stock firmware, the default, answers those commands "unsupported".
+  bool areaLimits = false;
+
   /// Ack code for attempt 0; each attempt adds its attempt number.
   int ack = 0x1234;
 
@@ -105,6 +109,14 @@ class ScriptedRadio {
     CommandCode.sendTextMessage => _text(frame),
     CommandCode.resetPath => _resetPath(),
     CommandCode.sendChannelText => [okFrame()],
+    CommandCode.sendChannelTextInArea || CommandCode.getAreaRegion =>
+      areaLimits
+          ? [
+              frame[0] == CommandCode.getAreaRegion
+                  ? [ResponseCode.areaRegion, ...List.filled(31, 0)]
+                  : okFrame(),
+            ]
+          : [errorFrame(RadioErrorCode.unsupportedCommand)],
     CommandCode.setAdvertName => _setName(frame),
     CommandCode.setAdvertLatLon => _setPosition(frame),
     CommandCode.setTxPower => _setPower(frame),

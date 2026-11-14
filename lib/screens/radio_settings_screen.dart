@@ -17,6 +17,7 @@ import 'appearance_screen.dart';
 import '../app/channel_cleanup.dart';
 import 'radio_console_screen.dart';
 import 'backup_screen.dart';
+import 'area_messages_screen.dart';
 import 'hop_names_screen.dart';
 import 'observer_reach_screen.dart';
 import 'identity_key_screen.dart';
@@ -364,6 +365,18 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
                     nodeKey: self.publicKey.hex,
                     name: self.name,
                   ),
+                ),
+              ),
+            ),
+            ListTile(
+              key: const ValueKey('settings-area-messages'),
+              leading: const Icon(Icons.radar),
+              title: Text(context.l10n.areaMessages),
+              subtitle: Text(context.l10n.areaMessagesSubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const AreaMessagesScreen(),
                 ),
               ),
             ),

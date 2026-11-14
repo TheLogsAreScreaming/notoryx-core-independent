@@ -2109,5 +2109,54 @@
   },
   "reachOneWay": "one way only",
   "reachUnknown": "The server has no record of this radio: none of its observers has heard it yet.",
-  "reachFailed": "Couldn't get an answer from the server. Check the address and your internet connection, then try again."
+  "reachFailed": "Couldn't get an answer from the server. Check the address and your internet connection, then try again.",
+  "areaMessages": "Area-limited messages (experimental)",
+  "areaMessagesSubtitle": "Keep channel posts near you; needs special firmware",
+  "areaMessagesExplainer": "An area-limited channel post carries a circle around your radio's position, and repeaters outside the circle don't pass it on. Only radios running firmware with flood-corridor support can send these, and today that's only the feature/flood-corridor branch of MeshCore, not the standard firmware. On standard firmware your posts go out normally, to everyone in range.",
+  "areaMessagesSwitch": "Offer area-limited posts",
+  "areaMessagesSwitchDetail": "Off by default. Adds a 'limit to area' button beside the message box in channels.",
+  "areaFirmwareSupport": "This radio's firmware",
+  "areaSupportOff": "Turn the option on to check the connected radio.",
+  "areaSupportChecking": "Checking…",
+  "areaSupportYes": "Supports area-limited posts.",
+  "areaSupportNo": "Standard firmware: no area limits. Posts go out normally.",
+  "areaSupportUnknown": "Can't tell: connect a radio. Until then, posts go out normally.",
+  "areaRadius": "Circle size",
+  "areaRadiusValue": "{km} km around your radio",
+  "@areaRadiusValue": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "areaSmaller": "Smaller circle",
+  "areaLarger": "Larger circle",
+  "areaMessagesHowTo": "The circle is centred on the position your radio advertises, so set one in Radio settings first. Repeaters that don't know their own position still pass the post on.",
+  "areaNotOnThisFirmware": "Area limits need flood-corridor firmware",
+  "areaNeedsPosition": "Area limits need your radio's position",
+  "areaLimitOn": "Limited to {km} km around you: tap to send to everyone",
+  "@areaLimitOn": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "areaLimitOff": "Sending to everyone: tap to limit to {km} km around you",
+  "@areaLimitOff": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "areaMessageHint": "Message (within {km} km)",
+  "@areaMessageHint": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  }
 }

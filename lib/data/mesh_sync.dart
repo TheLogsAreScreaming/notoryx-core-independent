@@ -808,23 +808,39 @@ class MeshSync {
   /// With [region] the post is scoped to it, and only repeaters allowing
   /// that region pass it on. If the radio can't scope, it still goes out,
   /// unscoped.
+  ///
+  /// With [area] (experimental) the post is limited to those circles, on
+  /// firmware that supports it; on firmware that doesn't, it goes out
+  /// normally. [region] isn't used with an area.
   Future<int> sendChannel(
     int slot,
     String text, {
     DateTime? now,
     String? region,
     bool signed = false,
+    List<AreaCircle>? area,
   }) {
     final sentAt = _seconds(now);
-    final command = SendChannelText(
-      channel: slot,
-      text: text,
-      timestamp: sentAt,
-    );
-    return _send(Threads.channel(slot), text, sentAt, command, (id) async {
+    final plain = SendChannelText(channel: slot, text: text, timestamp: sentAt);
+    final limited = area == null || area.isEmpty
+        ? null
+        : SendChannelTextInArea(
+            channel: slot,
+            text: text,
+            timestamp: sentAt,
+            circles: area,
+          );
+    // Refuse a message too long either way before anything is stored.
+    limited?.encode();
+    return _send(Threads.channel(slot), text, sentAt, plain, (id) async {
+      if (limited != null && await _sendInArea(limited)) {
+        await _store.markSent(id);
+        if (signed) _signLater(id, slot, sentAt, text);
+        return;
+      }
       final scoped = region != null && await _setScope(regionKey(region));
       try {
-        await _session.run(command);
+        await _session.run(plain);
       } finally {
         // Direct messages and SOS must never pick up the region.
         if (scoped) await _setScope(null);
@@ -833,14 +849,47 @@ class MeshSync {
       await _store.markSent(id);
       // The post is out. Signing follows on its own, so it never holds up
       // an SOS, and a failed signature can't make the post look unsent.
-      if (signed) {
-        unawaited(
-          _signPost(id, slot, sentAt, text).catchError((Object e) {
-            if (!_errors.isClosed) _errors.add(e);
-          }),
-        );
-      }
+      if (signed) _signLater(id, slot, sentAt, text);
     });
+  }
+
+  void _signLater(int id, int slot, int sentAt, String text) => unawaited(
+    _signPost(id, slot, sentAt, text).catchError((Object e) {
+      if (!_errors.isClosed) _errors.add(e);
+    }),
+  );
+
+  /// Sends an area-limited post. False when the firmware doesn't know the
+  /// command, so the caller sends it normally instead.
+  Future<bool> _sendInArea(SendChannelTextInArea command) async {
+    try {
+      await _session.run(command);
+      _areaSupport = AreaSupport.supported;
+      return true;
+    } on RadioRejected catch (e) {
+      if (e.code != RadioErrorCode.unsupportedCommand) rethrow;
+      _areaSupport = AreaSupport.unsupported;
+      return false;
+    }
+  }
+
+  AreaSupport? _areaSupport;
+
+  /// Whether the radio's firmware can limit posts to an area. Asked once
+  /// per connection; [AreaSupport.unknown] if the radio didn't answer.
+  Future<AreaSupport> areaSupport() async {
+    if (_areaSupport case final known?) return known;
+    try {
+      await _session.request<AreaRegionReply>(const GetAreaRegion());
+      return _areaSupport = AreaSupport.supported;
+    } on RadioRejected catch (e) {
+      if (e.code == RadioErrorCode.unsupportedCommand) {
+        return _areaSupport = AreaSupport.unsupported;
+      }
+      return AreaSupport.unknown;
+    } on RadioRequestException {
+      return AreaSupport.unknown;
+    }
   }
 
   /// Stops syncing. Direct messages still waiting for an ack are marked
@@ -1128,3 +1177,6 @@ final class _DirectSend {
     return fits ? attempt % 256 : attempt % 4;
   }
 }
+
+/// Whether a radio's firmware supports area-limited posts.
+enum AreaSupport { supported, unsupported, unknown }
