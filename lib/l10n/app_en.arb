@@ -148,6 +148,53 @@
   "paste": "Paste",
   "locationIsOffOrNotAllowed": "Location is off or not allowed for NOTORYX Independent.",
   "goToMyRadio": "Go to my radio",
+  "offlineMapPacks": "Offline map packs",
+  "importMapPack": "Import map pack",
+  "mapPacksIntro": "Bring a raster MBTiles file (PNG, JPEG or WebP tiles) to use the map with no signal. Make one with a mapping tool, or get one from a tile provider that allows offline use. The pack is drawn first; online map tiles fill in around it.",
+  "mapPackNone": "No pack",
+  "mapPackNoneSubtitle": "Online map, with tiles you’ve viewed saved for later",
+  "mapPackZooms": "Zoom {min} to {max}",
+  "@mapPackZooms": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "mapPackSize": "{mb} MB, {tiles} tiles",
+  "@mapPackSize": {
+    "placeholders": {
+      "mb": {
+        "type": "Object"
+      },
+      "tiles": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteMapPack": "Delete {name}",
+  "@deleteMapPack": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "mapPacksUnreadable": "The map packs folder couldn’t be read.",
+  "mapPackImported": "{name} imported and in use",
+  "@mapPackImported": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "mapPackNotMbtiles": "That file isn’t an MBTiles map pack.",
+  "mapPackVector": "That pack has vector tiles. Only picture (raster) tiles are supported.",
+  "mapPackEmpty": "That pack has no tiles in it.",
   "goToMyLocation": "Go to my location",
   "message": "Message",
   "addContact": "Add contact",
