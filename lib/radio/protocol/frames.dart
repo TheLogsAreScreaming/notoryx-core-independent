@@ -304,6 +304,13 @@ final class SignStartReply extends ReplyFrame {
   final int maxLength;
 }
 
+/// The radio's identity private key (64 bytes).
+final class PrivateKeyReply extends ReplyFrame {
+  PrivateKeyReply(List<int> key) : key = Uint8List.fromList(key);
+
+  final Uint8List key;
+}
+
 /// An Ed25519 signature by the radio's own key.
 final class SignatureReply extends ReplyFrame {
   SignatureReply(List<int> signature)
@@ -527,6 +534,7 @@ RadioFrame decodeFrame(List<int> frame) {
       ),
       ResponseCode.signStart => SignStartReply((r..skip(1)).u32()),
       ResponseCode.signature => SignatureReply(r.bytes(64)),
+      ResponseCode.privateKey => PrivateKeyReply(r.bytes(64)),
       ResponseCode.stats => _stats(r),
       ResponseCode.channelInfo => ChannelInfo(
         index: r.u8(),

@@ -1674,5 +1674,25 @@
         "type": "String"
       }
     }
-  }
+  },
+  "show": "Show",
+  "identityKey": "Identity key",
+  "identityKeySubtitle": "Back up or restore this radio's private key",
+  "identityKeyExplainer": "Your radio's identity is its private key. Keep a copy to move this identity to another radio, or to get it back after a reset. Your contacts keep recognising you.",
+  "showPrivateKey": "Show private key",
+  "showPrivateKeyQ": "Show private key?",
+  "showPrivateKeyWarning": "Anyone who sees this key can read your direct messages and send as you. Only show it somewhere private.",
+  "copyKey": "Copy key",
+  "privateKeyCopied": "Key copied. Store it somewhere safe, then clear your clipboard.",
+  "pastePrivateKeyHint": "Paste a 128-character hex private key",
+  "privateKeyFormat": "A key is exactly 128 hex characters (0–9, a–f).",
+  "replaceIdentity": "Replace identity",
+  "replaceIdentityQ": "Replace this radio's identity?",
+  "replaceIdentityWarning": "The radio takes on the identity in this key. Its current key is gone for good unless you backed it up.",
+  "identityReplaced": "Identity replaced.",
+  "neverSharePrivateKey": "Never share this key. Anyone who has it can read your direct messages and pretend to be you.",
+  "keyBackupNotConnected": "Connect a radio first.",
+  "keyBackupTurnedOff": "This radio's firmware has key backup turned off.",
+  "keyBackupNoAnswer": "The radio didn't answer. Try again.",
+  "keyBackupRefused": "The radio refused. Check the key and try again."
 }

@@ -214,6 +214,11 @@ class MeshSync {
     return _radio!;
   }
 
+  /// The radio's identity private key, for a backup. Throws
+  /// [RadioFeatureDisabled] when the firmware was built without it.
+  Future<Uint8List> exportIdentityKey() async =>
+      (await _session.request<PrivateKeyReply>(const ExportPrivateKey())).key;
+
   /// The radio's auto-add rules, or null on firmware without them.
   Future<AutoAddConfig?> autoAddConfig() async {
     try {
