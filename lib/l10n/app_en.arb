@@ -271,6 +271,109 @@
   "noReadingsInThisReply": "No readings in this reply.",
   "tracingTheRoute": "Tracing the route…",
   "traceAgain": "Trace again",
+  "traceCardTitle": "Trace to {name}",
+  "@traceCardTitle": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "traceCardFrom": "Sent by {sender} at {time}",
+  "@traceCardFrom": {
+    "placeholders": {
+      "sender": {
+        "type": "Object"
+      },
+      "time": {
+        "type": "Object"
+      }
+    }
+  },
+  "traceCardSummary": "Round trip {ms} ms through {count} repeaters, weakest hop {snr} dB",
+  "@traceCardSummary": {
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "snr": {
+        "type": "Object"
+      }
+    }
+  },
+  "traceCardRoundTrip": "Round trip {ms} ms",
+  "@traceCardRoundTrip": {
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "traceCardRepeaters": "{count, plural, =1{1 repeater} other{{count} repeaters}}",
+  "@traceCardRepeaters": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "traceCardWeakest": "Weakest {snr} dB ({word})",
+  "@traceCardWeakest": {
+    "placeholders": {
+      "snr": {
+        "type": "Object"
+      },
+      "word": {
+        "type": "Object"
+      }
+    }
+  },
+  "traceCardLegSemantics": "{from} to {to}, {snr} dB, {word} signal",
+  "@traceCardLegSemantics": {
+    "placeholders": {
+      "from": {
+        "type": "Object"
+      },
+      "to": {
+        "type": "Object"
+      },
+      "snr": {
+        "type": "Object"
+      },
+      "word": {
+        "type": "Object"
+      }
+    }
+  },
+  "traceCardSketchSemantics": "Route sketch with {placed} places; {unplaced} repeaters have no position",
+  "@traceCardSketchSemantics": {
+    "placeholders": {
+      "placed": {
+        "type": "int"
+      },
+      "unplaced": {
+        "type": "int"
+      }
+    }
+  },
+  "traceCardUnplaced": "{count, plural, =1{1 repeater has no known position and isn’t drawn.} other{{count} repeaters have no known position and aren’t drawn.}}",
+  "@traceCardUnplaced": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "traceCardNoSketch": "No map sketch: fewer than two stops on this route have shared a position.",
+  "traceCardFooter": "Shared from NOTORYX Independent",
+  "traceCardCopyText": "Copy trace as text",
+  "traceCardSavePicture": "Save trace card as a picture",
+  "traceCardCopied": "Trace copied",
+  "traceCardSaved": "Trace card saved",
+  "traceCardNotSaved": "Trace card not saved",
   "trackLog": "Track log",
   "noTracksYet": "No tracks yet.",
   "deleteThisTrack": "Delete this track?",
