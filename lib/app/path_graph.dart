@@ -3,6 +3,8 @@
 /// repeaters behind each.
 library;
 
+export 'hop_names.dart' show hopName;
+
 import 'dart:async';
 
 import 'package:drift/drift.dart';
@@ -57,23 +59,6 @@ List<DirectRepeater> directRepeaters(List<HeardPathRow> paths) {
       }(),
   ];
   return out..sort((a, b) => b.heard.compareTo(a.heard));
-}
-
-/// The name for hop [hash] among [repeaters] (name and full key). Short
-/// hashes can match several; then they're all listed.
-String hopName(
-  String hash,
-  Iterable<({String name, String publicKey})> repeaters,
-) {
-  final matches = {
-    for (final r in repeaters)
-      if (r.publicKey.toLowerCase().startsWith(hash.toLowerCase())) r.name,
-  };
-  return switch (matches.length) {
-    0 => hash.toUpperCase(),
-    1 => matches.first,
-    _ => '${hash.toUpperCase()} (${matches.join(' or ')})',
-  };
 }
 
 /// Records paths from flooded packets while a radio is connected.

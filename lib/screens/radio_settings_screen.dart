@@ -17,6 +17,7 @@ import 'appearance_screen.dart';
 import '../app/channel_cleanup.dart';
 import 'radio_console_screen.dart';
 import 'backup_screen.dart';
+import 'hop_names_screen.dart';
 import 'identity_key_screen.dart';
 import 'blocked_screen.dart';
 import '../app/sentinel.dart';
@@ -338,6 +339,16 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
                     isSelf: true,
                   ),
                 ),
+              ),
+            ),
+            ListTile(
+              key: const ValueKey('settings-repeater-names'),
+              leading: const Icon(Icons.alt_route),
+              title: Text(context.l10n.repeaterNames),
+              subtitle: Text(context.l10n.repeaterNamesSubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const HopNamesScreen()),
               ),
             ),
             ListTile(

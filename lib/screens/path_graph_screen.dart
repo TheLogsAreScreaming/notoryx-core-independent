@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/connection.dart';
+import '../app/hop_names.dart';
 import '../app/path_graph.dart';
 import '../data/data.dart';
 import '../l10n/l10n.dart';
@@ -34,7 +35,19 @@ class _PathGraphScreenState extends ConsumerState<PathGraphScreen> {
               const <DiscoveredData>[])
         if (d.type == repeater) (name: d.name, publicKey: d.publicKey),
     ];
-    String name(String hash) => hopName(hash, known);
+    final hints = hopHints(
+      ref,
+      radioKey,
+      onlineLabel: context.l10n.foundOnline,
+    );
+    final unknown = <String>{};
+    String name(String hash) {
+      final named = hopName(hash, known, hints: hints);
+      if (named == hash.toUpperCase()) unknown.add(hash);
+      return named;
+    }
+
+    afterNamingHops(ref, unknown, hints);
     final direct = directRepeaters(paths);
     return Scaffold(
       appBar: AppBar(
