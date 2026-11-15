@@ -10,6 +10,7 @@ import 'conversation_screen.dart';
 import 'manage_actions.dart';
 import 'server_screen.dart';
 import 'telemetry_screen.dart';
+import 'node_avatar.dart';
 import 'node_compass_screen.dart';
 import 'node_journal_screen.dart';
 import 'route_screen.dart';
@@ -134,7 +135,11 @@ Future<void> showNodeDetails(
           children: [
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: CircleAvatar(child: Icon(nodeIcon(node.type))),
+              leading: NodeAvatar(
+                publicKey: node.publicKey,
+                name: node.name,
+                type: node.type,
+              ),
               title: Text(node.name, style: theme.textTheme.titleLarge),
               subtitle: Text(
                 '${nodeKind(node.type)}'
@@ -297,6 +302,20 @@ Future<void> showNodeDetails(
                       );
                     },
                   ),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.palette_outlined),
+                  label: Text(context.l10n.nodeLookButton),
+                  onPressed: () {
+                    Navigator.pop(sheet);
+                    showNodeLookPicker(
+                      context,
+                      ref,
+                      publicKey: node.publicKey,
+                      name: node.name,
+                      type: node.type,
+                    );
+                  },
+                ),
                 OutlinedButton.icon(
                   icon: const Icon(Icons.menu_book_outlined),
                   label: Text(context.l10n.journalButton),

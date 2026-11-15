@@ -3,7 +3,7 @@
 NOTORYX Independent is a client for MeshCore LoRa radios. It has no accounts. Its developer receives data only if you turn on the optional Community moderation feature and send a report or appeal. It contains no advertising, analytics or crash-reporting SDK.
 
 ## Stored on your phone
-Messages, contacts, channels, telemetry, recorded tracks and settings are kept in the app's private storage. Android's own device backup may include this data if you have backup turned on; your Android and Google settings control that. Encrypted backup files are created only when you make one, and are saved where you choose.
+Messages, contacts, channels, telemetry, recorded tracks, settings, and any photo or colour you pick for a node are kept in the app's private storage. Node photos are shrunk to a small square and are never sent over the radio. Android's own device backup may include this data if you have backup turned on; your Android and Google settings control that. Encrypted backup files are created only when you make one, and are saved where you choose.
 
 ## What leaves your phone, and when
 - **Over your radio:** messages, node information and any position you choose to share are sent over the air through your radio. Other mesh users and anyone listening can receive them. Channels and direct messages are protected only as far as the mesh protocol and your channel settings provide.
