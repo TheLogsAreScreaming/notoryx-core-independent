@@ -2242,5 +2242,18 @@
   "compassCalibrate": "The compass is unsure. Move the phone in a figure of eight to calibrate it.",
   "compassFromPhone": "From the phone’s location",
   "compassFromRadio": "From your radio’s position",
-  "compassUsePhone": "Use phone location"
+  "compassUsePhone": "Use phone location",
+  "nodeLookButton": "Photo or colour",
+  "nodeLookTitle": "Look for {name}",
+  "@nodeLookTitle": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "nodeLookIntro": "Shown wherever this node appears, on this phone only. It isn’t sent to anyone, and it’s kept in backups.",
+  "nodeLookPhoto": "Choose photo",
+  "nodeLookClear": "Clear",
+  "nodeColourNames": "Red,Orange,Amber,Green,Teal,Cyan,Blue,Indigo,Purple,Pink,Brown,Grey"
 }

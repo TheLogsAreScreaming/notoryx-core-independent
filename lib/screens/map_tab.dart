@@ -12,6 +12,7 @@ import '../app/telemetry.dart';
 import '../app/track_log.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
+import '../app/node_look.dart';
 import 'node_details.dart';
 import 'map_packs_screen.dart';
 import 'zone_alerts_screen.dart';
@@ -307,7 +308,7 @@ class _MapTabState extends ConsumerState<MapTab> {
   }
 }
 
-class _NodeMarker extends StatelessWidget {
+class _NodeMarker extends ConsumerWidget {
   const _NodeMarker({required this.node, required this.onTap, this.badge});
 
   final NodeSummary node;
@@ -317,11 +318,21 @@ class _NodeMarker extends StatelessWidget {
   final String? badge;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
-    final color = node.isContact
-        ? scheme.primaryContainer
-        : scheme.surfaceContainerHighest;
+    final look = ref
+        .watch(nodeLooksProvider)
+        .value?[node.publicKey.toLowerCase()];
+    final color = switch (look) {
+      NodeColour(:final colour) => colour,
+      _ when node.isContact => scheme.primaryContainer,
+      _ => scheme.surfaceContainerHighest,
+    };
+    final iconColour = switch (look) {
+      NodeColour(:final colour) => onColour(colour),
+      _ when node.isContact => scheme.onPrimaryContainer,
+      _ => scheme.onSurfaceVariant,
+    };
     final badgeText = badge;
     // The circle stays centred on the node's position; the badge hangs
     // below it.
@@ -344,21 +355,24 @@ class _NodeMarker extends StatelessWidget {
                 height: 40,
                 decoration: BoxDecoration(
                   color: color,
+                  image: look is NodePhoto
+                      ? DecorationImage(image: look.image, fit: BoxFit.cover)
+                      : null,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: node.isContact ? scheme.primary : scheme.outline,
                     width: 2,
                   ),
                 ),
-                child: Icon(
-                  node.type == NodeType.chat
-                      ? Icons.person
-                      : nodeIcon(node.type),
-                  size: 20,
-                  color: node.isContact
-                      ? scheme.onPrimaryContainer
-                      : scheme.onSurfaceVariant,
-                ),
+                child: look is NodePhoto
+                    ? null
+                    : Icon(
+                        node.type == NodeType.chat
+                            ? Icons.person
+                            : nodeIcon(node.type),
+                        size: 20,
+                        color: iconColour,
+                      ),
               ),
             ),
           ),
