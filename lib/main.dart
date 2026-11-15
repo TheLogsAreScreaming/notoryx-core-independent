@@ -23,6 +23,7 @@ import 'app/notifications.dart';
 import 'l10n/l10n.dart';
 import 'screens/app_lock_screen.dart';
 import 'screens/conversation_screen.dart';
+import 'screens/background_layer.dart';
 import 'screens/home_screen.dart';
 import 'screens/safety_screen.dart';
 
@@ -177,7 +178,9 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
       _ => _shown,
     };
     return switch (_shown) {
-      (:final key, :final name) => HomeScreen(radioKey: key, radioName: name),
+      (:final key, :final name) => BackgroundLayer(
+        child: HomeScreen(radioKey: key, radioName: name),
+      ),
       null => const Scaffold(body: Center(child: CircularProgressIndicator())),
     };
   }

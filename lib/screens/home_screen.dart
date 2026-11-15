@@ -20,6 +20,7 @@ import 'own_status_strip.dart';
 import 'conversation_screen.dart';
 import 'manage_actions.dart';
 import 'map_tab.dart';
+import 'background_layer.dart';
 import 'node_details.dart';
 import 'radio_settings_screen.dart';
 import 'search_screen.dart';
@@ -365,7 +366,9 @@ class _ThreadTile extends StatelessWidget {
   final bool muted;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => GlassCard(child: _tile(context));
+
+  Widget _tile(BuildContext context) {
     final message = latest;
     final preview = message == null
         ? null
@@ -483,32 +486,34 @@ class _ContactsTab extends ConsumerWidget {
             ),
           ),
         for (final contact in sorted)
-          ListTile(
-            leading: CircleAvatar(child: Icon(_icon(contact.type))),
-            title: Text(contact.name),
-            subtitle: Text(_describe(contact)),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (contact.flags & 1 == 1)
-                  Icon(Icons.star, semanticLabel: context.l10n.favourite),
-                IconButton(
-                  tooltip: context.l10n.detailsFor(contact.name),
-                  icon: const Icon(Icons.info_outline),
-                  onPressed: () =>
-                      showNodeDetails(context, ref, nodeFromContact(contact)),
-                ),
-              ],
+          GlassCard(
+            child: ListTile(
+              leading: CircleAvatar(child: Icon(_icon(contact.type))),
+              title: Text(contact.name),
+              subtitle: Text(_describe(contact)),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (contact.flags & 1 == 1)
+                    Icon(Icons.star, semanticLabel: context.l10n.favourite),
+                  IconButton(
+                    tooltip: context.l10n.detailsFor(contact.name),
+                    icon: const Icon(Icons.info_outline),
+                    onPressed: () =>
+                        showNodeDetails(context, ref, nodeFromContact(contact)),
+                  ),
+                ],
+              ),
+              onTap: NodeType.fromByte(contact.type) == NodeType.chat
+                  ? () => _openThread(
+                      context,
+                      thread: Threads.direct(contact.publicKey),
+                      title: contact.name,
+                    )
+                  : () => _openNode(context, ref, nodeFromContact(contact)),
+              onLongPress: () =>
+                  showContactActions(context, ref, contact: contact),
             ),
-            onTap: NodeType.fromByte(contact.type) == NodeType.chat
-                ? () => _openThread(
-                    context,
-                    thread: Threads.direct(contact.publicKey),
-                    title: contact.name,
-                  )
-                : () => _openNode(context, ref, nodeFromContact(contact)),
-            onLongPress: () =>
-                showContactActions(context, ref, contact: contact),
           ),
         if (heard.isNotEmpty) ...[
           Padding(
@@ -535,13 +540,15 @@ class _ContactsTab extends ConsumerWidget {
             ),
           ),
           for (final node in heard)
-            ListTile(
-              leading: CircleAvatar(child: Icon(_icon(node.type))),
-              title: Text(node.name),
-              subtitle: Text(_kind(node.type)),
-              trailing: TextButton(
-                onPressed: () => addDiscovered(context, ref, node),
-                child: Text(context.l10n.add),
+            GlassCard(
+              child: ListTile(
+                leading: CircleAvatar(child: Icon(_icon(node.type))),
+                title: Text(node.name),
+                subtitle: Text(_kind(node.type)),
+                trailing: TextButton(
+                  onPressed: () => addDiscovered(context, ref, node),
+                  child: Text(context.l10n.add),
+                ),
               ),
             ),
         ],
