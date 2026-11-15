@@ -35,3 +35,15 @@ jobs:
 
       - run: flutter pub get
       - run: flutter build ios --release --no-codesign
+      - name: Package unsigned .ipa for sideloading
+        # Unsigned: Sideloadly or AltStore signs it with your own Apple ID when installing.
+        run: |
+          rm -rf build/ipa && mkdir -p build/ipa/Payload
+          cp -R build/ios/iphoneos/Runner.app build/ipa/Payload/
+          cd build/ipa && zip -qry ../NOTORYX-Independent-unsigned.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NOTORYX-Independent-ios-unsigned-ipa
+          path: build/NOTORYX-Independent-unsigned.ipa
+          retention-days: 30
+          if-no-files-found: error
