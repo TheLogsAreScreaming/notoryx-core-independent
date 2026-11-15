@@ -20,6 +20,7 @@ import 'own_status_strip.dart';
 import 'conversation_screen.dart';
 import 'manage_actions.dart';
 import 'map_tab.dart';
+import 'node_avatar.dart';
 import 'node_details.dart';
 import 'radio_settings_screen.dart';
 import 'search_screen.dart';
@@ -294,6 +295,11 @@ class _ChatsTab extends ConsumerWidget {
         for (final message in direct)
           _ThreadTile(
             icon: Icons.person_outline,
+            avatar: NodeAvatar(
+              publicKey: message.thread.substring(2),
+              name: _directTitle(message.thread, names),
+              type: NodeType.chat,
+            ),
             title: _directTitle(message.thread, names),
             latest: message,
             unread: unread[message.thread] ?? 0,
@@ -351,10 +357,14 @@ class _ThreadTile extends StatelessWidget {
     this.muted = false,
     this.draft,
     this.onLongPress,
+    this.avatar,
   });
 
   /// Unsent text left in this chat, shown instead of the last message.
   final String? draft;
+
+  /// Shown in place of [icon], such as a contact's picked look.
+  final Widget? avatar;
 
   final IconData icon;
   final String title;
@@ -375,7 +385,7 @@ class _ThreadTile extends StatelessWidget {
           ].join(': ');
     final scheme = Theme.of(context).colorScheme;
     return ListTile(
-      leading: CircleAvatar(child: Icon(icon)),
+      leading: avatar ?? CircleAvatar(child: Icon(icon)),
       title: Text(
         title,
         style: unread > 0 ? const TextStyle(fontWeight: FontWeight.w700) : null,
@@ -484,7 +494,12 @@ class _ContactsTab extends ConsumerWidget {
           ),
         for (final contact in sorted)
           ListTile(
-            leading: CircleAvatar(child: Icon(_icon(contact.type))),
+            leading: NodeAvatar(
+              publicKey: contact.publicKey,
+              name: contact.name,
+              type: NodeType.fromByte(contact.type),
+              icon: _icon(contact.type),
+            ),
             title: Text(contact.name),
             subtitle: Text(_describe(contact)),
             trailing: Row(
@@ -536,7 +551,12 @@ class _ContactsTab extends ConsumerWidget {
           ),
           for (final node in heard)
             ListTile(
-              leading: CircleAvatar(child: Icon(_icon(node.type))),
+              leading: NodeAvatar(
+                publicKey: node.publicKey,
+                name: node.name,
+                type: NodeType.fromByte(node.type),
+                icon: _icon(node.type),
+              ),
               title: Text(node.name),
               subtitle: Text(_kind(node.type)),
               trailing: TextButton(

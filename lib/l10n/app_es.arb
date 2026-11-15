@@ -813,5 +813,11 @@
   "areaNeedsPosition": "Los límites de zona necesitan la posición de tu radio",
   "areaLimitOn": "Limitado a {km} km a tu alrededor: toca para enviar a todos",
   "areaLimitOff": "Enviando a todos: toca para limitar a {km} km a tu alrededor",
-  "areaMessageHint": "Mensaje (dentro de {km} km)"
+  "areaMessageHint": "Mensaje (dentro de {km} km)",
+  "nodeLookButton": "Foto o color",
+  "nodeLookTitle": "Aspecto de {name}",
+  "nodeLookIntro": "Se muestra dondequiera que aparezca este nodo, solo en este teléfono. No se envía a nadie y se guarda en las copias de seguridad.",
+  "nodeLookPhoto": "Elegir foto",
+  "nodeLookClear": "Quitar",
+  "nodeColourNames": "Rojo,Naranja,Ámbar,Verde,Verde azulado,Cian,Azul,Índigo,Morado,Rosa,Marrón,Gris"
 }

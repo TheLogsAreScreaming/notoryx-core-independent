@@ -8,6 +8,7 @@ import '../data/data.dart';
 import '../radio/radio.dart';
 import 'antenna_hunt_screen.dart';
 import 'conversation_screen.dart';
+import 'node_avatar.dart';
 import 'node_details.dart';
 import 'repeater_tools.dart';
 import 'telemetry_screen.dart';
@@ -156,7 +157,11 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
         children: [
           Row(
             children: [
-              CircleAvatar(child: Icon(nodeIcon(widget.node.type))),
+              NodeAvatar(
+                publicKey: widget.node.publicKey,
+                name: widget.node.name,
+                type: widget.node.type,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
