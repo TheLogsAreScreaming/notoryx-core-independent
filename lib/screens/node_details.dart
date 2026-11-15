@@ -4,6 +4,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../app/connection.dart';
 import '../data/data.dart';
+import '../presets/area_presets_provider.dart';
 import '../radio/radio.dart';
 import 'conversation_screen.dart';
 import 'manage_actions.dart';
@@ -12,6 +13,7 @@ import 'telemetry_screen.dart';
 import 'node_avatar.dart';
 import 'node_journal_screen.dart';
 import 'route_screen.dart';
+import 'terrain_profile_screen.dart';
 import 'trace_screen.dart';
 import '../l10n/l10n.dart';
 
@@ -248,6 +250,35 @@ Future<void> showNodeDetails(
                           ),
                         );
                       }
+                    },
+                  ),
+                if (position != null)
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.terrain),
+                    label: Text(context.l10n.terrainButton),
+                    onPressed: () {
+                      final radio = ref.read(radioPositionProvider);
+                      final start =
+                          from ??
+                          (radio == null ? null : LatLng(radio.lat, radio.lon));
+                      if (start == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(context.l10n.terrainNeedsPosition),
+                          ),
+                        );
+                        return;
+                      }
+                      Navigator.pop(sheet);
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => TerrainProfileScreen(
+                            from: start,
+                            to: position,
+                            name: node.name,
+                          ),
+                        ),
+                      );
                     },
                   ),
                 OutlinedButton.icon(
