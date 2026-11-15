@@ -2158,5 +2158,53 @@
         "type": "String"
       }
     }
-  }
+  },
+  "terrainButton": "Terrain",
+  "terrainProfileTitle": "Terrain to {name}",
+  "@terrainProfileTitle": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "terrainProfileIntro": "Ground height along the path, the direct line between the antennas, and its Fresnel zone, the space around the line that also needs to stay clear. Checking sends both positions to the free Open-Meteo elevation service.",
+  "terrainPathSummary": "{distance} at {mhz} MHz",
+  "@terrainPathSummary": {
+    "placeholders": {
+      "distance": {
+        "type": "Object"
+      },
+      "mhz": {
+        "type": "Object"
+      }
+    }
+  },
+  "terrainCheck": "Check terrain",
+  "terrainFailed": "Couldn’t get ground heights. Check the internet connection and try again.",
+  "terrainChartLabel": "Chart of ground height, the direct line and the Fresnel zone along the path",
+  "legendGround": "Ground",
+  "legendDirectLine": "Direct line",
+  "legendFresnelZone": "Fresnel zone",
+  "legendFresnel60": "60% of the zone",
+  "fresnelClear": "Fresnel zone {percent}% clear at the tightest point. 60% or more is good.",
+  "@fresnelClear": {
+    "placeholders": {
+      "percent": {
+        "type": "Object"
+      }
+    }
+  },
+  "fresnelPartial": "Fresnel zone only {percent}% clear at the tightest point. Aim for 60% or more: raise an antenna or move a point.",
+  "@fresnelPartial": {
+    "placeholders": {
+      "percent": {
+        "type": "Object"
+      }
+    }
+  },
+  "fresnelBlocked": "Terrain cuts into the Fresnel zone and the beam. Raise an antenna or move a point.",
+  "lineOfSightClearNote": "The direct line clears the ground.",
+  "lineOfSightBlockedNote": "The ground blocks the direct line.",
+  "terrainNeedsPosition": "Your radio needs a position first. Set one in radio settings."
 }
