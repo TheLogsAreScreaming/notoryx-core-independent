@@ -6,6 +6,7 @@ import android.os.PowerManager
 import android.provider.Settings
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterFragmentActivity() {
@@ -35,6 +36,11 @@ class MainActivity : FlutterFragmentActivity() {
                     else -> result.notImplemented()
                 }
             }
+        val heading = HeadingStream(this)
+        EventChannel(flutterEngine.dartExecutor.binaryMessenger, "notoryx/heading")
+            .setStreamHandler(heading)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "notoryx/compass")
+            .setMethodCallHandler(heading::handle)
         widgetChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "notoryx/widget")
         widgetChannel?.setMethodCallHandler { call, result ->
             when (call.method) {

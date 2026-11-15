@@ -2207,6 +2207,42 @@
   "lineOfSightClearNote": "The direct line clears the ground.",
   "lineOfSightBlockedNote": "The ground blocks the direct line.",
   "terrainNeedsPosition": "Your radio needs a position first. Set one in radio settings.",
+  "compassButton": "Compass",
+  "compassPoints": "N,NE,E,SE,S,SW,W,NW",
+  "compassBearing": "Bearing {degrees}° {point}",
+  "@compassBearing": {
+    "placeholders": {
+      "degrees": {
+        "type": "Object"
+      },
+      "point": {
+        "type": "Object"
+      }
+    }
+  },
+  "compassOnTarget": "On target",
+  "compassTurnLeft": "Turn left {degrees}°",
+  "@compassTurnLeft": {
+    "placeholders": {
+      "degrees": {
+        "type": "Object"
+      }
+    }
+  },
+  "compassTurnRight": "Turn right {degrees}°",
+  "@compassTurnRight": {
+    "placeholders": {
+      "degrees": {
+        "type": "Object"
+      }
+    }
+  },
+  "compassNoPosition": "No position to point from yet. Use the phone’s location, or give your radio a position.",
+  "compassNone": "No compass on this device, so the arrow is drawn with north at the top.",
+  "compassCalibrate": "The compass is unsure. Move the phone in a figure of eight to calibrate it.",
+  "compassFromPhone": "From the phone’s location",
+  "compassFromRadio": "From your radio’s position",
+  "compassUsePhone": "Use phone location",
   "background": "Background",
   "backgroundIntro": "What sits behind the chats and contacts. Lists float over it on frosted glass.",
   "backgroundTheme": "Theme default",
