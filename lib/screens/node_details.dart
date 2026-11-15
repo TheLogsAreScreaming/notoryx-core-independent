@@ -9,6 +9,7 @@ import 'conversation_screen.dart';
 import 'manage_actions.dart';
 import 'server_screen.dart';
 import 'telemetry_screen.dart';
+import 'node_compass_screen.dart';
 import 'node_journal_screen.dart';
 import 'route_screen.dart';
 import 'trace_screen.dart';
@@ -113,6 +114,15 @@ Future<void> showNodeDetails(
         ? null
         : LatLng(node.latitude!, node.longitude!);
     final theme = Theme.of(sheet);
+    void openCompass() {
+      Navigator.pop(sheet);
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => NodeCompassScreen(name: node.name, target: position!),
+        ),
+      );
+    }
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -140,9 +150,14 @@ Future<void> showNodeDetails(
                   ? 'Not shared'
                   : '${position.latitude.toStringAsFixed(5)}, '
                         '${position.longitude.toStringAsFixed(5)}',
+              onTap: position == null ? null : openCompass,
             ),
             if (position != null && from != null)
-              _Row('Distance from your radio', distanceText(from, position)),
+              _Row(
+                'Distance from your radio',
+                distanceText(from, position),
+                onTap: openCompass,
+              ),
             _Row('Key', '${node.publicKey.substring(0, 16)}…'),
             const SizedBox(height: 12),
             Wrap(
@@ -245,6 +260,12 @@ Future<void> showNodeDetails(
                       }
                     },
                   ),
+                if (position != null)
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.navigation_outlined),
+                    label: Text(context.l10n.compassButton),
+                    onPressed: openCompass,
+                  ),
                 OutlinedButton.icon(
                   icon: const Icon(Icons.menu_book_outlined),
                   label: Text(context.l10n.journalButton),
@@ -305,23 +326,42 @@ Future<void> showNodeDetails(
 );
 
 class _Row extends StatelessWidget {
-  const _Row(this.label, this.value);
+  const _Row(this.label, this.value, {this.onTap});
 
   final String label;
   final String value;
 
+  /// Opens something about this row, such as the compass for a position.
+  final VoidCallback? onTap;
+
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 170,
-          child: Text(label, style: Theme.of(context).textTheme.bodySmall),
-        ),
-        Expanded(child: Text(value)),
-      ],
-    ),
-  );
+  Widget build(BuildContext context) {
+    final row = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 170,
+            child: Text(label, style: Theme.of(context).textTheme.bodySmall),
+          ),
+          Expanded(child: Text(value)),
+          if (onTap != null)
+            Icon(
+              Icons.navigation_outlined,
+              size: 18,
+              semanticLabel: context.l10n.compassButton,
+            ),
+        ],
+      ),
+    );
+    if (onTap == null) return row;
+    return InkWell(
+      onTap: onTap,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 44),
+        child: row,
+      ),
+    );
+  }
 }

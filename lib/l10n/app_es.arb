@@ -813,5 +813,17 @@
   "areaNeedsPosition": "Los límites de zona necesitan la posición de tu radio",
   "areaLimitOn": "Limitado a {km} km a tu alrededor: toca para enviar a todos",
   "areaLimitOff": "Enviando a todos: toca para limitar a {km} km a tu alrededor",
-  "areaMessageHint": "Mensaje (dentro de {km} km)"
+  "areaMessageHint": "Mensaje (dentro de {km} km)",
+  "compassButton": "Brújula",
+  "compassPoints": "N,NE,E,SE,S,SO,O,NO",
+  "compassBearing": "Rumbo {degrees}° {point}",
+  "compassOnTarget": "En la dirección correcta",
+  "compassTurnLeft": "Gira {degrees}° a la izquierda",
+  "compassTurnRight": "Gira {degrees}° a la derecha",
+  "compassNoPosition": "Todavía no hay una posición desde la que apuntar. Usa la ubicación del teléfono o da una posición a tu radio.",
+  "compassNone": "Este dispositivo no tiene brújula, así que la flecha se dibuja con el norte arriba.",
+  "compassCalibrate": "La brújula no es precisa. Mueve el teléfono haciendo un ocho para calibrarla.",
+  "compassFromPhone": "Desde la ubicación del teléfono",
+  "compassFromRadio": "Desde la posición de tu radio",
+  "compassUsePhone": "Usar la ubicación del teléfono"
 }
