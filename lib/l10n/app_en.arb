@@ -2255,5 +2255,21 @@
   "nodeLookIntro": "Shown wherever this node appears, on this phone only. It isn’t sent to anyone, and it’s kept in backups.",
   "nodeLookPhoto": "Choose photo",
   "nodeLookClear": "Clear",
-  "nodeColourNames": "Red,Orange,Amber,Green,Teal,Cyan,Blue,Indigo,Purple,Pink,Brown,Grey"
+  "nodeColourNames": "Red,Orange,Amber,Green,Teal,Cyan,Blue,Indigo,Purple,Pink,Brown,Grey",
+  "background": "Background",
+  "backgroundIntro": "What sits behind the chats and contacts. Lists float over it on frosted glass.",
+  "backgroundTheme": "Theme default",
+  "backgroundSolid": "Solid colour",
+  "backgroundGradient": "Gradient",
+  "backgroundMesh": "Mesh gradient",
+  "backgroundPhoto": "Your photo",
+  "backgroundColour": "Colour",
+  "backgroundFirstColour": "First colour",
+  "backgroundSecondColour": "Second colour",
+  "backgroundChoosePhoto": "Choose photo",
+  "backgroundDim": "Dim",
+  "backgroundBlur": "Blur",
+  "backgroundReadableNote": "Dimming goes up on its own when needed to keep text readable. Frosted glass turns off when reduce motion or battery saver is on.",
+  "backgroundPreviewTitle": "Preview",
+  "backgroundColourNames": "Deep blue,Blue,Teal,Green,Olive,Orange,Red,Pink,Purple,Slate,Charcoal,Mist"
 }

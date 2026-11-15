@@ -848,5 +848,21 @@
   "nodeLookIntro": "Se muestra dondequiera que aparezca este nodo, solo en este teléfono. No se envía a nadie y se guarda en las copias de seguridad.",
   "nodeLookPhoto": "Elegir foto",
   "nodeLookClear": "Quitar",
-  "nodeColourNames": "Rojo,Naranja,Ámbar,Verde,Verde azulado,Cian,Azul,Índigo,Morado,Rosa,Marrón,Gris"
+  "nodeColourNames": "Rojo,Naranja,Ámbar,Verde,Verde azulado,Cian,Azul,Índigo,Morado,Rosa,Marrón,Gris",
+  "background": "Fondo",
+  "backgroundIntro": "Lo que hay detrás de los chats y los contactos. Las listas flotan encima sobre cristal esmerilado.",
+  "backgroundTheme": "El del tema",
+  "backgroundSolid": "Color liso",
+  "backgroundGradient": "Degradado",
+  "backgroundMesh": "Degradado en malla",
+  "backgroundPhoto": "Tu foto",
+  "backgroundColour": "Color",
+  "backgroundFirstColour": "Primer color",
+  "backgroundSecondColour": "Segundo color",
+  "backgroundChoosePhoto": "Elegir foto",
+  "backgroundDim": "Atenuar",
+  "backgroundBlur": "Desenfocar",
+  "backgroundReadableNote": "La atenuación sube sola cuando hace falta para que el texto se lea bien. El cristal esmerilado se desactiva con la reducción de movimiento o el ahorro de batería.",
+  "backgroundPreviewTitle": "Vista previa",
+  "backgroundColourNames": "Azul oscuro,Azul,Verde azulado,Verde,Oliva,Naranja,Rojo,Rosa,Morado,Pizarra,Carbón,Niebla"
 }

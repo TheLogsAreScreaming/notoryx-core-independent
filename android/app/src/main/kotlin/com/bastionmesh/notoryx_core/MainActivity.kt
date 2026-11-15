@@ -26,6 +26,9 @@ class MainActivity : FlutterFragmentActivity() {
                         result.success(null)
                     }
                     "batteryUnrestricted" -> result.success(batteryUnrestricted())
+                    "powerSave" -> result.success(
+                        (getSystemService(Context.POWER_SERVICE) as PowerManager).isPowerSaveMode,
+                    )
                     "requestBatteryUnrestricted" -> {
                         requestBatteryUnrestricted()
                         result.success(null)
