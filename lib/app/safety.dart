@@ -510,8 +510,14 @@ class Safety extends AsyncNotifier<SafetyState> {
                 int.parse(id),
                 text,
                 signed: (await ref.read(postSigningProvider.future)).safety,
+                // Safety messages must be readable by every app.
+                compress: false,
               )
-            : await state.sync.sendDirect(PublicKey.fromHex(id), text);
+            : await state.sync.sendDirect(
+                PublicKey.fromHex(id),
+                text,
+                compress: false,
+              );
         sends.add((thread: thread, messageId: messageId));
       } on RadioRequestException catch (e) {
         firstError ??= e;

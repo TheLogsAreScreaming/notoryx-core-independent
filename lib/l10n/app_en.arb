@@ -2271,5 +2271,11 @@
   "backgroundBlur": "Blur",
   "backgroundReadableNote": "Dimming goes up on its own when needed to keep text readable. Frosted glass turns off when reduce motion or battery saver is on.",
   "backgroundPreviewTitle": "Preview",
-  "backgroundColourNames": "Deep blue,Blue,Teal,Green,Olive,Orange,Red,Pink,Purple,Slate,Charcoal,Mist"
+  "backgroundColourNames": "Deep blue,Blue,Teal,Green,Olive,Orange,Red,Pink,Purple,Slate,Charcoal,Mist",
+  "compressionOn": "Compression on: tap to send plain text",
+  "compressionOff": "Compress messages in this chat",
+  "compressionOnNote": "Messages here are now sent compressed (SMAZ) when that makes them shorter. Apps that don't understand SMAZ will see scrambled text. SOS and check-ins always go plain.",
+  "compressionOffNote": "Messages here are sent as plain text again.",
+  "unmuteChat": "Unmute",
+  "muteNotifications": "Mute notifications"
 }

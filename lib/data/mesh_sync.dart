@@ -269,10 +269,19 @@ class MeshSync {
   /// is dropped and it floods up to [RetryPolicy.floodAttempts] times. With
   /// no ack after that it is marked failed. [stopTrying] gives up early and
   /// [resend] starts again.
-  Future<int> sendDirect(PublicKey to, String text, {DateTime? now}) async {
+  Future<int> sendDirect(
+    PublicKey to,
+    String text, {
+    DateTime? now,
+    bool compress = true,
+  }) async {
     final key = _requireKey();
     _checkDirectText(text);
-    final job = _DirectSend(to: to, text: text, sentAt: _seconds(now));
+    final job = _DirectSend(
+      to: to,
+      text: compress ? await _onAir(Threads.direct(to.hex), text) : text,
+      sentAt: _seconds(now),
+    );
     // Encode first so a message too long for the radio is refused before
     // anything is stored.
     job.command().encode();
@@ -305,7 +314,7 @@ class MeshSync {
         await _session.run(
           SendChannelText(
             channel: int.parse(target),
-            text: message.body,
+            text: await _onAir(message.thread, message.body),
             timestamp: message.sentAt,
           ),
         );
@@ -318,7 +327,7 @@ class MeshSync {
     }
     final job = _DirectSend(
       to: PublicKey.fromHex(target),
-      text: message.body,
+      text: await _onAir(message.thread, message.body),
       sentAt: message.sentAt,
       // Keep counting so each packet differs from earlier tries; repeaters
       // drop packets they have already passed on.
@@ -819,14 +828,19 @@ class MeshSync {
     String? region,
     bool signed = false,
     List<AreaCircle>? area,
-  }) {
+    bool compress = true,
+  }) async {
     final sentAt = _seconds(now);
-    final plain = SendChannelText(channel: slot, text: text, timestamp: sentAt);
+    // Signed posts go out as written, so any app can check them.
+    final wire = compress && !signed
+        ? await _onAir(Threads.channel(slot), text)
+        : text;
+    final plain = SendChannelText(channel: slot, text: wire, timestamp: sentAt);
     final limited = area == null || area.isEmpty
         ? null
         : SendChannelTextInArea(
             channel: slot,
-            text: text,
+            text: wire,
             timestamp: sentAt,
             circles: area,
           );
@@ -909,6 +923,11 @@ class MeshSync {
     await _incoming.close();
     await _errors.close();
   }
+
+  /// [text] as it goes on the air in [thread]: SMAZ-compressed when the
+  /// chat has compression on and that makes it shorter.
+  Future<String> _onAir(String thread, String text) async =>
+      await _store.setting(smazSetting(thread)) == 'on' ? smazWrap(text) : text;
 
   Future<int> _send(
     String thread,

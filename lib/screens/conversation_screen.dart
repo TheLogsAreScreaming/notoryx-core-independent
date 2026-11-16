@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../app/compression.dart';
 import '../app/area_messages.dart';
 import '../app/blocking.dart';
 import '../app/sentinel.dart';
@@ -458,6 +459,17 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
         SnackBar(content: Text(l10n.theRadioCouldNotSendIt)),
       );
     }
+  }
+
+  Future<void> _toggleCompression(bool on) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    await setCompressed(ref.read(storeProvider), widget.thread, on);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(on ? l10n.compressionOnNote : l10n.compressionOffNote),
+      ),
+    );
   }
 
   /// Asks which chat, then sends [message] there.
@@ -954,6 +966,10 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
           m,
     ], senderOf: senderOf);
 
+    final compressed =
+        ref.watch(compressedThreadsProvider).value?.contains(widget.thread) ??
+        false;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -963,9 +979,19 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
             icon: const Icon(Icons.schedule_send),
             onPressed: _schedule,
           ),
+          IconButton(
+            tooltip: compressed
+                ? context.l10n.compressionOn
+                : context.l10n.compressionOff,
+            isSelected: compressed,
+            icon: const Icon(Icons.compress),
+            onPressed: () => _toggleCompression(!compressed),
+          ),
           if (radioKey != null)
             IconButton(
-              tooltip: muted ? 'Unmute' : 'Mute notifications',
+              tooltip: muted
+                  ? context.l10n.unmuteChat
+                  : context.l10n.muteNotifications,
               icon: Icon(
                 muted
                     ? Icons.notifications_off_outlined
