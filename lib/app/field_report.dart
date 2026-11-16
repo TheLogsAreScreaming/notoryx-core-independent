@@ -7,6 +7,7 @@ library;
 import 'dart:convert';
 
 import '../data/data.dart';
+import '../l10n/l10n.dart';
 
 /// One line of a report.
 typedef ReportField = ({String tag, String label, String hint});
@@ -14,13 +15,66 @@ typedef ReportField = ({String tag, String label, String hint});
 /// A kind of report.
 final class ReportTemplate {
   const ReportTemplate({
+    required this.id,
     required this.title,
     required this.heading,
     required this.locationField,
     required this.fields,
   });
 
+  /// Which template: `salute` or `nineLine`.
+  final String id;
+
+  /// English name.
   final String title;
+
+  /// The name in the app's language.
+  String shownTitle(AppLocalizations l10n) =>
+      id == 'salute' ? l10n.saluteTitle : l10n.nineLineTitle;
+
+  /// Field [i]'s label in the app's language.
+  String shownLabel(AppLocalizations l10n, int i) => id == 'salute'
+      ? [
+          l10n.saluteLabel1,
+          l10n.saluteLabel2,
+          l10n.saluteLabel3,
+          l10n.saluteLabel4,
+          l10n.saluteLabel5,
+          l10n.saluteLabel6,
+        ][i]
+      : [
+          l10n.nineLineLabel1,
+          l10n.nineLineLabel2,
+          l10n.nineLineLabel3,
+          l10n.nineLineLabel4,
+          l10n.nineLineLabel5,
+          l10n.nineLineLabel6,
+          l10n.nineLineLabel7,
+          l10n.nineLineLabel8,
+          l10n.nineLineLabel9,
+        ][i];
+
+  /// Field [i]'s hint in the app's language.
+  String shownHint(AppLocalizations l10n, int i) => id == 'salute'
+      ? [
+          l10n.saluteHint1,
+          l10n.saluteHint2,
+          l10n.saluteHint3,
+          l10n.saluteHint4,
+          l10n.saluteHint5,
+          l10n.saluteHint6,
+        ][i]
+      : [
+          l10n.nineLineHint1,
+          l10n.nineLineHint2,
+          l10n.nineLineHint3,
+          l10n.nineLineHint4,
+          l10n.nineLineHint5,
+          l10n.nineLineHint6,
+          l10n.nineLineHint7,
+          l10n.nineLineHint8,
+          l10n.nineLineHint9,
+        ][i];
 
   /// What the message starts with.
   final String heading;
@@ -32,6 +86,7 @@ final class ReportTemplate {
 }
 
 const saluteReport = ReportTemplate(
+  id: 'salute',
   title: 'SALUTE report',
   heading: 'SALUTE',
   locationField: 2,
@@ -46,6 +101,7 @@ const saluteReport = ReportTemplate(
 );
 
 const nineLineReport = ReportTemplate(
+  id: 'nineLine',
   title: '9-Line MEDEVAC',
   heading: '9-LINE',
   locationField: 0,
