@@ -149,6 +149,54 @@ void main() {
     },
   );
 
+  group('SMAZ', () {
+    const text = 'the weather is clear on the ridge tonight';
+    String onAir() =>
+        latin1.decode(link.sent.last.where((b) => b < 256).toList());
+
+    test('compressed messages are stored as plain text', () async {
+      radio.queue
+        ..add(_directFrame(smazWrap(text)))
+        ..add(channelMessageFrame('Ridge: ${smazWrap(text)}', channel: 1));
+      final key = (await sync.start(now: now)).key;
+      final direct = await store
+          .watchThread(key, Threads.direct('01' * 32))
+          .first;
+      expect(direct.single.body, text);
+      final channel = await store.watchThread(key, Threads.channel(1)).first;
+      expect(channel.single.body, text);
+      expect(channel.single.senderName, 'Ridge');
+    });
+
+    test('sends compressed only where it is turned on', () async {
+      final key = (await sync.start(now: now)).key;
+      await sync.sendChannel(1, text, now: now);
+      expect(onAir(), contains(text));
+
+      await store.saveSetting(smazSetting(Threads.channel(1)), 'on');
+      await sync.sendChannel(1, text, now: now);
+      expect(onAir(), contains(smazWrap(text)));
+      final stored = await store.watchThread(key, Threads.channel(1)).first;
+      expect(stored.map((m) => m.body), everyElement(text));
+
+      final alice = PublicKey(List.filled(32, 1));
+      await store.saveSetting(smazSetting(Threads.direct(alice.hex)), 'on');
+      await sync.sendDirect(alice, text, now: now);
+      expect(onAir(), contains(smazWrap(text)));
+    });
+
+    test('SOS and check-in sends stay plain', () async {
+      await sync.start(now: now);
+      await store.saveSetting(smazSetting(Threads.channel(1)), 'on');
+      await sync.sendChannel(1, text, now: now, compress: false);
+      expect(onAir(), contains(text));
+      final alice = PublicKey(List.filled(32, 1));
+      await store.saveSetting(smazSetting(Threads.direct(alice.hex)), 'on');
+      await sync.sendDirect(alice, text, now: now, compress: false);
+      expect(onAir(), contains(text));
+    });
+  });
+
   test('channel messages end at sent', () async {
     final key = (await sync.start(now: now)).key;
     await sync.sendChannel(1, 'heading down', now: now);

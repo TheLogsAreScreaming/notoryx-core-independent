@@ -4,6 +4,9 @@ import '../radio/radio.dart';
 import 'database.dart';
 
 /// Thread ids group messages into conversations.
+/// The settings key that turns SMAZ compression on for [thread]'s sends.
+String smazSetting(String thread) => 'smaz.$thread';
+
 abstract final class Threads {
   /// A direct conversation, by the contact's full key or, when the sender
   /// isn't a known contact yet, the 6-byte prefix the radio reported.
@@ -271,7 +274,7 @@ class MeshStore {
           radioKey,
           kind: MessageKind.direct,
           thread: Threads.direct(contact?.publicKey ?? prefix),
-          body: frame.text,
+          body: smazUnwrap(frame.text) ?? frame.text,
           sentAt: frame.timestamp,
           pathLength: frame.pathLength,
           snr: frame.snr,
@@ -287,7 +290,7 @@ class MeshStore {
           radioKey,
           kind: MessageKind.channel,
           thread: Threads.channel(frame.channel),
-          body: parts.body,
+          body: smazUnwrap(parts.body) ?? parts.body,
           senderName: parts.sender,
           sentAt: frame.timestamp,
           pathLength: frame.pathLength,

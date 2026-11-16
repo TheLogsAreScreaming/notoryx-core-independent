@@ -864,5 +864,11 @@
   "backgroundBlur": "Desenfocar",
   "backgroundReadableNote": "La atenuación sube sola cuando hace falta para que el texto se lea bien. El cristal esmerilado se desactiva con la reducción de movimiento o el ahorro de batería.",
   "backgroundPreviewTitle": "Vista previa",
-  "backgroundColourNames": "Azul oscuro,Azul,Verde azulado,Verde,Oliva,Naranja,Rojo,Rosa,Morado,Pizarra,Carbón,Niebla"
+  "backgroundColourNames": "Azul oscuro,Azul,Verde azulado,Verde,Oliva,Naranja,Rojo,Rosa,Morado,Pizarra,Carbón,Niebla",
+  "compressionOn": "Compresión activada: toca para enviar texto normal",
+  "compressionOff": "Comprimir los mensajes de este chat",
+  "compressionOnNote": "Los mensajes de aquí se envían comprimidos (SMAZ) cuando así ocupan menos. Las apps que no entienden SMAZ verán texto ilegible. SOS y avisos de llegada siempre van sin comprimir.",
+  "compressionOffNote": "Los mensajes de aquí vuelven a enviarse como texto normal.",
+  "unmuteChat": "Activar sonido",
+  "muteNotifications": "Silenciar notificaciones"
 }
