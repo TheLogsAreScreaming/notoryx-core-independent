@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../radio/radio.dart';
+import 'core_import.dart';
 import 'database.dart';
 
 /// Thread ids group messages into conversations.
@@ -304,6 +305,51 @@ class MeshStore {
     return _db
         .into(_db.messages)
         .insertReturningOrNull(row, mode: InsertMode.insertOrIgnore);
+  }
+
+  /// Adds [messages] from a NOTORYX Core backup, skipping ones already
+  /// here and ones for radios this app hasn't connected to yet. Returns how
+  /// many were added and how many radios were skipped.
+  Future<({int added, int skippedRadios})> importCoreMessages(
+    List<CoreMessage> messages,
+  ) async {
+    final known = {
+      for (final r in await _db.select(_db.radios).get()) r.publicKey,
+    };
+    final skipped = <String>{};
+    var added = 0;
+    final storedAt = DateTime.now().millisecondsSinceEpoch;
+    await _db.transaction(() async {
+      for (final m in messages) {
+        if (!known.contains(m.radioKey)) {
+          skipped.add(m.radioKey);
+          continue;
+        }
+        final id = await _db
+            .into(_db.messages)
+            .insertReturningOrNull(
+              MessagesCompanion.insert(
+                radioKey: m.radioKey,
+                kind: m.kind,
+                thread: m.thread,
+                outgoing: m.outgoing,
+                body: m.body,
+                senderName: Value(m.senderName),
+                sentAt: m.sentAt,
+                storedAt: storedAt,
+                status: m.status,
+                pathLength: Value(m.pathLength),
+                textType: Value(m.textType),
+                authorPrefix: Value(m.authorPrefix),
+                region: Value(m.region),
+                dedupeKey: Value(m.dedupeKey),
+              ),
+              mode: InsertMode.insertOrIgnore,
+            );
+        if (id != null) added++;
+      }
+    });
+    return (added: added, skippedRadios: skipped.length);
   }
 
   MessagesCompanion _incoming(

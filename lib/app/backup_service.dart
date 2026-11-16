@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../data/backup.dart';
 import '../data/backup_crypto.dart';
+import '../data/core_import.dart';
 import 'about.dart';
 import 'connection.dart';
 import 'db_encryption_control.dart';
@@ -107,6 +108,18 @@ class BackupService {
       payload,
       currentSchema: _ref.read(databaseProvider).schemaVersion,
     );
+  }
+
+  /// Adds the message history from a NOTORYX Core backup [file] to this
+  /// app, keeping everything already here. Throws [CoreImportException].
+  Future<({int added, int skippedRadios})> importFromCore(
+    Uint8List file,
+    String password,
+  ) async {
+    final messages = await Isolate.run(
+      () => coreHistory(openCoreBackup(file, password)),
+    );
+    return _ref.read(storeProvider).importCoreMessages(messages);
   }
 
   /// Replaces everything on this device with [backup]. Only while no radio
