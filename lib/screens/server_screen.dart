@@ -110,11 +110,11 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
       if (!mounted) return;
       setState(() {
         _status = status ?? _status;
-        _statusNote = status == null ? 'No reply from the server.' : null;
+        _statusNote = status == null ? context.l10n.noReplyFromServer : null;
       });
     } on RadioRequestException {
       if (mounted) {
-        setState(() => _statusNote = 'The radio could not send the request.');
+        setState(() => _statusNote = context.l10n.radioCouldNotSendRequest);
       }
     } finally {
       if (mounted) setState(() => _loadingStatus = false);
@@ -165,8 +165,8 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  '${nodeKind(widget.node.type)} · '
-                  '${routeText(widget.node.outPathLength)}',
+                  '${nodeKind(widget.node.type, context.l10n)} · '
+                  '${routeText(widget.node.outPathLength, context.l10n)}',
                 ),
               ),
             ],
@@ -201,9 +201,8 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
                         const SizedBox(height: 4),
                         Text(
                           _isRoom
-                              ? 'Use the room’s password, or leave it empty '
-                                    'if the room allows guests.'
-                              : 'Use the admin or guest password.',
+                              ? context.l10n.roomPasswordHint
+                              : context.l10n.adminOrGuestPassword,
                         ),
                         TextField(
                           controller: _password,
@@ -217,7 +216,9 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
                         const SizedBox(height: 12),
                         FilledButton(
                           onPressed: _loggingIn ? null : _login,
-                          child: Text(_loggingIn ? 'Logging in…' : 'Log in'),
+                          child: Text(
+                            context.l10n.loggingInOrLogIn('$_loggingIn'),
+                          ),
                         ),
                       ],
                     ),
@@ -266,7 +267,9 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
                         TextButton(
                           onPressed: _refreshStatus,
                           child: Text(
-                            _status == null ? 'Get status' : 'Refresh',
+                            context.l10n.getStatusOrRefresh(
+                              '${_status == null}',
+                            ),
                           ),
                         ),
                     ],
@@ -391,23 +394,39 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
   }
 
   List<Widget> _statusRows(ServerStatus s) => [
-    _Stat('Battery', '${(s.batteryMillivolts / 1000).toStringAsFixed(2)} V'),
-    _Stat('Up for', _duration(s.upTimeSeconds)),
     _Stat(
-      'Last signal',
+      context.l10n.infoBattery,
+      '${(s.batteryMillivolts / 1000).toStringAsFixed(2)} V',
+    ),
+    _Stat(context.l10n.statUpFor, _duration(s.upTimeSeconds)),
+    _Stat(
+      context.l10n.statLastSignal,
       '${s.lastRssi} dBm · SNR ${s.lastSnr.toStringAsFixed(1)} dB',
     ),
-    _Stat('Noise floor', '${s.noiseFloor} dBm'),
-    _Stat('Packets', '${s.packetsReceived} received · ${s.packetsSent} sent'),
-    _Stat('Flood', '${s.receivedFlood} in · ${s.sentFlood} out'),
-    _Stat('Direct', '${s.receivedDirect} in · ${s.sentDirect} out'),
-    _Stat('Duplicates dropped', '${s.floodDuplicates + s.directDuplicates}'),
-    _Stat('Transmitting', _duration(s.airTimeSeconds)),
+    _Stat(context.l10n.noiseFloor, '${s.noiseFloor} dBm'),
+    _Stat(
+      context.l10n.statPackets,
+      context.l10n.statPacketsValue(s.packetsReceived, s.packetsSent),
+    ),
+    _Stat(
+      context.l10n.statFlood,
+      context.l10n.statInOut(s.receivedFlood, s.sentFlood),
+    ),
+    _Stat(
+      context.l10n.statDirect,
+      context.l10n.statInOut(s.receivedDirect, s.sentDirect),
+    ),
+    _Stat(
+      context.l10n.statDuplicates,
+      '${s.floodDuplicates + s.directDuplicates}',
+    ),
+    _Stat(context.l10n.statTransmitting, _duration(s.airTimeSeconds)),
     if (s.receiveAirTimeSeconds case final rx?)
-      _Stat('Receiving', _duration(rx)),
-    _Stat('Send queue', '${s.txQueue}'),
-    if (s.posts case final posts?) _Stat('Posts', '$posts'),
-    if (s.receiveErrors case final e?) _Stat('Receive errors', '$e'),
+      _Stat(context.l10n.statReceiving, _duration(rx)),
+    _Stat(context.l10n.statSendQueue, '${s.txQueue}'),
+    if (s.posts case final posts?) _Stat(context.l10n.statPosts, '$posts'),
+    if (s.receiveErrors case final e?)
+      _Stat(context.l10n.statReceiveErrors, '$e'),
   ];
 
   static String _duration(int seconds) {

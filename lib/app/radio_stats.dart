@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/data.dart';
+import '../l10n/l10n.dart';
 import 'connection.dart';
 import 'refresh_rate.dart';
 import 'telemetry.dart' show TelemetryPoint;
@@ -57,14 +58,20 @@ final radioStatsSamplerProvider = Provider<void>((ref) {
 
 /// The figures charted from receiver samples.
 enum RadioStatsSeries {
-  noiseFloor('Noise floor', 'dBm'),
-  lastRssi('Last packet signal', 'dBm'),
-  lastSnr('Last packet SNR', 'dB');
+  noiseFloor('dBm'),
+  lastRssi('dBm'),
+  lastSnr('dB');
 
-  const RadioStatsSeries(this.label, this.unit);
+  const RadioStatsSeries(this.unit);
 
-  final String label;
   final String unit;
+
+  /// The figure's name in the app's language.
+  String label(AppLocalizations l10n) => switch (this) {
+    noiseFloor => l10n.statsNoiseFloor,
+    lastRssi => l10n.statsLastSignal,
+    lastSnr => l10n.statsLastSnr,
+  };
 
   double valueOf(RadioStatsSample s) => switch (this) {
     noiseFloor => s.noiseFloor.toDouble(),
@@ -82,11 +89,13 @@ enum RadioStatsSeries {
 }
 
 /// A plain-words reading of a noise floor, in dBm.
-String noiseVerdict(int dbm) => switch (dbm) {
-  <= -115 => 'Quiet. Weak signals get through.',
-  <= -105 => 'Normal.',
-  <= -95 => 'Noisy. Weak signals may be missed.',
-  _ => 'Very noisy. Something nearby is drowning out the mesh.',
+String noiseVerdict(int dbm, [AppLocalizations? l10n]) => switch (dbm) {
+  <= -115 => l10n?.noiseQuiet ?? 'Quiet. Weak signals get through.',
+  <= -105 => l10n?.noiseNormal ?? 'Normal.',
+  <= -95 => l10n?.noiseNoisy ?? 'Noisy. Weak signals may be missed.',
+  _ =>
+    l10n?.noiseVeryNoisy ??
+        'Very noisy. Something nearby is drowning out the mesh.',
 };
 
 /// "2 h 5 min" for an airtime total.

@@ -40,8 +40,8 @@ class AboutScreen extends ConsumerWidget {
           ),
           Text(
             app == null
-                ? 'Version …'
-                : 'Version ${app.version} (build ${app.build})',
+                ? context.l10n.versionLoading
+                : context.l10n.versionBuild(app.version, app.build),
             style: theme.textTheme.titleMedium,
           ),
           const SizedBox(height: 8),
@@ -74,21 +74,21 @@ class AboutScreen extends ConsumerWidget {
             child: FilledButton.tonalIcon(
               onPressed: details == null
                   ? null
-                  : () => _copy(context, details, 'Details copied'),
+                  : () => _copy(context, details, context.l10n.detailsCopied),
               icon: const Icon(Icons.copy),
               label: Text(context.l10n.copyDetails),
             ),
           ),
           const SizedBox(height: 24),
           _Link(
-            label: 'Downloads and problem reports',
+            label: context.l10n.downloadsAndReports,
             url: releasesUrl,
-            onCopy: () => _copy(context, releasesUrl, 'Link copied'),
+            onCopy: () => _copy(context, releasesUrl, context.l10n.linkCopied),
           ),
           _Link(
-            label: 'Source code',
+            label: context.l10n.sourceCode,
             url: sourceUrl,
-            onCopy: () => _copy(context, sourceUrl, 'Link copied'),
+            onCopy: () => _copy(context, sourceUrl, context.l10n.linkCopied),
           ),
           ListTile(
             contentPadding: EdgeInsets.zero,

@@ -70,7 +70,7 @@ class _FieldLogScreenState extends ConsumerState<FieldLogScreen> {
           child: SegmentedButton<FieldLogRange>(
             segments: [
               for (final r in FieldLogRange.values)
-                ButtonSegment(value: r, label: Text(r.label)),
+                ButtonSegment(value: r, label: Text(r.label(context.l10n))),
             ],
             selected: {_range},
             onSelectionChanged: (v) => setState(() {

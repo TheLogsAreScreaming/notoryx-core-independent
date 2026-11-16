@@ -171,7 +171,7 @@ class _MapTabState extends ConsumerState<MapTab> {
                     width: 40,
                     height: 40,
                     child: Semantics(
-                      label: 'Your radio',
+                      label: context.l10n.yourRadio,
                       child: Icon(
                         Icons.router,
                         color: scheme.primary,
@@ -185,7 +185,7 @@ class _MapTabState extends ConsumerState<MapTab> {
                     width: 24,
                     height: 24,
                     child: Semantics(
-                      label: 'You',
+                      label: context.l10n.youLabel,
                       child: Container(
                         decoration: BoxDecoration(
                           color: Colors.blue,
@@ -278,7 +278,9 @@ class _MapTabState extends ConsumerState<MapTab> {
               const SizedBox(height: 8),
               FloatingActionButton.small(
                 heroTag: 'map-track',
-                tooltip: activeTrack == null ? 'Track log' : 'Recording track',
+                tooltip: activeTrack == null
+                    ? context.l10n.trackLog
+                    : context.l10n.recordingTrack,
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => const TrackLogScreen(),

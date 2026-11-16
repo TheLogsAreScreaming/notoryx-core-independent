@@ -43,8 +43,9 @@ class AppearanceScreen extends ConsumerWidget {
                   max: chatScales.length - 1.0,
                   divisions: chatScales.length - 1,
                   label: '${(look.chatScale * 100).round()}%',
-                  semanticFormatterCallback: (_) =>
-                      '${(look.chatScale * 100).round()} percent',
+                  semanticFormatterCallback: (_) => context.l10n.percentSpoken(
+                    (look.chatScale * 100).round(),
+                  ),
                   onChanged: (v) =>
                       notifier.setChatScale(chatScales[v.round()]),
                 ),
@@ -73,8 +74,8 @@ class AppearanceScreen extends ConsumerWidget {
                 for (final t in AppThemeChoice.values)
                   RadioListTile<AppThemeChoice>(
                     value: t,
-                    title: Text(t.label),
-                    subtitle: Text(t.description),
+                    title: Text(t.label(context.l10n)),
+                    subtitle: Text(t.description(context.l10n)),
                   ),
               ],
             ),

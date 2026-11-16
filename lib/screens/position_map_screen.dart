@@ -63,7 +63,10 @@ class PositionMapScreen extends ConsumerWidget {
                       width: 40,
                       height: 40,
                       child: Semantics(
-                        label: '$label at $coordinates',
+                        label: context.l10n.labelAtCoordinates(
+                          label,
+                          coordinates,
+                        ),
                         child: Icon(
                           Icons.location_on,
                           size: 40,

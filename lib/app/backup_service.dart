@@ -11,6 +11,7 @@ import '../data/backup_crypto.dart';
 import '../data/core_import.dart';
 import 'about.dart';
 import 'connection.dart';
+import 'language.dart';
 import 'db_encryption_control.dart';
 import 'quick_messages.dart';
 import 'safety.dart';
@@ -137,7 +138,7 @@ class BackupService {
   Future<RestoreSummary> restore(OpenedBackup backup) async {
     final state = _ref.read(connectionProvider);
     if (state is! Disconnected && state is! ViewingSaved) {
-      throw const BackupException('Disconnect the radio first.');
+      throw BackupException(_ref.read(appL10nProvider).disconnectRadioFirst);
     }
     final summary = await restoreDatabase(
       _ref.read(databaseProvider),

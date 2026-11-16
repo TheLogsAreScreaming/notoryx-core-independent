@@ -1,6 +1,7 @@
 /// Helpers for the repeater console's one-tap tools.
 library;
 
+import '../l10n/l10n.dart';
 import '../data/data.dart';
 
 /// A node a repeater has heard directly.
@@ -47,7 +48,17 @@ enum ServerPermission {
   const ServerPermission(this.value, this.label);
 
   final int value;
+
+  /// English name, for logs.
   final String label;
+
+  /// The name in the app's language.
+  String shown(AppLocalizations l10n) => switch (this) {
+    remove => l10n.permRemove,
+    readOnly => l10n.permReadOnly,
+    readWrite => l10n.permReadWrite,
+    admin => l10n.permAdmin,
+  };
 }
 
 /// The console command that sets [publicKeyHex]'s [permission].

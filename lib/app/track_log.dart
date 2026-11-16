@@ -15,6 +15,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../data/data.dart';
 import 'connection.dart';
+import 'language.dart';
 
 /// One GPS reading.
 typedef TrackFix = ({double latitude, double longitude, double? altitude});
@@ -39,9 +40,9 @@ final trackFixesProvider = Provider<Stream<TrackFix> Function()>(
             accuracy: LocationAccuracy.high,
             distanceFilter: trackMinMetres,
             // Keeps GPS running with the screen off.
-            foregroundNotificationConfig: const ForegroundNotificationConfig(
-              notificationTitle: 'Recording your track',
-              notificationText: 'NOTORYX Independent is logging your GPS.',
+            foregroundNotificationConfig: ForegroundNotificationConfig(
+              notificationTitle: ref.read(appL10nProvider).trackNoticeTitle,
+              notificationText: ref.read(appL10nProvider).trackNoticeText,
               enableWakeLock: true,
             ),
           )

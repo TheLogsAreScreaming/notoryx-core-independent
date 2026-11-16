@@ -8,34 +8,32 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/l10n.dart';
 import 'connection.dart';
 
 const refreshRateSetting = 'refresh_rate';
 
 enum RefreshRate {
-  frequent(
-    'Frequent',
-    'Sensors every 10 min, noise floor every 5 min',
-    Duration(minutes: 10),
-    Duration(minutes: 5),
-  ),
-  normal(
-    'Normal',
-    'Sensors every 30 min, noise floor every 10 min',
-    Duration(minutes: 30),
-    Duration(minutes: 10),
-  ),
-  saver(
-    'Battery saver',
-    'Sensors every 2 hours, noise floor every hour',
-    Duration(hours: 2),
-    Duration(hours: 1),
-  );
+  frequent(Duration(minutes: 10), Duration(minutes: 5)),
+  normal(Duration(minutes: 30), Duration(minutes: 10)),
+  saver(Duration(hours: 2), Duration(hours: 1));
 
-  const RefreshRate(this.label, this.detail, this.sensors, this.noiseFloor);
+  const RefreshRate(this.sensors, this.noiseFloor);
 
-  final String label;
-  final String detail;
+  /// The rate's name in the app's language.
+  String label(AppLocalizations l10n) => switch (this) {
+    frequent => l10n.rateFrequent,
+    normal => l10n.rateNormal,
+    saver => l10n.rateSaver,
+  };
+
+  /// What the rate means, in the app's language.
+  String detail(AppLocalizations l10n) => switch (this) {
+    frequent => l10n.rateFrequentDetail,
+    normal => l10n.rateNormalDetail,
+    saver => l10n.rateSaverDetail,
+  };
+
   final Duration sensors;
   final Duration noiseFloor;
 }
@@ -72,18 +70,22 @@ class RefreshRateTile extends ConsumerWidget {
     final rate = ref.watch(refreshRateProvider);
     return ListTile(
       leading: const Icon(Icons.speed),
-      title: const Text('Refresh rate'),
-      subtitle: Text('${rate.label}. ${rate.detail}.'),
+      title: Text(context.l10n.refreshRate),
+      subtitle: Text(
+        '${rate.label(context.l10n)}. ${rate.detail(context.l10n)}.',
+      ),
       onTap: () async {
         final picked = await showDialog<RefreshRate>(
           context: context,
           builder: (dialog) => SimpleDialog(
-            title: const Text('Refresh rate'),
+            title: Text(context.l10n.refreshRate),
             children: [
               for (final r in RefreshRate.values)
                 SimpleDialogOption(
                   onPressed: () => Navigator.of(dialog).pop(r),
-                  child: Text('${r.label}\n${r.detail}'),
+                  child: Text(
+                    '${r.label(context.l10n)}\n${r.detail(context.l10n)}',
+                  ),
                 ),
             ],
           ),

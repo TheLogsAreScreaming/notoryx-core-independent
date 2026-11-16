@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'connection.dart';
+import 'language.dart';
+import '../l10n/l10n.dart';
 
 /// Setting holding the quick messages as a JSON list of strings.
 const quickMessagesSetting = 'quick_messages';
@@ -18,28 +20,42 @@ const defaultQuickMessages = [
   'Need help',
 ];
 
+/// [defaultQuickMessages] in the app's language.
+List<String> defaultQuickMessagesIn(AppLocalizations l10n) => [
+  l10n.quickOk,
+  l10n.quickOnMyWay,
+  l10n.quickArrivedSafe,
+  l10n.quickRunningLate,
+  l10n.quickWhereAreYou,
+  l10n.quickAllGoodHere,
+  l10n.quickNeedHelp,
+];
+
 /// Short replies sent with one tap from any chat, in the person's order.
 final quickMessagesProvider =
     AsyncNotifierProvider<QuickMessages, List<String>>(QuickMessages.new);
 
 class QuickMessages extends AsyncNotifier<List<String>> {
+  List<String> get _defaults =>
+      defaultQuickMessagesIn(ref.read(appL10nProvider));
+
   @override
   Future<List<String>> build() async {
     final raw = await ref.read(storeProvider).setting(quickMessagesSetting);
-    if (raw == null) return defaultQuickMessages;
+    if (raw == null) return _defaults;
     try {
       return [
         for (final item in jsonDecode(raw) as List<Object?>)
           if (item is String && item.trim().isNotEmpty) item,
       ];
     } on FormatException {
-      return defaultQuickMessages;
+      return _defaults;
     } on TypeError {
-      return defaultQuickMessages;
+      return _defaults;
     }
   }
 
-  List<String> get _current => state.value ?? defaultQuickMessages;
+  List<String> get _current => state.value ?? _defaults;
 
   Future<void> _save(List<String> next) async {
     state = AsyncData(List.unmodifiable(next));
@@ -77,7 +93,7 @@ class QuickMessages extends AsyncNotifier<List<String>> {
     return _save(next);
   }
 
-  Future<void> reset() => _save(defaultQuickMessages);
+  Future<void> reset() => _save(_defaults);
 }
 
 /// Unsent text left in each chat's box, by thread.

@@ -1,6 +1,8 @@
 /// The trip brief, and the Field Log of everything sent and received.
 library;
 
+import '../l10n/l10n.dart';
+
 import 'dart:convert';
 
 import '../data/data.dart';
@@ -66,13 +68,19 @@ final class TripBrief {
 
 /// How far back the Field Log looks.
 enum FieldLogRange {
-  today('Today', Duration(hours: 24)),
-  week('7 days', Duration(days: 7)),
-  all('All', null);
+  today(Duration(hours: 24)),
+  week(Duration(days: 7)),
+  all(null);
 
-  const FieldLogRange(this.label, this.span);
+  const FieldLogRange(this.span);
 
-  final String label;
+  /// The range's name in the app's language.
+  String label(AppLocalizations l10n) => switch (this) {
+    today => l10n.rangeToday,
+    week => l10n.range7Days,
+    all => l10n.rangeAll,
+  };
+
   final Duration? span;
 }
 

@@ -108,10 +108,18 @@ class _TripBriefScreenState extends ConsumerState<TripBriefScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _field(_where, 'Going to', 'Trail, area or route'),
-          _field(_backBy, 'Back by', 'Sat 6 pm'),
-          _field(_people, 'Who’s going', 'Sam, Alex'),
-          _field(_notes, 'Notes', 'Car at north lot'),
+          _field(
+            _where,
+            context.l10n.tripGoingTo,
+            context.l10n.tripGoingToHint,
+          ),
+          _field(_backBy, context.l10n.tripBackBy, context.l10n.tripBackByHint),
+          _field(
+            _people,
+            context.l10n.tripWhosGoing,
+            context.l10n.tripWhosGoingHint,
+          ),
+          _field(_notes, context.l10n.tripNotes, context.l10n.tripNotesHint),
           if (!brief.isEmpty) ...[
             Text(context.l10n.willSend, style: theme.textTheme.titleSmall),
             const SizedBox(height: 4),
@@ -120,9 +128,8 @@ class _TripBriefScreenState extends ConsumerState<TripBriefScreen> {
           ],
           Text(
             tooLong
-                ? '$length of $maxDirectTextBytes bytes. Too long for one '
-                      'message: shorten it to send.'
-                : '$length of $maxDirectTextBytes bytes',
+                ? context.l10n.bytesOfMaxTooLong(length, maxDirectTextBytes)
+                : context.l10n.bytesOfMax(length, maxDirectTextBytes),
             style: theme.textTheme.bodySmall?.copyWith(
               color: tooLong ? theme.colorScheme.error : null,
             ),

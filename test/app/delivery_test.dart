@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:notoryx_core/l10n/l10n.dart';
 import 'package:notoryx_core/app/delivery.dart';
 import 'package:notoryx_core/data/data.dart';
 import 'package:notoryx_core/radio/radio.dart';
@@ -37,21 +39,29 @@ Contact _contact(int pathLength) => Contact(
   lastModified: 0,
 );
 
+final en = lookupAppLocalizations(const Locale('en'));
+
 void main() {
   test('a failed message lists likely causes and the route', () {
-    final r = deliveryReport(_message(), retrying: false, contact: _contact(2));
+    final r = deliveryReport(
+      l10n: en,
+      _message(),
+      retrying: false,
+      contact: _contact(2),
+    );
     expect(r.headline, 'No confirmation after 8 tries');
     expect(r.details.join('\n'), contains('added you as a contact'));
     expect(r.details.last, 'Known route to Ann: 2 hops.');
   });
 
   test('a message the radio refused says so', () {
-    final r = deliveryReport(_message(attempts: 0), retrying: false);
+    final r = deliveryReport(l10n: en, _message(attempts: 0), retrying: false);
     expect(r.headline, 'The radio didn’t send it');
   });
 
   test('a flooded delivery explains the route was found again', () {
     final r = deliveryReport(
+      l10n: en,
       _message(status: MessageStatus.delivered, attempts: 5, flooded: true),
       retrying: false,
       contact: _contact(pathUnknown),
@@ -63,6 +73,7 @@ void main() {
 
   test('a retrying message shows progress out of the policy total', () {
     final r = deliveryReport(
+      l10n: en,
       _message(status: MessageStatus.sent, attempts: 2),
       retrying: true,
     );
@@ -71,6 +82,7 @@ void main() {
 
   test('channel messages have no confirmation', () {
     final r = deliveryReport(
+      l10n: en,
       _message(status: MessageStatus.sent, kind: MessageKind.channel),
       retrying: false,
     );
@@ -79,6 +91,7 @@ void main() {
 
   test('a direct route reads as direct', () {
     final r = deliveryReport(
+      l10n: en,
       _message(status: MessageStatus.delivered, attempts: 1),
       retrying: false,
       contact: _contact(0),

@@ -62,7 +62,9 @@ class _RegionTagTileState extends ConsumerState<RegionTagTile> {
   Widget build(BuildContext context) => ListTile(
     leading: const Icon(Icons.place_outlined),
     title: Text(context.l10n.channelPostRegion),
-    subtitle: Text(_send == null ? 'Off' : 'Posts go out in $_send'),
+    subtitle: Text(
+      _send == null ? context.l10n.off : context.l10n.postsGoOutIn(_send!),
+    ),
     onTap: _edit,
   );
 }

@@ -12,6 +12,7 @@ import '../data/data.dart';
 import '../radio/protocol/discover.dart';
 import '../radio/radio.dart';
 import 'connection.dart';
+import 'language.dart';
 import 'position.dart';
 import 'safety.dart';
 
@@ -87,10 +88,13 @@ class Wardrive extends Notifier<int?> {
         .into(_db.wardrives)
         .insert(
           WardrivesCompanion.insert(
-            name:
-                'Drive ${now.month}/${now.day} '
-                '${now.hour.toString().padLeft(2, '0')}:'
-                '${now.minute.toString().padLeft(2, '0')}',
+            name: ref
+                .read(appL10nProvider)
+                .driveNamed(
+                  '${now.month}/${now.day} '
+                  '${now.hour.toString().padLeft(2, '0')}:'
+                  '${now.minute.toString().padLeft(2, '0')}',
+                ),
             startedAt: now.millisecondsSinceEpoch,
           ),
         );
@@ -122,7 +126,7 @@ class Wardrive extends Notifier<int?> {
     try {
       final here = await ref.read(phonePositionProvider)();
       if (here == null) {
-        lastResult = 'No GPS position, so that ping was skipped.';
+        lastResult = ref.read(appL10nProvider).wardriveNoGps;
         ref.notifyListeners();
         return;
       }
@@ -151,8 +155,8 @@ class Wardrive extends Notifier<int?> {
             );
       }
       lastResult = hits.isEmpty
-          ? 'No repeater answered here.'
-          : '${hits.length} repeater${hits.length == 1 ? '' : 's'} answered.';
+          ? ref.read(appL10nProvider).wardriveNoRepeater
+          : ref.read(appL10nProvider).wardriveRepeatersAnswered(hits.length);
       ref.notifyListeners();
     } on Object catch (e) {
       ref.read(connectionLogProvider).add('wardrive ping: $e');

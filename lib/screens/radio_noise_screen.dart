@@ -31,12 +31,10 @@ class _RadioNoiseScreenState extends ConsumerState<RadioNoiseScreen> {
       final stats = await state.sync.sampleRadioStats();
       if (!mounted) return;
       setState(
-        () => _note = stats == null
-            ? 'This radio’s firmware doesn’t report its noise floor.'
-            : null,
+        () => _note = stats == null ? context.l10n.noNoiseFloorFirmware : null,
       );
     } on Object catch (e) {
-      if (mounted) setState(() => _note = 'Couldn’t read it: $e');
+      if (mounted) setState(() => _note = context.l10n.couldntReadIt(e));
     } finally {
       if (mounted) setState(() => _reading = false);
     }
@@ -102,7 +100,9 @@ class _RadioNoiseScreenState extends ConsumerState<RadioNoiseScreen> {
           FilledButton.icon(
             onPressed: connected && !_reading ? _readNow : null,
             icon: const Icon(Icons.graphic_eq),
-            label: Text(_reading ? 'Reading…' : 'Read now'),
+            label: Text(
+              _reading ? context.l10n.readingBusy : context.l10n.readNow,
+            ),
           ),
           if (_note case final note?)
             Padding(padding: const EdgeInsets.only(top: 8), child: Text(note)),
@@ -118,7 +118,7 @@ class _RadioNoiseScreenState extends ConsumerState<RadioNoiseScreen> {
                       context.l10n.dbm2(latest.noiseFloor),
                       style: theme.textTheme.headlineSmall,
                     ),
-                    Text(noiseVerdict(latest.noiseFloor)),
+                    Text(noiseVerdict(latest.noiseFloor, context.l10n)),
                     const SizedBox(height: 8),
                     Text(
                       context.l10n.airtimeSinceTheRadioStartedSending(
@@ -145,7 +145,7 @@ class _RadioNoiseScreenState extends ConsumerState<RadioNoiseScreen> {
             SegmentedButton<TelemetryRange>(
               segments: [
                 for (final r in TelemetryRange.values)
-                  ButtonSegment(value: r, label: Text(r.label)),
+                  ButtonSegment(value: r, label: Text(r.label(context.l10n))),
               ],
               selected: {_range},
               onSelectionChanged: (s) => setState(() => _range = s.first),
@@ -159,7 +159,7 @@ class _RadioNoiseScreenState extends ConsumerState<RadioNoiseScreen> {
             else
               for (final series in RadioStatsSeries.values)
                 HistoryChartCard(
-                  label: series.label,
+                  label: series.label(context.l10n),
                   points: series.points(shown),
                   format: series.format,
                 ),

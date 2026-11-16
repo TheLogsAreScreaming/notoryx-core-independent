@@ -56,11 +56,12 @@ NodeSummary nodeFromDiscovered(DiscoveredData d) => (
   outPathLength: null,
 );
 
-String nodeKind(NodeType type) => switch (type) {
-  NodeType.repeater => 'Repeater',
-  NodeType.room => 'Room server',
-  NodeType.sensor => 'Sensor',
-  _ => 'Person',
+/// The node's kind in [l10n]'s language, or English without it.
+String nodeKind(NodeType type, [AppLocalizations? l10n]) => switch (type) {
+  NodeType.repeater => l10n?.kindRepeater ?? 'Repeater',
+  NodeType.room => l10n?.kindRoomServer ?? 'Room server',
+  NodeType.sensor => l10n?.kindSensor ?? 'Sensor',
+  _ => l10n?.kindPerson ?? 'Person',
 };
 
 IconData nodeIcon(NodeType type) => switch (type) {
@@ -72,22 +73,28 @@ IconData nodeIcon(NodeType type) => switch (type) {
 
 /// "just now", "5 min ago", "3 h ago", "2 days ago". [unixSeconds] is the
 /// node's own clock, so a node with a wrong clock can look old or new.
-String timeAgo(int unixSeconds, DateTime now) {
-  if (unixSeconds <= 0) return 'never';
+String timeAgo(int unixSeconds, DateTime now, [AppLocalizations? l10n]) {
+  if (unixSeconds <= 0) return l10n?.agoNever ?? 'never';
   final seconds = now.millisecondsSinceEpoch ~/ 1000 - unixSeconds;
-  if (seconds < 60) return 'just now';
-  if (seconds < 3600) return '${seconds ~/ 60} min ago';
-  if (seconds < 86400) return '${seconds ~/ 3600} h ago';
+  if (seconds < 60) return l10n?.agoJustNow ?? 'just now';
+  if (seconds < 3600) {
+    return l10n?.agoMinutes(seconds ~/ 60) ?? '${seconds ~/ 60} min ago';
+  }
+  if (seconds < 86400) {
+    return l10n?.agoHours(seconds ~/ 3600) ?? '${seconds ~/ 3600} h ago';
+  }
   final days = seconds ~/ 86400;
-  return days == 1 ? '1 day ago' : '$days days ago';
+  return l10n?.agoDaysLong(days) ??
+      (days == 1 ? '1 day ago' : '$days days ago');
 }
 
 /// "direct", "2 hops", or "no route yet" from an encoded path length.
-String routeText(int? outPathLength) {
+String routeText(int? outPathLength, [AppLocalizations? l10n]) {
   if (outPathLength == null || outPathLength == pathUnknown) {
-    return 'No route yet (messages flood)';
+    return l10n?.noRouteYetFlood ?? 'No route yet (messages flood)';
   }
   final hops = outPathLength & 0x3F;
+  if (l10n != null) return l10n.routeHops(hops);
   return hops == 0
       ? 'Direct'
       : hops == 1
@@ -142,30 +149,40 @@ Future<void> showNodeDetails(
               ),
               title: Text(node.name, style: theme.textTheme.titleLarge),
               subtitle: Text(
-                '${nodeKind(node.type)}'
-                '${node.isContact ? '' : ' · heard nearby, not added'}',
+                node.isContact
+                    ? nodeKind(node.type, context.l10n)
+                    : context.l10n.kindHeardNotAdded(
+                        nodeKind(node.type, context.l10n),
+                      ),
               ),
               trailing: node.favourite
                   ? Icon(Icons.star, semanticLabel: context.l10n.favourite2)
                   : null,
             ),
-            _Row('Last advert', timeAgo(node.lastAdvert, DateTime.now())),
-            if (node.isContact) _Row('Route', routeText(node.outPathLength)),
             _Row(
-              'Position',
+              context.l10n.lastAdvertLabel,
+              timeAgo(node.lastAdvert, DateTime.now(), context.l10n),
+            ),
+            if (node.isContact)
+              _Row(
+                context.l10n.routeLabel,
+                routeText(node.outPathLength, context.l10n),
+              ),
+            _Row(
+              context.l10n.positionLabel,
               position == null
-                  ? 'Not shared'
+                  ? context.l10n.notShared
                   : '${position.latitude.toStringAsFixed(5)}, '
                         '${position.longitude.toStringAsFixed(5)}',
               onTap: position == null ? null : openCompass,
             ),
             if (position != null && from != null)
               _Row(
-                'Distance from your radio',
+                context.l10n.distanceFromYourRadio,
                 distanceText(from, position),
                 onTap: openCompass,
               ),
-            _Row('Key', '${node.publicKey.substring(0, 16)}…'),
+            _Row(context.l10n.keyLabel, '${node.publicKey.substring(0, 16)}…'),
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,

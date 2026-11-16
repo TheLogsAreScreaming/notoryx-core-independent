@@ -6,23 +6,43 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/l10n.dart';
 import 'connection.dart';
 
 /// The themes on offer.
 enum AppThemeChoice {
-  automatic('Automatic', 'Follows your phone'),
-  light('Light', 'Always light'),
-  dark('Dark', 'Always dark'),
-  trail('Trail', 'Forest green'),
-  lake('Lake', 'Deep blue'),
-  night('Night', 'Red on black, to protect night vision'),
-  highContrast('High contrast', 'Strongest text and edges'),
-  colourSafe('Colour-blind safe', 'Blue and orange, never red against green');
+  automatic,
+  light,
+  dark,
+  trail,
+  lake,
+  night,
+  highContrast,
+  colourSafe;
 
-  const AppThemeChoice(this.label, this.description);
+  /// The theme's name in the app's language.
+  String label(AppLocalizations l10n) => switch (this) {
+    automatic => l10n.themeAutomatic,
+    light => l10n.themeLight,
+    dark => l10n.themeDark,
+    trail => l10n.themeTrail,
+    lake => l10n.themeLake,
+    night => l10n.themeNight,
+    highContrast => l10n.themeHighContrast,
+    colourSafe => l10n.themeColourSafe,
+  };
 
-  final String label;
-  final String description;
+  /// One line on what the theme looks like.
+  String description(AppLocalizations l10n) => switch (this) {
+    automatic => l10n.themeAutomaticNote,
+    light => l10n.themeLightNote,
+    dark => l10n.themeDarkNote,
+    trail => l10n.themeTrailNote,
+    lake => l10n.themeLakeNote,
+    night => l10n.themeNightNote,
+    highContrast => l10n.themeHighContrastNote,
+    colourSafe => l10n.themeColourSafeNote,
+  };
 
   /// Whether the phone's light or dark mode decides, or this theme does.
   ThemeMode get mode => switch (this) {

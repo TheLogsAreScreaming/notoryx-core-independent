@@ -148,7 +148,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
         absorbing: _busy,
         child: ListView(
           children: [
-            const _Section('This radio'),
+            _Section(context.l10n.sectionThisRadio),
             ListTile(
               leading: const Icon(Icons.badge_outlined),
               title: Text(context.l10n.name),
@@ -156,7 +156,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
               onTap: () async {
                 final name = await _askText(
                   context,
-                  title: 'Radio name',
+                  title: context.l10n.radioName,
                   initial: self.name,
                   maxBytes: 31,
                 );
@@ -168,7 +168,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
               title: Text(context.l10n.position),
               subtitle: Text(
                 self.latitude == null
-                    ? 'Not set'
+                    ? context.l10n.notSet
                     : '${self.latitude!.toStringAsFixed(5)}, '
                           '${self.longitude!.toStringAsFixed(5)}',
               ),
@@ -199,7 +199,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
                   _change([_otherParams(self, locationPolicy: on ? 1 : 0)]),
             ),
 
-            const _Section('Radio'),
+            _Section(context.l10n.sectionRadio),
             ListTile(
               leading: const Icon(Icons.settings_input_antenna),
               title: Text(context.l10n.transmitPower),
@@ -225,6 +225,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
               title: Text(context.l10n.loraSettings),
               subtitle: Text(_lora(self)),
               onTap: () async {
+                final changed = context.l10n.loraSettingsChanged;
                 final params = await showDialog<SetRadioParams>(
                   context: context,
                   builder: (_) => _LoraDialog(
@@ -233,7 +234,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
                   ),
                 );
                 if (params != null) {
-                  await _change([params], done: 'LoRa settings changed');
+                  await _change([params], done: changed);
                 }
               },
             ),
@@ -246,7 +247,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
               ),
             ),
 
-            const _Section('Contacts'),
+            _Section(context.l10n.navContacts),
             SwitchListTile(
               secondary: const Icon(Icons.person_add_alt),
               title: Text(context.l10n.addNewNodesAutomatically),
@@ -255,14 +256,14 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
               onChanged: (on) => _change([_otherParams(self, manualAdd: !on)]),
             ),
             if (self.manualAddContacts && autoAdd != null) ...[
-              for (final (flag, label) in const [
-                (AutoAddConfig.companions, 'Still add people automatically'),
-                (AutoAddConfig.repeaters, 'Still add repeaters automatically'),
-                (AutoAddConfig.roomServers, 'Still add rooms automatically'),
-                (AutoAddConfig.sensors, 'Still add sensors automatically'),
+              for (final (flag, label) in [
+                (AutoAddConfig.companions, context.l10n.stillAddPeople),
+                (AutoAddConfig.repeaters, context.l10n.stillAddRepeaters),
+                (AutoAddConfig.roomServers, context.l10n.stillAddRooms),
+                (AutoAddConfig.sensors, context.l10n.stillAddSensors),
                 (
                   AutoAddConfig.replaceOldest,
-                  'When full, replace the oldest non-favourite',
+                  context.l10n.whenFullReplaceOldest,
                 ),
               ])
                 SwitchListTile(
@@ -288,7 +289,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
                     for (var h = 1; h <= 8; h++)
                       DropdownMenuItem(
                         value: h,
-                        child: Text(h == 1 ? 'direct only' : '${h - 1} hops'),
+                        child: Text(context.l10n.hopsLimit(h - 1)),
                       ),
                   ],
                   onChanged: (hops) async {
@@ -304,29 +305,36 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
               ),
             ],
 
-            const _Section('About this radio'),
-            _Info('Model', device.manufacturer ?? 'Unknown'),
+            _Section(context.l10n.sectionAboutRadio),
             _Info(
-              'Firmware',
-              '${device.firmwareVersion ?? 'Unknown'} '
-                  '(protocol ${device.firmwareVersionCode})',
+              context.l10n.infoModel,
+              device.manufacturer ?? context.l10n.unknownValue,
+            ),
+            _Info(
+              context.l10n.infoFirmware,
+              context.l10n.firmwareVersionText(
+                device.firmwareVersion ?? context.l10n.unknownValue,
+                device.firmwareVersionCode,
+              ),
             ),
             if (device.buildDate case final date? when date.isNotEmpty)
-              _Info('Built', date),
+              _Info(context.l10n.infoBuilt, date),
             _Info(
-              'Capacity',
-              '${device.maxContacts ?? '?'} contacts, '
-                  '${device.maxChannels ?? '?'} channels',
+              context.l10n.infoCapacity,
+              context.l10n.capacityText(
+                device.maxContacts ?? '?',
+                device.maxChannels ?? '?',
+              ),
             ),
             if (_battery case final battery?) ...[
               _Info(
-                'Battery',
+                context.l10n.infoBattery,
                 '${(battery.millivolts / 1000).toStringAsFixed(2)} V',
               ),
               if (battery.usedKb != null && battery.totalKb != null)
                 _Info(
-                  'Storage',
-                  '${battery.usedKb} of ${battery.totalKb} KB used',
+                  context.l10n.infoStorage,
+                  context.l10n.storageUsed(battery.usedKb!, battery.totalKb!),
                 ),
             ],
             ListTile(
@@ -735,11 +743,7 @@ class _PositionDialogState extends State<_PositionDialog> {
     final lat = double.tryParse(_lat.text.trim());
     final lon = double.tryParse(_lon.text.trim());
     if (lat == null || lon == null || lat.abs() > 90 || lon.abs() > 180) {
-      setState(
-        () => _error =
-            'Use decimal degrees: latitude −90 to 90, '
-            'longitude −180 to 180.',
-      );
+      setState(() => _error = context.l10n.decimalDegreesHint);
       return;
     }
     Navigator.pop(context, (lat, lon));
@@ -874,7 +878,7 @@ class _LoraDialogState extends State<_LoraDialog> {
     final mhz = double.tryParse(_frequency.text.trim());
     // The firmware's accepted range: 150 MHz to 2.5 GHz.
     if (mhz == null || mhz < 150 || mhz > 2500) {
-      setState(() => _error = 'Frequency must be between 150 and 2500 MHz.');
+      setState(() => _error = context.l10n.frequencyRange);
       return;
     }
     Navigator.pop(
@@ -904,13 +908,13 @@ class _LoraDialogState extends State<_LoraDialog> {
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: InputDecoration(labelText: context.l10n.frequencyMHz),
           ),
-          _picker<double>('Bandwidth', _bandwidth, {
+          _picker<double>(context.l10n.bandwidth, _bandwidth, {
             for (final b in loraBandwidths) b: '$b kHz',
           }, (v) => setState(() => _bandwidth = v)),
-          _picker<int>('Spreading factor', _sf, {
+          _picker<int>(context.l10n.spreadingFactor, _sf, {
             for (var i = 5; i <= 12; i++) i: 'SF$i',
           }, (v) => setState(() => _sf = v)),
-          _picker<int>('Coding rate', _cr, {
+          _picker<int>(context.l10n.codingRate, _cr, {
             for (var i = 5; i <= 8; i++) i: '4/$i',
           }, (v) => setState(() => _cr = v)),
           if (_error case final error?)

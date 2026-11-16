@@ -128,7 +128,10 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
         children: [
           if (state
               case Disconnected(:final error?) || ViewingSaved(:final error?))
-            _Banner(message: error, color: theme.colorScheme.errorContainer),
+            _Banner(
+              message: connectionErrorText(context.l10n, error),
+              color: theme.colorScheme.errorContainer,
+            ),
           if (state case Connecting(:final target))
             _Banner(
               message: context.l10n.connectingTo(target.label),
@@ -189,7 +192,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
             ),
           ),
           _Header(
-            'Bluetooth',
+            context.l10n.bluetoothHeader,
             trailing: _scanning
                 ? const SizedBox.square(
                     dimension: 20,
@@ -203,14 +206,16 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
           if (_scanError case final error?)
             ListTile(
               leading: const Icon(Icons.bluetooth_disabled),
-              title: const Text('Can\u2019t scan for radios'),
+              title: Text(context.l10n.cantScanForRadios),
               subtitle: Text(error),
             )
           else if (_ble.isEmpty)
             ListTile(
               leading: const Icon(Icons.bluetooth_searching),
               title: Text(
-                _scanning ? 'Looking for radios…' : 'No radios found',
+                _scanning
+                    ? context.l10n.lookingForRadios
+                    : context.l10n.noRadiosFound,
               ),
               subtitle: _scanning
                   ? null
@@ -228,7 +233,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
             ),
           SwitchListTile(
             title: Text(context.l10n.showAllBluetoothDevices),
-            subtitle: const Text('For a radio that doesn\u2019t show up'),
+            subtitle: Text(context.l10n.forRadioNotShowing),
             value: _showAll,
             onChanged: connecting
                 ? null
@@ -239,7 +244,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
           ),
           if (ref.read(radioConnectorProvider).supportsUsb) ...[
             _Header(
-              'USB',
+              context.l10n.usbHeader,
               trailing: TextButton(
                 onPressed: connecting ? null : _refreshUsb,
                 child: Text(context.l10n.refresh),
@@ -258,7 +263,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
                 onTap: () => _connect(port),
               ),
           ],
-          const _Header('Wi-Fi'),
+          _Header(context.l10n.wifiHeader),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(

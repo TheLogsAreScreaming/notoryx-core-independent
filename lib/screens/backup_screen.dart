@@ -31,16 +31,16 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
   String? get _passwordProblem {
     final p = _password.text;
     if (p.length < minBackupPassword) {
-      return 'At least $minBackupPassword characters.';
+      return context.l10n.atLeastCharacters(minBackupPassword);
     }
-    if (_again.text != p) return 'The two passwords don’t match.';
+    if (_again.text != p) return context.l10n.passwordsDontMatch;
     return null;
   }
 
   Future<void> _backUp() async {
     final messenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
-    setState(() => _working = 'Encrypting…');
+    setState(() => _working = l10n.encryptingBusy);
     try {
       final saved = await ref
           .read(backupServiceProvider)
@@ -51,12 +51,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
       }
       messenger.showSnackBar(
         SnackBar(
-          content: Text(
-            saved
-                ? 'Backup saved. Keep the password: without it the file '
-                      'can’t be opened.'
-                : 'Not saved.',
-          ),
+          content: Text(saved ? l10n.backupSavedKeepPassword : l10n.notSaved),
         ),
       );
     } on Object catch (e) {
@@ -74,7 +69,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
     if (file == null || !mounted) return;
     final password = await _askPassword();
     if (password == null || !mounted) return;
-    setState(() => _working = 'Opening…');
+    setState(() => _working = l10n.openingBusy);
     try {
       final backup = await service.open(file, password);
       if (!mounted) return;
@@ -104,15 +99,11 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
         ),
       );
       if (sure != true || !mounted) return;
-      setState(() => _working = 'Restoring…');
+      setState(() => _working = l10n.restoringBusy);
       final summary = await service.restore(backup);
       messenger.showSnackBar(
         SnackBar(
-          content: Text(
-            'Restored ${summary.messages} message'
-            '${summary.messages == 1 ? '' : 's'} from '
-            '${summary.radios} radio${summary.radios == 1 ? '' : 's'}.',
-          ),
+          content: Text(l10n.restoredSummary(summary.messages, summary.radios)),
         ),
       );
     } on BackupException catch (e) {
@@ -212,7 +203,9 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
               labelText: context.l10n.password,
               border: const OutlineInputBorder(),
               suffixIcon: IconButton(
-                tooltip: _show ? 'Hide password' : 'Show password',
+                tooltip: _show
+                    ? context.l10n.hidePassword
+                    : context.l10n.showPassword,
                 icon: Icon(_show ? Icons.visibility_off : Icons.visibility),
                 onPressed: () => setState(() => _show = !_show),
               ),
@@ -245,10 +238,8 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
           const SizedBox(height: 4),
           Text(
             disconnected
-                ? 'Brings back a backup, replacing everything in this app. '
-                      'Backups from older versions are upgraded.'
-                : 'Disconnect the radio first, so nothing changes while the '
-                      'backup is put back.',
+                ? context.l10n.restoreExplainer
+                : context.l10n.disconnectBeforeRestore,
             style: theme.textTheme.bodySmall,
           ),
           const SizedBox(height: 12),

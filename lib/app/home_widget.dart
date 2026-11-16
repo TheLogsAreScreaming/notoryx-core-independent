@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app_lock.dart';
 import 'connection.dart';
+import 'language.dart';
+import '../l10n/l10n.dart';
 import 'safety.dart';
 
 /// What the widget shows.
@@ -23,19 +25,28 @@ WidgetLines widgetLines(
   bool sosActive = false,
   DateTime? lastCheckIn,
   bool private = false,
+  AppLocalizations? l10n,
 }) {
   String named(String word, String name) => private ? word : '$word: $name';
   final status = switch (connection) {
-    Connected(:final radio) => named('Connected', radio.self.name),
-    Reconnecting(:final radioName) => named('Reconnecting', radioName),
-    Connecting() => 'Connecting…',
-    Disconnected() || ViewingSaved() => 'No radio connected',
+    Connected(:final radio) => named(
+      l10n?.widgetConnected ?? 'Connected',
+      radio.self.name,
+    ),
+    Reconnecting(:final radioName) => named(
+      l10n?.widgetReconnecting ?? 'Reconnecting',
+      radioName,
+    ),
+    Connecting() => l10n?.widgetConnecting ?? 'Connecting…',
+    Disconnected() ||
+    ViewingSaved() => l10n?.widgetNoRadio ?? 'No radio connected',
   };
   final detail = sosActive
-      ? 'SOS is active'
+      ? l10n?.widgetSosActive ?? 'SOS is active'
       : lastCheckIn == null || private
       ? ''
-      : 'Last check-in ${_clock(lastCheckIn)}';
+      : l10n?.widgetLastCheckIn(_clock(lastCheckIn)) ??
+            'Last check-in ${_clock(lastCheckIn)}';
   return (status: status, detail: detail);
 }
 
@@ -61,6 +72,7 @@ final homeWidgetSyncProvider = Provider<void>((ref) {
     sosActive: safety?.sosActive ?? false,
     lastCheckIn: safety?.lastCheckIn,
     private: ref.watch(appLockProvider.select((l) => l.enabled)),
+    l10n: ref.watch(appL10nProvider),
   );
   _channel
       .invokeMethod<void>('update', {

@@ -27,9 +27,10 @@ class _RadioConsoleScreenState extends ConsumerState<RadioConsoleScreen> {
 
   /// Runs [command], showing it as [shown] so passwords stay off the screen.
   Future<void> _run(String command, {String? shown}) async {
+    final l10n = context.l10n;
     final state = ref.read(connectionProvider);
     if (state is! Connected) {
-      setState(() => _lines.add('Connect to the radio first.'));
+      setState(() => _lines.add(context.l10n.connectToTheRadioFirst));
       return;
     }
     setState(() {
@@ -40,9 +41,7 @@ class _RadioConsoleScreenState extends ConsumerState<RadioConsoleScreen> {
     try {
       reply = await state.sync.runRadioCommand(command);
     } on RadioRequestException {
-      reply =
-          'The radio refused that. The command line needs firmware '
-          'with version code 14 or later.';
+      reply = l10n.cliNeedsFirmware;
     }
     if (mounted) {
       setState(() {
@@ -68,7 +67,7 @@ class _RadioConsoleScreenState extends ConsumerState<RadioConsoleScreen> {
     await _run('set wifi.ssid ${details.$1}');
     await _run('set wifi.pwd ${details.$2}', shown: 'set wifi.pwd ••••••');
     if (mounted) {
-      setState(() => _lines.add('Restart the radio for this to take effect.'));
+      setState(() => _lines.add(context.l10n.restartRadioToApply));
     }
   }
 

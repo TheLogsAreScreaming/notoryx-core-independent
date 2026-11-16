@@ -22,9 +22,10 @@ class _RepeaterPingCardState extends ConsumerState<RepeaterPingCard> {
   String? _result;
 
   Future<void> _ping() async {
+    final l10n = context.l10n;
     final state = ref.read(connectionProvider);
     if (state is! Connected) {
-      setState(() => _result = 'Connect to the radio first.');
+      setState(() => _result = context.l10n.connectToTheRadioFirst);
       return;
     }
     setState(() {
@@ -37,11 +38,13 @@ class _RepeaterPingCardState extends ConsumerState<RepeaterPingCard> {
         fromHex(widget.publicKey).sublist(0, 1),
       ], hashBytes: 1);
       text = reply == null || reply.snrs.isEmpty
-          ? 'No answer. It may be more than one hop away.'
-          : 'It heard you at ${reply.snrs.first.toStringAsFixed(1)} dB. '
-                'You heard it at ${reply.finalSnr.toStringAsFixed(1)} dB.';
+          ? l10n.pingNoAnswer
+          : l10n.pingHeardBothWays(
+              reply.snrs.first.toStringAsFixed(1),
+              reply.finalSnr.toStringAsFixed(1),
+            );
     } on RadioRequestException {
-      text = 'The radio could not send it.';
+      text = l10n.theRadioCouldNotSendIt;
     }
     if (mounted) {
       setState(() {
@@ -164,7 +167,7 @@ class RepeaterAdminTools extends ConsumerWidget {
                 context.l10n.db(
                   nameFor(n.prefix),
                   n.snr.toStringAsFixed(1),
-                  _ago(n.secondsAgo),
+                  _ago(context.l10n, n.secondsAgo),
                 ),
               ),
             ),
@@ -174,12 +177,12 @@ class RepeaterAdminTools extends ConsumerWidget {
     );
   }
 
-  static String _ago(int seconds) {
+  static String _ago(AppLocalizations l10n, int seconds) {
     final d = Duration(seconds: seconds);
-    if (d.inDays > 0) return '${d.inDays} d ago';
-    if (d.inHours > 0) return '${d.inHours} h ago';
-    if (d.inMinutes > 0) return '${d.inMinutes} min ago';
-    return '${d.inSeconds} s ago';
+    if (d.inDays > 0) return l10n.agoDays(d.inDays);
+    if (d.inHours > 0) return l10n.agoHours(d.inHours);
+    if (d.inMinutes > 0) return l10n.agoMinutes(d.inMinutes);
+    return l10n.agoSeconds(d.inSeconds);
   }
 }
 
@@ -218,7 +221,7 @@ class _AccessDialogState extends State<_AccessDialog> {
           decoration: InputDecoration(labelText: context.l10n.permission),
           items: [
             for (final p in ServerPermission.values)
-              DropdownMenuItem(value: p, child: Text(p.label)),
+              DropdownMenuItem(value: p, child: Text(p.shown(context.l10n))),
           ],
           onChanged: (p) => setState(() => _what = p ?? _what),
         ),

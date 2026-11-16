@@ -31,9 +31,9 @@ class _ChannelDirectoryScreenState
 
   String _ago(DateTime t) {
     final d = DateTime.now().difference(t);
-    if (d.inMinutes < 1) return 'just now';
-    if (d.inHours < 1) return '${d.inMinutes} min ago';
-    return '${d.inHours} h ago';
+    if (d.inMinutes < 1) return context.l10n.agoJustNow;
+    if (d.inHours < 1) return context.l10n.agoMinutes(d.inMinutes);
+    return context.l10n.agoHours(d.inHours);
   }
 
   @override
@@ -56,8 +56,7 @@ class _ChannelDirectoryScreenState
       final h = heard[code];
       final subtitle = [
         ?note,
-        if (h != null)
-          'Probably heard on air: ${h.count}×, last ${_ago(h.last)}',
+        if (h != null) context.l10n.probablyHeardOnAir(h.count, _ago(h.last)),
       ].join(' · ');
       return ListTile(
         leading: Icon(
@@ -72,7 +71,10 @@ class _ChannelDirectoryScreenState
                 onPressed: connected
                     ? () => joinHashtag(context, ref, name)
                     : null,
-                child: Text(context.l10n.join, semanticsLabel: 'Join $name'),
+                child: Text(
+                  context.l10n.join,
+                  semanticsLabel: context.l10n.joinName(name),
+                ),
               ),
       );
     }
@@ -103,11 +105,10 @@ class _ChannelDirectoryScreenState
           ),
           if (searchName != null) tile(searchName),
           _Header(
-            'Heard on air',
+            context.l10n.heardOnAir,
             connected
-                ? 'Channels with traffic since you connected that you '
-                      'haven’t joined.'
-                : 'Connect a radio to hear which channels are in use.',
+                ? context.l10n.heardOnAirNote
+                : context.l10n.heardOnAirConnect,
           ),
           if (connected && unheardOf.isEmpty)
             ListTile(
@@ -130,11 +131,16 @@ class _ChannelDirectoryScreenState
                 ),
               ),
           if (local.isNotEmpty) ...[
-            const _Header('Near you', 'Named after your area.'),
+            _Header(context.l10n.nearYou, context.l10n.namedAfterYourArea),
             for (final name in local) tile(name),
           ],
           for (final group in channelDirectory) ...[
-            _Header(group.title, null),
+            _Header(switch (group.title) {
+              'Safety' => context.l10n.dirSafety,
+              'Getting started' => context.l10n.dirGettingStarted,
+              'Interests' => context.l10n.dirInterests,
+              final other => other,
+            }, null),
             for (final name in group.names) tile(name),
           ],
           const SizedBox(height: 24),

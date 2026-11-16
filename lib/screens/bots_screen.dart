@@ -84,11 +84,13 @@ class BotsScreen extends ConsumerWidget {
                 rule.isAway ? Icons.bedtime_outlined : Icons.smart_toy_outlined,
               ),
               title: Text(
-                rule.isAway ? 'Away message' : 'When it says “${rule.trigger}”',
+                rule.isAway
+                    ? context.l10n.awayMessage
+                    : context.l10n.whenItSays(rule.trigger),
               ),
               subtitle: Text(
                 '${rule.reply}\n'
-                '${rule.onChannels ? 'Direct messages and channels' : 'Direct messages only'}',
+                '${rule.onChannels ? context.l10n.directAndChannels : context.l10n.directOnly}',
               ),
               isThreeLine: true,
               trailing: IconButton(
@@ -150,7 +152,7 @@ class _RuleDialogState extends State<_RuleDialog> {
               decoration: InputDecoration(
                 labelText: context.l10n.replyWith,
                 hintText: 'pong {name}, it is {time}',
-                errorText: fits ? null : 'Too long for one message.',
+                errorText: fits ? null : context.l10n.tooLongForOneMessage,
               ),
             ),
             CheckboxListTile(

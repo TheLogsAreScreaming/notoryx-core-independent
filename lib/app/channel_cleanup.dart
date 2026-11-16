@@ -1,6 +1,8 @@
 /// Removing old channel messages, if the person turns it on.
 library;
 
+import '../l10n/l10n.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -62,25 +64,26 @@ final channelCleanerProvider = Provider<void>((ref) {
 class ChannelCleanupTile extends ConsumerWidget {
   const ChannelCleanupTile({super.key});
 
-  static String _label(int days) => days == 0 ? 'Forever' : '$days days';
+  static String _label(AppLocalizations l10n, int days) =>
+      days == 0 ? l10n.keepForever : l10n.keepDays(days);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final days = ref.watch(channelKeepDaysProvider);
     return ListTile(
       leading: const Icon(Icons.auto_delete_outlined),
-      title: const Text('Keep channel messages'),
-      subtitle: Text(_label(days)),
+      title: Text(context.l10n.keepChannelMessages),
+      subtitle: Text(_label(context.l10n, days)),
       onTap: () async {
         final picked = await showDialog<int>(
           context: context,
           builder: (dialog) => SimpleDialog(
-            title: const Text('Keep channel messages'),
+            title: Text(context.l10n.keepChannelMessages),
             children: [
               for (final d in const [0, 7, 30, 90])
                 SimpleDialogOption(
                   onPressed: () => Navigator.of(dialog).pop(d),
-                  child: Text(_label(d)),
+                  child: Text(_label(context.l10n, d)),
                 ),
             ],
           ),
