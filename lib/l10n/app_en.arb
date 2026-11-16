@@ -2277,5 +2277,16 @@
   "compressionOnNote": "Messages here are now sent compressed (SMAZ) when that makes them shorter. Apps that don't understand SMAZ will see scrambled text. SOS and check-ins always go plain.",
   "compressionOffNote": "Messages here are sent as plain text again.",
   "unmuteChat": "Unmute",
-  "muteNotifications": "Mute notifications"
+  "muteNotifications": "Mute notifications",
+  "fromNotoryxCore": "From NOTORYX Core",
+  "fromNotoryxCoreBody": "Brings your chat history over from a NOTORYX Core backup file, keeping everything already here. In Core, make an encrypted backup with chats included, then choose it here. Contacts and channels come from your radio, so they don't need moving. Connect each radio to this app once first.",
+  "chooseCoreBackupFile": "Choose a Core backup file",
+  "bringingInCoreHistory": "Bringing in history…",
+  "coreHistoryAdded": "Added {count} messages from NOTORYX Core.",
+  "@coreHistoryAdded": {"placeholders": {"count": {"type": "int"}}},
+  "coreHistoryAddedSomeSkipped": "Added {count} messages from NOTORYX Core. {radios} radios in the backup haven't connected to this app yet: connect them once, then import again to add theirs.",
+  "@coreHistoryAddedSomeSkipped": {"placeholders": {"count": {"type": "int"}, "radios": {"type": "int"}}},
+  "notACoreBackup": "That isn't a NOTORYX Core backup file.",
+  "coreBackupWrongPassword": "Wrong password for that backup.",
+  "coreBackupHasNoHistory": "That backup has no chat history. In NOTORYX Core, make a new backup with chats included."
 }

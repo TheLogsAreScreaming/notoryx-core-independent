@@ -870,5 +870,14 @@
   "compressionOnNote": "Los mensajes de aquí se envían comprimidos (SMAZ) cuando así ocupan menos. Las apps que no entienden SMAZ verán texto ilegible. SOS y avisos de llegada siempre van sin comprimir.",
   "compressionOffNote": "Los mensajes de aquí vuelven a enviarse como texto normal.",
   "unmuteChat": "Activar sonido",
-  "muteNotifications": "Silenciar notificaciones"
+  "muteNotifications": "Silenciar notificaciones",
+  "fromNotoryxCore": "Desde NOTORYX Core",
+  "fromNotoryxCoreBody": "Trae tu historial de chats desde una copia de seguridad de NOTORYX Core, sin borrar nada de lo que ya hay aquí. En Core, haz una copia cifrada que incluya los chats y elígela aquí. Los contactos y canales vienen de tu radio, así que no hace falta moverlos. Conecta antes cada radio a esta app una vez.",
+  "chooseCoreBackupFile": "Elegir una copia de Core",
+  "bringingInCoreHistory": "Trayendo el historial…",
+  "coreHistoryAdded": "Se añadieron {count} mensajes de NOTORYX Core.",
+  "coreHistoryAddedSomeSkipped": "Se añadieron {count} mensajes de NOTORYX Core. {radios} radios de la copia aún no se han conectado a esta app: conéctalas una vez e importa de nuevo para añadir los suyos.",
+  "notACoreBackup": "Ese archivo no es una copia de seguridad de NOTORYX Core.",
+  "coreBackupWrongPassword": "Contraseña incorrecta para esa copia.",
+  "coreBackupHasNoHistory": "Esa copia no tiene historial de chats. En NOTORYX Core, haz una copia nueva que incluya los chats."
 }

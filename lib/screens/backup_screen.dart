@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/backup_service.dart';
 import '../app/connection.dart';
 import '../data/backup_crypto.dart';
+import '../data/core_import.dart';
 import '../l10n/l10n.dart';
 
 /// Save everything to an encrypted file, or bring it back on a new phone.
@@ -123,6 +124,47 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
     }
   }
 
+  Future<void> _importCore() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    final service = ref.read(backupServiceProvider);
+    final file = await service.pick();
+    if (file == null || !mounted) return;
+    final password = await _askPassword();
+    if (password == null || !mounted) return;
+    setState(() => _working = l10n.bringingInCoreHistory);
+    try {
+      final result = await service.importFromCore(file, password);
+      messenger.showSnackBar(
+        SnackBar(
+          duration: const Duration(seconds: 8),
+          content: Text(
+            result.skippedRadios == 0
+                ? l10n.coreHistoryAdded(result.added)
+                : l10n.coreHistoryAddedSomeSkipped(
+                    result.added,
+                    result.skippedRadios,
+                  ),
+          ),
+        ),
+      );
+    } on CoreImportException catch (e) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(switch (e.problem) {
+            CoreImportProblem.notCoreBackup => l10n.notACoreBackup,
+            CoreImportProblem.wrongPassword => l10n.coreBackupWrongPassword,
+            CoreImportProblem.noHistory => l10n.coreBackupHasNoHistory,
+          }),
+        ),
+      );
+    } on Object catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.restoreFailed(e))));
+    } finally {
+      if (mounted) setState(() => _working = null);
+    }
+  }
+
   Future<String?> _askPassword() => showDialog<String>(
     context: context,
     builder: (context) => const _PasswordDialog(),
@@ -214,6 +256,22 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
             onPressed: disconnected && !busy ? _restore : null,
             icon: const Icon(Icons.restore),
             label: Text(context.l10n.chooseBackupFile),
+          ),
+          const Divider(height: 40),
+          Text(
+            context.l10n.fromNotoryxCore,
+            style: theme.textTheme.titleMedium,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            context.l10n.fromNotoryxCoreBody,
+            style: theme.textTheme.bodySmall,
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: busy ? null : _importCore,
+            icon: const Icon(Icons.move_down),
+            label: Text(context.l10n.chooseCoreBackupFile),
           ),
         ],
       ),
