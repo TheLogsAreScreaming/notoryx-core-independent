@@ -59,10 +59,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       if (thread.startsWith('c:')) {
         final slot = int.parse(id);
         return channels.where((c) => c.slot == slot).firstOrNull?.name ??
-            'Channel $slot';
+            context.l10n.channelSlot(slot);
       }
       return contacts.where((c) => c.publicKey == id).firstOrNull?.name ??
-          'Unknown ${id.substring(0, 6)}';
+          context.l10n.unknownThread(id.substring(0, 6));
     }
 
     return Scaffold(
@@ -100,7 +100,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   title: Text(title),
                   subtitle: _Highlighted(
                     text: [
-                      if (m.outgoing) 'You' else ?m.senderName,
+                      if (m.outgoing) context.l10n.youLabel else ?m.senderName,
                       m.body,
                     ].join(': '),
                     query: _searched,

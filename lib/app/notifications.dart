@@ -11,6 +11,7 @@ import 'app_lock.dart';
 import 'blocking.dart';
 import 'spam_filter.dart';
 import 'connection.dart';
+import 'language.dart';
 
 /// A chat to open, carried by a notification.
 typedef ChatLink = ({String thread, String title, bool isChannel});
@@ -159,9 +160,9 @@ final messageAlertsProvider = Provider<void>((ref) {
       title: hide
           ? 'NOTORYX Core'
           : mentioned
-          ? '${chat.title}: mentioned you'
+          ? ref.read(appL10nProvider).mentionedYou(chat.title)
           : chat.title,
-      body: hide ? 'New message' : body,
+      body: hide ? ref.read(appL10nProvider).newMessageHidden : body,
       chat: chat,
     );
   });

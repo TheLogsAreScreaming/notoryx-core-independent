@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'connection.dart';
+import 'language.dart';
+import '../l10n/l10n.dart';
 
 /// Keeps the app running in the background while it holds a radio, and
 /// asks Android's battery saver to leave it alone. Does nothing off Android.
@@ -66,11 +68,14 @@ final keepAliveProvider = Provider<BackgroundKeeper>(
 );
 
 /// The notification text for [state], or null when nothing needs keeping.
-String? keepAliveText(RadioConnectionState state) => switch (state) {
-  Connected(:final radio) => 'Connected to ${radio.self.name}',
-  Reconnecting(:final radioName) => 'Reconnecting to $radioName',
-  Connecting() || Disconnected() || ViewingSaved() => null,
-};
+String? keepAliveText(RadioConnectionState state, [AppLocalizations? l10n]) =>
+    switch (state) {
+      Connected(:final radio) =>
+        l10n?.connectedTo(radio.self.name) ?? 'Connected to ${radio.self.name}',
+      Reconnecting(:final radioName) =>
+        l10n?.reconnectingTo(radioName) ?? 'Reconnecting to $radioName',
+      Connecting() || Disconnected() || ViewingSaved() => null,
+    };
 
 /// Holds the app in the background while a radio is connected or being
 /// got back, and lets it go once the person disconnects.
@@ -79,7 +84,7 @@ final keepAliveWatcherProvider = Provider<void>((ref) {
   final log = ref.read(connectionLogProvider);
   String? shown;
   void apply(RadioConnectionState state) {
-    final text = keepAliveText(state);
+    final text = keepAliveText(state, ref.read(appL10nProvider));
     if (text == shown) return;
     shown = text;
     log.add(

@@ -2,6 +2,7 @@
 /// make room. The radio stops adding nodes it hears once the table is full.
 library;
 
+import '../l10n/l10n.dart';
 import '../data/data.dart';
 
 /// How full the table is.
@@ -40,16 +41,23 @@ List<Contact> removalCandidates(List<Contact> contacts) {
 
 /// "heard 3 days ago" for a contact's last advert (Unix seconds, by the
 /// node's clock); "never heard" for zero.
-String lastHeard(int lastAdvert, DateTime now) {
-  if (lastAdvert <= 0) return 'never heard';
+String lastHeard(int lastAdvert, DateTime now, [AppLocalizations? l10n]) {
+  if (lastAdvert <= 0) return l10n?.heardNever ?? 'never heard';
   final ago = now.difference(
     DateTime.fromMillisecondsSinceEpoch(lastAdvert * 1000),
   );
-  if (ago.isNegative || ago.inHours < 1) return 'heard in the last hour';
-  if (ago.inDays < 1) return 'heard ${ago.inHours} h ago';
-  if (ago.inDays == 1) return 'heard yesterday';
-  if (ago.inDays < 60) return 'heard ${ago.inDays} days ago';
+  if (ago.isNegative || ago.inHours < 1) {
+    return l10n?.heardLastHour ?? 'heard in the last hour';
+  }
+  if (ago.inDays < 1) {
+    return l10n?.heardHoursAgo(ago.inHours) ?? 'heard ${ago.inHours} h ago';
+  }
+  if (ago.inDays == 1) return l10n?.heardYesterday ?? 'heard yesterday';
+  if (ago.inDays < 60) {
+    return l10n?.heardDaysAgo(ago.inDays) ?? 'heard ${ago.inDays} days ago';
+  }
   // A node whose clock was never set reports times near 1970.
-  if (ago.inDays > 730) return 'heard long ago';
-  return 'heard ${ago.inDays ~/ 30} months ago';
+  if (ago.inDays > 730) return l10n?.heardLongAgo ?? 'heard long ago';
+  return l10n?.heardMonthsAgo(ago.inDays ~/ 30) ??
+      'heard ${ago.inDays ~/ 30} months ago';
 }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/data.dart';
 import '../radio/radio.dart';
+import '../l10n/l10n.dart';
 import 'connection.dart';
 import 'refresh_rate.dart';
 
@@ -51,44 +52,56 @@ Map<TelemetrySeriesKey, List<TelemetryPoint>> telemetrySeries(
 const _axes = ['x', 'y', 'z'];
 
 /// A name for one sensor value, e.g. "Battery" or "Temperature (sensor 2)".
-String seriesLabel(TelemetrySeriesKey key, {bool axis = true}) {
+String seriesLabel(
+  TelemetrySeriesKey key, {
+  bool axis = true,
+  AppLocalizations? l10n,
+}) {
   final suffix = axis ? ' ${_axes[key.index]}' : '';
   final base = switch (key.kind) {
-    LppKind.voltage when key.channel == 1 => 'Battery',
-    LppKind.temperature when key.channel == 1 => 'Chip temperature',
-    LppKind.digitalInput => 'Digital input',
-    LppKind.digitalOutput => 'Digital output',
-    LppKind.analogInput => 'Analog input',
-    LppKind.analogOutput => 'Analog output',
-    LppKind.genericSensor => 'Sensor',
-    LppKind.luminosity => 'Light',
-    LppKind.presence => 'Presence',
-    LppKind.temperature => 'Temperature',
-    LppKind.humidity => 'Humidity',
-    LppKind.accelerometer => 'Acceleration$suffix',
-    LppKind.barometer => 'Pressure',
-    LppKind.voltage => 'Voltage',
-    LppKind.current => 'Current',
-    LppKind.frequency => 'Frequency',
-    LppKind.percentage => 'Level',
-    LppKind.altitude => 'Altitude',
-    LppKind.concentration => 'Concentration',
-    LppKind.power => 'Power',
-    LppKind.distance => 'Distance',
-    LppKind.energy => 'Energy',
-    LppKind.direction => 'Direction',
-    LppKind.unixTime => 'Clock',
-    LppKind.gyrometer => 'Rotation$suffix',
-    LppKind.colour => 'Colour',
-    LppKind.gps => 'Position',
-    LppKind.switchState => 'Switch',
+    LppKind.voltage when key.channel == 1 =>
+      (l10n?.sensorBatteryOwn ?? 'Battery'),
+    LppKind.temperature when key.channel == 1 =>
+      (l10n?.sensorChipTemperatureOwn ?? 'Chip temperature'),
+    LppKind.digitalInput => (l10n?.sensorDigitalInput ?? 'Digital input'),
+    LppKind.digitalOutput => (l10n?.sensorDigitalOutput ?? 'Digital output'),
+    LppKind.analogInput => (l10n?.sensorAnalogInput ?? 'Analog input'),
+    LppKind.analogOutput => (l10n?.sensorAnalogOutput ?? 'Analog output'),
+    LppKind.genericSensor => (l10n?.sensorSensor ?? 'Sensor'),
+    LppKind.luminosity => (l10n?.sensorLight ?? 'Light'),
+    LppKind.presence => (l10n?.sensorPresence ?? 'Presence'),
+    LppKind.temperature => (l10n?.sensorTemperature ?? 'Temperature'),
+    LppKind.humidity => (l10n?.sensorHumidity ?? 'Humidity'),
+    LppKind.accelerometer =>
+      (l10n?.sensorAcceleration ?? 'Acceleration') + suffix,
+    LppKind.barometer => (l10n?.sensorPressure ?? 'Pressure'),
+    LppKind.voltage => (l10n?.sensorVoltage ?? 'Voltage'),
+    LppKind.current => (l10n?.sensorCurrent ?? 'Current'),
+    LppKind.frequency => (l10n?.sensorFrequency ?? 'Frequency'),
+    LppKind.percentage => (l10n?.sensorLevel ?? 'Level'),
+    LppKind.altitude => (l10n?.sensorAltitude ?? 'Altitude'),
+    LppKind.concentration => (l10n?.sensorConcentration ?? 'Concentration'),
+    LppKind.power => (l10n?.sensorPower ?? 'Power'),
+    LppKind.distance => (l10n?.sensorDistance ?? 'Distance'),
+    LppKind.energy => (l10n?.sensorEnergy ?? 'Energy'),
+    LppKind.direction => (l10n?.sensorDirection ?? 'Direction'),
+    LppKind.unixTime => (l10n?.sensorClock ?? 'Clock'),
+    LppKind.gyrometer => (l10n?.sensorRotation ?? 'Rotation') + suffix,
+    LppKind.colour => (l10n?.sensorColour ?? 'Colour'),
+    LppKind.gps => (l10n?.sensorPosition ?? 'Position'),
+    LppKind.switchState => (l10n?.sensorSwitch ?? 'Switch'),
   };
-  return key.channel > 1 ? '$base (sensor ${key.channel})' : base;
+  if (key.channel <= 1) return base;
+  return l10n?.sensorOnChannel(base, key.channel) ??
+      '$base (sensor ${key.channel})';
 }
 
 /// A name for a whole reading, axes and all.
-String readingLabel(LppReading r) =>
-    seriesLabel((channel: r.channel, kind: r.kind, index: 0), axis: false);
+String readingLabel(LppReading r, [AppLocalizations? l10n]) => seriesLabel(
+  (channel: r.channel, kind: r.kind, index: 0),
+  axis: false,
+  l10n: l10n,
+);
 
 /// [value] with the right precision and unit for [kind].
 String formatValue(LppKind kind, double value) {
@@ -160,24 +173,28 @@ final selfTelemetrySamplerProvider = Provider<void>((ref) {
 });
 
 /// How long ago a reading at [at] was taken.
-String readingAge(DateTime at, DateTime now) {
+String readingAge(DateTime at, DateTime now, [AppLocalizations? l10n]) {
   final ago = now.difference(at);
-  if (ago.inMinutes < 1) return 'just now';
-  if (ago.inHours < 1) return '${ago.inMinutes} min ago';
-  if (ago.inDays < 1) return '${ago.inHours} h ago';
-  return '${ago.inDays} d ago';
+  if (ago.inMinutes < 1) return l10n?.agoJustNow ?? 'just now';
+  if (ago.inHours < 1) {
+    return l10n?.agoMinutes(ago.inMinutes) ?? '${ago.inMinutes} min ago';
+  }
+  if (ago.inDays < 1) {
+    return l10n?.agoHours(ago.inHours) ?? '${ago.inHours} h ago';
+  }
+  return l10n?.agoDays(ago.inDays) ?? '${ago.inDays} d ago';
 }
 
 /// The connected radio's readings as one line, like
 /// "Battery 3.91 V · Temperature 18.5°C", or null when there's nothing to
 /// show. The chip's own temperature is left out: it says little about the
 /// weather, and is still on the history screen.
-String? ownStatusText(TelemetrySample sample) {
+String? ownStatusText(TelemetrySample sample, [AppLocalizations? l10n]) {
   final parts = [
     for (final r in decodeLpp(sample.data))
       if (isChartable(r.kind) &&
           !(r.kind == LppKind.temperature && r.channel == 1))
-        '${readingLabel(r)} ${readingText(r)}',
+        '${readingLabel(r, l10n)} ${readingText(r)}',
   ];
   return parts.isEmpty ? null : parts.join(' · ');
 }

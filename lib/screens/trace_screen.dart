@@ -70,15 +70,11 @@ class _TraceScreenState extends ConsumerState<TraceScreen> {
     final connection = ref.read(connectionProvider);
     final plan = planTrace(widget.contact);
     if (connection is! Connected) {
-      setState(() => _state = const _Failed('Connect to the radio first.'));
+      setState(() => _state = _Failed(context.l10n.connectToTheRadioFirst));
       return;
     }
     if (plan == null) {
-      setState(
-        () => _state = const _Failed(
-          'There’s no route through repeaters to trace yet.',
-        ),
-      );
+      setState(() => _state = _Failed(context.l10n.noRouteToTrace));
       return;
     }
     setState(() => _state = const _Running());
@@ -91,12 +87,7 @@ class _TraceScreenState extends ConsumerState<TraceScreen> {
       final returnedAt = DateTime.now();
       if (!mounted) return;
       if (trace == null) {
-        setState(
-          () => _state = const _Failed(
-            'The trace didn’t come back. A hop on the route may be out '
-            'of reach or switched off.',
-          ),
-        );
+        setState(() => _state = _Failed(context.l10n.traceDidntComeBack));
         return;
       }
       final contacts = await ref
@@ -121,9 +112,7 @@ class _TraceScreenState extends ConsumerState<TraceScreen> {
       );
     } on RadioRequestException {
       if (mounted) {
-        setState(
-          () => _state = const _Failed('The radio could not send the trace.'),
-        );
+        setState(() => _state = _Failed(context.l10n.radioCouldNotSendTrace));
       }
     }
   }

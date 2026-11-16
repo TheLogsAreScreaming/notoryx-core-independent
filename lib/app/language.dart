@@ -1,9 +1,12 @@
 /// The app's language: the phone's own, or one picked in Appearance.
 library;
 
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/l10n.dart';
 import 'connection.dart';
 
 const languageSetting = 'app_language';
@@ -32,3 +35,16 @@ class Language extends AsyncNotifier<Locale?> {
 }
 
 final languageProvider = AsyncNotifierProvider<Language, Locale?>(Language.new);
+
+/// The app's strings in its current language, for code that runs away
+/// from any screen: notifications, the home widget, background notices.
+final appL10nProvider = Provider<AppLocalizations>((ref) {
+  final chosen = ref.watch(languageProvider).value;
+  final phone = PlatformDispatcher.instance.locale;
+  final locale =
+      chosen ??
+      (appLanguages.containsKey(phone.languageCode)
+          ? Locale(phone.languageCode)
+          : const Locale('en'));
+  return lookupAppLocalizations(locale);
+});

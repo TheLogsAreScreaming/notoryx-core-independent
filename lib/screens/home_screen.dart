@@ -51,7 +51,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    if (Platform.isAndroid) _setUpShortcuts();
+  }
+
+  bool _shortcutsSet = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Titles need the app's language, which isn't known until now.
+    if (!_shortcutsSet && Platform.isAndroid) {
+      _shortcutsSet = true;
+      _setUpShortcuts();
+    }
   }
 
   /// Long-press shortcuts on the app icon. Safety only opens the screen:
@@ -76,10 +87,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       }
     });
     actions
-        .setShortcutItems(const [
-          ShortcutItem(type: 'safety', localizedTitle: 'SOS and check-ins'),
-          ShortcutItem(type: 'map', localizedTitle: 'Map'),
-          ShortcutItem(type: 'search', localizedTitle: 'Search messages'),
+        .setShortcutItems([
+          ShortcutItem(
+            type: 'safety',
+            localizedTitle: context.l10n.shortcutSafety,
+          ),
+          ShortcutItem(type: 'map', localizedTitle: context.l10n.shortcutMap),
+          ShortcutItem(
+            type: 'search',
+            localizedTitle: context.l10n.shortcutSearch,
+          ),
         ])
         .catchError((Object e) {
           ref.read(connectionLogProvider).add('app shortcuts: $e');
@@ -176,7 +193,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       floatingActionButton: _tab == 2
           ? null
           : FloatingActionButton(
-              tooltip: _tab == 0 ? 'Add a channel' : 'Add or share contacts',
+              tooltip: _tab == 0
+                  ? context.l10n.addAChannel
+                  : context.l10n.addOrShareContacts,
               onPressed: () => _tab == 0
                   ? showAddChannel(context, ref)
                   : showContactsMenu(
@@ -267,7 +286,7 @@ class _ChatsTab extends ConsumerWidget {
     final direct = latest.where((m) => m.kind == MessageKind.direct).toList();
 
     if (channels.isEmpty && direct.isEmpty) {
-      return const _Empty('No chats yet');
+      return _Empty(context.l10n.noChatsYet);
     }
     return ListView(
       children: [
@@ -298,10 +317,10 @@ class _ChatsTab extends ConsumerWidget {
             icon: Icons.person_outline,
             avatar: NodeAvatar(
               publicKey: message.thread.substring(2),
-              name: _directTitle(message.thread, names),
+              name: _directTitle(context.l10n, message.thread, names),
               type: NodeType.chat,
             ),
-            title: _directTitle(message.thread, names),
+            title: _directTitle(context.l10n, message.thread, names),
             latest: message,
             unread: unread[message.thread] ?? 0,
             draft: drafts[message.thread],
@@ -310,7 +329,7 @@ class _ChatsTab extends ConsumerWidget {
             onTap: () => _openThread(
               context,
               thread: message.thread,
-              title: _directTitle(message.thread, names),
+              title: _directTitle(context.l10n, message.thread, names),
             ),
           ),
       ],
@@ -334,7 +353,9 @@ class _ChatsTab extends ConsumerWidget {
                 ? Icons.notifications_active_outlined
                 : Icons.notifications_off_outlined,
           ),
-          title: Text(muted ? 'Unmute' : 'Mute notifications'),
+          title: Text(
+            muted ? context.l10n.unmuteChat : context.l10n.muteNotifications,
+          ),
           onTap: () => Navigator.pop(context, true),
         ),
       ),
@@ -342,9 +363,13 @@ class _ChatsTab extends ConsumerWidget {
     if (change == true) await store.setMuted(radioKey, thread, !muted);
   }
 
-  static String _directTitle(String thread, Map<String, String> names) {
+  static String _directTitle(
+    AppLocalizations l10n,
+    String thread,
+    Map<String, String> names,
+  ) {
     final key = thread.substring(2);
-    return names[key] ?? 'Unknown ${key.substring(0, 6)}';
+    return names[key] ?? l10n.unknownThread(key.substring(0, 6));
   }
 }
 
@@ -383,7 +408,10 @@ class _ThreadTile extends StatelessWidget {
     final preview = message == null
         ? null
         : [
-            if (message.outgoing) 'You' else ?message.senderName,
+            if (message.outgoing)
+              context.l10n.youLabel
+            else
+              ?message.senderName,
             message.body,
           ].join(': ');
     final scheme = Theme.of(context).colorScheme;
@@ -398,7 +426,7 @@ class _ThreadTile extends StatelessWidget {
               TextSpan(
                 children: [
                   TextSpan(
-                    text: 'Draft: ',
+                    text: context.l10n.draftPrefix,
                     style: TextStyle(
                       color: scheme.error,
                       fontWeight: FontWeight.w600,
@@ -451,7 +479,7 @@ class _ContactsTab extends ConsumerWidget {
         ? const <DiscoveredData>[]
         : ref.watch(discoveredProvider(radioKey)).value ?? const [];
     if (contacts.isEmpty && heard.isEmpty) {
-      return const _Empty('No contacts on this radio');
+      return _Empty(context.l10n.noContactsOnRadio);
     }
     // Favourites first, each group by name (the store already sorts by name).
     final sorted = [
@@ -505,7 +533,7 @@ class _ContactsTab extends ConsumerWidget {
                 icon: _icon(contact.type),
               ),
               title: Text(contact.name),
-              subtitle: Text(_describe(contact)),
+              subtitle: Text(_describe(context.l10n, contact)),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -564,7 +592,7 @@ class _ContactsTab extends ConsumerWidget {
                   icon: _icon(node.type),
                 ),
                 title: Text(node.name),
-                subtitle: Text(_kind(node.type)),
+                subtitle: Text(_kind(context.l10n, node.type)),
                 trailing: TextButton(
                   onPressed: () => addDiscovered(context, ref, node),
                   child: Text(context.l10n.add),
@@ -583,18 +611,18 @@ class _ContactsTab extends ConsumerWidget {
     _ => Icons.person_outline,
   };
 
-  static String _kind(int type) => switch (NodeType.fromByte(type)) {
-    NodeType.repeater => 'Repeater',
-    NodeType.room => 'Room',
-    NodeType.sensor => 'Sensor',
-    _ => 'Person',
-  };
+  static String _kind(AppLocalizations l10n, int type) =>
+      switch (NodeType.fromByte(type)) {
+        NodeType.repeater => l10n.kindRepeater,
+        NodeType.room => l10n.kindRoom,
+        NodeType.sensor => l10n.kindSensor,
+        _ => l10n.kindPerson,
+      };
 
-  static String _describe(Contact c) {
-    final kind = _kind(c.type);
-    if (c.outPathLength == pathUnknown) return '$kind · no route yet';
-    final hops = c.outPathLength & 0x3F;
-    return '$kind · ${hops == 0 ? 'direct' : '$hops hops'}';
+  static String _describe(AppLocalizations l10n, Contact c) {
+    final kind = _kind(l10n, c.type);
+    if (c.outPathLength == pathUnknown) return l10n.kindNoRouteYet(kind);
+    return l10n.kindWithHops(kind, c.outPathLength & 0x3F);
   }
 }
 
@@ -617,11 +645,13 @@ class _ViewingSavedBanner extends ConsumerWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(switch (ref.watch(connectionProvider)) {
-              _ when databaseSetAside => 'Earlier chats couldn’t be opened. See Radio settings → App lock.',
-              ViewingSaved(radioKey: '') =>
-                'No radio yet. Connect one to start chatting.',
-              ViewingSaved(:final error?) => error,
-              _ => 'No radio connected. You can read, but not send.',
+              _ when databaseSetAside => context.l10n.earlierChatsSetAside,
+              ViewingSaved(radioKey: '') => context.l10n.noRadioYetConnect,
+              ViewingSaved(:final error?) => connectionErrorText(
+                context.l10n,
+                error,
+              ),
+              _ => context.l10n.noRadioConnectedReadOnly,
             }),
           ),
           TextButton(
@@ -660,11 +690,14 @@ class _ReconnectBanner extends ConsumerWidget {
                 children: [
                   Text(
                     attempt == 0
-                        ? 'Reconnecting to the radio\u2026'
-                        : 'Reconnecting to the radio (try ${attempt + 1})\u2026',
+                        ? context.l10n.reconnectingToRadio
+                        : context.l10n.reconnectingToRadioTry(attempt + 1),
                   ),
                   if (error case final error?)
-                    Text(error, style: Theme.of(context).textTheme.bodySmall),
+                    Text(
+                      connectionErrorText(context.l10n, error),
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                 ],
               ),
             ),
@@ -689,7 +722,7 @@ class _UnreadBadge extends StatelessWidget {
   Widget build(BuildContext context) => count == 0
       ? child
       : Semantics(
-          label: count == 1 ? '1 unread' : '$count unread',
+          label: context.l10n.unreadCount(count),
           child: ExcludeSemantics(
             child: Badge(
               label: Text(count > 99 ? '99+' : '$count'),

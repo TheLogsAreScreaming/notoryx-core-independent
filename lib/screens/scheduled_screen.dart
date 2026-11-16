@@ -16,10 +16,10 @@ Future<DateTime?> pickSendTime(BuildContext context, DateTime now) async {
         mainAxisSize: MainAxisSize.min,
         children: [
           for (final (label, at) in [
-            ('In 15 minutes', now.add(const Duration(minutes: 15))),
-            ('In 1 hour', now.add(const Duration(hours: 1))),
-            ('In 3 hours', now.add(const Duration(hours: 3))),
-            ('Tomorrow at 8:00', tomorrow),
+            (context.l10n.inMinutes(15), now.add(const Duration(minutes: 15))),
+            (context.l10n.inHours(1), now.add(const Duration(hours: 1))),
+            (context.l10n.inHours(3), now.add(const Duration(hours: 3))),
+            (context.l10n.tomorrowAt8, tomorrow),
           ])
             ListTile(
               title: Text(label),
@@ -64,9 +64,7 @@ class ScheduledStrip extends ConsumerWidget {
     return ListTile(
       dense: true,
       leading: const Icon(Icons.schedule_send),
-      title: Text(
-        count == 1 ? '1 scheduled message' : '$count scheduled messages',
-      ),
+      title: Text(context.l10n.scheduledCount(count)),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => Navigator.of(
         context,
@@ -92,15 +90,15 @@ class ScheduledScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             child: Text(
               connected
-                  ? 'These send while the app is running and connected.'
-                  : 'No radio connected. These wait until one is.',
+                  ? context.l10n.scheduledConnectedNote
+                  : context.l10n.scheduledWaitingNote,
             ),
           ),
           for (final m in list)
             ListTile(
               title: Text(m.title),
               subtitle: Text(
-                '${m.isMissed(now) ? 'Missed, not sent' : _when(m.at)}\n${m.text}',
+                '${m.isMissed(now) ? context.l10n.missedNotSent : _when(m.at)}\n${m.text}',
               ),
               isThreeLine: true,
               trailing: IconButton(

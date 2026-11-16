@@ -31,9 +31,7 @@ class _ContactCleanupScreenState extends ConsumerState<ContactCleanupScreen> {
     final sure = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(
-          'Remove ${picked.length} contact${picked.length == 1 ? '' : 's'}?',
-        ),
+        title: Text(context.l10n.removeContactsCount(picked.length)),
         content: Text(context.l10n.theRadioForgetsThemChatsAlready),
         actions: [
           TextButton(
@@ -49,6 +47,7 @@ class _ContactCleanupScreenState extends ConsumerState<ContactCleanupScreen> {
     );
     if (sure != true || !mounted) return;
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     setState(() {
       _removing = true;
       _done = 0;
@@ -73,8 +72,8 @@ class _ContactCleanupScreenState extends ConsumerState<ContactCleanupScreen> {
       SnackBar(
         content: Text(
           failed == 0
-              ? 'Removed $removed.'
-              : 'Removed $removed. The radio refused $failed.',
+              ? l10n.removedCount(removed)
+              : l10n.removedCountRefused(removed, failed),
         ),
       ),
     );
@@ -100,7 +99,7 @@ class _ContactCleanupScreenState extends ConsumerState<ContactCleanupScreen> {
           if (max != null)
             ContactMeterBar(
               meter: ContactMeter(contacts.length - picked.length, max),
-              prefix: picked.isEmpty ? null : 'After removing',
+              prefix: picked.isEmpty ? null : context.l10n.afterRemoving,
             ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -144,7 +143,7 @@ class _ContactCleanupScreenState extends ConsumerState<ContactCleanupScreen> {
                                 ),
                           title: Text(c.name),
                           subtitle: Text(
-                            '${_kind(c.type)} · ${lastHeard(c.lastAdvert, now)}',
+                            '${_kind(context.l10n, c.type)} · ${lastHeard(c.lastAdvert, now, context.l10n)}',
                           ),
                         ),
                     ],
@@ -163,10 +162,10 @@ class _ContactCleanupScreenState extends ConsumerState<ContactCleanupScreen> {
                   icon: const Icon(Icons.person_remove_outlined),
                   label: Text(
                     _removing
-                        ? 'Removing $_done of $_total…'
+                        ? context.l10n.removingProgress(_done, _total)
                         : picked.isEmpty
-                        ? 'Pick contacts to remove'
-                        : 'Remove ${picked.length}',
+                        ? context.l10n.pickContactsToRemove
+                        : context.l10n.removeCount(picked.length),
                   ),
                 ),
               ),
@@ -177,12 +176,13 @@ class _ContactCleanupScreenState extends ConsumerState<ContactCleanupScreen> {
     );
   }
 
-  static String _kind(int type) => switch (NodeType.fromByte(type)) {
-    NodeType.repeater => 'Repeater',
-    NodeType.room => 'Room',
-    NodeType.sensor => 'Sensor',
-    _ => 'Person',
-  };
+  static String _kind(AppLocalizations l10n, int type) =>
+      switch (NodeType.fromByte(type)) {
+        NodeType.repeater => l10n.kindRepeater,
+        NodeType.room => l10n.kindRoom,
+        NodeType.sensor => l10n.kindSensor,
+        _ => l10n.kindPerson,
+      };
 }
 
 /// "120 of 350 contacts" with a bar; warns when nearly full.
@@ -208,10 +208,10 @@ class ContactMeterBar extends StatelessWidget {
     final scheme = theme.colorScheme;
     final level = meter.level;
     final warn = level != ContactLevel.ok;
-    final count = '${meter.count} of ${meter.max} contacts';
+    final count = context.l10n.contactsOfMax(meter.count, meter.max);
     final note = switch (level) {
-      ContactLevel.full => 'Full: the radio won’t add new nodes it hears.',
-      ContactLevel.nearlyFull => 'Nearly full: ${meter.free} left.',
+      ContactLevel.full => context.l10n.contactsFullNote,
+      ContactLevel.nearlyFull => context.l10n.contactsNearlyFull(meter.free),
       ContactLevel.ok => null,
     };
     return Semantics(
@@ -234,7 +234,9 @@ class ContactMeterBar extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      prefix == null ? count : '$prefix: $count',
+                      prefix == null
+                          ? count
+                          : context.l10n.labelColonValue(prefix!, count),
                       style: theme.textTheme.labelLarge,
                     ),
                     const SizedBox(height: 4),

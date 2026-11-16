@@ -12,6 +12,8 @@ import 'package:latlong2/latlong.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
 import 'connection.dart';
+import 'language.dart';
+import '../l10n/l10n.dart';
 import 'notifications.dart';
 import 'position.dart';
 import 'post_signing.dart';
@@ -52,7 +54,16 @@ enum CheckInKind {
 
   const CheckInKind(this.label);
 
+  /// The words sent over the air. Kept in English so every app reads them.
   final String label;
+
+  /// The button's words in the app's language.
+  String shown(AppLocalizations l10n) => switch (this) {
+    ok => l10n.checkInOk,
+    atCamp => l10n.checkInAtCamp,
+    delayed => l10n.checkInDelayed,
+    headingBack => l10n.checkInHeadingBack,
+  };
 }
 
 /// One recipient of a check-in, and the stored message sent to them (null
@@ -494,11 +505,11 @@ class Safety extends AsyncNotifier<SafetyState> {
         .where((t) => only == null || only.contains(t))
         .toList();
     if (targets.isEmpty) {
-      throw const SafetyException('Choose who to send it to first.');
+      throw SafetyException(ref.read(appL10nProvider).chooseWhoFirst);
     }
     final state = ref.read(connectionProvider);
     if (state is! Connected) {
-      throw const SafetyException('Not connected to a radio.');
+      throw SafetyException(ref.read(appL10nProvider).notConnectedToRadio);
     }
     final sends = <CheckInSend>[];
     Object? firstError;
@@ -586,11 +597,12 @@ final checkInWatchdogProvider = Provider<void>((ref) {
         );
         await notifier.show(
           id: checkInReminderId,
-          title: 'Check-in due',
+          title: ref.read(appL10nProvider).checkInDue,
           body: s.alertOnMiss
-              ? 'Open NOTORYX and check in, or ${chat.title} is told in '
-                    '${grace.inMinutes} minutes.'
-              : 'Open NOTORYX and check in.',
+              ? ref
+                    .read(appL10nProvider)
+                    .checkInDueOrTold(chat.title, grace.inMinutes)
+              : ref.read(appL10nProvider).checkInDueBody,
           chat: chat,
         );
       }
@@ -743,14 +755,15 @@ final tripQuietWatchdogProvider = Provider<void>((ref) {
       warned[key] = now;
       final chat = await chatLinkFor(store, radioKey, thread);
       final hours = now.difference(quietFrom).inMinutes / 60;
+      final l10n = ref.read(appL10nProvider);
       await ref
           .read(messageNotifierProvider)
           .show(
             id: quietWarningBaseId + s.tripContacts.indexOf(key),
-            title: '${chat.title} has gone quiet',
+            title: l10n.goneQuiet(chat.title),
             body: heard == null || !heard.isAfter(since)
-                ? 'Nothing from ${chat.title} for over ${_hours(hours)}.'
-                : 'Last heard from ${chat.title} ${_hours(hours)} ago.',
+                ? l10n.nothingFromFor(chat.title, _hours(l10n, hours))
+                : l10n.lastHeardFromAgo(chat.title, _hours(l10n, hours)),
             chat: chat,
           );
     }
@@ -793,5 +806,5 @@ final tripQuietWatchdogProvider = Provider<void>((ref) {
   ref.listen(safetyProvider, (_, next) => follow(next.value));
 });
 
-String _hours(double h) =>
-    h < 1.5 ? '${(h * 60).round()} minutes' : '${h.round()} hours';
+String _hours(AppLocalizations l10n, double h) =>
+    h < 1.5 ? l10n.everyMinutes((h * 60).round()) : l10n.everyHours(h.round());

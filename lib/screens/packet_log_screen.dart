@@ -25,7 +25,9 @@ class PacketLogScreen extends ConsumerWidget {
         title: Text(context.l10n.packetsHeard2(packets.length)),
         actions: [
           IconButton(
-            tooltip: log.paused ? 'Resume' : 'Pause',
+            tooltip: log.paused
+                ? context.l10n.resumeAction
+                : context.l10n.pauseAction,
             icon: Icon(log.paused ? Icons.play_arrow : Icons.pause),
             onPressed: () => log.setPaused(!log.paused),
           ),
@@ -87,14 +89,15 @@ class _PacketTile extends StatelessWidget {
     }
     final hops = h.hops;
     final via = switch ((h.route, hops.isEmpty)) {
-      (RouteKind.flood || RouteKind.transportFlood, true) => 'heard directly',
+      (RouteKind.flood || RouteKind.transportFlood, true) =>
+        context.l10n.heardDirectlyLog,
       (RouteKind.flood || RouteKind.transportFlood, false) =>
-        'via ${hops.map(_name).join(' → ')}',
-      (_, true) => 'direct, last hop',
-      (_, false) => 'direct, next ${hops.map(_name).join(' → ')}',
+        context.l10n.viaHops(hops.map(_name).join(' → ')),
+      (_, true) => context.l10n.directLastHop,
+      (_, false) => context.l10n.directNext(hops.map(_name).join(' → ')),
     };
     final title = switch (h.advertKey) {
-      final key? => 'Advert from ${_fullName(key)}',
+      final key? => context.l10n.advertFrom(_fullName(key)),
       null => h.payload.label,
     };
     return ListTile(

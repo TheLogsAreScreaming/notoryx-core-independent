@@ -51,7 +51,7 @@ Future<String?> _ask(
   required String label,
   String? hint,
   String initial = '',
-  String action = 'OK',
+  String? action,
   bool pasteButton = false,
 }) async {
   final value = await showDialog<String>(
@@ -61,7 +61,7 @@ Future<String?> _ask(
       label: label,
       hint: hint,
       initial: initial,
-      action: action,
+      action: action ?? MaterialLocalizations.of(context).okButtonLabel,
       pasteButton: pasteButton,
     ),
   );
@@ -184,11 +184,11 @@ Future<String?> _pick(
 /// The Chats tab's + button.
 Future<void> showAddChannel(BuildContext context, WidgetRef ref) async {
   final choice = await _pick(context, [
-    (Icons.travel_explore, 'Find channels', 'find'),
-    (Icons.tag, 'Join a #hashtag channel', 'hashtag'),
-    (Icons.lock_outline, 'Create a private channel', 'private'),
-    (Icons.link, 'Add from a link', 'link'),
-    if (canScanQr) (Icons.qr_code_scanner, 'Scan a QR code', 'scan'),
+    (Icons.travel_explore, context.l10n.findChannels, 'find'),
+    (Icons.tag, context.l10n.joinHashtagChannel, 'hashtag'),
+    (Icons.lock_outline, context.l10n.createPrivateChannel, 'private'),
+    (Icons.link, context.l10n.addFromALink, 'link'),
+    if (canScanQr) (Icons.qr_code_scanner, context.l10n.scanAQRCode, 'scan'),
   ]);
   if (choice == null || !context.mounted) return;
   if (choice == 'find') {
@@ -206,10 +206,10 @@ Future<void> showAddChannel(BuildContext context, WidgetRef ref) async {
   if (choice == 'hashtag') {
     final input = await _ask(
       context,
-      title: 'Join a #hashtag channel',
-      label: 'Channel name',
+      title: context.l10n.joinHashtagChannel,
+      label: context.l10n.channelName,
       hint: '#hiking',
-      action: 'Join',
+      action: context.l10n.join,
     );
     if (input == null || !context.mounted) return;
     await joinHashtag(context, ref, input);
@@ -218,9 +218,9 @@ Future<void> showAddChannel(BuildContext context, WidgetRef ref) async {
 
   final name = await _ask(
     context,
-    title: 'Create a private channel',
-    label: 'Channel name',
-    action: 'Create',
+    title: context.l10n.createPrivateChannel,
+    label: context.l10n.channelName,
+    action: context.l10n.create,
   );
   if (name == null || !context.mounted) return;
   final secret = randomChannelSecret();
@@ -241,7 +241,7 @@ Future<bool> joinHashtag(
   return _run(
     context,
     () => sync.addChannel(name, hashtagSecret(name)),
-    done: 'Joined $name',
+    done: context.l10n.joinedChannel(name),
   );
 }
 
@@ -250,9 +250,7 @@ Future<void> _shareChannel(BuildContext context, ChannelLink link) =>
       context,
       title: link.name,
       link: link,
-      warning:
-          'Anyone with this code or link can read and write in the channel. '
-          'Share it only with people you trust.',
+      warning: context.l10n.channelLinkWarning,
     );
 
 /// Holding a channel in the Chats tab.
@@ -268,11 +266,15 @@ Future<void> showChannelActions(
   if (!context.mounted) return;
   final choice = await _pick(context, [
     muted
-        ? (Icons.notifications_active_outlined, 'Unmute', 'mute')
-        : (Icons.notifications_off_outlined, 'Mute notifications', 'mute'),
-    (Icons.share_outlined, 'Share channel link', 'share'),
-    (Icons.edit_outlined, 'Rename', 'rename'),
-    (Icons.logout, 'Leave channel', 'leave'),
+        ? (Icons.notifications_active_outlined, context.l10n.unmuteChat, 'mute')
+        : (
+            Icons.notifications_off_outlined,
+            context.l10n.muteNotifications,
+            'mute',
+          ),
+    (Icons.share_outlined, context.l10n.shareChannelLink, 'share'),
+    (Icons.edit_outlined, context.l10n.renameAction, 'rename'),
+    (Icons.logout, context.l10n.leaveChannel, 'leave'),
   ]);
   if (choice == null || !context.mounted) return;
   switch (choice) {
@@ -288,10 +290,10 @@ Future<void> showChannelActions(
       if (sync == null) return;
       final name = await _ask(
         context,
-        title: 'Rename channel',
-        label: 'Name',
+        title: context.l10n.renameChannel,
+        label: context.l10n.zoneName,
         initial: channel.name,
-        action: 'Rename',
+        action: context.l10n.renameAction,
       );
       if (name == null || !context.mounted) return;
       await _run(context, () => sync.renameChannel(channel.slot, name));
@@ -300,16 +302,15 @@ Future<void> showChannelActions(
       if (sync == null) return;
       final sure = await _confirm(
         context,
-        'Leave ${channel.name}?',
-        'The radio stops receiving this channel. Messages already here stay. '
-            'You can join again with its name or link.',
-        'Leave',
+        context.l10n.leaveChannelQuestion(channel.name),
+        context.l10n.leaveChannelBody,
+        context.l10n.leaveAction,
       );
       if (!sure || !context.mounted) return;
       await _run(
         context,
         () => sync.leaveChannel(channel.slot),
-        done: 'Left ${channel.name}',
+        done: context.l10n.leftChannel(channel.name),
       );
   }
 }
@@ -320,9 +321,9 @@ Future<void> showChannelActions(
 Future<void> addFromLink(BuildContext context, WidgetRef ref) async {
   final text = await _ask(
     context,
-    title: 'Add from a link',
-    label: 'Link, advert or public key',
-    action: 'Add',
+    title: context.l10n.addFromALink,
+    label: context.l10n.linkAdvertOrKey,
+    action: context.l10n.add,
     pasteButton: true,
   );
   if (text == null || !context.mounted) return;
@@ -355,13 +356,13 @@ Future<void> addLink(
       await _run(
         context,
         () => sync.addChannel(name, secret),
-        done: 'Added $name',
+        done: context.l10n.added(name),
       );
     case AdvertLink(:final packet):
       await _run(
         context,
         () => sync.importAdvert(packet),
-        done: 'Contact added',
+        done: context.l10n.contactAdded,
       );
     case ContactLink(:final name, :final publicKey, :final type):
       await _addMakingRoom(
@@ -384,11 +385,11 @@ Future<void> showContactsMenu(
   required String radioKey,
 }) async {
   final choice = await _pick(context, [
-    (Icons.link, 'Add from a link', 'link'),
-    if (canScanQr) (Icons.qr_code_scanner, 'Scan a QR code', 'scan'),
-    (Icons.qr_code_2, 'Share my contact', 'share'),
-    (Icons.campaign_outlined, 'Advertise to nearby nodes', 'advert'),
-    (Icons.public, 'Advertise across the mesh', 'flood'),
+    (Icons.link, context.l10n.addFromALink, 'link'),
+    if (canScanQr) (Icons.qr_code_scanner, context.l10n.scanAQRCode, 'scan'),
+    (Icons.qr_code_2, context.l10n.shareMyContact, 'share'),
+    (Icons.campaign_outlined, context.l10n.advertiseNearby, 'advert'),
+    (Icons.public, context.l10n.advertiseAcrossMesh, 'flood'),
   ]);
   if (choice == null || !context.mounted) return;
   switch (choice) {
@@ -402,7 +403,7 @@ Future<void> showContactsMenu(
         publicKey: PublicKey.fromHex(radioKey),
         type: NodeType.chat,
       );
-      await showLinkSheet(context, title: 'My contact', link: link);
+      await showLinkSheet(context, title: context.l10n.myContact, link: link);
     case 'advert' || 'flood':
       final sync = _syncOrNotice(context, ref);
       if (sync == null) return;
@@ -411,8 +412,8 @@ Future<void> showContactsMenu(
         context,
         () => sync.sendAdvert(flood: flood),
         done: flood
-            ? 'Advert sent across the mesh'
-            : 'Advert sent to nearby nodes',
+            ? context.l10n.advertSentAcrossMesh
+            : context.l10n.advertSentNearby,
       );
   }
 }
@@ -428,17 +429,17 @@ Future<void> showContactActions(
   final remoteAllowed = contact.flags & contactFlagRemoteCommands != 0;
   final choice = await _pick(context, [
     favourite
-        ? (Icons.star, 'Remove from favourites', 'favourite')
-        : (Icons.star_border, 'Add to favourites', 'favourite'),
-    (Icons.share_outlined, 'Share contact link', 'share'),
-    (Icons.update, 'Forget last advert time', 'forget'),
+        ? (Icons.star, context.l10n.removeFromFavourites, 'favourite')
+        : (Icons.star_border, context.l10n.addToFavourites, 'favourite'),
+    (Icons.share_outlined, context.l10n.shareContactLink, 'share'),
+    (Icons.update, context.l10n.forgetLastAdvertTime, 'forget'),
     if (isPerson) ...[
-      (Icons.terminal, 'Use their command line', 'their_cli'),
+      (Icons.terminal, context.l10n.useTheirCommandLine, 'their_cli'),
       remoteAllowed
-          ? (Icons.lock, 'Stop them using my command line', 'allow_cli')
-          : (Icons.lock_open, 'Let them use my command line', 'allow_cli'),
+          ? (Icons.lock, context.l10n.stopThemUsingMyCli, 'allow_cli')
+          : (Icons.lock_open, context.l10n.letThemUseMyCli, 'allow_cli'),
     ],
-    (Icons.person_remove_outlined, 'Remove contact', 'remove'),
+    (Icons.person_remove_outlined, context.l10n.removeContact, 'remove'),
   ]);
   if (choice == null || !context.mounted) return;
   final key = PublicKey.fromHex(contact.publicKey);
@@ -466,12 +467,9 @@ Future<void> showContactActions(
       if (!remoteAllowed) {
         final sure = await _confirm(
           context,
-          'Give ${contact.name} control of your radio?',
-          'They could run any command on it from anywhere on the mesh, '
-              'including changing its settings, restarting it or turning it '
-              'off. Only allow someone you completely trust. You can stop '
-              'this here at any time.',
-          'Allow',
+          context.l10n.giveControlTitle(contact.name),
+          context.l10n.giveControlBody,
+          context.l10n.allow,
         );
         if (!sure || !context.mounted) return;
       }
@@ -479,8 +477,8 @@ Future<void> showContactActions(
         context,
         () => sync.setRemoteCommandsAllowed(key, allowed: !remoteAllowed),
         done: remoteAllowed
-            ? '${contact.name} can no longer use your command line'
-            : '${contact.name} can now use your command line',
+            ? context.l10n.cliRevoked(contact.name)
+            : context.l10n.cliGranted(contact.name),
       );
     case 'forget':
       final sync = _syncOrNotice(context, ref);
@@ -488,23 +486,22 @@ Future<void> showContactActions(
       await _run(
         context,
         () => sync.forgetLastAdvert(key),
-        done: 'The next advert from ${contact.name} will be accepted',
+        done: context.l10n.nextAdvertAccepted(contact.name),
       );
     case 'remove':
       final sync = _syncOrNotice(context, ref);
       if (sync == null) return;
       final sure = await _confirm(
         context,
-        'Remove ${contact.name}?',
-        'The radio forgets this contact. Chats already here stay, and you '
-            'can add them again when they advertise.',
-        'Remove',
+        context.l10n.removeNameQuestion(contact.name),
+        context.l10n.removeContactBody,
+        context.l10n.remove,
       );
       if (!sure || !context.mounted) return;
       await _run(
         context,
         () => sync.removeContact(key),
-        done: 'Removed ${contact.name}',
+        done: context.l10n.removedName(contact.name),
       );
   }
 }
@@ -667,14 +664,17 @@ Future<void> _addMakingRoom(
   }
   final swap = await _confirm(
     context,
-    'Contacts are full',
-    'To add $name, remove ${out.name} '
-        '(${lastHeard(out.lastAdvert, DateTime.now())})?',
-    'Swap',
+    context.l10n.contactsAreFull,
+    context.l10n.swapContactBody(
+      name,
+      out.name,
+      lastHeard(out.lastAdvert, DateTime.now(), context.l10n),
+    ),
+    context.l10n.swapAction,
   );
   if (!swap || !context.mounted) return;
   await _run(context, () async {
     await sync.removeContact(PublicKey.fromHex(out.publicKey));
     await add();
-  }, done: 'Removed ${out.name} and added $name');
+  }, done: context.l10n.swappedContacts(out.name, name));
 }

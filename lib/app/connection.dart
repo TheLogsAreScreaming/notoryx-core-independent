@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/data.dart';
+import '../l10n/l10n.dart';
 import '../radio/radio.dart';
 import 'connection_log.dart';
 import 'radio_connector.dart';
@@ -319,7 +320,7 @@ class ConnectionController extends Notifier<RadioConnectionState> {
       target: target,
       radioKey: current.radio.key,
       radioName: current.radio.self.name,
-      error: 'The radio disconnected.',
+      error: _radioDisconnected,
     );
     state = reconnecting;
     final generation = _generation;
@@ -413,12 +414,30 @@ class ConnectionController extends Notifier<RadioConnectionState> {
 
   static String _describe(Object error) => switch (error) {
     BluetoothUnavailable() => error.message,
-    RadioTimeout() => 'The radio did not answer.',
-    RadioDisconnected() ||
-    LinkClosedException() => 'The connection closed before setup finished.',
-    _ => 'Could not connect: $error',
+    RadioTimeout() => _radioDidNotAnswer,
+    RadioDisconnected() || LinkClosedException() => _closedBeforeSetup,
+    _ => '$_couldNotConnect$error',
   };
 }
+
+// Connection errors are kept in English in the state and the connection
+// log; [connectionErrorText] puts them in the app's language for display.
+const _radioDisconnected = 'The radio disconnected.';
+const _radioDidNotAnswer = 'The radio did not answer.';
+const _closedBeforeSetup = 'The connection closed before setup finished.';
+const _couldNotConnect = 'Could not connect: ';
+
+/// [error] from the connection state, in [l10n]'s language where known.
+String connectionErrorText(AppLocalizations l10n, String error) =>
+    switch (error) {
+      _radioDisconnected => l10n.errRadioDisconnected,
+      _radioDidNotAnswer => l10n.errRadioDidNotAnswer,
+      _closedBeforeSetup => l10n.errClosedBeforeSetup,
+      _ when error.startsWith(_couldNotConnect) => l10n.errCouldNotConnect(
+        error.substring(_couldNotConnect.length),
+      ),
+      _ => error,
+    };
 
 typedef _SavedRadio = ({
   RadioTarget target,

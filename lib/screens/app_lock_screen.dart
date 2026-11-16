@@ -131,11 +131,9 @@ class _LockedScreenState extends ConsumerState<_LockedScreen> {
   );
 }
 
-String _label(Duration d) => d == Duration.zero
-    ? 'Right away'
-    : d.inMinutes == 1
-    ? 'After 1 minute'
-    : 'After ${d.inMinutes} minutes';
+String _label(AppLocalizations l10n, Duration d) => d == Duration.zero
+    ? l10n.lockRightAway
+    : l10n.lockAfterMinutes(d.inMinutes);
 
 /// The lock's on/off switch and timeout.
 class AppLockSettingsScreen extends ConsumerWidget {
@@ -143,12 +141,12 @@ class AppLockSettingsScreen extends ConsumerWidget {
 
   Future<void> _toggle(BuildContext context, WidgetRef ref, bool on) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     final result = await ref.read(appLockProvider.notifier).setEnabled(on);
     final message = switch (result) {
       AuthResult.success => null,
-      AuthResult.failed => 'That didn’t work, so nothing changed.',
-      AuthResult.unavailable =>
-        on ? 'Set a screen lock on this device first.' : null,
+      AuthResult.failed => l10n.authFailedNothingChanged,
+      AuthResult.unavailable => on ? l10n.setScreenLockFirst : null,
     };
     if (message != null) {
       messenger.showSnackBar(SnackBar(content: Text(message)));
@@ -175,7 +173,10 @@ class AppLockSettingsScreen extends ConsumerWidget {
                 value: lock.timeout,
                 items: [
                   for (final d in appLockChoices)
-                    DropdownMenuItem(value: d, child: Text(_label(d))),
+                    DropdownMenuItem(
+                      value: d,
+                      child: Text(_label(context.l10n, d)),
+                    ),
                 ],
                 onChanged: (d) {
                   if (d != null) {

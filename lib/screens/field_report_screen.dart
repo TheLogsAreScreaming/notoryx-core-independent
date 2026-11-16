@@ -112,9 +112,7 @@ class _FieldReportScreenState extends ConsumerState<FieldReportScreen> {
             )
           else if (messages.isNotEmpty) ...[
             Text(
-              messages.length == 1
-                  ? 'Will send'
-                  : 'Will send as ${messages.length} messages',
+              context.l10n.willSendAsMessages(messages.length),
               style: theme.textTheme.titleSmall,
             ),
             const SizedBox(height: 4),

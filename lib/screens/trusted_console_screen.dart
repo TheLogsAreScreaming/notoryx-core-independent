@@ -109,8 +109,8 @@ class _TrustedConsoleScreenState extends ConsumerState<TrustedConsoleScreen> {
                       onSubmitted: (_) => _send(),
                       decoration: InputDecoration(
                         labelText: connected
-                            ? 'Command'
-                            : 'Connect a radio to send commands',
+                            ? context.l10n.command
+                            : context.l10n.connectRadioToSendCommands,
                         border: const OutlineInputBorder(),
                       ),
                     ),

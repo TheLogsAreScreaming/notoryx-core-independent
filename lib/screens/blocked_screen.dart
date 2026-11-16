@@ -34,7 +34,7 @@ class BlockedScreen extends ConsumerWidget {
         : ref.watch(contactsProvider(radioKey)).value ?? const <Contact>[];
     String nameOf(String key) =>
         contacts.where((c) => c.publicKey == key).firstOrNull?.name ??
-        'Unknown ${key.substring(0, 8)}';
+        context.l10n.unknownThread(key.substring(0, 8));
     final blocking = ref.read(blockingProvider);
     final names = blocked.names.toList()..sort();
     final keys = blocked.keys.toList()..sort();
@@ -67,7 +67,7 @@ class BlockedScreen extends ConsumerWidget {
                       onPressed: () => blocking.unblockName(name),
                       child: Text(
                         context.l10n.unblock,
-                        semanticsLabel: 'Unblock $name',
+                        semanticsLabel: context.l10n.unblockName(name),
                       ),
                     ),
                   ),
@@ -81,7 +81,7 @@ class BlockedScreen extends ConsumerWidget {
                       onPressed: () => blocking.unblockKey(key),
                       child: Text(
                         context.l10n.unblock,
-                        semanticsLabel: 'Unblock ${nameOf(key)}',
+                        semanticsLabel: context.l10n.unblockName(nameOf(key)),
                       ),
                     ),
                   ),

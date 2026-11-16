@@ -42,7 +42,7 @@ class _TelemetryScreenState extends ConsumerState<TelemetryScreen> {
   Future<void> _ask() async {
     final state = ref.read(connectionProvider);
     if (state is! Connected) {
-      setState(() => _note = 'Connect to the radio first.');
+      setState(() => _note = context.l10n.connectToTheRadioFirst);
       return;
     }
     setState(() {
@@ -56,19 +56,15 @@ class _TelemetryScreenState extends ConsumerState<TelemetryScreen> {
       if (!mounted) return;
       setState(
         () => _note = switch (readings) {
-          null when _needsLogin =>
-            'No reply. Log in first (guest is enough), and check the '
-                'node is in range.',
-          null =>
-            'No reply. The node may be out of range, or not share '
-                'telemetry with you.',
-          [] => 'It answered, but shared no readings.',
+          null when _needsLogin => context.l10n.noReplyLogInFirst,
+          null => context.l10n.noReplyOutOfRange,
+          [] => context.l10n.answeredNoReadings,
           _ => null,
         },
       );
     } on RadioRequestException {
       if (mounted) {
-        setState(() => _note = 'The radio could not send the request.');
+        setState(() => _note = context.l10n.radioCouldNotSendRequest);
       }
     } finally {
       if (mounted) setState(() => _asking = false);
@@ -123,7 +119,7 @@ class _TelemetryScreenState extends ConsumerState<TelemetryScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isSelf ? 'Radio telemetry' : widget.name),
+        title: Text(widget.isSelf ? context.l10n.radioTelemetry : widget.name),
         actions: [
           if (radioKey != null && samples.isNotEmpty)
             IconButton(
@@ -138,13 +134,10 @@ class _TelemetryScreenState extends ConsumerState<TelemetryScreen> {
         children: [
           Text(
             widget.isSelf
-                ? 'Your radio’s battery and sensors. Saved every 30 minutes '
-                      'while connected, at no airtime cost.'
+                ? context.l10n.telemetrySelfNote
                 : _needsLogin
-                ? 'Repeaters and rooms answer after you log in. Guest is '
-                      'enough for the battery; admin gets every sensor.'
-                : 'Each request sends one packet. The node only answers if '
-                      'it shares telemetry with you.',
+                ? context.l10n.telemetryServerNote
+                : context.l10n.telemetryNodeNote,
             style: theme.textTheme.bodySmall,
           ),
           const SizedBox(height: 12),
@@ -156,7 +149,7 @@ class _TelemetryScreenState extends ConsumerState<TelemetryScreen> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.sensors),
-            label: Text(_asking ? 'Asking…' : 'Request readings'),
+            label: Text(context.l10n.askingOrRequest('$_asking')),
           ),
           if (_note case final note?)
             Padding(padding: const EdgeInsets.only(top: 8), child: Text(note)),
@@ -175,7 +168,7 @@ class _TelemetryScreenState extends ConsumerState<TelemetryScreen> {
             SegmentedButton<TelemetryRange>(
               segments: [
                 for (final r in TelemetryRange.values)
-                  ButtonSegment(value: r, label: Text(r.label)),
+                  ButtonSegment(value: r, label: Text(r.label(context.l10n))),
               ],
               selected: {_range},
               onSelectionChanged: (s) => setState(() => _range = s.first),
@@ -212,7 +205,7 @@ class _Latest extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(context.l10n.latest, style: theme.textTheme.titleMedium),
-            Text(_when(at), style: theme.textTheme.bodySmall),
+            Text(_when(context.l10n, at), style: theme.textTheme.bodySmall),
             const SizedBox(height: 8),
             if (readings.isEmpty) Text(context.l10n.noReadingsInThisReply),
             for (final r in readings)
@@ -222,7 +215,7 @@ class _Latest extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        readingLabel(r),
+                        readingLabel(r, context.l10n),
                         style: theme.textTheme.bodySmall,
                       ),
                     ),
@@ -239,12 +232,12 @@ class _Latest extends StatelessWidget {
   }
 }
 
-String _when(DateTime at) {
+String _when(AppLocalizations l10n, DateTime at) {
   final ago = DateTime.now().difference(at);
-  if (ago.inMinutes < 1) return 'Just now';
-  if (ago.inHours < 1) return '${ago.inMinutes} min ago';
-  if (ago.inDays < 1) return '${ago.inHours} h ago';
-  return '${ago.inDays} d ago';
+  if (ago.inMinutes < 1) return l10n.agoJustNowCap;
+  if (ago.inHours < 1) return l10n.agoMinutes(ago.inMinutes);
+  if (ago.inDays < 1) return l10n.agoHours(ago.inHours);
+  return l10n.agoDays(ago.inDays);
 }
 
 class _SeriesCard extends StatelessWidget {
@@ -255,7 +248,7 @@ class _SeriesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => HistoryChartCard(
-    label: seriesLabel(seriesKey),
+    label: seriesLabel(seriesKey, l10n: context.l10n),
     points: points,
     format: (v) => formatValue(seriesKey.kind, v),
   );

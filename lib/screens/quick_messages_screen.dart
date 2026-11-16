@@ -89,7 +89,11 @@ class QuickMessagesScreen extends ConsumerWidget {
     return showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(initial.isEmpty ? 'New quick message' : 'Change message'),
+        title: Text(
+          initial.isEmpty
+              ? context.l10n.newQuickMessage
+              : context.l10n.changeMessage,
+        ),
         content: TextField(
           controller: controller,
           autofocus: true,

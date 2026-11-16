@@ -44,8 +44,7 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
 
   Future<void> _startSos(String who) => _run(
     () => ref.read(safetyProvider.notifier).sendSos(),
-    'SOS sent to $who. It repeats every '
-    '${ref.read(sosRepeatProvider).inMinutes} minutes until someone answers.',
+    context.l10n.sosSentTo(who, ref.read(sosRepeatProvider).inMinutes),
   );
 
   Future<void> _endSos({required bool allClear}) async {
@@ -71,17 +70,15 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
     }
     await _run(
       () => ref.read(safetyProvider.notifier).endSos(allClear: allClear),
-      allClear ? 'All-clear sent. SOS over.' : 'SOS stopped.',
+      context.l10n.sosEnded('$allClear'),
     );
   }
 
   /// "#trail", "#trail and 2 trip contacts", "1 trip contact".
-  static String _who(String? main, int trip) {
-    final people = trip == 0
-        ? null
-        : '$trip trip contact${trip == 1 ? '' : 's'}';
-    if (main == null) return people ?? 'nobody';
-    return people == null ? main : '$main and $people';
+  static String _who(AppLocalizations l10n, String? main, int trip) {
+    final people = trip == 0 ? null : l10n.whoTripContacts(trip);
+    if (main == null) return people ?? l10n.whoNobody;
+    return people == null ? main : l10n.whoAnd(main, people);
   }
 
   Future<void> _pickTripContact(List<Contact> choices) async {
@@ -132,12 +129,16 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
     };
     final target = targets.containsKey(safety.target) ? safety.target : null;
     String nameOf(String thread) =>
-        targets[thread] ?? 'Unknown ${thread.substring(2, 8)}';
+        targets[thread] ?? context.l10n.unknownThread(thread.substring(2, 8));
     final recipients = safety.recipients
         .where((t) => t != safety.target || target != null)
         .toList();
     final trip = safety.tripContacts;
-    final who = _who(target == null ? null : targets[target], trip.length);
+    final who = _who(
+      context.l10n,
+      target == null ? null : targets[target],
+      trip.length,
+    );
     final canSend = connected && recipients.isNotEmpty && !_busy;
     final notifier = ref.read(safetyProvider.notifier);
 
@@ -188,8 +189,9 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
                 InputChip(
                   avatar: const Icon(Icons.person, size: 18),
                   label: Text(nameOf(Threads.direct(key))),
-                  deleteButtonTooltipMessage:
-                      'Remove ${nameOf(Threads.direct(key))}',
+                  deleteButtonTooltipMessage: context.l10n.removeHop(
+                    nameOf(Threads.direct(key)),
+                  ),
                   onDeleted: () => notifier.removeTripContact(key),
                 ),
               if (trip.length < maxTripContacts)
@@ -210,13 +212,14 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
               time: _time,
               busy: _busy,
               canSend: canSend,
-              onSendAgain: () => _run(notifier.sendSos, 'SOS sent again.'),
+              onSendAgain: () =>
+                  _run(notifier.sendSos, context.l10n.sosSentAgain),
               onSafe: () => _endSos(allClear: true),
               onStop: () => _endSos(allClear: false),
             )
           else
             HoldToSendButton(
-              label: 'Hold for SOS',
+              label: context.l10n.holdForSos,
               enabled: canSend,
               onSend: () => _startSos(who),
             ),
@@ -226,10 +229,10 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
             child: FilledButton.tonalIcon(
               onPressed: canSend
                   ? () =>
-                        _run(notifier.checkIn, "Check-in sent to $who: I'm OK.")
+                        _run(notifier.checkIn, context.l10n.checkInSentOk(who))
                   : null,
               icon: const Icon(Icons.check_circle_outline),
-              label: Text(CheckInKind.ok.label),
+              label: Text(CheckInKind.ok.shown(context.l10n)),
             ),
           ),
           const SizedBox(height: 8),
@@ -242,10 +245,16 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
                     onPressed: canSend
                         ? () => _run(
                             () => notifier.checkIn(kind),
-                            'Check-in sent to $who: ${kind.label}.',
+                            context.l10n.checkInSent(
+                              who,
+                              kind.shown(context.l10n),
+                            ),
                           )
                         : null,
-                    child: Text(kind.label, textAlign: TextAlign.center),
+                    child: Text(
+                      kind.shown(context.l10n),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
               ],
@@ -254,14 +263,13 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
           const SizedBox(height: 8),
           Text(
             !connected
-                ? 'Connect a radio to send.'
+                ? context.l10n.connectRadioToSend
                 : recipients.isEmpty
-                ? 'Choose a main chat or a trip contact first.'
-                : 'Everything goes to $who, with your position from the '
-                      'phone or else the radio. An SOS repeats every '
-                      '${ref.watch(sosRepeatProvider).inMinutes} minutes until '
-                      'someone answers: any direct reply, or on a channel a '
-                      'message that mentions you or says SOS.',
+                ? context.l10n.chooseMainChatFirst
+                : context.l10n.safetyExplainer(
+                    who,
+                    ref.watch(sosRepeatProvider).inMinutes,
+                  ),
             style: theme.textTheme.bodySmall,
           ),
           if (safety.lastRecord case final record?)
@@ -272,7 +280,7 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
               canResend: canSend,
               onResend: (missed) => _run(
                 () => notifier.resendCheckIn(missed),
-                'Sent again to ${missed.length}.',
+                context.l10n.sentAgainTo(missed.length),
               ),
             )
           else if (safety.lastCheckIn case final last?)
@@ -295,7 +303,10 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
               items: [
                 DropdownMenuItem(value: null, child: Text(context.l10n.never)),
                 for (final d in quietChoices)
-                  DropdownMenuItem(value: d, child: Text(_every(d))),
+                  DropdownMenuItem(
+                    value: d,
+                    child: Text(_every(context.l10n, d)),
+                  ),
               ],
               onChanged: notifier.setQuietLimit,
             ),
@@ -353,7 +364,10 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
             items: [
               DropdownMenuItem(value: null, child: Text(context.l10n.off)),
               for (final d in checkInChoices)
-                DropdownMenuItem(value: d, child: Text(_every(d))),
+                DropdownMenuItem(
+                  value: d,
+                  child: Text(_every(context.l10n, d)),
+                ),
             ],
             onChanged: recipients.isEmpty
                 ? null
@@ -400,7 +414,9 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
             title: Text(
-              'Tell ${recipients.isEmpty ? 'the chat' : who} if I miss one',
+              context.l10n.tellIfIMiss(
+                recipients.isEmpty ? context.l10n.theChat : who,
+              ),
             ),
             subtitle: Text(
               context.l10n.minutesAfterTheReminderNeedsThe(
@@ -416,11 +432,9 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
     );
   }
 
-  static String _every(Duration d) => d.inMinutes < 60
-      ? '${d.inMinutes} minutes'
-      : d.inHours == 1
-      ? '1 hour'
-      : '${d.inHours} hours';
+  static String _every(AppLocalizations l10n, Duration d) => d.inMinutes < 60
+      ? l10n.everyMinutes(d.inMinutes)
+      : l10n.everyHours(d.inHours);
 }
 
 /// A big red button that sends only after being held for [hold], so a
@@ -486,7 +500,7 @@ class _HoldToSendButtonState extends State<HoldToSendButton>
       button: true,
       enabled: enabled,
       label: widget.label,
-      hint: 'Hold for ${widget.hold.inSeconds} seconds',
+      hint: context.l10n.holdForSeconds(widget.hold.inSeconds),
       onLongPress: enabled ? widget.onSend : null,
       excludeSemantics: true,
       child: GestureDetector(
@@ -528,7 +542,9 @@ class _HoldToSendButtonState extends State<HoldToSendButton>
                     Icon(Icons.sos, size: 32, color: foreground),
                     const SizedBox(width: 8),
                     Text(
-                      _progress.value > 0 ? 'Keep holding…' : widget.label,
+                      _progress.value > 0
+                          ? context.l10n.keepHolding
+                          : widget.label,
                       style: Theme.of(context).textTheme.titleLarge
                           ?.copyWith(color: foreground),
                     ),
@@ -601,8 +617,9 @@ class _SosActiveCard extends StatelessWidget {
                 children: [
                   Text(context.l10n.since(time(safety.sosSince!))),
                   Text(
-                    'Sent $sends time${sends == 1 ? '' : 's'}'
-                    '${last == null ? '' : ', last at ${time(last)}'}',
+                    last == null
+                        ? context.l10n.sosSentTimes(sends)
+                        : context.l10n.sosSentTimesLast(sends, time(last)),
                   ),
                   if (answered != null)
                     Text(
@@ -675,8 +692,8 @@ class SosBanner extends ConsumerWidget {
               Expanded(
                 child: Text(
                   answered == null
-                      ? 'SOS active, repeating. Tap to send I\'m safe.'
-                      : 'SOS answered by $answered. Tap to send I\'m safe.',
+                      ? context.l10n.sosActiveRepeating
+                      : context.l10n.sosAnsweredBy(answered),
                   style: TextStyle(color: scheme.onError),
                 ),
               ),
@@ -719,16 +736,22 @@ class _CheckInReport extends ConsumerWidget {
       final m = send.messageId == null ? null : byId[send.messageId];
       final channel = send.thread.startsWith('c:');
       final (icon, status) = switch (m?.status) {
-        _ when send.messageId == null => (Icons.error_outline, 'Not sent'),
-        MessageStatus.delivered => (Icons.done_all, 'Reached'),
+        _ when send.messageId == null => (
+          Icons.error_outline,
+          context.l10n.notSent,
+        ),
+        MessageStatus.delivered => (Icons.done_all, context.l10n.reached),
         MessageStatus.sent when channel => (
           Icons.check,
-          'Sent (channels don’t confirm)',
+          context.l10n.sentChannelsDontConfirm,
         ),
-        MessageStatus.sent => (Icons.check, 'Sent, not confirmed yet'),
-        MessageStatus.pending => (Icons.schedule, 'Sending'),
-        MessageStatus.failed => (Icons.error_outline, 'Didn’t reach them'),
-        _ => (Icons.schedule, 'Sending'),
+        MessageStatus.sent => (Icons.check, context.l10n.sentNotConfirmed),
+        MessageStatus.pending => (Icons.schedule, context.l10n.sendingStatus),
+        MessageStatus.failed => (
+          Icons.error_outline,
+          context.l10n.didntReachThem,
+        ),
+        _ => (Icons.schedule, context.l10n.sendingStatus),
       };
       if (send.messageId == null || m?.status == MessageStatus.failed) {
         missed.add(send.thread);
@@ -768,7 +791,10 @@ class _CheckInReport extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              context.l10n.lastCheckIn2(record.kind.label, time(record.at)),
+              context.l10n.lastCheckIn2(
+                record.kind.shown(context.l10n),
+                time(record.at),
+              ),
               style: theme.textTheme.titleSmall,
             ),
             const SizedBox(height: 4),

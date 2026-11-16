@@ -669,9 +669,8 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                 title: Text(context.l10n.block(sender)),
                 subtitle: Text(
                   message.kind == MessageKind.channel
-                      ? 'Hides messages posted under this name, on every '
-                            'channel.'
-                      : 'Hides their direct messages.',
+                      ? context.l10n.blockChannelNameHint
+                      : context.l10n.blockDirectHint,
                 ),
                 onTap: () => Navigator.pop(context, 'block'),
               ),
@@ -709,12 +708,15 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     if (action == 'read') {
       try {
         await ref.read(speakerProvider)(
-          readAloudText(sender, message.body, mine: message.outgoing),
+          readAloudText(
+            sender,
+            message.body,
+            mine: message.outgoing,
+            l10n: l10n,
+          ),
         );
       } on Object {
-        messenger.showSnackBar(
-          const SnackBar(content: Text('This device can’t read aloud.')),
-        );
+        messenger.showSnackBar(SnackBar(content: Text(l10n.cantReadAloud)));
       }
       return;
     }
@@ -751,7 +753,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
         SnackBar(
           content: Text(l10n.blocked2(sender)),
           action: SnackBarAction(
-            label: 'Undo',
+            label: l10n.undo,
             onPressed: () {
               if (message.kind == MessageKind.channel) {
                 final name = message.senderName;
@@ -790,6 +792,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     Contact? contact,
   ) async {
     final report = deliveryReport(
+      l10n: context.l10n,
       message,
       retrying: retrying,
       contact: contact,
@@ -867,12 +870,16 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
 
   /// A room post's writer: the contact whose key starts with [prefix], or
   /// the prefix itself for someone not in contacts.
-  static String? _authorName(String? prefix, List<Contact> contacts) {
+  static String? _authorName(
+    AppLocalizations l10n,
+    String? prefix,
+    List<Contact> contacts,
+  ) {
     if (prefix == null) return null;
     for (final c in contacts) {
       if (c.publicKey.startsWith(prefix)) return c.name;
     }
-    return 'Member $prefix';
+    return l10n.memberPrefix(prefix);
   }
 
   /// The "limit to area" toggle beside the box, when the experimental
@@ -946,11 +953,13 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     final connection = ref.watch(connectionProvider);
     final selfName = connection is Connected
         ? connection.radio.self.name
-        : 'Me';
+        : context.l10n.meLabel;
     String senderOf(Message m) {
       if (m.outgoing) return selfName;
-      return _authorName(m.authorPrefix, contacts) ??
-          (widget.isChannel ? m.senderName ?? 'Someone' : widget.title);
+      return _authorName(context.l10n, m.authorPrefix, contacts) ??
+          (widget.isChannel
+              ? m.senderName ?? context.l10n.someone
+              : widget.title);
     }
 
     final blocked = ref.watch(blockListProvider).value ?? const BlockList();
@@ -1050,7 +1059,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                           flagged: sentinel.banForMessage(message),
                           body: item.replyText ?? message.body,
                           showSender: widget.isChannel,
-                          author: _authorName(message.authorPrefix, contacts),
+                          author: _authorName(
+                            context.l10n,
+                            message.authorPrefix,
+                            contacts,
+                          ),
                           signedBy: _signerLabel(context, message, contacts),
                           replyTo: replyTo == null
                               ? null
@@ -1140,12 +1153,12 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                                 ),
                               )
                             : canReply
-                            ? 'Message'
+                            ? context.l10n.message
                             : connected
-                            ? 'Add this sender as a contact to reply'
+                            ? context.l10n.addSenderToReply
                             : radioKey != null
-                            ? 'Waiting for the radio to reconnect'
-                            : 'Not connected',
+                            ? context.l10n.waitingForReconnect
+                            : context.l10n.mqttNotConnected,
                         border: const OutlineInputBorder(),
                       ),
                       onSubmitted: (_) => _send(),
@@ -1236,15 +1249,16 @@ class _Bubble extends StatelessWidget {
       if (message.region case final region?) '📍 $region',
       ?signedBy,
       if (!mine && message.kind == MessageKind.channel)
-        ?_hops(message.pathLength),
-      if (mine && retrying) 'try ${message.attempts}',
-      if (mine && message.status == MessageStatus.failed) 'hold for details',
+        ?_hops(context.l10n, message.pathLength),
+      if (mine && retrying) context.l10n.tryNumber(message.attempts),
+      if (mine && message.status == MessageStatus.failed)
+        context.l10n.holdForDetails,
     ].join(' · ');
 
     return Align(
       alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
       child: Semantics(
-        onLongPressHint: onLongPress == null ? null : 'show options',
+        onLongPressHint: onLongPress == null ? null : context.l10n.showOptions,
         child: GestureDetector(
           onLongPress: onLongPress,
           child: ConstrainedBox(
@@ -1346,9 +1360,11 @@ class _Bubble extends StatelessWidget {
                                 size: 18,
                               ),
                               label: Text(switch (link) {
-                                ChannelLink(:final name) => 'Join $name',
-                                ContactLink(:final name) => 'Add $name',
-                                AdvertLink() => 'Add contact',
+                                ChannelLink(:final name) =>
+                                  context.l10n.joinName(name),
+                                ContactLink(:final name) =>
+                                  context.l10n.addName(name),
+                                AdvertLink() => context.l10n.addContact,
                               }),
                               onPressed: onAddLink == null
                                   ? null
@@ -1384,15 +1400,10 @@ class _Bubble extends StatelessWidget {
   }
 
   /// "direct", "1 hop", "3 hops" for a channel message's path.
-  static String? _hops(int? pathLength) {
+  static String? _hops(AppLocalizations l10n, int? pathLength) {
     if (pathLength == null) return null;
-    if (pathLength == 0xFF) return 'direct';
-    final hops = pathLength & 0x3F;
-    return switch (hops) {
-      0 => 'direct',
-      1 => '1 hop',
-      _ => '$hops hops',
-    };
+    if (pathLength == 0xFF) return l10n.hopsCount(0);
+    return l10n.hopsCount(pathLength & 0x3F);
   }
 }
 
@@ -1404,11 +1415,11 @@ class _StatusIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (icon, label) = switch (status) {
-      MessageStatus.pending => (Icons.schedule, 'Sending'),
-      MessageStatus.sent => (Icons.check, 'Sent'),
-      MessageStatus.delivered => (Icons.done_all, 'Delivered'),
-      MessageStatus.failed => (Icons.error_outline, 'Not sent'),
-      MessageStatus.received => (Icons.check, 'Received'),
+      MessageStatus.pending => (Icons.schedule, context.l10n.sendingStatus),
+      MessageStatus.sent => (Icons.check, context.l10n.sentStatus),
+      MessageStatus.delivered => (Icons.done_all, context.l10n.deliveredStatus),
+      MessageStatus.failed => (Icons.error_outline, context.l10n.notSent),
+      MessageStatus.received => (Icons.check, context.l10n.receivedStatus),
     };
     return Semantics(
       label: label,
@@ -1434,7 +1445,7 @@ class _Quote extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Semantics(
-      label: 'In reply to $name: $body',
+      label: context.l10n.inReplyTo(name, body),
       excludeSemantics: true,
       child: Container(
         margin: const EdgeInsets.only(bottom: 4),
@@ -1485,10 +1496,12 @@ class _ReactionChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final names = reaction.who.join(', ');
-    final yours = reaction.mine ? ', including you' : '';
+    final who = reaction.mine
+        ? context.l10n.reactionIncludingYou(names)
+        : names;
     return Semantics(
       button: onTap != null,
-      label: '${reaction.emoji} ${reaction.count}: $names$yours',
+      label: context.l10n.reactionLabel(reaction.emoji, reaction.count, who),
       excludeSemantics: true,
       child: Tooltip(
         message: names,

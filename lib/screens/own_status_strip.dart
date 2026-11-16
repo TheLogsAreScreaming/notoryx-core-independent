@@ -49,12 +49,13 @@ class _OwnStatusStripState extends ConsumerState<OwnStatusStrip> {
   Widget build(BuildContext context) {
     final latest = ref.watch(latestTelemetryProvider(widget.radioKey)).value;
     final sample = latest?[widget.radioKey];
-    final text = sample == null ? null : ownStatusText(sample);
+    final text = sample == null ? null : ownStatusText(sample, context.l10n);
     if (sample == null || text == null) return const SizedBox.shrink();
     final theme = Theme.of(context);
     final age = readingAge(
       DateTime.fromMillisecondsSinceEpoch(sample.at),
       DateTime.now(),
+      context.l10n,
     );
     return Material(
       color: theme.colorScheme.surfaceContainerHighest,

@@ -6,13 +6,17 @@ import '../radio/radio.dart';
 import '../l10n/l10n.dart';
 
 enum _Tree {
-  us('United States', 'usa', usRegions),
-  canada('Canada', 'canada', canadaRegions),
-  own('My own list', null, <String>[]);
+  us('usa', usRegions),
+  canada('canada', canadaRegions),
+  own(null, <String>[]);
 
-  const _Tree(this.label, this.parent, this.regions);
+  const _Tree(this.parent, this.regions);
 
-  final String label;
+  String label(AppLocalizations l10n) => switch (this) {
+    us => l10n.treeUnitedStates,
+    canada => l10n.treeCanada,
+    own => l10n.treeMyOwnList,
+  };
   final String? parent;
   final List<String> regions;
 }
@@ -90,7 +94,7 @@ class _RegionSetupScreenState extends State<RegionSetupScreen> {
             decoration: InputDecoration(labelText: context.l10n.regionsFrom),
             items: [
               for (final t in _Tree.values)
-                DropdownMenuItem(value: t, child: Text(t.label)),
+                DropdownMenuItem(value: t, child: Text(t.label(context.l10n))),
             ],
             onChanged: (t) => setState(() {
               _tree = t ?? _tree;
@@ -154,8 +158,8 @@ class _RegionSetupScreenState extends State<RegionSetupScreen> {
                 : () => _sendAll(commands),
             child: Text(
               _sending
-                  ? 'Sending $_sent of ${commands.length}…'
-                  : 'Send to repeater',
+                  ? context.l10n.sendingProgress(_sent, commands.length)
+                  : context.l10n.sendToRepeater,
             ),
           ),
         ],

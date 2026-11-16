@@ -18,11 +18,11 @@ class AreaBanner extends ConsumerWidget {
     if (offer == null) return const SizedBox.shrink();
     final area = offer.area;
     final scheme = Theme.of(context).colorScheme;
-    final who = area.fromMap
-        ? 'Most radios around ${area.name}'
-              '${area.nodeCount == null ? '' : ' (${area.nodeCount} on the MeshCore map)'}'
-              ' use'
-        : 'The ${area.name} mesh uses';
+    final who = !area.fromMap
+        ? context.l10n.areaMeshUses(area.name)
+        : area.nodeCount == null
+        ? context.l10n.areaMostRadiosUse(area.name)
+        : context.l10n.areaMostRadiosUseCount(area.name, area.nodeCount!);
     return Material(
       key: const ValueKey('area-banner'),
       color: scheme.tertiaryContainer,
@@ -98,9 +98,10 @@ Future<void> reviewArea(
             ],
             const SizedBox(height: 8),
             Text(
-              '${area.fromMap ? 'Reported by node owners on the MeshCore map, not checked on air. ' : ''}'
-              'Updated ${area.updated}. After switching you will only hear '
-              'radios on the same settings. Transmit power is not changed.',
+              [
+                if (area.fromMap) context.l10n.areaFromMapNote,
+                context.l10n.areaUpdatedNote(area.updated),
+              ].join(' '),
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
@@ -172,10 +173,10 @@ class AreaScreen extends ConsumerWidget {
               title: Text(context.l10n.automatic),
               subtitle: Text(
                 at == null
-                    ? "Your radio has no position, so pick your area below."
+                    ? context.l10n.radioNoPositionPickArea
                     : active == null
-                    ? 'No listed area around your radio.'
-                    : 'Around your radio: ${active.name}',
+                    ? context.l10n.noListedAreaNearby
+                    : context.l10n.aroundYourRadio(active.name),
               ),
             ),
             if (active != null)
@@ -217,9 +218,13 @@ class AreaScreen extends ConsumerWidget {
                   [
                     area.summary,
                     if (area.fromMap)
-                      'MeshCore map${area.nodeCount == null ? '' : ', ${area.nodeCount} nodes'}',
+                      area.nodeCount == null
+                          ? context.l10n.meshcoreMap
+                          : context.l10n.meshcoreMapNodes(area.nodeCount!),
                     if (at != null)
-                      '${area.distanceKm(at.lat, at.lon).round()} km away',
+                      context.l10n.kmAway(
+                        area.distanceKm(at.lat, at.lon).round(),
+                      ),
                   ].join(' · '),
                 ),
               ),

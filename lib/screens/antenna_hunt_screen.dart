@@ -64,7 +64,7 @@ class _AntennaHuntScreenState extends ConsumerState<AntennaHuntScreen> {
             Semantics(
               liveRegion: true,
               child: Text(
-                _hunt.lost ? 'No answer' : _db(_hunt.latest),
+                _hunt.lost ? context.l10n.noAnswer : _db(_hunt.latest),
                 textAlign: TextAlign.center,
                 style: theme.textTheme.displayMedium,
               ),
@@ -77,16 +77,18 @@ class _AntennaHuntScreenState extends ConsumerState<AntennaHuntScreen> {
             const SizedBox(height: 24),
             FilledButton.icon(
               icon: Icon(_hunt.running ? Icons.stop : Icons.play_arrow),
-              label: Text(_hunt.running ? 'Stop' : 'Start'),
+              label: Text(
+                _hunt.running
+                    ? context.l10n.stopWardrive
+                    : context.l10n.startAction,
+              ),
               onPressed: _hunt.running ? _hunt.stop : _hunt.start,
             ),
             const SizedBox(height: 16),
             Text(
               _hunt.timedOut
-                  ? 'Stopped after 5 minutes to keep the channel clear. '
-                        'Start again if you need more time.'
-                  : 'Pings every 5 seconds and stops by itself after 5 '
-                        'minutes, because each ping uses airtime.',
+                  ? context.l10n.huntStoppedNote
+                  : context.l10n.huntRunningNote,
               style: theme.textTheme.bodySmall,
             ),
           ],

@@ -38,7 +38,7 @@ Future<void> showLinkSheet(
               data: link.url,
               size: 240,
               backgroundColor: Colors.white,
-              semanticsLabel: 'QR code for $title',
+              semanticsLabel: context.l10n.qrCodeFor(title),
             ),
           ),
           if (warning != null) ...[
@@ -96,7 +96,7 @@ class _QrScanScreenState extends State<QrScanScreen> {
     if (_done || !mounted) return;
     final link = MeshLink.parse(text);
     if (link == null) {
-      setState(() => _hint = 'That QR code isn’t a MeshCore link.');
+      setState(() => _hint = context.l10n.qrNotMeshcore);
       return;
     }
     _done = true;
@@ -122,9 +122,8 @@ class _QrScanScreenState extends State<QrScanScreen> {
                     padding: const EdgeInsets.all(24),
                     child: Text(
                       error.errorCode == MobileScannerErrorCode.permissionDenied
-                          ? 'Allow camera access for NOTORYX Independent in '
-                                'your device settings to scan QR codes.'
-                          : 'The camera couldn’t start.',
+                          ? context.l10n.allowCameraAccess
+                          : context.l10n.cameraCouldntStart,
                       textAlign: TextAlign.center,
                     ),
                   ),

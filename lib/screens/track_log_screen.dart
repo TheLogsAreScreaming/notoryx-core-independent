@@ -37,7 +37,9 @@ class TrackLogScreen extends ConsumerWidget {
     }
     try {
       await recorder.start(
-        'Track ${_dateText(DateTime.now().millisecondsSinceEpoch)}',
+        context.l10n.trackNamed(
+          _dateText(DateTime.now().millisecondsSinceEpoch),
+        ),
       );
     } on Object catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('$e')));
@@ -63,7 +65,9 @@ class TrackLogScreen extends ConsumerWidget {
                     active == null ? Icons.fiber_manual_record : Icons.stop,
                   ),
                   label: Text(
-                    active == null ? 'Start recording' : 'Stop recording',
+                    active == null
+                        ? context.l10n.startRecording
+                        : context.l10n.stopRecording,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -83,7 +87,9 @@ class TrackLogScreen extends ConsumerWidget {
               ),
               title: Text(t.name),
               subtitle: Text(
-                t.id == active ? 'Recording' : _dateText(t.startedAt),
+                t.id == active
+                    ? context.l10n.recordingNow
+                    : _dateText(t.startedAt),
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).push(
@@ -110,7 +116,7 @@ class TrackDetailScreen extends ConsumerWidget {
     try {
       final saved = await exportTrack(ref, track);
       messenger.showSnackBar(
-        SnackBar(content: Text(saved ? 'GPX saved.' : 'Not saved.')),
+        SnackBar(content: Text(saved ? l10n.gpxSaved : l10n.notSaved)),
       );
     } on Object catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(l10n.exportFailed(e))));

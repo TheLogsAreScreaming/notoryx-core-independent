@@ -7,13 +7,19 @@ import '../l10n/l10n.dart';
 
 /// How far back the charts reach.
 enum TelemetryRange {
-  day('24 h', Duration(hours: 24)),
-  week('7 days', Duration(days: 7)),
-  all('All', null);
+  day(Duration(hours: 24)),
+  week(Duration(days: 7)),
+  all(null);
 
-  const TelemetryRange(this.label, this.span);
+  const TelemetryRange(this.span);
 
-  final String label;
+  /// The range's name in the app's language.
+  String label(AppLocalizations l10n) => switch (this) {
+    day => l10n.range24h,
+    week => l10n.range7Days,
+    all => l10n.rangeAll,
+  };
+
   final Duration? span;
 }
 
@@ -55,9 +61,11 @@ class HistoryChartCard extends StatelessWidget {
               ],
             ),
             Text(
-              '${points.length} reading${points.length == 1 ? '' : 's'} · '
-              'low ${format(low)} · '
-              'high ${format(high)}',
+              context.l10n.readingsLowHigh(
+                points.length,
+                format(low),
+                format(high),
+              ),
               style: theme.textTheme.bodySmall,
             ),
             const SizedBox(height: 8),
@@ -68,10 +76,12 @@ class HistoryChartCard extends StatelessWidget {
               )
             else
               Semantics(
-                label:
-                    '$label chart, ${points.length} readings, from '
-                    '${format(points.first.value)} to '
-                    '${format(last)}',
+                label: context.l10n.chartSemantics(
+                  label,
+                  points.length,
+                  format(points.first.value),
+                  format(last),
+                ),
                 child: ExcludeSemantics(
                   child: SizedBox(
                     height: 96,

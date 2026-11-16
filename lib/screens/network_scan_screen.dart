@@ -73,7 +73,11 @@ class NetworkScanScreen extends ConsumerWidget {
             ListTile(title: Text(context.l10n.scanFailed(error))),
           for (final r in results)
             ListTile(
-              title: Text(r.preset.name),
+              title: Text(
+                r.preset.id == 'current'
+                    ? context.l10n.yourCurrentSettings
+                    : r.preset.name,
+              ),
               subtitle: Text(
                 r.hits.isEmpty
                     ? '${r.preset.summary}\n${context.l10n.noRepeatersHeard}'
