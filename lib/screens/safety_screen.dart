@@ -316,7 +316,7 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.assignment_outlined),
-              title: Text(report.title),
+              title: Text(report.shownTitle(context.l10n)),
               subtitle: Text(context.l10n.fillInAReportAndSend),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(

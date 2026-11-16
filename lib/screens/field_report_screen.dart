@@ -58,7 +58,9 @@ class _FieldReportScreenState extends ConsumerState<FieldReportScreen> {
         count = await safety.sendTripBrief(message);
       }
       messenger.showSnackBar(
-        SnackBar(content: Text(l10n.sentTo(widget.template.title, count))),
+        SnackBar(
+          content: Text(l10n.sentTo(widget.template.shownTitle(l10n), count)),
+        ),
       );
     } on SafetyException catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
@@ -79,7 +81,7 @@ class _FieldReportScreenState extends ConsumerState<FieldReportScreen> {
       for (final c in _fields) c.text,
     ]);
     return Scaffold(
-      appBar: AppBar(title: Text(template.title)),
+      appBar: AppBar(title: Text(template.shownTitle(context.l10n))),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -90,8 +92,8 @@ class _FieldReportScreenState extends ConsumerState<FieldReportScreen> {
                 controller: _fields[i],
                 onChanged: (_) => setState(() {}),
                 decoration: InputDecoration(
-                  labelText: template.fields[i].label,
-                  hintText: template.fields[i].hint,
+                  labelText: template.shownLabel(context.l10n, i),
+                  hintText: template.shownHint(context.l10n, i),
                   border: const OutlineInputBorder(),
                   suffixIcon: i == template.locationField
                       ? IconButton(
