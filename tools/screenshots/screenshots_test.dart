@@ -23,6 +23,7 @@ import 'package:notoryx_core/app/node_look.dart';
 import 'package:notoryx_core/app/notifications.dart';
 import 'package:notoryx_core/app/radio_connector.dart';
 import 'package:notoryx_core/app/terrain_profile.dart';
+import 'package:notoryx_core/app/traffic.dart';
 import 'package:notoryx_core/data/data.dart';
 import 'package:notoryx_core/main.dart';
 import 'package:notoryx_core/presets/area_presets_provider.dart';
@@ -327,6 +328,48 @@ void main() {
     }
     await settle(tester);
     await shot(tester, 'compass');
+    await finish(tester);
+  });
+
+  testWidgets('live traffic on the map', (tester) async {
+    await tester.runAsync(colours);
+    await start(tester);
+    await tester.tap(find.text('Map'));
+    await settle(tester);
+    await tester.tap(find.byKey(const Key('map-traffic')));
+    await settle(tester);
+    final traffic = ProviderScope.containerOf(
+      tester.element(find.byType(MapTab)),
+    ).read(trafficProvider.notifier);
+    // A channel message on its way in: Fire Tower, then Ridge Repeater.
+    traffic.heard(
+      RxLog(snr: 4.75, rssi: -97, packet: [0x15, 0x02, 0x05, 0x03, 0x11]),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
+    // Maya's advert flooded through Fire Tower, an unknown repeater and
+    // Ridge Repeater.
+    traffic.heard(
+      RxLog(
+        snr: 9.25,
+        rssi: -82,
+        packet: [
+          0x11,
+          0x03,
+          0x05,
+          0x7f,
+          0x03,
+          ...List.filled(32, 2),
+          ...List.filled(70, 0),
+        ],
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 900));
+    await shot(tester, 'traffic');
+    for (var i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 500));
+    }
     await finish(tester);
   });
 
