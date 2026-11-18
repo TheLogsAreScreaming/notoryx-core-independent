@@ -134,6 +134,6 @@ void main() {
       zoneAlertText(alertStrings(const Locale('es')), a).body,
       'Sam ha salido de Camp.',
     );
-    expect(alertStrings(const Locale('ja')).zoneOnBoth, 'Both');
+    expect(alertStrings(const Locale('ar')).zoneOnBoth, 'Both');
   });
 }
