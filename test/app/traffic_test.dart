@@ -193,6 +193,18 @@ void main() {
       expect(route.stops.map((s) => s.label), ['Ridge', 'Base']);
     });
 
+    test('point labels line up with points, one per spot', () {
+      final route = build(
+        packet(
+          payload: PayloadKind.advert,
+          path: [0xcc, 0xbb, 0xcc],
+          body: [0xaa, 0x11, ...List.filled(30, 0)],
+        ),
+      );
+      expect(route.points, hasLength(route.pointLabels.length));
+      expect(route.pointLabels, ['Ridge', 'Tower', 'Base']);
+    });
+
     test('junk is not a route', () {
       expect(
         buildTrafficRoute(
