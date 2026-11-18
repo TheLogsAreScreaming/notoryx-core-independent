@@ -15,6 +15,7 @@ const languageSetting = 'app_language';
 /// original; the others were written by AI.
 const appLanguages = <String, String>{
   'en': 'English',
+  'bg': 'Български',
   'de': 'Deutsch',
   'es': 'Español',
   'fr': 'Français',
@@ -23,7 +24,11 @@ const appLanguages = <String, String>{
   'nl': 'Nederlands',
   'pl': 'Polski',
   'pt': 'Português',
+  'ru': 'Русский',
+  'sk': 'Slovenčina',
+  'sl': 'Slovenščina',
   'sv': 'Svenska',
+  'uk': 'Українська',
 };
 
 class Language extends AsyncNotifier<Locale?> {
