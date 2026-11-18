@@ -67,10 +67,7 @@ class _TrafficLayerState extends ConsumerState<TrafficLayer>
                   for (final p in a.route.points)
                     camera.latLngToScreenOffset(p),
                 ],
-                labels: [
-                  for (final s in a.route.stops)
-                    if (s.at != null) s.label,
-                ],
+                labels: a.route.pointLabels,
                 elapsed: _now - a.start,
                 travel: trafficTravelTime(a.route, reduceMotion: _reduceMotion),
               ),
@@ -112,8 +109,12 @@ class _TrafficPainter extends CustomPainter {
 
   static const _pulse = Duration(milliseconds: 1200);
 
+  /// Where labels went this frame, so crowded ones are left out.
+  final _labelled = <Offset>[];
+
   @override
   void paint(Canvas canvas, Size size) {
+    _labelled.clear();
     for (final r in routes) {
       _paintRoute(canvas, r);
     }
@@ -237,6 +238,14 @@ class _TrafficPainter extends CustomPainter {
       shadows: const [Shadow(blurRadius: 3)],
     );
     for (var i = 0; i < r.points.length && i < r.labels.length; i++) {
+      final at = r.points[i];
+      // Zoomed out, hops sit on top of each other; one name is enough.
+      if (_labelled.any(
+        (o) => (o.dx - at.dx).abs() < 90 && (o.dy - at.dy).abs() < 18,
+      )) {
+        continue;
+      }
+      _labelled.add(at);
       final text = TextPainter(
         text: TextSpan(text: r.labels[i], style: style),
         textDirection: TextDirection.ltr,

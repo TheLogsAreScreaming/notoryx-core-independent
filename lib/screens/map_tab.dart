@@ -398,12 +398,15 @@ class _MapTabState extends ConsumerState<MapTab> {
                     point: radio,
                     width: 40,
                     height: 40,
+                    // Taps fall through to a cluster underneath.
                     child: Semantics(
                       label: context.l10n.yourRadio,
-                      child: Icon(
-                        Icons.router,
-                        color: scheme.primary,
-                        size: 32,
+                      child: IgnorePointer(
+                        child: Icon(
+                          Icons.router,
+                          color: scheme.primary,
+                          size: 32,
+                        ),
                       ),
                     ),
                   ),

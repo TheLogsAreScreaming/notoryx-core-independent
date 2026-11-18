@@ -129,6 +129,20 @@ final class TrafficRoute {
     return out;
   }
 
+  /// A label for each of [points]: the first stop at that spot.
+  List<String> get pointLabels {
+    final out = <String>[];
+    LatLng? last;
+    for (final s in stops) {
+      final at = s.at;
+      if (at == null) continue;
+      if (last == at) continue;
+      last = at;
+      out.add(s.label);
+    }
+    return out;
+  }
+
   /// Stops with no position, not counting this radio.
   List<TrafficStop> get offMap => [
     for (final s in stops)
