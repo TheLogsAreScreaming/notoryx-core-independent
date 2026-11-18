@@ -323,6 +323,8 @@ void main() {
     await connect(tester);
     await tester.tap(find.text('Map'));
     await settle(tester);
+    await tester.tap(find.byKey(const Key('map-options')));
+    await settle(tester);
     await tester.tap(find.byKey(const Key('map-zones')));
     await settle(tester);
     expect(find.textContaining('No zones yet'), findsOneWidget);

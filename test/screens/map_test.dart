@@ -9,6 +9,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:notoryx_core/app/connection.dart';
 import 'package:notoryx_core/app/notifications.dart';
 import 'package:notoryx_core/app/radio_connector.dart';
+import 'package:notoryx_core/app/traffic.dart';
 import 'package:notoryx_core/data/data.dart';
 import 'package:notoryx_core/main.dart';
 import 'package:notoryx_core/radio/radio.dart';
@@ -140,6 +141,61 @@ void main() {
     await tester.tap(find.byTooltip('Go to my location'));
     await settle(tester);
     expect(find.bySemanticsLabel('You'), findsOneWidget);
+    await cleanUp(tester);
+  });
+
+  testWidgets('Traffic draws heard packets with a route card and legend', (
+    tester,
+  ) async {
+    await openMap(tester);
+    expect(find.byKey(const Key('traffic-card')), findsNothing);
+    await tester.tap(find.byKey(const Key('map-traffic')));
+    await settle(tester);
+    expect(find.text('Listening for packets…'), findsOneWidget);
+    expect(find.text('Acknowledgement'), findsOneWidget);
+
+    // A channel message flooded through Ridge RPT (key 02…) and an
+    // unknown repeater 7F.
+    final traffic = ProviderScope.containerOf(
+      tester.element(find.byType(MapTab)),
+    ).read(trafficProvider.notifier);
+    traffic.heard(
+      RxLog(snr: 6.5, rssi: -88, packet: [0x15, 0x02, 0x02, 0x7f, 0x11]),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Ridge RPT → 7F → Base'), findsOneWidget);
+    expect(find.text('Channel message'), findsWidgets);
+    expect(find.text('Heard from 7F · 6.50 dB'), findsOneWidget);
+    expect(find.textContaining('Flood 2 · -88 dBm'), findsOneWidget);
+    expect(find.text('Not on map: 7F'), findsOneWidget);
+
+    // It plays out and the layer goes quiet again.
+    for (var i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 500));
+    }
+    expect(
+      ProviderScope.containerOf(tester.element(find.byType(MapTab)))
+          .read(trafficProvider)
+          .busy,
+      isFalse,
+    );
+
+    await tester.tap(find.byKey(const Key('map-traffic')));
+    await settle(tester);
+    expect(find.byKey(const Key('traffic-card')), findsNothing);
+    await cleanUp(tester);
+  });
+
+  testWidgets('the options menu holds the other map tools', (tester) async {
+    await openMap(tester);
+    await tester.tap(find.byKey(const Key('map-options')));
+    await settle(tester);
+    expect(find.text('Offline map packs'), findsOneWidget);
+    expect(find.text('Zone & trail alerts'), findsOneWidget);
+    await tester.tap(find.text('Zone & trail alerts'));
+    await settle(tester);
+    expect(find.textContaining('No zones yet'), findsOneWidget);
     await cleanUp(tester);
   });
 
