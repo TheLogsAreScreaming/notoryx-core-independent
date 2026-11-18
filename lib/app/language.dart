@@ -18,8 +18,12 @@ const appLanguages = <String, String>{
   'de': 'Deutsch',
   'es': 'Español',
   'fr': 'Français',
+  'hu': 'Magyar',
   'it': 'Italiano',
+  'nl': 'Nederlands',
+  'pl': 'Polski',
   'pt': 'Português',
+  'sv': 'Svenska',
 };
 
 class Language extends AsyncNotifier<Locale?> {
