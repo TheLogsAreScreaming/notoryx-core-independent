@@ -2964,5 +2964,17 @@
   "@trafficNotOnMapNames": {"placeholders": {"names": {"type": "String"}}},
   "trafficAge": "{seconds}s",
   "@trafficAge": {"placeholders": {"seconds": {"type": "int"}}},
-  "trafficShowPackets": "Show these packets"
+  "trafficShowPackets": "Show these packets",
+  "trafficPacketDetails": "Packet details",
+  "trafficRouteHeading": "Route",
+  "trafficHeardAt": "Heard at {time}",
+  "@trafficHeardAt": {"placeholders": {"time": {"type": "String"}}},
+  "trafficRawPacket": "Raw packet, {bytes} bytes",
+  "@trafficRawPacket": {"placeholders": {"bytes": {"type": "int"}}},
+  "trafficOpenLog": "Open packet log",
+  "trafficThisRadio": "This radio",
+  "trafficOffMap": "Not on map",
+  "trafficOnMap": "On the map",
+  "mapClusterNodes": "{count} nodes here. Tap to zoom in.",
+  "@mapClusterNodes": {"placeholders": {"count": {"type": "int"}}}
 }

@@ -10,6 +10,7 @@ import '../app/contact_room.dart' show isFavourite;
 import '../app/favourites_view.dart';
 import '../app/connection.dart';
 import '../app/map_cache.dart';
+import '../app/map_clusters.dart';
 import '../app/map_packs.dart';
 import '../app/telemetry.dart';
 import '../app/track_log.dart';
@@ -63,6 +64,14 @@ class _MapTabState extends ConsumerState<MapTab> {
   final _map = MapController();
   LatLng? _phone;
   bool _locating = false;
+
+  /// The map's zoom in half steps, for clustering; null until it's shown.
+  double? _zoom;
+
+  void _onMove(MapCamera camera) {
+    final zoom = (camera.zoom * 2).floorToDouble() / 2;
+    if (zoom != _zoom && mounted) setState(() => _zoom = zoom);
+  }
 
   /// The connected radio's own position, if it has one.
   LatLng? _radioPosition() {
@@ -130,6 +139,25 @@ class _MapTabState extends ConsumerState<MapTab> {
     if (node.lastAdvert <= 0) return false;
     final age = DateTime.now().millisecondsSinceEpoch ~/ 1000 - node.lastAdvert;
     return age >= 0 && age < 3600;
+  }
+
+  /// Zooms in on a cluster until its pins come apart.
+  void _openCluster(MapCluster<NodeSummary> cluster) {
+    final points = [
+      for (final n in cluster.items) LatLng(n.latitude!, n.longitude!),
+    ];
+    final bounds = LatLngBounds.fromPoints(points);
+    if (bounds.north == bounds.south && bounds.east == bounds.west) {
+      _map.move(cluster.at, clusterUntilZoom);
+      return;
+    }
+    _map.fitCamera(
+      CameraFit.bounds(
+        bounds: bounds,
+        padding: const EdgeInsets.all(72),
+        maxZoom: clusterUntilZoom,
+      ),
+    );
   }
 
   void _fitAll(List<LatLng> points) {
@@ -285,6 +313,15 @@ class _MapTabState extends ConsumerState<MapTab> {
     final traffic = ref.watch(trafficProvider);
     _shareWithTraffic(contacts, heard, radio);
     final tiles = ref.watch(mapTilesProvider);
+    final zoom = _zoom;
+    final grouping = zoom != null && zoom < clusterUntilZoom;
+    final clusters = clusterPins(
+      nodes,
+      position: (n) => LatLng(n.latitude!, n.longitude!),
+      project: (at) => const Epsg3857().latLngToOffset(at, zoom ?? 0),
+      // Until the map is shown, or when zoomed right in, nothing groups.
+      radius: grouping ? clusterRadius : -1,
+    );
     final points = [
       for (final n in nodes) LatLng(n.latitude!, n.longitude!),
       ?radio,
@@ -305,6 +342,8 @@ class _MapTabState extends ConsumerState<MapTab> {
                     maxZoom: 13,
                   )
                 : null,
+            onMapReady: () => _onMove(_map.camera),
+            onPositionChanged: (camera, _) => _onMove(camera),
           ),
           children: [
             if (tiles != null)
@@ -324,7 +363,21 @@ class _MapTabState extends ConsumerState<MapTab> {
             const TrafficLayer(),
             MarkerLayer(
               markers: [
-                for (final node in nodes)
+                for (final cluster in clusters)
+                  if (cluster.items.length > 1)
+                    Marker(
+                      point: cluster.at,
+                      width: 48,
+                      height: 48,
+                      child: _ClusterMarker(
+                        count: cluster.items.length,
+                        onTap: () => _openCluster(cluster),
+                      ),
+                    ),
+                for (final node in [
+                  for (final c in clusters)
+                    if (c.items.length == 1) c.items.single,
+                ])
                   Marker(
                     point: LatLng(node.latitude!, node.longitude!),
                     width: 110,
@@ -394,11 +447,19 @@ class _MapTabState extends ConsumerState<MapTab> {
             right: 84,
             bottom: 12,
             child: TrafficRouteCard(
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => const PacketLogScreen(),
-                ),
-              ),
+              onTap: () {
+                final latest = ref.read(trafficProvider).latest;
+                void openLog() => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const PacketLogScreen(),
+                  ),
+                );
+                if (latest == null) {
+                  openLog();
+                } else {
+                  showTrafficPacket(context, latest, onOpenLog: openLog);
+                }
+              },
             ),
           ),
         Positioned(
@@ -823,6 +884,48 @@ class _NodeSearchSheetState extends State<_NodeSearchSheet> {
                     ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Several nodes too close to tell apart at this zoom.
+class _ClusterMarker extends StatelessWidget {
+  const _ClusterMarker({required this.count, required this.onTap});
+
+  final int count;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Semantics(
+      button: true,
+      label: context.l10n.mapClusterNodes(count),
+      excludeSemantics: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Center(
+          child: Container(
+            width: 44,
+            height: 44,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: const Color(0xFF2F7DF6),
+              shape: BoxShape.circle,
+              border: Border.all(color: scheme.surface, width: 2.5),
+              boxShadow: const [
+                BoxShadow(color: Color(0x55000000), blurRadius: 6),
+              ],
+            ),
+            child: Text(
+              '$count',
+              style: Theme.of(context).textTheme.titleSmall
+                  ?.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
+            ),
+          ),
         ),
       ),
     );
