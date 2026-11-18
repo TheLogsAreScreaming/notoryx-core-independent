@@ -531,3 +531,109 @@ Future<void> showTrafficFilter(BuildContext context, WidgetRef ref) =>
         },
       ),
     );
+
+/// Everything known about one heard packet: its route stop by stop, signal
+/// and the raw bytes.
+Future<void> showTrafficPacket(
+  BuildContext context,
+  TrafficRoute route, {
+  VoidCallback? onOpenLog,
+}) => showModalBottomSheet<void>(
+  context: context,
+  isScrollControlled: true,
+  showDragHandle: true,
+  builder: (context) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final raw = route.raw;
+    final time = TimeOfDay.fromDateTime(route.heardAt).format(context);
+    return DraggableScrollableSheet(
+      key: const Key('traffic-packet'),
+      expand: false,
+      initialChildSize: 0.6,
+      maxChildSize: 0.95,
+      builder: (context, scroll) => ListView(
+        controller: scroll,
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+        children: [
+          Text(l10n.trafficPacketDetails, style: theme.textTheme.titleLarge),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              _TypePill(route: route),
+              Text(
+                route.isFlood
+                    ? l10n.trafficFlood(route.hopCount)
+                    : l10n.trafficDirect(route.hopCount),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            [
+              l10n.trafficRssi(route.rssi),
+              l10n.trafficSnrShort(route.snr.toStringAsFixed(2)),
+              l10n.trafficHeardAt(time),
+            ].join(' · '),
+          ),
+          const SizedBox(height: 16),
+          Text(l10n.trafficRouteHeading, style: theme.textTheme.titleMedium),
+          for (final (i, stop) in route.stops.indexed)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: CircleAvatar(
+                radius: 14,
+                backgroundColor: route.kind.colour.withValues(alpha: 0.25),
+                child: Text('${i + 1}', style: theme.textTheme.labelMedium),
+              ),
+              title: Text(
+                stop.isSelf
+                    ? '${stop.label} (${l10n.trafficThisRadio})'
+                    : stop.label,
+              ),
+              subtitle: Text(
+                '${stop.shortId} · '
+                '${stop.at == null ? l10n.trafficOffMap : l10n.trafficOnMap}',
+              ),
+              trailing: Icon(
+                stop.at == null
+                    ? Icons.location_off_outlined
+                    : Icons.place_outlined,
+              ),
+            ),
+          if (raw != null) ...[
+            const SizedBox(height: 16),
+            Text(
+              l10n.trafficRawPacket(raw.length),
+              style: theme.textTheme.titleMedium,
+            ),
+            const SizedBox(height: 4),
+            SelectableText(
+              toHex(raw)
+                  .toUpperCase()
+                  .replaceAllMapped(RegExp('..'), (m) => '${m[0]} ')
+                  .trim(),
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontFamily: 'monospace',
+              ),
+            ),
+          ],
+          if (onOpenLog != null) ...[
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: () {
+                Navigator.pop(context);
+                onOpenLog();
+              },
+              icon: const Icon(Icons.list_alt),
+              label: Text(l10n.trafficOpenLog),
+            ),
+          ],
+        ],
+      ),
+    );
+  },
+);

@@ -8,6 +8,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' show Color;
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -88,6 +89,7 @@ final class TrafficRoute {
     required this.snr,
     required this.rssi,
     required this.heardAt,
+    this.raw,
   });
 
   final PayloadKind payload;
@@ -100,6 +102,9 @@ final class TrafficRoute {
   final double snr;
   final int rssi;
   final DateTime heardAt;
+
+  /// The packet as heard, for the details sheet.
+  final Uint8List? raw;
 
   TrafficKind get kind => TrafficKind.of(payload);
 
@@ -200,6 +205,7 @@ TrafficRoute? buildTrafficRoute({
     snr: snr,
     rssi: rssi,
     heardAt: heardAt,
+    raw: raw,
   );
 }
 
@@ -345,8 +351,33 @@ final trafficProvider = NotifierProvider<TrafficNotifier, TrafficState>(
   TrafficNotifier.new,
 );
 
+/// Setting keys: Traffic on ('1'/'0') and the shown kinds, comma-separated.
+const trafficOnKey = 'traffic.on';
+const trafficShownKey = 'traffic.shown';
+
+/// Reads the saved shown kinds; unknown names are ignored, nothing saved
+/// means all of them.
+Set<TrafficKind> decodeTrafficShown(String? saved) {
+  if (saved == null) return {...TrafficKind.values};
+  final names = saved.split(',');
+  return {
+    for (final k in TrafficKind.values)
+      if (names.contains(k.name)) k,
+  };
+}
+
+String encodeTrafficShown(Set<TrafficKind> shown) => [
+  for (final k in TrafficKind.values)
+    if (shown.contains(k)) k.name,
+].join(',');
+
 class TrafficNotifier extends Notifier<TrafficState> {
   StreamSubscription<RxLog>? _sub;
+
+  /// Whether the toggle or filter changed since the saved choice was read,
+  /// so a late read doesn't undo it.
+  bool _touched = false;
+  bool _loaded = false;
 
   /// The nodes routes are matched against.
   TrafficPlace place = (nodes: const [], self: null);
@@ -367,12 +398,42 @@ class TrafficNotifier extends Notifier<TrafficState> {
     _sub = null;
     if (state is! Connected) return;
     _sub = state.sync.heard.listen(heard);
+    if (!_loaded) unawaited(_load());
   }
 
-  void setOn(bool on) =>
-      state = on ? state.copyWith(on: true) : TrafficState(shown: state.shown);
+  /// Brings back the toggle and filter from last time.
+  Future<void> _load() async {
+    _loaded = true;
+    try {
+      final store = ref.read(storeProvider);
+      final on = await store.setting(trafficOnKey);
+      final shown = await store.setting(trafficShownKey);
+      if (!ref.mounted || _touched) return;
+      state = state.copyWith(on: on == '1', shown: decodeTrafficShown(shown));
+    } on Object catch (e) {
+      // Not worth stopping the map for; it starts off as before.
+      _loaded = false;
+      debugPrint('Traffic settings not read: $e');
+    }
+  }
+
+  Future<void> _save(String key, String value) async {
+    try {
+      await ref.read(storeProvider).saveSetting(key, value);
+    } on Object catch (_) {
+      // The choice still holds for this run.
+    }
+  }
+
+  void setOn(bool on) {
+    _touched = true;
+    state = on ? state.copyWith(on: true) : TrafficState(shown: state.shown);
+    unawaited(_save(trafficOnKey, on ? '1' : '0'));
+  }
 
   void setShown(Set<TrafficKind> shown) {
+    _touched = true;
+    unawaited(_save(trafficShownKey, encodeTrafficShown(shown)));
     state = state.copyWith(
       shown: shown,
       active: [

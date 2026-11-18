@@ -170,6 +170,22 @@ void main() {
     expect(find.textContaining('Flood 2 · -88 dBm'), findsOneWidget);
     expect(find.text('Not on map: 7F'), findsOneWidget);
 
+    // Tapping the card shows the packet stop by stop.
+    await tester.tap(find.byKey(const Key('traffic-card')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.text('Packet details'), findsOneWidget);
+    expect(find.text('Base (This radio)'), findsOneWidget);
+    expect(find.text('7F · Not on map'), findsOneWidget);
+    await tester.drag(find.text('Packet details'), const Offset(0, -500));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.text('Raw packet, 5 bytes'), findsOneWidget);
+    expect(find.text('15 02 02 7F 11'), findsOneWidget);
+    await tester.tapAt(const Offset(20, 20));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
     // It plays out and the layer goes quiet again.
     for (var i = 0; i < 20; i++) {
       await tester.pump(const Duration(milliseconds: 500));

@@ -1427,5 +1427,14 @@
   "trafficNotOnMapCount": "{count} fuera del mapa",
   "trafficNotOnMapNames": "Fuera del mapa: {names}",
   "trafficAge": "{seconds} s",
-  "trafficShowPackets": "Mostrar estos paquetes"
+  "trafficShowPackets": "Mostrar estos paquetes",
+  "trafficPacketDetails": "Detalles del paquete",
+  "trafficRouteHeading": "Ruta",
+  "trafficHeardAt": "Oído a las {time}",
+  "trafficRawPacket": "Paquete en bruto, {bytes} bytes",
+  "trafficOpenLog": "Abrir registro de paquetes",
+  "trafficThisRadio": "Esta radio",
+  "trafficOffMap": "Fuera del mapa",
+  "trafficOnMap": "En el mapa",
+  "mapClusterNodes": "{count} nodos aquí. Toca para acercar."
 }
