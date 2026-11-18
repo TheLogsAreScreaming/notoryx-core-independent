@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
@@ -10,6 +13,7 @@ import '../app/map_cache.dart';
 import '../app/map_packs.dart';
 import '../app/telemetry.dart';
 import '../app/track_log.dart';
+import '../app/traffic.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
 import '../app/node_look.dart';
@@ -17,6 +21,8 @@ import 'node_details.dart';
 import 'map_packs_screen.dart';
 import 'zone_alerts_screen.dart';
 import 'track_log_screen.dart';
+import 'traffic_layer.dart';
+import 'packet_log_screen.dart';
 import '../app/position.dart';
 import '../l10n/l10n.dart';
 import '../app/wardrive.dart';
@@ -87,6 +93,166 @@ class _MapTabState extends ConsumerState<MapTab> {
     }
   }
 
+  /// Hands the nodes this map knows to the traffic layer, so heard paths
+  /// can be named and placed.
+  void _shareWithTraffic(
+    List<Contact> contacts,
+    List<DiscoveredData> heard,
+    LatLng? radio,
+  ) {
+    final state = ref.read(connectionProvider);
+    final self = state is Connected ? state.radio.self : null;
+    LatLng? at(double? lat, double? lon) =>
+        lat == null || lon == null ? null : LatLng(lat, lon);
+    ref.read(trafficProvider.notifier).place = (
+      nodes: [
+        for (final c in contacts)
+          (
+            publicKey: c.publicKey,
+            name: c.name,
+            at: at(c.latitude, c.longitude),
+          ),
+        for (final d in heard)
+          (
+            publicKey: d.publicKey,
+            name: d.name,
+            at: at(d.latitude, d.longitude),
+          ),
+      ],
+      self: self == null
+          ? null
+          : (publicKey: self.publicKey.hex, name: self.name, at: radio),
+    );
+  }
+
+  /// Whether [node] advertised in the last hour.
+  bool _recentlyHeard(NodeSummary node) {
+    if (node.lastAdvert <= 0) return false;
+    final age = DateTime.now().millisecondsSinceEpoch ~/ 1000 - node.lastAdvert;
+    return age >= 0 && age < 3600;
+  }
+
+  void _fitAll(List<LatLng> points) {
+    if (points.length == 1) {
+      _map.move(points.single, 13);
+      return;
+    }
+    _map.fitCamera(
+      CameraFit.coordinates(
+        coordinates: points,
+        padding: const EdgeInsets.fromLTRB(48, 48, 96, 48),
+        maxZoom: 15,
+      ),
+    );
+  }
+
+  Future<void> _advert(BuildContext context) async {
+    final l10n = context.l10n;
+    final state = ref.read(connectionProvider);
+    final messenger = ScaffoldMessenger.of(context);
+    final flood = await showModalBottomSheet<bool>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              key: const Key('map-advert-nearby'),
+              leading: const Icon(Icons.campaign_outlined),
+              title: Text(l10n.advertiseNearby),
+              onTap: () => Navigator.pop(context, false),
+            ),
+            ListTile(
+              key: const Key('map-advert-flood'),
+              leading: const Icon(Icons.public),
+              title: Text(l10n.advertiseAcrossMesh),
+              onTap: () => Navigator.pop(context, true),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (flood == null || state is! Connected) return;
+    try {
+      await state.sync.sendAdvert(flood: flood);
+      unawaited(HapticFeedback.lightImpact());
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            flood ? l10n.advertSentAcrossMesh : l10n.advertSentNearby,
+          ),
+        ),
+      );
+    } on Object catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('$e')));
+    }
+  }
+
+  Future<void> _search(BuildContext context, List<NodeSummary> nodes) async {
+    final picked = await showModalBottomSheet<NodeSummary>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (_) => _NodeSearchSheet(nodes: nodes),
+    );
+    if (picked == null) return;
+    _map.move(LatLng(picked.latitude!, picked.longitude!), 14);
+  }
+
+  List<_MapOption> _options(
+    BuildContext context, {
+    required LatLng? radio,
+    required bool favouritesOnly,
+    required bool tracking,
+  }) {
+    final l10n = context.l10n;
+    void push(Widget screen) =>
+        Navigator.of(context)
+            .push(MaterialPageRoute<void>(builder: (_) => screen));
+    return [
+      if (radio != null)
+        _MapOption(
+          'map-radio',
+          Icons.router,
+          l10n.goToMyRadio,
+          () => _map.move(radio, 13),
+        ),
+      _MapOption(
+        'map-packs',
+        Icons.layers_outlined,
+        l10n.offlineMapPacks,
+        () => push(const MapPacksScreen()),
+      ),
+      _MapOption(
+        'map-zones',
+        Icons.radar,
+        l10n.zoneAlerts,
+        () => push(const ZoneAlertsScreen()),
+      ),
+      _MapOption(
+        'map-favourites-only',
+        favouritesOnly ? Icons.star : Icons.star_outline,
+        favouritesOnly ? l10n.showEveryone : l10n.favouritesOnly,
+        () => setFavouritesOnly(ref.read(storeProvider), !favouritesOnly),
+      ),
+      _MapOption(
+        'map-wardrive',
+        ref.watch(wardriveProvider) == null
+            ? Icons.cell_tower
+            : Icons.radio_button_on,
+        l10n.wardrive,
+        () => push(const WardriveScreen()),
+      ),
+      _MapOption(
+        'map-track',
+        tracking ? Icons.radio_button_on : Icons.route,
+        tracking ? l10n.recordingTrack : l10n.trackLog,
+        () => push(const TrackLogScreen()),
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final contacts =
@@ -114,7 +280,11 @@ class _MapTabState extends ConsumerState<MapTab> {
               LatLng(p.latitude, p.longitude),
           ];
     final radio = _radioPosition();
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final traffic = ref.watch(trafficProvider);
+    _shareWithTraffic(contacts, heard, radio);
+    final tiles = ref.watch(mapTilesProvider);
     final points = [
       for (final n in nodes) LatLng(n.latitude!, n.longitude!),
       ?radio,
@@ -137,7 +307,10 @@ class _MapTabState extends ConsumerState<MapTab> {
                 : null,
           ),
           children: [
-            ?ref.watch(mapTilesProvider),
+            if (tiles != null)
+              theme.brightness == Brightness.dark
+                  ? ColorFiltered(colorFilter: _nightTiles, child: tiles)
+                  : tiles,
             if (trail.length > 1)
               PolylineLayer(
                 polylines: [
@@ -148,6 +321,7 @@ class _MapTabState extends ConsumerState<MapTab> {
                   ),
                 ],
               ),
+            const TrafficLayer(),
             MarkerLayer(
               markers: [
                 for (final node in nodes)
@@ -157,6 +331,7 @@ class _MapTabState extends ConsumerState<MapTab> {
                     height: 84,
                     child: _NodeMarker(
                       node: node,
+                      recent: _recentlyHeard(node),
                       badge: switch (latest[node.publicKey]) {
                         final sample? => telemetryBadge(sample),
                         null => null,
@@ -213,96 +388,44 @@ class _MapTabState extends ConsumerState<MapTab> {
               ),
             ),
           ),
+        if (traffic.on)
+          Positioned(
+            left: 12,
+            right: 84,
+            bottom: 12,
+            child: TrafficRouteCard(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const PacketLogScreen(),
+                ),
+              ),
+            ),
+          ),
         Positioned(
-          right: 16,
-          top: 16,
-          child: Column(
-            children: [
-              if (radio != null)
-                FloatingActionButton.small(
-                  heroTag: 'map-radio',
-                  tooltip: context.l10n.goToMyRadio,
-                  onPressed: () => _map.move(radio, 13),
-                  child: const Icon(Icons.router),
-                ),
-              const SizedBox(height: 8),
-              FloatingActionButton.small(
-                key: const Key('map-packs'),
-                heroTag: 'map-packs',
-                tooltip: context.l10n.offlineMapPacks,
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => const MapPacksScreen(),
-                  ),
-                ),
-                child: const Icon(Icons.layers_outlined),
-              ),
-              const SizedBox(height: 8),
-              FloatingActionButton.small(
-                key: const Key('map-zones'),
-                heroTag: 'map-zones',
-                tooltip: context.l10n.zoneAlerts,
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => const ZoneAlertsScreen(),
-                  ),
-                ),
-                child: const Icon(Icons.radar),
-              ),
-              const SizedBox(height: 8),
-              FloatingActionButton.small(
-                key: const Key('map-favourites-only'),
-                heroTag: 'map-favourites',
-                tooltip: favouritesOnly
-                    ? context.l10n.showEveryone
-                    : context.l10n.favouritesOnly,
-                onPressed: () =>
-                    setFavouritesOnly(ref.read(storeProvider), !favouritesOnly),
-                child: Icon(favouritesOnly ? Icons.star : Icons.star_outline),
-              ),
-              const SizedBox(height: 8),
-              FloatingActionButton.small(
-                heroTag: 'map-wardrive',
-                tooltip: context.l10n.wardrive,
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => const WardriveScreen(),
-                  ),
-                ),
-                child: Icon(
-                  ref.watch(wardriveProvider) == null
-                      ? Icons.cell_tower
-                      : Icons.radio_button_on,
+          right: 12,
+          top: 12,
+          bottom: 12,
+          child: Align(
+            alignment: Alignment.topRight,
+            child: SingleChildScrollView(
+              child: _MapToolbar(
+                locating: _locating,
+                trafficOn: traffic.on,
+                onLocate: _goToPhone,
+                onAdvert: () => _advert(context),
+                onFilter: () => showTrafficFilter(context, ref),
+                onTraffic: () =>
+                    ref.read(trafficProvider.notifier).setOn(!traffic.on),
+                onSearch: () => _search(context, nodes),
+                onFitAll: points.isEmpty ? null : () => _fitAll(points),
+                options: _options(
+                  context,
+                  radio: radio,
+                  favouritesOnly: favouritesOnly,
+                  tracking: activeTrack != null,
                 ),
               ),
-              const SizedBox(height: 8),
-              FloatingActionButton.small(
-                heroTag: 'map-track',
-                tooltip: activeTrack == null
-                    ? context.l10n.trackLog
-                    : context.l10n.recordingTrack,
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => const TrackLogScreen(),
-                  ),
-                ),
-                child: Icon(
-                  activeTrack == null ? Icons.route : Icons.radio_button_on,
-                ),
-              ),
-              const SizedBox(height: 8),
-              FloatingActionButton.small(
-                heroTag: 'map-phone',
-                tooltip: context.l10n.goToMyLocation,
-                onPressed: _locating ? null : _goToPhone,
-                child: _locating
-                    ? const SizedBox.square(
-                        dimension: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.my_location),
-              ),
-            ],
+            ),
           ),
         ),
       ],
@@ -311,10 +434,18 @@ class _MapTabState extends ConsumerState<MapTab> {
 }
 
 class _NodeMarker extends ConsumerWidget {
-  const _NodeMarker({required this.node, required this.onTap, this.badge});
+  const _NodeMarker({
+    required this.node,
+    required this.onTap,
+    this.recent = false,
+    this.badge,
+  });
 
   final NodeSummary node;
   final VoidCallback onTap;
+
+  /// Whether it was heard lately; drawn with a green ring.
+  final bool recent;
 
   /// Latest readings, when there are recent ones.
   final String? badge;
@@ -336,6 +467,12 @@ class _NodeMarker extends ConsumerWidget {
       _ => scheme.onSurfaceVariant,
     };
     final badgeText = badge;
+    final tower = node.type == NodeType.repeater;
+    final ring = recent
+        ? const Color(0xFF3DDC84)
+        : node.isContact
+        ? scheme.primary
+        : scheme.outline;
     // The circle stays centred on the node's position; the badge hangs
     // below it.
     return Stack(
@@ -360,18 +497,18 @@ class _NodeMarker extends ConsumerWidget {
                   image: look is NodePhoto
                       ? DecorationImage(image: look.image, fit: BoxFit.cover)
                       : null,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: node.isContact ? scheme.primary : scheme.outline,
-                    width: 2,
-                  ),
+                  shape: tower ? BoxShape.rectangle : BoxShape.circle,
+                  borderRadius: tower ? BorderRadius.circular(12) : null,
+                  border: Border.all(color: ring, width: recent ? 3 : 2),
                 ),
                 child: look is NodePhoto
                     ? null
                     : Icon(
-                        node.type == NodeType.chat
-                            ? Icons.person
-                            : nodeIcon(node.type),
+                        switch (node.type) {
+                          NodeType.chat => Icons.person,
+                          NodeType.repeater => Icons.cell_tower,
+                          _ => nodeIcon(node.type),
+                        },
                         size: 20,
                         color: iconColour,
                       ),
@@ -398,6 +535,296 @@ class _NodeMarker extends ConsumerWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+/// Darkens daytime map tiles for the dark theme: inverted brightness with
+/// a slight blue cast, so roads and labels stay readable.
+const _nightTiles = ColorFilter.matrix([
+  -0.25, -0.62, -0.08, 0, 240, //
+  -0.25, -0.62, -0.08, 0, 244, //
+  -0.22, -0.58, -0.07, 0, 252, //
+  0, 0, 0, 1, 0, //
+]);
+
+/// An item in the map's Options menu.
+class _MapOption {
+  const _MapOption(this.key, this.icon, this.label, this.onTap);
+
+  final String key;
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+}
+
+/// The map's tools in one frosted pill down the right side.
+class _MapToolbar extends StatelessWidget {
+  const _MapToolbar({
+    required this.locating,
+    required this.trafficOn,
+    required this.onLocate,
+    required this.onAdvert,
+    required this.onFilter,
+    required this.onTraffic,
+    required this.onSearch,
+    required this.onFitAll,
+    required this.options,
+  });
+
+  final bool locating;
+  final bool trafficOn;
+  final VoidCallback onLocate;
+  final VoidCallback onAdvert;
+  final VoidCallback onFilter;
+  final VoidCallback onTraffic;
+  final VoidCallback onSearch;
+  final VoidCallback? onFitAll;
+  final List<_MapOption> options;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return FrostedPanel(
+      radius: 30,
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: SizedBox(
+        width: 64,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _ToolButton(
+              key: const Key('map-locate'),
+              icon: Icons.near_me_outlined,
+              label: l10n.mapLocate,
+              tooltip: l10n.goToMyLocation,
+              busy: locating,
+              onTap: locating ? null : onLocate,
+            ),
+            _ToolButton(
+              key: const Key('map-advert'),
+              icon: Icons.campaign_outlined,
+              label: l10n.mapAdvert,
+              tooltip: l10n.mapAdvert,
+              onTap: onAdvert,
+            ),
+            _ToolButton(
+              key: const Key('map-filter'),
+              icon: Icons.filter_list,
+              label: l10n.mapFilter,
+              tooltip: l10n.trafficShowPackets,
+              onTap: onFilter,
+            ),
+            _ToolButton(
+              key: const Key('map-traffic'),
+              icon: Icons.timeline,
+              label: l10n.mapTraffic,
+              tooltip: trafficOn ? l10n.trafficHideLive : l10n.trafficShowLive,
+              selected: trafficOn,
+              onTap: onTraffic,
+            ),
+            _ToolButton(
+              key: const Key('map-search'),
+              icon: Icons.search,
+              label: l10n.search,
+              tooltip: l10n.mapSearchNodes,
+              onTap: onSearch,
+            ),
+            _ToolButton(
+              key: const Key('map-fit-all'),
+              icon: Icons.open_in_full,
+              label: l10n.mapFitAll,
+              tooltip: l10n.mapShowAllNodes,
+              onTap: onFitAll,
+            ),
+            PopupMenuButton<_MapOption>(
+              key: const Key('map-options'),
+              tooltip: l10n.mapOptions,
+              onSelected: (o) => o.onTap(),
+              itemBuilder: (_) => [
+                for (final o in options)
+                  PopupMenuItem(
+                    key: Key(o.key),
+                    value: o,
+                    child: ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(o.icon),
+                      title: Text(o.label),
+                    ),
+                  ),
+              ],
+              child: _ToolFace(icon: Icons.more_horiz, label: l10n.mapOptions),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ToolButton extends StatelessWidget {
+  const _ToolButton({
+    required this.icon,
+    required this.label,
+    required this.tooltip,
+    required this.onTap,
+    this.selected = false,
+    this.busy = false,
+    super.key,
+  });
+
+  final IconData icon;
+  final String label;
+  final String tooltip;
+  final VoidCallback? onTap;
+  final bool selected;
+  final bool busy;
+
+  @override
+  Widget build(BuildContext context) => Tooltip(
+    message: tooltip,
+    excludeFromSemantics: true,
+    child: Semantics(
+      button: true,
+      toggled: selected ? true : null,
+      enabled: onTap != null,
+      label: tooltip,
+      excludeSemantics: true,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: _ToolFace(
+          icon: icon,
+          label: label,
+          selected: selected,
+          busy: busy,
+          enabled: onTap != null,
+        ),
+      ),
+    ),
+  );
+}
+
+class _ToolFace extends StatelessWidget {
+  const _ToolFace({
+    required this.icon,
+    required this.label,
+    this.selected = false,
+    this.busy = false,
+    this.enabled = true,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final bool busy;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final colour = !enabled && !busy
+        ? scheme.onSurface.withValues(alpha: 0.38)
+        : selected
+        ? scheme.primary
+        : scheme.onSurface;
+    return Container(
+      constraints: const BoxConstraints(minHeight: 52),
+      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      decoration: selected
+          ? BoxDecoration(
+              color: scheme.primary.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(16),
+            )
+          : null,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (busy)
+            const SizedBox.square(
+              dimension: 22,
+              child: Padding(
+                padding: EdgeInsets.all(2),
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            )
+          else
+            Icon(icon, size: 22, color: colour),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: colour,
+              fontWeight: selected ? FontWeight.w700 : null,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Finds a node on the map by name.
+class _NodeSearchSheet extends StatefulWidget {
+  const _NodeSearchSheet({required this.nodes});
+
+  final List<NodeSummary> nodes;
+
+  @override
+  State<_NodeSearchSheet> createState() => _NodeSearchSheetState();
+}
+
+class _NodeSearchSheetState extends State<_NodeSearchSheet> {
+  var _query = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final q = _query.trim().toLowerCase();
+    final matches = [
+      for (final n in widget.nodes)
+        if (q.isEmpty ||
+            n.name.toLowerCase().contains(q) ||
+            n.publicKey.toLowerCase().startsWith(q))
+          n,
+    ]..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: SizedBox(
+        height: MediaQuery.sizeOf(context).height * 0.6,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: TextField(
+                key: const Key('map-search-field'),
+                autofocus: true,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.search),
+                  hintText: context.l10n.mapSearchNodes,
+                ),
+                onChanged: (v) => setState(() => _query = v),
+              ),
+            ),
+            Expanded(
+              child: matches.isEmpty
+                  ? Center(child: Text(context.l10n.mapNoNodesMatch))
+                  : ListView(
+                      children: [
+                        for (final n in matches)
+                          ListTile(
+                            leading: Icon(nodeIcon(n.type)),
+                            title: Text(n.name),
+                            subtitle: Text(nodeKind(n.type, context.l10n)),
+                            onTap: () => Navigator.pop(context, n),
+                          ),
+                      ],
+                    ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
