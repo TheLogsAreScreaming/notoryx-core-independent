@@ -13,7 +13,14 @@ const languageSetting = 'app_language';
 
 /// Languages offered, by code, with their own names. English is the
 /// original; the others were written by AI.
-const appLanguages = <String, String>{'en': 'English', 'es': 'Español'};
+const appLanguages = <String, String>{
+  'en': 'English',
+  'de': 'Deutsch',
+  'es': 'Español',
+  'fr': 'Français',
+  'it': 'Italiano',
+  'pt': 'Português',
+};
 
 class Language extends AsyncNotifier<Locale?> {
   @override
