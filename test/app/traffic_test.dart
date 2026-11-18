@@ -3,7 +3,9 @@ import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:drift/drift.dart' show driftRuntimeOptions;
 import 'package:notoryx_core/app/connection.dart';
+import 'package:notoryx_core/data/data.dart';
 import 'package:notoryx_core/app/traffic.dart';
 import 'package:notoryx_core/radio/radio.dart';
 
@@ -225,18 +227,45 @@ void main() {
     });
   });
 
+  test('saved filters read back, ignoring unknown names', () {
+    expect(decodeTrafficShown(null), TrafficKind.values.toSet());
+    expect(decodeTrafficShown(''), isEmpty);
+    expect(decodeTrafficShown('ack,bogus,path'), {
+      TrafficKind.ack,
+      TrafficKind.path,
+    });
+    expect(
+      encodeTrafficShown({TrafficKind.path, TrafficKind.advert}),
+      'advert,path',
+    );
+  });
+
+  test('a built route keeps the raw packet for the details sheet', () {
+    final raw = packet(payload: PayloadKind.ack, body: [1, 2, 3, 4]);
+    expect(build(raw).raw, raw);
+  });
+
   group('traffic queue', () {
     late ProviderContainer container;
     late TrafficNotifier traffic;
+    late MeshDatabase db;
 
     setUp(() {
+      driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+      db = MeshDatabase.inMemory();
       container = ProviderContainer(
-        overrides: [connectionProvider.overrideWith(_Idle.new)],
+        overrides: [
+          connectionProvider.overrideWith(_Idle.new),
+          databaseProvider.overrideWithValue(db),
+        ],
       );
       traffic = container.read(trafficProvider.notifier);
       traffic.place = (nodes: nodes, self: self);
     });
-    tearDown(() => container.dispose());
+    tearDown(() async {
+      container.dispose();
+      await db.close();
+    });
 
     RxLog log(PayloadKind payload) => RxLog(
       snr: 5,
@@ -279,6 +308,16 @@ void main() {
       traffic.heard(log(PayloadKind.groupText));
       expect(container.read(trafficProvider).waiting, isEmpty);
       expect(container.read(trafficProvider).latest, isNull);
+    });
+
+    test('the toggle and filter are saved for next time', () async {
+      traffic
+        ..setOn(true)
+        ..setShown({TrafficKind.advert, TrafficKind.trace});
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      final store = container.read(storeProvider);
+      expect(await store.setting(trafficOnKey), '1');
+      expect(await store.setting(trafficShownKey), 'advert,trace');
     });
 
     test('turning Traffic off clears the routes but keeps the filter', () {
