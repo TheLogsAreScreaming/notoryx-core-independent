@@ -1314,6 +1314,7 @@
   "rateNormalDetail": "Senzory každých 30 min, šum každých 10 min",
   "rateSaver": "Šetrič batérie",
   "rateSaverDetail": "Senzory každé 2 hodiny, šum každú hodinu",
+  "rateSummary": "{rate}. {detail}.",
   "widgetConnected": "Pripojené",
   "widgetReconnecting": "Opätovné pripájanie",
   "widgetConnecting": "Pripája sa…",

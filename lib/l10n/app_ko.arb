@@ -1314,6 +1314,7 @@
   "rateNormalDetail": "센서 30분마다, 노이즈 플로어 10분마다",
   "rateSaver": "배터리 절약",
   "rateSaverDetail": "센서 2시간마다, 노이즈 플로어 1시간마다",
+  "rateSummary": "{rate}. {detail}.",
   "widgetConnected": "연결됨",
   "widgetReconnecting": "다시 연결 중",
   "widgetConnecting": "연결 중…",

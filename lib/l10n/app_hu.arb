@@ -1314,6 +1314,7 @@
   "rateNormalDetail": "Érzékelők 30 percenként, zajszint 10 percenként",
   "rateSaver": "Energiatakarékos",
   "rateSaverDetail": "Érzékelők 2 óránként, zajszint óránként",
+  "rateSummary": "{rate}. {detail}.",
   "widgetConnected": "Csatlakozva",
   "widgetReconnecting": "Újracsatlakozás",
   "widgetConnecting": "Csatlakozás…",

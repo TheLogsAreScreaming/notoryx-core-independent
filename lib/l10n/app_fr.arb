@@ -1314,6 +1314,7 @@
   "rateNormalDetail": "Capteurs toutes les 30 min, bruit toutes les 10 min",
   "rateSaver": "Économie de batterie",
   "rateSaverDetail": "Capteurs toutes les 2 heures, bruit toutes les heures",
+  "rateSummary": "{rate}. {detail}.",
   "widgetConnected": "Connectée",
   "widgetReconnecting": "Reconnexion",
   "widgetConnecting": "Connexion…",

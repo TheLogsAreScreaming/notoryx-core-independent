@@ -2829,6 +2829,18 @@
   "rateNormalDetail": "Sensors every 30 min, noise floor every 10 min",
   "rateSaver": "Battery saver",
   "rateSaverDetail": "Sensors every 2 hours, noise floor every hour",
+  "rateSummary": "{rate}. {detail}.",
+  "@rateSummary": {
+    "description": "Refresh rate row subtitle: the chosen rate, then what it does.",
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      },
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
   "widgetConnected": "Connected",
   "widgetReconnecting": "Reconnecting",
   "widgetConnecting": "Connecting…",

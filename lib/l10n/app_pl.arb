@@ -1314,6 +1314,7 @@
   "rateNormalDetail": "Czujniki co 30 min, szum co 10 min",
   "rateSaver": "Oszczędzanie baterii",
   "rateSaverDetail": "Czujniki co 2 godziny, szum co godzinę",
+  "rateSummary": "{rate}. {detail}.",
   "widgetConnected": "Połączono",
   "widgetReconnecting": "Ponowne łączenie",
   "widgetConnecting": "Łączenie…",

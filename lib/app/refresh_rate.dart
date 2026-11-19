@@ -72,7 +72,10 @@ class RefreshRateTile extends ConsumerWidget {
       leading: const Icon(Icons.speed),
       title: Text(context.l10n.refreshRate),
       subtitle: Text(
-        '${rate.label(context.l10n)}. ${rate.detail(context.l10n)}.',
+        context.l10n.rateSummary(
+          rate.label(context.l10n),
+          rate.detail(context.l10n),
+        ),
       ),
       onTap: () async {
         final picked = await showDialog<RefreshRate>(

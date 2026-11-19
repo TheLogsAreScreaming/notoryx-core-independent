@@ -1314,6 +1314,7 @@
   "rateNormalDetail": "センサー30分ごと、ノイズフロア10分ごと",
   "rateSaver": "省電力",
   "rateSaverDetail": "センサー2時間ごと、ノイズフロア1時間ごと",
+  "rateSummary": "{rate}。{detail}。",
   "widgetConnected": "接続済み",
   "widgetReconnecting": "再接続中",
   "widgetConnecting": "接続中…",

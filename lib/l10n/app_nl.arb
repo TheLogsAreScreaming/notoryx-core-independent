@@ -1314,6 +1314,7 @@
   "rateNormalDetail": "Sensoren elke 30 min, ruisvloer elke 10 min",
   "rateSaver": "Batterijbesparing",
   "rateSaverDetail": "Sensoren elke 2 uur, ruisvloer elk uur",
+  "rateSummary": "{rate}. {detail}.",
   "widgetConnected": "Verbonden",
   "widgetReconnecting": "Opnieuw verbinden",
   "widgetConnecting": "Verbinden…",

@@ -1314,6 +1314,7 @@
   "rateNormalDetail": "Sensores a cada 30 min, ruído a cada 10 min",
   "rateSaver": "Economia de bateria",
   "rateSaverDetail": "Sensores a cada 2 horas, ruído a cada hora",
+  "rateSummary": "{rate}. {detail}.",
   "widgetConnected": "Conectado",
   "widgetReconnecting": "Reconectando",
   "widgetConnecting": "Conectando…",

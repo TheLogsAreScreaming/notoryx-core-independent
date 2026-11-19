@@ -1314,6 +1314,7 @@
   "rateNormalDetail": "Senzorji vsakih 30 min, šum vsakih 10 min",
   "rateSaver": "Varčevanje z baterijo",
   "rateSaverDetail": "Senzorji vsaki 2 uri, šum vsako uro",
+  "rateSummary": "{rate}. {detail}.",
   "widgetConnected": "Povezano",
   "widgetReconnecting": "Ponovno povezovanje",
   "widgetConnecting": "Povezovanje…",

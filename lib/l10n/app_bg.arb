@@ -1314,6 +1314,7 @@
   "rateNormalDetail": "Сензори на всеки 30 мин, шум на всеки 10 мин",
   "rateSaver": "Пестене на батерия",
   "rateSaverDetail": "Сензори на всеки 2 часа, шум на всеки час",
+  "rateSummary": "{rate}. {detail}.",
   "widgetConnected": "Свързано",
   "widgetReconnecting": "Повторно свързване",
   "widgetConnecting": "Свързване…",
