@@ -1437,5 +1437,18 @@
   "trafficThisRadio": "Este rádio",
   "trafficOffMap": "Fora do mapa",
   "trafficOnMap": "No mapa",
-  "mapClusterNodes": "{count} nós aqui. Toque para ampliar."
+  "mapClusterNodes": "{count} nós aqui. Toque para ampliar.",
+  "staleAfterSetting": "Marcar nós como inativos após",
+  "staleAfterExplain": "Contactos e repetidores não ouvidos durante este tempo são marcados como inativos nas listas e esbatidos no mapa.",
+  "staleOff": "Desligado",
+  "staleHour": "1 hora",
+  "staleSixHours": "6 horas",
+  "staleDay": "24 horas",
+  "staleThreeDays": "3 dias",
+  "staleWeek": "7 dias",
+  "staleBadge": "inativo · {age}",
+  "rangeRingsShow": "Mostrar anéis de distância",
+  "rangeRingsHide": "Ocultar anéis de distância",
+  "rangeRingsNoPosition": "A sua posição ainda não é conhecida, por isso não é possível desenhar os anéis de distância. Toque em Localizar ou dê uma posição ao seu rádio.",
+  "rangeRingsSpoken": "Anéis de distância a {distances}"
 }

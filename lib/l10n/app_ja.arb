@@ -1437,5 +1437,18 @@
   "trafficThisRadio": "この無線機",
   "trafficOffMap": "地図にない",
   "trafficOnMap": "地図上",
-  "mapClusterNodes": "ここに {count} 台のノード。タップで拡大。"
+  "mapClusterNodes": "ここに {count} 台のノード。タップで拡大。",
+  "staleAfterSetting": "ノードを古いと表示するまでの時間",
+  "staleAfterExplain": "この時間受信がない連絡先とリピーターは、リストで「古い」と表示され、地図上では薄く表示されます。",
+  "staleOff": "オフ",
+  "staleHour": "1時間",
+  "staleSixHours": "6時間",
+  "staleDay": "24時間",
+  "staleThreeDays": "3日",
+  "staleWeek": "7日",
+  "staleBadge": "古い · {age}",
+  "rangeRingsShow": "距離リングを表示",
+  "rangeRingsHide": "距離リングを隠す",
+  "rangeRingsNoPosition": "現在地がまだ不明なため、距離リングを描けません。「位置を特定」をタップするか、無線機に位置を設定してください。",
+  "rangeRingsSpoken": "距離リング：{distances}"
 }

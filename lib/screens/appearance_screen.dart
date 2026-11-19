@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/app_background.dart';
 import '../app/appearance.dart';
+import '../app/connection.dart';
 import '../l10n/l10n.dart';
 import '../app/language.dart';
 import '../app/link_preview.dart';
+import '../app/stale_nodes.dart';
 import 'background_layer.dart';
 
 /// Pick a theme and the size of chat text.
@@ -29,6 +31,7 @@ class AppearanceScreen extends ConsumerWidget {
             value: ref.watch(linkPreviewsAutoProvider).value ?? false,
             onChanged: ref.read(linkPreviewsAutoProvider.notifier).set,
           ),
+          const _StaleAfterTile(),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -82,6 +85,55 @@ class AppearanceScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// How long a node can go unheard before the lists and map mark it stale.
+class _StaleAfterTile extends ConsumerWidget {
+  const _StaleAfterTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final current = ref.watch(staleAfterProvider).value ?? StaleAfter.fallback;
+    return ListTile(
+      key: const Key('stale-after'),
+      leading: const Icon(Icons.history_toggle_off),
+      title: Text(l10n.staleAfterSetting),
+      subtitle: Text(current.label(l10n)),
+      onTap: () async {
+        final picked = await showDialog<StaleAfter>(
+          context: context,
+          builder: (dialog) => SimpleDialog(
+            title: Text(l10n.staleAfterSetting),
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+                child: Text(l10n.staleAfterExplain),
+              ),
+              RadioGroup<StaleAfter>(
+                groupValue: current,
+                onChanged: (v) => Navigator.of(dialog).pop(v),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (final choice in StaleAfter.values)
+                      RadioListTile<StaleAfter>(
+                        key: Key('stale-after-${choice.name}'),
+                        value: choice,
+                        title: Text(choice.label(l10n)),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+        if (picked != null) {
+          await setStaleAfter(ref.read(storeProvider), picked);
+        }
+      },
     );
   }
 }

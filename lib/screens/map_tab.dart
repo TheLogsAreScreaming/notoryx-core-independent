@@ -25,6 +25,9 @@ import 'track_log_screen.dart';
 import 'traffic_layer.dart';
 import 'packet_log_screen.dart';
 import '../app/position.dart';
+import '../app/range_rings.dart';
+import '../app/stale_nodes.dart';
+import 'range_rings_layer.dart';
 import '../l10n/l10n.dart';
 import '../app/wardrive.dart';
 import 'wardrive_screen.dart';
@@ -141,6 +144,17 @@ class _MapTabState extends ConsumerState<MapTab> {
     return age >= 0 && age < 3600;
   }
 
+  /// Turns the range rings on or off, and says so when there's no position
+  /// to centre them on.
+  void _toggleRings({required bool on, required LatLng? centre}) {
+    unawaited(setRangeRings(ref, on));
+    if (on && centre == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.rangeRingsNoPosition)),
+      );
+    }
+  }
+
   /// Zooms in on a cluster until its pins come apart.
   void _openCluster(MapCluster<NodeSummary> cluster) {
     final points = [
@@ -233,6 +247,8 @@ class _MapTabState extends ConsumerState<MapTab> {
     required LatLng? radio,
     required bool favouritesOnly,
     required bool tracking,
+    required bool rings,
+    required LatLng? me,
   }) {
     final l10n = context.l10n;
     void push(Widget screen) =>
@@ -246,6 +262,12 @@ class _MapTabState extends ConsumerState<MapTab> {
           l10n.goToMyRadio,
           () => _map.move(radio, 13),
         ),
+      _MapOption(
+        'map-range-rings',
+        rings ? Icons.track_changes : Icons.adjust,
+        rings ? l10n.rangeRingsHide : l10n.rangeRingsShow,
+        () => _toggleRings(on: !rings, centre: me),
+      ),
       _MapOption(
         'map-packs',
         Icons.layers_outlined,
@@ -308,6 +330,12 @@ class _MapTabState extends ConsumerState<MapTab> {
               LatLng(p.latitude, p.longitude),
           ];
     final radio = _radioPosition();
+    // "Me" on the map: the phone once located, otherwise the radio.
+    final me = _phone ?? radio;
+    final rings = ref.watch(rangeRingsProvider).value ?? false;
+    final staleAfter =
+        (ref.watch(staleAfterProvider).value ?? StaleAfter.fallback).after;
+    final now = DateTime.now();
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final traffic = ref.watch(trafficProvider);
@@ -360,6 +388,13 @@ class _MapTabState extends ConsumerState<MapTab> {
                   ),
                 ],
               ),
+            if (rings && me != null)
+              RangeRingsLayer(
+                centre: me,
+                unit: distanceUnitFor(
+                  WidgetsBinding.instance.platformDispatcher.locale,
+                ),
+              ),
             const TrafficLayer(),
             MarkerLayer(
               markers: [
@@ -385,6 +420,11 @@ class _MapTabState extends ConsumerState<MapTab> {
                     child: _NodeMarker(
                       node: node,
                       recent: _recentlyHeard(node),
+                      stale: isStale(
+                        advertTime(node.lastAdvert),
+                        now,
+                        staleAfter,
+                      ),
                       badge: switch (latest[node.publicKey]) {
                         final sample? => telemetryBadge(sample),
                         null => null,
@@ -487,6 +527,8 @@ class _MapTabState extends ConsumerState<MapTab> {
                   radio: radio,
                   favouritesOnly: favouritesOnly,
                   tracking: activeTrack != null,
+                  rings: rings,
+                  me: me,
                 ),
               ),
             ),
@@ -502,6 +544,7 @@ class _NodeMarker extends ConsumerWidget {
     required this.node,
     required this.onTap,
     this.recent = false,
+    this.stale = false,
     this.badge,
   });
 
@@ -510,6 +553,10 @@ class _NodeMarker extends ConsumerWidget {
 
   /// Whether it was heard lately; drawn with a green ring.
   final bool recent;
+
+  /// Whether it hasn't been heard for the stale-after time; drawn faded,
+  /// and said aloud.
+  final bool stale;
 
   /// Latest readings, when there are recent ones.
   final String? badge;
@@ -537,14 +584,20 @@ class _NodeMarker extends ConsumerWidget {
         : node.isContact
         ? scheme.primary
         : scheme.outline;
+    final staleText = stale
+        ? context.l10n.staleBadge(
+            timeAgo(node.lastAdvert, DateTime.now(), context.l10n),
+          )
+        : null;
+    final spoken = [node.name, ?staleText, ?badgeText].join(', ');
     // The circle stays centred on the node's position; the badge hangs
     // below it.
-    return Stack(
+    final marker = Stack(
       alignment: Alignment.center,
       children: [
         Semantics(
           button: true,
-          label: badgeText == null ? node.name : '${node.name}, $badgeText',
+          label: spoken,
           child: GestureDetector(
             // Bigger than the dot, so it's a comfortable target.
             behavior: HitTestBehavior.opaque,
@@ -600,6 +653,8 @@ class _NodeMarker extends ConsumerWidget {
           ),
       ],
     );
+    // Faded, not recoloured: the spoken label carries the state too.
+    return stale ? Opacity(opacity: 0.45, child: marker) : marker;
   }
 }
 

@@ -1437,5 +1437,18 @@
   "trafficThisRadio": "Це радіо",
   "trafficOffMap": "Не на мапі",
   "trafficOnMap": "На мапі",
-  "mapClusterNodes": "Вузлів тут: {count}. Торкніться, щоб наблизити."
+  "mapClusterNodes": "Вузлів тут: {count}. Торкніться, щоб наблизити.",
+  "staleAfterSetting": "Позначати вузли застарілими через",
+  "staleAfterExplain": "Контакти й ретранслятори, яких не чути стільки часу, позначаються у списках як застарілі й бліднуть на карті.",
+  "staleOff": "Вимк.",
+  "staleHour": "1 година",
+  "staleSixHours": "6 годин",
+  "staleDay": "24 години",
+  "staleThreeDays": "3 дні",
+  "staleWeek": "7 днів",
+  "staleBadge": "застарілий · {age}",
+  "rangeRingsShow": "Показати кільця відстаней",
+  "rangeRingsHide": "Сховати кільця відстаней",
+  "rangeRingsNoPosition": "Ваше місцезнаходження ще невідоме, тож кільця відстаней не можна намалювати. Торкніться «Знайти» або задайте позицію радіо.",
+  "rangeRingsSpoken": "Кільця відстаней: {distances}"
 }
