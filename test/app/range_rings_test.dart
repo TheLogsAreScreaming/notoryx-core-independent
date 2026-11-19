@@ -1,4 +1,4 @@
-import 'dart:ui' show Locale, Offset, Rect;
+import 'dart:ui' show Locale;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
@@ -157,99 +157,5 @@ void main() {
     expect(distanceUnitFor(const Locale('en', 'AU')), metric);
     expect(distanceUnitFor(const Locale('de', 'DE')), metric);
     expect(distanceUnitFor(const Locale('en')), metric);
-  });
-
-  group('ringReachPixels', () {
-    test('half the shorter side of the visible part', () {
-      expect(ringReachPixels(const Rect.fromLTWH(8, 8, 300, 600)), 150);
-      expect(ringReachPixels(const Rect.fromLTWH(0, 0, 800, 400)), 200);
-    });
-
-    test('nothing visible means no reach', () {
-      expect(ringReachPixels(Rect.zero), 0);
-    });
-  });
-
-  group('placeLabels', () {
-    const area = Rect.fromLTRB(
-      8,
-      8,
-      316,
-      592,
-    ); // a 400 × 600 map less a toolbar
-
-    test('a label already inside stays put', () {
-      const box = Rect.fromLTWH(100, 100, 40, 16);
-      expect(placeLabels([box], area), [box]);
-    });
-
-    test('a label under the side toolbar moves left, inside', () {
-      // The E tag, centred at x = 360, under a toolbar from x = 316.
-      final box = Rect.fromCenter(
-        center: const Offset(360, 300),
-        width: 20,
-        height: 16,
-      );
-      final placed = placeLabels([box], area).single!;
-      expect(placed.right, 316);
-      expect(placed.center.dy, 300);
-      expect(placed.size, box.size);
-    });
-
-    test('a label above the top moves down, inside', () {
-      final box = Rect.fromCenter(
-        center: const Offset(160, -30),
-        width: 20,
-        height: 16,
-      );
-      final placed = placeLabels([box], area).single!;
-      expect(placed.top, 8);
-      expect(placed.center.dx, 160);
-    });
-
-    test('a corner overflow is pulled in both ways', () {
-      final placed = placeLabels([
-        const Rect.fromLTWH(-50, 590, 30, 16),
-      ], area).single!;
-      expect(placed.left, 8);
-      expect(placed.bottom, 592);
-    });
-
-    test('a label that would land on an earlier one is left out', () {
-      // Two ring labels both off the top, at the same x.
-      final first = Rect.fromCenter(
-        center: const Offset(160, -10),
-        width: 40,
-        height: 16,
-      );
-      final second = Rect.fromCenter(
-        center: const Offset(160, -60),
-        width: 40,
-        height: 16,
-      );
-      final placed = placeLabels([first, second], area);
-      expect(placed.first, isNotNull);
-      expect(placed.last, isNull);
-    });
-
-    test('a label bigger than the area is left out', () {
-      expect(
-        placeLabels([const Rect.fromLTWH(0, 0, 500, 10)], area).single,
-        isNull,
-      );
-    });
-
-    test('every placed label is wholly inside the area', () {
-      final wanted = [
-        for (var x = -100.0; x < 500; x += 37)
-          for (var y = -100.0; y < 700; y += 53)
-            Rect.fromCenter(center: Offset(x, y), width: 30, height: 14),
-      ];
-      for (final box in placeLabels(wanted, area).nonNulls) {
-        expect(area.contains(box.topLeft), isTrue);
-        expect(box.right, lessThanOrEqualTo(area.right));
-        expect(box.bottom, lessThanOrEqualTo(area.bottom));
-      }
-    });
   });
 }

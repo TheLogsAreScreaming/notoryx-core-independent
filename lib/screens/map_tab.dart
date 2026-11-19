@@ -394,8 +394,6 @@ class _MapTabState extends ConsumerState<MapTab> {
                 unit: distanceUnitFor(
                   WidgetsBinding.instance.platformDispatcher.locale,
                 ),
-                // Clear of the toolbar down the right side.
-                obscured: const EdgeInsets.fromLTRB(8, 8, 84, 8),
               ),
             const TrafficLayer(),
             MarkerLayer(

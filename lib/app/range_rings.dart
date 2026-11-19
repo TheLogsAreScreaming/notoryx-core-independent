@@ -3,7 +3,7 @@
 library;
 
 import 'dart:math' as math;
-import 'dart:ui' show Locale, Offset, Rect;
+import 'dart:ui' show Locale;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
@@ -122,44 +122,6 @@ double viewReach(
   final toEast = metresBetween(centre, LatLng(centre.latitude, east));
   final toWest = metresBetween(centre, LatLng(centre.latitude, west));
   return [toNorth, toSouth, toEast, toWest].reduce(math.min);
-}
-
-/// How far, in screen pixels, the outer ring may reach from the middle of
-/// [area], the part of the map nothing is drawn over: to its nearer edge.
-double ringReachPixels(Rect area) =>
-    area.isEmpty ? 0 : math.min(area.width, area.height) / 2;
-
-/// Places label boxes (screen pixels, most important first) inside [area].
-///
-/// Each box is moved the least distance that puts all of it inside [area].
-/// A box bigger than [area], or one that would then overlap a box already
-/// placed, is left out (null), so labels squeezed to the same edge don't
-/// pile up on each other.
-List<Rect?> placeLabels(List<Rect> wanted, Rect area) {
-  final placed = <Rect>[];
-  return [
-    for (final box in wanted)
-      if (_clampInto(box, area) case final moved?
-          when !placed.any((p) => p.overlaps(moved)))
-        (placed..add(moved)).last
-      else
-        null,
-  ];
-}
-
-Rect? _clampInto(Rect box, Rect area) {
-  if (box.width > area.width || box.height > area.height) return null;
-  final dx = box.left < area.left
-      ? area.left - box.left
-      : box.right > area.right
-      ? area.right - box.right
-      : 0.0;
-  final dy = box.top < area.top
-      ? area.top - box.top
-      : box.bottom > area.bottom
-      ? area.bottom - box.bottom
-      : 0.0;
-  return box.shift(Offset(dx, dy));
 }
 
 /// Whether the map shows range rings. Saved on the phone, for every radio.
