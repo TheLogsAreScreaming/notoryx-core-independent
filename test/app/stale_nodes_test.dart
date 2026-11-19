@@ -14,7 +14,10 @@ void main() {
     });
 
     test('nothing is stale when the setting is off', () {
-      expect(isStale(DateTime.utc(1999), now, null), isFalse);
+      expect(
+        isStale(now.subtract(const Duration(days: 9)), now, null),
+        isFalse,
+      );
     });
 
     test('stale from exactly the threshold on', () {
@@ -28,6 +31,30 @@ void main() {
 
     test('a time ahead of now, from a fast clock, is not stale', () {
       expect(isStale(now.add(const Duration(hours: 5)), now, day), isFalse);
+    });
+
+    test('an unset or impossible time is unknown, so never stale', () {
+      // The 1970 epoch, from a node whose clock was never set.
+      expect(isStale(DateTime.utc(1970), now, day), isFalse);
+      expect(isStale(advertTime(1), now, day), isFalse);
+      // Before 2020.
+      expect(isStale(DateTime.utc(2019, 12, 31, 23), now, day), isFalse);
+      expect(
+        isStale(DateTime.utc(2017, 6), now, StaleAfter.hour.after),
+        isFalse,
+      );
+      // More than a day in the future.
+      expect(isStale(now.add(const Duration(days: 2)), now, day), isFalse);
+      expect(isStale(DateTime.utc(2031), now, day), isFalse);
+    });
+
+    test('a normal time is judged as before', () {
+      expect(isStale(DateTime.utc(2020, 1, 2), now, day), isTrue);
+      expect(isStale(now.subtract(const Duration(days: 3)), now, day), isTrue);
+      expect(
+        isStale(now.subtract(const Duration(hours: 3)), now, day),
+        isFalse,
+      );
     });
 
     test('each choice uses its own threshold', () {
@@ -47,6 +74,18 @@ void main() {
       advertTime(1763467200),
       DateTime.fromMillisecondsSinceEpoch(1763467200 * 1000),
     );
+  });
+
+  test('plausibleHeard keeps real times and drops the rest', () {
+    expect(plausibleHeard(null, now), isNull);
+    expect(plausibleHeard(DateTime.utc(1970), now), isNull);
+    expect(plausibleHeard(DateTime.utc(2019, 12, 31), now), isNull);
+    expect(plausibleHeard(DateTime.utc(2020), now), DateTime.utc(2020));
+    final soon = now.add(const Duration(hours: 23));
+    expect(plausibleHeard(soon, now), soon);
+    expect(plausibleHeard(now.add(const Duration(hours: 25)), now), isNull);
+    final normal = now.subtract(const Duration(days: 4));
+    expect(plausibleHeard(normal, now), normal);
   });
 
   test('the setting defaults to 24 hours and reads back by name', () {

@@ -42,15 +42,33 @@ enum StaleAfter {
       StaleAfter.values.asNameMap()[raw] ?? fallback;
 }
 
+/// Times before this can't be real last-heard times: a node whose clock was
+/// never set reports 1970 or thereabouts.
+final earliestPlausible = DateTime.utc(2020);
+
+/// How far ahead of the phone a node's clock may run before its times are
+/// not believed.
+const futureSlack = Duration(days: 1);
+
+/// [lastHeard] if it could be a real time at [now], else null: unset (null
+/// or the 1970 epoch), before 2020, or more than a day in the future.
+DateTime? plausibleHeard(DateTime? lastHeard, DateTime now) {
+  if (lastHeard == null) return null;
+  if (lastHeard.isBefore(earliestPlausible)) return null;
+  if (lastHeard.isAfter(now.add(futureSlack))) return null;
+  return lastHeard;
+}
+
 /// Whether a node last heard at [lastHeard] counts as stale at [now].
 ///
-/// A node never heard ([lastHeard] null) is never stale: there is no age to
-/// judge, and "never heard" is already shown. With [after] null (the
-/// setting is off) nothing is stale. A time in the future, from a node
-/// whose clock runs fast, is not stale either.
+/// A node whose last-heard time is unknown is never stale: never heard
+/// (null), or a time [plausibleHeard] rejects. There is no age to judge.
+/// With [after] null (the setting is off) nothing is stale. A time slightly
+/// in the future, from a node whose clock runs fast, is not stale either.
 bool isStale(DateTime? lastHeard, DateTime now, Duration? after) {
-  if (lastHeard == null || after == null) return false;
-  return now.difference(lastHeard) >= after;
+  final heard = plausibleHeard(lastHeard, now);
+  if (heard == null || after == null) return false;
+  return now.difference(heard) >= after;
 }
 
 /// A node's last advert (Unix seconds, by its own clock) as a time, or null
