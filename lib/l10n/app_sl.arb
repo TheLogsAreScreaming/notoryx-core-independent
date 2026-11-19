@@ -1437,5 +1437,18 @@
   "trafficThisRadio": "Ta radio",
   "trafficOffMap": "Ni na zemljevidu",
   "trafficOnMap": "Na zemljevidu",
-  "mapClusterNodes": "Vozlišč tukaj: {count}. Tapnite za povečavo."
+  "mapClusterNodes": "Vozlišč tukaj: {count}. Tapnite za povečavo.",
+  "staleAfterSetting": "Označi vozlišča kot neaktivna po",
+  "staleAfterExplain": "Stiki in repetitorji, ki jih toliko časa ni bilo slišati, so na seznamih označeni kot neaktivni in na zemljevidu zbledijo.",
+  "staleOff": "Izklopljeno",
+  "staleHour": "1 ura",
+  "staleSixHours": "6 ur",
+  "staleDay": "24 ur",
+  "staleThreeDays": "3 dni",
+  "staleWeek": "7 dni",
+  "staleBadge": "neaktivno · {age}",
+  "rangeRingsShow": "Pokaži kroge razdalje",
+  "rangeRingsHide": "Skrij kroge razdalje",
+  "rangeRingsNoPosition": "Vaš položaj še ni znan, zato krogov razdalje ni mogoče narisati. Tapnite Najdi ali radiu določite položaj.",
+  "rangeRingsSpoken": "Krogi razdalje: {distances}"
 }

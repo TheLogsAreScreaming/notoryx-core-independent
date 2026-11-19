@@ -1437,5 +1437,18 @@
   "trafficThisRadio": "Deze radio",
   "trafficOffMap": "Niet op de kaart",
   "trafficOnMap": "Op de kaart",
-  "mapClusterNodes": "{count} nodes hier. Tik om in te zoomen."
+  "mapClusterNodes": "{count} nodes hier. Tik om in te zoomen.",
+  "staleAfterSetting": "Nodes als verouderd markeren na",
+  "staleAfterExplain": "Contacten en repeaters die zo lang niet gehoord zijn, worden in de lijsten als verouderd gemarkeerd en vervaagd op de kaart.",
+  "staleOff": "Uit",
+  "staleHour": "1 uur",
+  "staleSixHours": "6 uur",
+  "staleDay": "24 uur",
+  "staleThreeDays": "3 dagen",
+  "staleWeek": "7 dagen",
+  "staleBadge": "verouderd · {age}",
+  "rangeRingsShow": "Afstandsringen tonen",
+  "rangeRingsHide": "Afstandsringen verbergen",
+  "rangeRingsNoPosition": "Je positie is nog niet bekend, dus er kunnen geen afstandsringen worden getekend. Tik op Zoeken of geef je radio een positie.",
+  "rangeRingsSpoken": "Afstandsringen op {distances}"
 }

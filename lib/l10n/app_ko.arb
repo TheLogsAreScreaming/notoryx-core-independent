@@ -1437,5 +1437,18 @@
   "trafficThisRadio": "이 무전기",
   "trafficOffMap": "지도에 없음",
   "trafficOnMap": "지도에 있음",
-  "mapClusterNodes": "여기에 노드 {count}개. 탭하여 확대."
+  "mapClusterNodes": "여기에 노드 {count}개. 탭하여 확대.",
+  "staleAfterSetting": "노드를 오래됨으로 표시하는 기준",
+  "staleAfterExplain": "이 기간 동안 수신되지 않은 연락처와 리피터는 목록에서 오래됨으로 표시되고 지도에서 흐리게 보입니다.",
+  "staleOff": "끔",
+  "staleHour": "1시간",
+  "staleSixHours": "6시간",
+  "staleDay": "24시간",
+  "staleThreeDays": "3일",
+  "staleWeek": "7일",
+  "staleBadge": "오래됨 · {age}",
+  "rangeRingsShow": "거리 링 표시",
+  "rangeRingsHide": "거리 링 숨기기",
+  "rangeRingsNoPosition": "아직 위치를 알 수 없어 거리 링을 그릴 수 없습니다. 위치 찾기를 누르거나 무전기에 위치를 설정하세요.",
+  "rangeRingsSpoken": "거리 링: {distances}"
 }

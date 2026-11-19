@@ -1437,5 +1437,18 @@
   "trafficThisRadio": "此电台",
   "trafficOffMap": "不在地图上",
   "trafficOnMap": "在地图上",
-  "mapClusterNodes": "这里有 {count} 个节点。点按放大。"
+  "mapClusterNodes": "这里有 {count} 个节点。点按放大。",
+  "staleAfterSetting": "节点标记为过时的时间",
+  "staleAfterExplain": "超过此时间未收到的联系人和中继器会在列表中标记为过时，并在地图上变淡显示。",
+  "staleOff": "关闭",
+  "staleHour": "1 小时",
+  "staleSixHours": "6 小时",
+  "staleDay": "24 小时",
+  "staleThreeDays": "3 天",
+  "staleWeek": "7 天",
+  "staleBadge": "过时 · {age}",
+  "rangeRingsShow": "显示距离环",
+  "rangeRingsHide": "隐藏距离环",
+  "rangeRingsNoPosition": "尚不知道你的位置，无法绘制距离环。请点按“定位”，或为无线电设置位置。",
+  "rangeRingsSpoken": "距离环：{distances}"
 }

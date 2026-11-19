@@ -8,6 +8,7 @@ import '../app/favourites_view.dart';
 import '../app/connection.dart';
 import '../app/contact_room.dart';
 import '../app/quick_messages.dart';
+import '../app/stale_nodes.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
 import 'connect_screen.dart';
@@ -488,6 +489,13 @@ class _ContactsTab extends ConsumerWidget {
     ];
     final state = ref.watch(connectionProvider);
     final max = state is Connected ? state.radio.device.maxContacts : null;
+    final staleAfter =
+        (ref.watch(staleAfterProvider).value ?? StaleAfter.fallback).after;
+    final now = DateTime.now();
+    Widget subtitle(String text, int lastAdvert) =>
+        isStale(advertTime(lastAdvert), now, staleAfter)
+        ? _StaleSubtitle(text: text, lastAdvert: lastAdvert, now: now)
+        : Text(text);
     return ListView(
       padding: const EdgeInsets.only(bottom: 88), // room for the + button
       children: [
@@ -533,7 +541,10 @@ class _ContactsTab extends ConsumerWidget {
                 icon: _icon(contact.type),
               ),
               title: Text(contact.name),
-              subtitle: Text(_describe(context.l10n, contact)),
+              subtitle: subtitle(
+                _describe(context.l10n, contact),
+                contact.lastAdvert,
+              ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -592,7 +603,10 @@ class _ContactsTab extends ConsumerWidget {
                   icon: _icon(node.type),
                 ),
                 title: Text(node.name),
-                subtitle: Text(_kind(context.l10n, node.type)),
+                subtitle: subtitle(
+                  _kind(context.l10n, node.type),
+                  node.lastAdvert,
+                ),
                 trailing: TextButton(
                   onPressed: () => addDiscovered(context, ref, node),
                   child: Text(context.l10n.add),
@@ -623,6 +637,43 @@ class _ContactsTab extends ConsumerWidget {
     final kind = _kind(l10n, c.type);
     if (c.outPathLength == pathUnknown) return l10n.kindNoRouteYet(kind);
     return l10n.kindWithHops(kind, c.outPathLength & 0x3F);
+  }
+}
+
+/// A list row's subtitle with "stale · 3 days ago" under it, marked with an
+/// icon as well as words so it doesn't rely on colour.
+class _StaleSubtitle extends StatelessWidget {
+  const _StaleSubtitle({
+    required this.text,
+    required this.lastAdvert,
+    required this.now,
+  });
+
+  final String text;
+  final int lastAdvert;
+  final DateTime now;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.bodySmall;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(text),
+        Row(
+          children: [
+            Icon(Icons.history_toggle_off, size: 16, color: style?.color),
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                context.l10n.staleBadge(timeAgo(lastAdvert, now, context.l10n)),
+                style: style,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }
 

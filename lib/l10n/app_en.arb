@@ -2988,5 +2988,22 @@
   "trafficOffMap": "Not on map",
   "trafficOnMap": "On the map",
   "mapClusterNodes": "{count} nodes here. Tap to zoom in.",
-  "@mapClusterNodes": {"placeholders": {"count": {"type": "int"}}}
+  "@mapClusterNodes": {"placeholders": {"count": {"type": "int"}}},
+  "staleAfterSetting": "Mark nodes stale after",
+  "@staleAfterSetting": {"description": "Setting title: how long a contact or repeater can go unheard before it is marked stale."},
+  "staleAfterExplain": "Contacts and repeaters not heard for this long are marked stale in the lists and faded on the map.",
+  "staleOff": "Off",
+  "staleHour": "1 hour",
+  "staleSixHours": "6 hours",
+  "staleDay": "24 hours",
+  "staleThreeDays": "3 days",
+  "staleWeek": "7 days",
+  "staleBadge": "stale · {age}",
+  "@staleBadge": {"description": "Shown under a contact or repeater not heard for a while. age is a phrase such as '3 days ago'.", "placeholders": {"age": {"type": "String"}}},
+  "rangeRingsShow": "Show range rings",
+  "@rangeRingsShow": {"description": "Map options menu item that turns on distance rings around your own position."},
+  "rangeRingsHide": "Hide range rings",
+  "rangeRingsNoPosition": "Your position isn’t known yet, so range rings can’t be drawn. Tap Locate, or give your radio a position.",
+  "rangeRingsSpoken": "Range rings at {distances}",
+  "@rangeRingsSpoken": {"description": "Screen reader label for the distance rings on the map.", "placeholders": {"distances": {"type": "String"}}}
 }

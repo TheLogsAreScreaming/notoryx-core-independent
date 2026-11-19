@@ -1437,5 +1437,18 @@
   "trafficThisRadio": "Ez a rádió",
   "trafficOffMap": "Nincs a térképen",
   "trafficOnMap": "A térképen",
-  "mapClusterNodes": "{count} csomópont itt. Koppints a nagyításhoz."
+  "mapClusterNodes": "{count} csomópont itt. Koppints a nagyításhoz.",
+  "staleAfterSetting": "Csomópontok elavultnak jelölése ennyi után",
+  "staleAfterExplain": "Az ennyi ideje nem hallott kapcsolatok és átjátszók elavultként jelennek meg a listákban, és halványan a térképen.",
+  "staleOff": "Ki",
+  "staleHour": "1 óra",
+  "staleSixHours": "6 óra",
+  "staleDay": "24 óra",
+  "staleThreeDays": "3 nap",
+  "staleWeek": "7 nap",
+  "staleBadge": "elavult · {age}",
+  "rangeRingsShow": "Távolsággyűrűk megjelenítése",
+  "rangeRingsHide": "Távolsággyűrűk elrejtése",
+  "rangeRingsNoPosition": "A helyzeted még nem ismert, ezért a távolsággyűrűk nem rajzolhatók meg. Koppints a Helymeghatározásra, vagy adj meg pozíciót a rádiónak.",
+  "rangeRingsSpoken": "Távolsággyűrűk: {distances}"
 }

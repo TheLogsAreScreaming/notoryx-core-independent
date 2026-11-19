@@ -15,6 +15,7 @@ import 'package:notoryx_core/main.dart';
 import 'package:notoryx_core/radio/radio.dart';
 import 'package:notoryx_core/screens/map_tab.dart';
 import 'package:notoryx_core/screens/node_details.dart';
+import 'package:notoryx_core/screens/range_rings_layer.dart';
 
 import '../support/fake_notifier.dart';
 import '../support/fake_radio_link.dart';
@@ -56,7 +57,10 @@ void main() {
     }
   }
 
-  Future<void> openMap(WidgetTester tester) async {
+  Future<void> openMap(
+    WidgetTester tester, {
+    List<List<int>> extra = const [],
+  }) async {
     db = MeshDatabase.inMemory();
     await tester.pumpWidget(
       ProviderScope(
@@ -78,6 +82,7 @@ void main() {
                     lastModified: 11,
                   ),
                   contactFrame('No Position', keyByte: 3, lastModified: 12),
+                  ...extra,
                 ]);
               return link;
             }),
@@ -226,5 +231,64 @@ void main() {
     expect(routeText(0), 'Direct');
     expect(routeText(0x42), '2 hops');
     expect(distanceText(const LatLng(0, 0), const LatLng(0, 0.001)), '111 m');
+  });
+
+  testWidgets('a node not heard for a day is faded and said to be stale', (
+    tester,
+  ) async {
+    final old = DateTime.now()
+        .subtract(const Duration(days: 3))
+        .millisecondsSinceEpoch;
+    await openMap(
+      tester,
+      extra: [
+        contactFrame(
+          'Old Hill',
+          keyByte: 4,
+          type: NodeType.repeater,
+          latitude: 35.10,
+          longitude: -81.40,
+          lastModified: 13,
+          lastAdvert: old ~/ 1000,
+        ),
+      ],
+    );
+    final stale = find.bySemanticsLabel(RegExp(r'^Old Hill, stale · '));
+    expect(stale, findsOneWidget);
+    expect(
+      find.ancestor(
+        of: stale,
+        matching: find.byWidgetPredicate(
+          (w) => w is Opacity && w.opacity == 0.45,
+        ),
+      ),
+      findsOneWidget,
+    );
+    // Never heard is never stale.
+    expect(find.bySemanticsLabel('Ridge RPT'), findsOneWidget);
+    // The Contacts list says so in words, with an icon.
+    await tester.tap(find.text('Contacts'));
+    await settle(tester);
+    expect(find.text('stale · 3 days ago'), findsOneWidget);
+    expect(find.byIcon(Icons.history_toggle_off), findsOneWidget);
+    await cleanUp(tester);
+  });
+
+  testWidgets('range rings toggle from the options menu', (tester) async {
+    await openMap(tester);
+    expect(find.byType(RangeRingsLayer), findsNothing);
+    await tester.tap(find.byKey(const Key('map-options')));
+    await settle(tester);
+    await tester.tap(find.text('Show range rings'));
+    await settle(tester);
+    expect(find.byType(RangeRingsLayer), findsOneWidget);
+    expect(find.textContaining(RegExp(r'\d (m|km|mi)$')), findsNWidgets(4));
+    expect(find.bySemanticsLabel(RegExp('^Range rings at ')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('map-options')));
+    await settle(tester);
+    await tester.tap(find.text('Hide range rings'));
+    await settle(tester);
+    expect(find.byType(RangeRingsLayer), findsNothing);
+    await cleanUp(tester);
   });
 }

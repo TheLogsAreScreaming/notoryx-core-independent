@@ -1437,5 +1437,18 @@
   "trafficThisRadio": "Cette radio",
   "trafficOffMap": "Hors de la carte",
   "trafficOnMap": "Sur la carte",
-  "mapClusterNodes": "{count} nœuds ici. Touchez pour zoomer."
+  "mapClusterNodes": "{count} nœuds ici. Touchez pour zoomer.",
+  "staleAfterSetting": "Marquer les nœuds inactifs après",
+  "staleAfterExplain": "Les contacts et répéteurs non entendus depuis ce délai sont marqués inactifs dans les listes et estompés sur la carte.",
+  "staleOff": "Désactivé",
+  "staleHour": "1 heure",
+  "staleSixHours": "6 heures",
+  "staleDay": "24 heures",
+  "staleThreeDays": "3 jours",
+  "staleWeek": "7 jours",
+  "staleBadge": "inactif · {age}",
+  "rangeRingsShow": "Afficher les cercles de distance",
+  "rangeRingsHide": "Masquer les cercles de distance",
+  "rangeRingsNoPosition": "Votre position est encore inconnue, les cercles de distance ne peuvent donc pas être tracés. Touchez Localiser ou donnez une position à votre radio.",
+  "rangeRingsSpoken": "Cercles de distance à {distances}"
 }

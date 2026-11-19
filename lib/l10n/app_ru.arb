@@ -1437,5 +1437,18 @@
   "trafficThisRadio": "Это радио",
   "trafficOffMap": "Не на карте",
   "trafficOnMap": "На карте",
-  "mapClusterNodes": "Узлов здесь: {count}. Нажмите, чтобы приблизить."
+  "mapClusterNodes": "Узлов здесь: {count}. Нажмите, чтобы приблизить.",
+  "staleAfterSetting": "Отмечать узлы устаревшими через",
+  "staleAfterExplain": "Контакты и ретрансляторы, которых не слышно столько времени, отмечаются в списках как устаревшие и бледнеют на карте.",
+  "staleOff": "Выкл.",
+  "staleHour": "1 час",
+  "staleSixHours": "6 часов",
+  "staleDay": "24 часа",
+  "staleThreeDays": "3 дня",
+  "staleWeek": "7 дней",
+  "staleBadge": "устарел · {age}",
+  "rangeRingsShow": "Показать кольца расстояний",
+  "rangeRingsHide": "Скрыть кольца расстояний",
+  "rangeRingsNoPosition": "Ваше местоположение пока неизвестно, поэтому кольца расстояний нельзя нарисовать. Нажмите «Найти» или задайте позицию радио.",
+  "rangeRingsSpoken": "Кольца расстояний: {distances}"
 }

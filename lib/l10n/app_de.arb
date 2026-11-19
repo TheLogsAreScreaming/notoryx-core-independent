@@ -1437,5 +1437,18 @@
   "trafficThisRadio": "Dieses Funkgerät",
   "trafficOffMap": "Nicht auf der Karte",
   "trafficOnMap": "Auf der Karte",
-  "mapClusterNodes": "{count} Knoten hier. Zum Vergrößern tippen."
+  "mapClusterNodes": "{count} Knoten hier. Zum Vergrößern tippen.",
+  "staleAfterSetting": "Knoten als veraltet markieren nach",
+  "staleAfterExplain": "Kontakte und Repeater, die so lange nicht gehört wurden, werden in den Listen als veraltet markiert und auf der Karte blass dargestellt.",
+  "staleOff": "Aus",
+  "staleHour": "1 Stunde",
+  "staleSixHours": "6 Stunden",
+  "staleDay": "24 Stunden",
+  "staleThreeDays": "3 Tage",
+  "staleWeek": "7 Tage",
+  "staleBadge": "veraltet · {age}",
+  "rangeRingsShow": "Entfernungsringe zeigen",
+  "rangeRingsHide": "Entfernungsringe ausblenden",
+  "rangeRingsNoPosition": "Deine Position ist noch unbekannt, daher können keine Entfernungsringe gezeichnet werden. Tippe auf Orten oder gib deinem Funkgerät eine Position.",
+  "rangeRingsSpoken": "Entfernungsringe bei {distances}"
 }

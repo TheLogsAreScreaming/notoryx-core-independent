@@ -1437,5 +1437,18 @@
   "trafficThisRadio": "To radio",
   "trafficOffMap": "Poza mapą",
   "trafficOnMap": "Na mapie",
-  "mapClusterNodes": "Węzły tutaj: {count}. Dotknij, aby przybliżyć."
+  "mapClusterNodes": "Węzły tutaj: {count}. Dotknij, aby przybliżyć.",
+  "staleAfterSetting": "Oznacz węzły jako nieaktywne po",
+  "staleAfterExplain": "Kontakty i przekaźniki niesłyszane przez ten czas są oznaczane na listach jako nieaktywne i wyblakłe na mapie.",
+  "staleOff": "Wyłączone",
+  "staleHour": "1 godzina",
+  "staleSixHours": "6 godzin",
+  "staleDay": "24 godziny",
+  "staleThreeDays": "3 dni",
+  "staleWeek": "7 dni",
+  "staleBadge": "nieaktywny · {age}",
+  "rangeRingsShow": "Pokaż pierścienie odległości",
+  "rangeRingsHide": "Ukryj pierścienie odległości",
+  "rangeRingsNoPosition": "Twoja pozycja nie jest jeszcze znana, więc nie można narysować pierścieni odległości. Stuknij Zlokalizuj lub podaj pozycję radia.",
+  "rangeRingsSpoken": "Pierścienie odległości: {distances}"
 }

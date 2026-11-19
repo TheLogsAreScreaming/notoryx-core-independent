@@ -1437,5 +1437,18 @@
   "trafficThisRadio": "Toto rádio",
   "trafficOffMap": "Mimo mapy",
   "trafficOnMap": "Na mape",
-  "mapClusterNodes": "Uzly tu: {count}. Ťuknutím priblížite."
+  "mapClusterNodes": "Uzly tu: {count}. Ťuknutím priblížite.",
+  "staleAfterSetting": "Označiť uzly ako neaktívne po",
+  "staleAfterExplain": "Kontakty a opakovače, ktoré tak dlho nebolo počuť, sa v zoznamoch označia ako neaktívne a na mape zblednú.",
+  "staleOff": "Vypnuté",
+  "staleHour": "1 hodina",
+  "staleSixHours": "6 hodín",
+  "staleDay": "24 hodín",
+  "staleThreeDays": "3 dni",
+  "staleWeek": "7 dní",
+  "staleBadge": "neaktívny · {age}",
+  "rangeRingsShow": "Zobraziť kruhy vzdialenosti",
+  "rangeRingsHide": "Skryť kruhy vzdialenosti",
+  "rangeRingsNoPosition": "Vaša poloha ešte nie je známa, takže kruhy vzdialenosti sa nedajú nakresliť. Ťuknite na Nájsť alebo zadajte polohu rádia.",
+  "rangeRingsSpoken": "Kruhy vzdialenosti: {distances}"
 }

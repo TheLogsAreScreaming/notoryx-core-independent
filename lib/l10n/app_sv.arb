@@ -1437,5 +1437,18 @@
   "trafficThisRadio": "Den här radion",
   "trafficOffMap": "Inte på kartan",
   "trafficOnMap": "På kartan",
-  "mapClusterNodes": "{count} noder här. Tryck för att zooma in."
+  "mapClusterNodes": "{count} noder här. Tryck för att zooma in.",
+  "staleAfterSetting": "Markera noder som inaktuella efter",
+  "staleAfterExplain": "Kontakter och repeatrar som inte hörts så länge markeras som inaktuella i listorna och tonas ned på kartan.",
+  "staleOff": "Av",
+  "staleHour": "1 timme",
+  "staleSixHours": "6 timmar",
+  "staleDay": "24 timmar",
+  "staleThreeDays": "3 dagar",
+  "staleWeek": "7 dagar",
+  "staleBadge": "inaktuell · {age}",
+  "rangeRingsShow": "Visa avståndsringar",
+  "rangeRingsHide": "Dölj avståndsringar",
+  "rangeRingsNoPosition": "Din position är inte känd än, så avståndsringar kan inte ritas. Tryck på Hitta eller ge din radio en position.",
+  "rangeRingsSpoken": "Avståndsringar vid {distances}"
 }
