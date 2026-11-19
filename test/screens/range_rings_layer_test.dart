@@ -14,6 +14,7 @@ void main() {
     WidgetTester tester, {
     required double rotation,
     required double zoom,
+    LatLng view = const LatLng(41.33, -74.2),
   }) async {
     tester.view.physicalSize = const Size(400, 700);
     tester.view.devicePixelRatio = 1;
@@ -25,7 +26,7 @@ void main() {
         home: FlutterMap(
           options: MapOptions(
             // The radio sits right of centre, nearer the toolbar.
-            initialCenter: const LatLng(41.33, -74.2),
+            initialCenter: view,
             initialZoom: zoom,
             initialRotation: rotation,
           ),
@@ -53,8 +54,10 @@ void main() {
           of: find.byType(RangeRingsLayer),
           matching: find.byType(Text),
         );
-        // 4 distance labels and N, E, S, W.
-        expect(chips, findsNWidgets(8));
+        // N, E, S, W and at least the outer ring's distance label; inner
+        // labels are dropped when the rings are close together.
+        expect(find.text('N'), findsOneWidget);
+        expect(chips.evaluate().length, inInclusiveRange(5, 8));
         for (final chip in chips.evaluate()) {
           final rect = tester.getRect(find.byWidget(chip.widget));
           expect(
@@ -66,4 +69,44 @@ void main() {
       }
     });
   }
+
+  testWidgets('just above the bottom card the rings stay small and readable', (
+    tester,
+  ) async {
+    // The view's centre is 2° north of the radio, so the radio sits about
+    // 30 px above the 200 px card along the bottom: too little room for
+    // the usual fit.
+    await pumpRings(
+      tester,
+      rotation: 0,
+      zoom: 6,
+      view: const LatLng(43.33, -73.09),
+    );
+    final radioAt =
+        tester.getCenter(find.byType(FlutterMap)) + const Offset(0, 120);
+    final chips = find.descendant(
+      of: find.byType(RangeRingsLayer),
+      matching: find.byType(Text),
+    );
+    final rects = [
+      for (final chip in chips.evaluate())
+        tester.getRect(find.byWidget(chip.widget)),
+    ];
+    // The compass letters sit close around the radio, not out at the size
+    // of the whole view.
+    for (final letter in ['N', 'E', 'S', 'W']) {
+      final at = tester.getCenter(find.text(letter));
+      expect((at - radioAt).distance, lessThan(90), reason: letter);
+    }
+    // No two labels overlap.
+    for (var i = 0; i < rects.length; i++) {
+      for (var j = i + 1; j < rects.length; j++) {
+        expect(
+          rects[i].overlaps(rects[j]),
+          isFalse,
+          reason: '${rects[i]} overlaps ${rects[j]}',
+        );
+      }
+    }
+  });
 }

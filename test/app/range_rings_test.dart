@@ -175,8 +175,27 @@ void main() {
   test('ringRoomPx leaves room for the compass letters', () {
     expect(ringRoomPx(0), 0);
     expect(ringRoomPx(10), 0);
-    final outer = ringRoomPx(126);
-    expect(outer, closeTo(100, 0.001));
-    expect(outer * compassTagFactor + compassTagRoom, closeTo(126, 0.001));
+    // Small rings: the letters sit a label's height past the outer ring.
+    final small = ringRoomPx(126);
+    expect(small, closeTo(94, 0.001));
+    expect(small + compassGapPx(small) + compassTagRoom, closeTo(126, 0.001));
+    // Big rings: the letters sit at compassTagFactor × the outer ring.
+    final big = ringRoomPx(500);
+    expect(big, closeTo(437.5, 0.001));
+    expect(big + compassGapPx(big) + compassTagRoom, closeTo(500, 0.001));
+  });
+
+  test('compass letters never crowd the outer label', () {
+    expect(compassGapPx(50), ringLabelGap);
+    expect(compassGapPx(500), closeTo(60, 0.001));
+  });
+
+  test('labelledRings thins the labels when the rings are close', () {
+    expect(labelledRings(30), [0, 1, 2, 3]);
+    expect(labelledRings(22), [0, 1, 2, 3]);
+    expect(labelledRings(15), [1, 3]);
+    expect(labelledRings(10), [0, 3]);
+    expect(labelledRings(5), [3]);
+    expect(labelledRings(0), [3]);
   });
 }
