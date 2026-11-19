@@ -1314,6 +1314,7 @@
   "rateNormalDetail": "Sensorer var 30:e min, brusgolv var 10:e min",
   "rateSaver": "Batterisparläge",
   "rateSaverDetail": "Sensorer varannan timme, brusgolv varje timme",
+  "rateSummary": "{rate}. {detail}.",
   "widgetConnected": "Ansluten",
   "widgetReconnecting": "Återansluter",
   "widgetConnecting": "Ansluter…",

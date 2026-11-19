@@ -1314,6 +1314,7 @@
   "rateNormalDetail": "Датчики кожні 30 хв, шум кожні 10 хв",
   "rateSaver": "Економія батареї",
   "rateSaverDetail": "Датчики кожні 2 години, шум щогодини",
+  "rateSummary": "{rate}. {detail}.",
   "widgetConnected": "Підключено",
   "widgetReconnecting": "Повторне підключення",
   "widgetConnecting": "Підключення…",

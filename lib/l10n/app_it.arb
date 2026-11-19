@@ -1314,6 +1314,7 @@
   "rateNormalDetail": "Sensori ogni 30 min, rumore di fondo ogni 10 min",
   "rateSaver": "Risparmio batteria",
   "rateSaverDetail": "Sensori ogni 2 ore, rumore di fondo ogni ora",
+  "rateSummary": "{rate}. {detail}.",
   "widgetConnected": "Connessa",
   "widgetReconnecting": "Riconnessione",
   "widgetConnecting": "Connessione…",

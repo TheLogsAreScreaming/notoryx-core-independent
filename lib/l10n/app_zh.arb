@@ -1314,6 +1314,7 @@
   "rateNormalDetail": "传感器每 30 分钟，底噪每 10 分钟",
   "rateSaver": "省电",
   "rateSaverDetail": "传感器每 2 小时，底噪每小时",
+  "rateSummary": "{rate}。{detail}。",
   "widgetConnected": "已连接",
   "widgetReconnecting": "正在重新连接",
   "widgetConnecting": "正在连接…",
