@@ -127,8 +127,9 @@ double viewReach(
 /// How far out the compass letters sit, as a share of the outer ring.
 const compassTagFactor = 1.12;
 
-/// Room in pixels for the compass letter chips past [compassTagFactor].
-const compassTagRoom = 14.0;
+/// Half a compass letter chip's height in pixels: room past the letter's
+/// centre so the chip stays inside.
+const compassTagRoom = 10.0;
 
 /// Pixels from [centre] to the nearest edge of the part of a [size] map
 /// that nothing covers, after taking [left], [top], [right] and [bottom]
@@ -148,10 +149,39 @@ double clearRoom(
 ].reduce(math.min);
 
 /// The largest outer-ring radius, in pixels, whose compass letters still
-/// fit in [room] pixels: the letters sit at [compassTagFactor] × the outer
+/// fit in [room] pixels: the letters sit [compassGapPx] past the outer
 /// ring and need [compassTagRoom] more. Zero when there isn't room.
-double ringRoomPx(double room) =>
-    math.max(0, (room - compassTagRoom) / compassTagFactor);
+double ringRoomPx(double room) => math.max(
+  0,
+  math.min(
+    (room - compassTagRoom) / compassTagFactor,
+    room - compassTagRoom - ringLabelGap,
+  ),
+);
+
+/// How far past an outer ring of [outerPx] pixels the compass letters sit:
+/// [compassTagFactor] of it, but never closer than [ringLabelGap], so the
+/// N letter clears the outer ring's distance label.
+double compassGapPx(double outerPx) =>
+    math.max(outerPx * (compassTagFactor - 1), ringLabelGap);
+
+/// Height in pixels a ring's distance label needs so it doesn't overlap
+/// the next one.
+const ringLabelGap = 22.0;
+
+/// Which rings get a distance label when the rings are [stepPx] pixels
+/// apart: the outer ring always, and inward from it every ring, every
+/// second or every third, so the labels on the north line never overlap.
+/// Indexes run from 0 (innermost) to [count] - 1 (outer).
+List<int> labelledRings(double stepPx, {int count = ringCount}) {
+  final every = stepPx <= 0
+      ? count
+      : math.max(1, (ringLabelGap / stepPx).ceil());
+  return [
+    for (var i = 0; i < count; i++)
+      if ((count - 1 - i) % every == 0) i,
+  ];
+}
 
 /// Whether the map shows range rings. Saved on the phone, for every radio.
 final rangeRingsProvider = StreamProvider<bool>(

@@ -29,28 +29,36 @@ class RangeRingsLayer extends StatelessWidget {
   /// How much of each side of the map is hidden behind other widgets.
   final EdgeInsets covered;
 
-  /// Below this outer radius in pixels the rings would be too cramped to
-  /// read, so they fall back to the size of the whole view.
-  static const _smallest = 40.0;
+  /// The smallest outer radius in pixels. Near a card or the toolbar the
+  /// clear room can be tiny; the rings stay at least this big rather than
+  /// jumping back to the size of the whole view.
+  static const _smallest = 48.0;
 
   @override
   Widget build(BuildContext context) {
     final camera = MapCamera.of(context);
     final view = camera.visibleBounds;
     final at = camera.latLngToScreenOffset(centre);
-    final room = ringRoomPx(
-      clearRoom(
-        at,
-        // The map as it is on screen; [MapCamera.size] is the larger box
-        // around a rotated map.
-        camera.nonRotatedSize,
-        left: covered.left,
-        top: covered.top,
-        right: covered.right,
-        bottom: covered.bottom,
+    // The map as it is on screen; [MapCamera.size] is the larger box
+    // around a rotated map.
+    final size = camera.nonRotatedSize;
+    final onScreen = clearRoom(at, size) >= 0;
+    final room = math.max(
+      ringRoomPx(
+        clearRoom(
+          at,
+          size,
+          left: covered.left,
+          top: covered.top,
+          right: covered.right,
+          bottom: covered.bottom,
+        ),
       ),
+      _smallest,
     );
-    final reach = room >= _smallest
+    // Sized to the clear room around the centre while it's on screen;
+    // sized to the whole view only when the centre is off it.
+    final reach = onScreen
         ? [
             for (final d in const [
               Offset(0, -1),
@@ -69,6 +77,16 @@ class RangeRingsLayer extends StatelessWidget {
           );
     final radii = ringRadii(reach, unit);
     final outer = radii.last;
+    final stepPx =
+        (camera.latLngToScreenOffset(pointAt(centre, radii.first, 0)) - at)
+            .distance;
+    final labelled = labelledRings(stepPx, count: radii.length);
+    // The compass letters, in metres from the centre.
+    final metresPerPx = stepPx > 0 ? radii.first / stepPx : 0.0;
+    final outerPx = outer / (metresPerPx > 0 ? metresPerPx : 1);
+    final compass = metresPerPx > 0
+        ? outer + compassGapPx(outerPx) * metresPerPx
+        : outer * compassTagFactor;
     final scheme = Theme.of(context).colorScheme;
     final line = scheme.primary;
     final textStyle = Theme.of(context).textTheme.labelSmall
@@ -126,20 +144,16 @@ class RangeRingsLayer extends StatelessWidget {
             ExcludeSemantics(
               child: MarkerLayer(
                 markers: [
-                  for (final r in radii)
+                  for (final i in labelled)
                     Marker(
-                      point: pointAt(centre, r, 0),
+                      point: pointAt(centre, radii[i], 0),
                       width: 80,
                       height: 20,
-                      child: chip(ringLabel(r, unit)),
+                      child: chip(ringLabel(radii[i], unit)),
                     ),
                   for (var i = 0; i < 4; i++)
                     Marker(
-                      point: pointAt(
-                        centre,
-                        outer * compassTagFactor,
-                        i * 90.0,
-                      ),
+                      point: pointAt(centre, compass, i * 90.0),
                       width: 32,
                       height: 20,
                       child: chip(letter(i * 2)),

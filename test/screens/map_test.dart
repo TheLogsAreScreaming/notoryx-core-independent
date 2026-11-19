@@ -291,7 +291,10 @@ void main() {
     await tester.tap(find.text('Show range rings'));
     await settle(tester);
     expect(find.byType(RangeRingsLayer), findsOneWidget);
-    expect(find.textContaining(RegExp(r'\d (m|km|mi)$')), findsNWidgets(4));
+    expect(
+      find.textContaining(RegExp(r'\d (m|km|mi)$')).evaluate().length,
+      inInclusiveRange(1, 4),
+    );
     expect(find.bySemanticsLabel(RegExp('^Range rings at ')), findsOneWidget);
     // Every ring label and compass letter is on the map and clear of the
     // toolbar down the right.
@@ -303,7 +306,7 @@ void main() {
       of: find.byType(RangeRingsLayer),
       matching: find.byType(Text),
     );
-    expect(chips, findsNWidgets(8));
+    expect(chips.evaluate().length, inInclusiveRange(5, 8));
     for (final chip in chips.evaluate()) {
       final rect = tester.getRect(find.byWidget(chip.widget));
       expect(map.contains(rect.topLeft), isTrue, reason: '$rect off the map');
@@ -318,8 +321,10 @@ void main() {
         reason: '$rect under the toolbar',
       );
     }
-    // With Traffic on and a route showing, the rings shrink to stay above
-    // the card along the bottom.
+    // With Traffic on and a route showing, the rings shrink toward the card
+    // along the bottom. In this small window the radio sits just above the
+    // card, so the rings stay at their smallest: the labels and N, E, W
+    // stay above the card, and only S may sit on it.
     await tester.tap(find.byKey(const Key('map-traffic')));
     await settle(tester);
     ProviderScope.containerOf(tester.element(find.byType(MapTab)))
@@ -331,12 +336,21 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
     await tester.pump();
     final cardTop = tester.getRect(find.byKey(const Key('traffic-card'))).top;
+    final radioAt = tester.getCenter(find.byIcon(Icons.router));
     for (final chip in chips.evaluate()) {
+      final text = (chip.widget as Text).data;
       final rect = tester.getRect(find.byWidget(chip.widget));
+      // Close to the radio, not sized to the whole view.
+      expect(
+        (rect.center - radioAt).distance,
+        lessThan(120),
+        reason: '$text at $rect is far from the radio',
+      );
+      if (text == 'S') continue;
       expect(
         rect.bottom,
         lessThanOrEqualTo(cardTop),
-        reason: '$rect under the card',
+        reason: '$text at $rect under the card',
       );
     }
     await tester.tap(find.byKey(const Key('map-traffic')));
