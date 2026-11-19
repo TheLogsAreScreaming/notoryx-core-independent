@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -9,26 +11,61 @@ import '../l10n/l10n.dart';
 /// label on each ring's north point, faint spokes every 45° and the
 /// compass letters just outside the outer ring. Ignores taps, so markers
 /// underneath still work.
+///
+/// While [centre] is on screen, the rings are sized so that the outer
+/// ring and its compass letters stay inside the map, clear of [covered]
+/// (the map's own buttons and cards on top of it).
 class RangeRingsLayer extends StatelessWidget {
-  const RangeRingsLayer({required this.centre, required this.unit, super.key});
+  const RangeRingsLayer({
+    required this.centre,
+    required this.unit,
+    this.covered = EdgeInsets.zero,
+    super.key,
+  });
 
   final LatLng centre;
   final DistanceUnit unit;
+
+  /// How much of each side of the map is hidden behind other widgets.
+  final EdgeInsets covered;
+
+  /// Below this outer radius in pixels the rings would be too cramped to
+  /// read, so they fall back to the size of the whole view.
+  static const _smallest = 40.0;
 
   @override
   Widget build(BuildContext context) {
     final camera = MapCamera.of(context);
     final view = camera.visibleBounds;
-    final radii = ringRadii(
-      viewReach(
-        camera.center,
-        north: view.north,
-        south: view.south,
-        east: view.east,
-        west: view.west,
+    final at = camera.latLngToScreenOffset(centre);
+    final room = ringRoomPx(
+      clearRoom(
+        at,
+        camera.size,
+        left: covered.left,
+        top: covered.top,
+        right: covered.right,
+        bottom: covered.bottom,
       ),
-      unit,
     );
+    final reach = room >= _smallest
+        ? [
+            for (final d in const [
+              Offset(0, -1),
+              Offset(1, 0),
+              Offset(0, 1),
+              Offset(-1, 0),
+            ])
+              metresBetween(centre, camera.screenOffsetToLatLng(at + d * room)),
+          ].reduce(math.min)
+        : viewReach(
+            camera.center,
+            north: view.north,
+            south: view.south,
+            east: view.east,
+            west: view.west,
+          );
+    final radii = ringRadii(reach, unit);
     final outer = radii.last;
     final scheme = Theme.of(context).colorScheme;
     final line = scheme.primary;
@@ -96,7 +133,11 @@ class RangeRingsLayer extends StatelessWidget {
                     ),
                   for (var i = 0; i < 4; i++)
                     Marker(
-                      point: pointAt(centre, outer * 1.12, i * 90.0),
+                      point: pointAt(
+                        centre,
+                        outer * compassTagFactor,
+                        i * 90.0,
+                      ),
                       width: 32,
                       height: 20,
                       child: chip(letter(i * 2)),

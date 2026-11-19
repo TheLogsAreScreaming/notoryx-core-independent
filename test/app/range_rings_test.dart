@@ -1,4 +1,4 @@
-import 'dart:ui' show Locale;
+import 'dart:ui' show Locale, Offset, Size;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
@@ -157,5 +157,26 @@ void main() {
     expect(distanceUnitFor(const Locale('en', 'AU')), metric);
     expect(distanceUnitFor(const Locale('de', 'DE')), metric);
     expect(distanceUnitFor(const Locale('en')), metric);
+  });
+
+  test('clearRoom is the distance to the nearest uncovered edge', () {
+    const size = Size(400, 800);
+    expect(clearRoom(const Offset(200, 400), size), 200);
+    expect(clearRoom(const Offset(200, 400), size, right: 84), 116);
+    expect(clearRoom(const Offset(200, 100), size, top: 8), 92);
+    expect(
+      clearRoom(const Offset(200, 700), size, bottom: 140),
+      -40,
+      reason: 'behind the bottom card',
+    );
+    expect(clearRoom(const Offset(-10, 400), size), isNegative);
+  });
+
+  test('ringRoomPx leaves room for the compass letters', () {
+    expect(ringRoomPx(0), 0);
+    expect(ringRoomPx(10), 0);
+    final outer = ringRoomPx(126);
+    expect(outer, closeTo(100, 0.001));
+    expect(outer * compassTagFactor + compassTagRoom, closeTo(126, 0.001));
   });
 }

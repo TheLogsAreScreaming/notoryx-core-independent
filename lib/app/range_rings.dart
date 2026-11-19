@@ -3,7 +3,7 @@
 library;
 
 import 'dart:math' as math;
-import 'dart:ui' show Locale;
+import 'dart:ui' show Locale, Offset, Size;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
@@ -123,6 +123,35 @@ double viewReach(
   final toWest = metresBetween(centre, LatLng(centre.latitude, west));
   return [toNorth, toSouth, toEast, toWest].reduce(math.min);
 }
+
+/// How far out the compass letters sit, as a share of the outer ring.
+const compassTagFactor = 1.12;
+
+/// Room in pixels for the compass letter chips past [compassTagFactor].
+const compassTagRoom = 14.0;
+
+/// Pixels from [centre] to the nearest edge of the part of a [size] map
+/// that nothing covers, after taking [left], [top], [right] and [bottom]
+/// off its sides. Zero or less when [centre] is outside that part.
+double clearRoom(
+  Offset centre,
+  Size size, {
+  double left = 0,
+  double top = 0,
+  double right = 0,
+  double bottom = 0,
+}) => [
+  centre.dx - left,
+  centre.dy - top,
+  size.width - right - centre.dx,
+  size.height - bottom - centre.dy,
+].reduce(math.min);
+
+/// The largest outer-ring radius, in pixels, whose compass letters still
+/// fit in [room] pixels: the letters sit at [compassTagFactor] × the outer
+/// ring and need [compassTagRoom] more. Zero when there isn't room.
+double ringRoomPx(double room) =>
+    math.max(0, (room - compassTagRoom) / compassTagFactor);
 
 /// Whether the map shows range rings. Saved on the phone, for every radio.
 final rangeRingsProvider = StreamProvider<bool>(

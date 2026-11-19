@@ -16,6 +16,7 @@ import 'package:notoryx_core/radio/radio.dart';
 import 'package:notoryx_core/screens/map_tab.dart';
 import 'package:notoryx_core/screens/node_details.dart';
 import 'package:notoryx_core/screens/range_rings_layer.dart';
+import 'package:flutter_map/flutter_map.dart';
 
 import '../support/fake_notifier.dart';
 import '../support/fake_radio_link.dart';
@@ -277,6 +278,14 @@ void main() {
   testWidgets('range rings toggle from the options menu', (tester) async {
     await openMap(tester);
     expect(find.byType(RangeRingsLayer), findsNothing);
+    // Bring the radio to the middle of the map, where the rings have room.
+    final radio = tester.getCenter(find.byIcon(Icons.router));
+    await tester.timedDragFrom(
+      radio,
+      tester.getCenter(find.byType(FlutterMap)) - radio,
+      const Duration(milliseconds: 600),
+    );
+    await settle(tester);
     await tester.tap(find.byKey(const Key('map-options')));
     await settle(tester);
     await tester.tap(find.text('Show range rings'));
@@ -284,6 +293,31 @@ void main() {
     expect(find.byType(RangeRingsLayer), findsOneWidget);
     expect(find.textContaining(RegExp(r'\d (m|km|mi)$')), findsNWidgets(4));
     expect(find.bySemanticsLabel(RegExp('^Range rings at ')), findsOneWidget);
+    // Every ring label and compass letter is on the map and clear of the
+    // toolbar down the right.
+    final map = tester.getRect(find.byType(FlutterMap));
+    final toolbarLeft = tester
+        .getRect(find.byKey(const Key('map-options')))
+        .left;
+    final chips = find.descendant(
+      of: find.byType(RangeRingsLayer),
+      matching: find.byType(Text),
+    );
+    expect(chips, findsNWidgets(8));
+    for (final chip in chips.evaluate()) {
+      final rect = tester.getRect(find.byWidget(chip.widget));
+      expect(map.contains(rect.topLeft), isTrue, reason: '$rect off the map');
+      expect(
+        map.contains(rect.bottomRight),
+        isTrue,
+        reason: '$rect off the map',
+      );
+      expect(
+        rect.right,
+        lessThanOrEqualTo(toolbarLeft),
+        reason: '$rect under the toolbar',
+      );
+    }
     await tester.tap(find.byKey(const Key('map-options')));
     await settle(tester);
     await tester.tap(find.text('Hide range rings'));
