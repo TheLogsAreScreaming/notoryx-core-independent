@@ -41,7 +41,9 @@ class RangeRingsLayer extends StatelessWidget {
     final room = ringRoomPx(
       clearRoom(
         at,
-        camera.size,
+        // The map as it is on screen; [MapCamera.size] is the larger box
+        // around a rotated map.
+        camera.nonRotatedSize,
         left: covered.left,
         top: covered.top,
         right: covered.right,
