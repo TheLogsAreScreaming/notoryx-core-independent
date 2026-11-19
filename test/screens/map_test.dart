@@ -318,6 +318,29 @@ void main() {
         reason: '$rect under the toolbar',
       );
     }
+    // With Traffic on and a route showing, the rings shrink to stay above
+    // the card along the bottom.
+    await tester.tap(find.byKey(const Key('map-traffic')));
+    await settle(tester);
+    ProviderScope.containerOf(tester.element(find.byType(MapTab)))
+        .read(trafficProvider.notifier)
+        .heard(
+          RxLog(snr: 6.5, rssi: -88, packet: [0x15, 0x02, 0x02, 0x7f, 0x11]),
+        );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump();
+    final cardTop = tester.getRect(find.byKey(const Key('traffic-card'))).top;
+    for (final chip in chips.evaluate()) {
+      final rect = tester.getRect(find.byWidget(chip.widget));
+      expect(
+        rect.bottom,
+        lessThanOrEqualTo(cardTop),
+        reason: '$rect under the card',
+      );
+    }
+    await tester.tap(find.byKey(const Key('map-traffic')));
+    await settle(tester);
     await tester.tap(find.byKey(const Key('map-options')));
     await settle(tester);
     await tester.tap(find.text('Hide range rings'));

@@ -67,9 +67,30 @@ class _MapTabState extends ConsumerState<MapTab> {
   /// Width kept clear down the right for the toolbar and its margin.
   static const _toolbarRoom = 84.0;
 
-  /// Height kept clear along the bottom for the traffic card and its
-  /// margin; about the card's height with two lines of route.
-  static const _trafficCardRoom = 140.0;
+  /// The traffic card's height until it has been measured.
+  static const _trafficCardGuess = 120.0;
+
+  /// Space between the traffic card and the bottom of the map.
+  static const _trafficCardMargin = 12.0;
+
+  /// The traffic card's height when it was last laid out, so the range
+  /// rings can keep clear of it. Null until measured.
+  double? _trafficCardHeight;
+  final _trafficCardKey = GlobalKey();
+
+  /// Reads the traffic card's height after this frame, and rebuilds only
+  /// when it changed, so the rings follow the card as its text grows.
+  void _measureTrafficCard() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final box = _trafficCardKey.currentContext?.findRenderObject();
+      if (box is! RenderBox || !box.hasSize) return;
+      final height = box.size.height;
+      if (height != _trafficCardHeight) {
+        setState(() => _trafficCardHeight = height);
+      }
+    });
+  }
 
   final _map = MapController();
   LatLng? _phone;
@@ -346,6 +367,7 @@ class _MapTabState extends ConsumerState<MapTab> {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final traffic = ref.watch(trafficProvider);
+    if (rings && traffic.on) _measureTrafficCard();
     _shareWithTraffic(contacts, heard, radio);
     final tiles = ref.watch(mapTilesProvider);
     final zoom = _zoom;
@@ -407,7 +429,11 @@ class _MapTabState extends ConsumerState<MapTab> {
                   8,
                   8,
                   _toolbarRoom,
-                  traffic.on ? _trafficCardRoom : 8,
+                  traffic.on
+                      ? _trafficCardMargin +
+                            (_trafficCardHeight ?? _trafficCardGuess) +
+                            8
+                      : 8,
                 ),
               ),
             const TrafficLayer(),
@@ -503,8 +529,9 @@ class _MapTabState extends ConsumerState<MapTab> {
           Positioned(
             left: 12,
             right: _toolbarRoom,
-            bottom: 12,
+            bottom: _trafficCardMargin,
             child: TrafficRouteCard(
+              key: _trafficCardKey,
               onTap: () {
                 final latest = ref.read(trafficProvider).latest;
                 void openLog() => Navigator.of(context).push(
