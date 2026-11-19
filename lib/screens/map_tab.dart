@@ -64,6 +64,13 @@ class MapTab extends ConsumerStatefulWidget {
 }
 
 class _MapTabState extends ConsumerState<MapTab> {
+  /// Width kept clear down the right for the toolbar and its margin.
+  static const _toolbarRoom = 84.0;
+
+  /// Height kept clear along the bottom for the traffic card and its
+  /// margin; about the card's height with two lines of route.
+  static const _trafficCardRoom = 140.0;
+
   final _map = MapController();
   LatLng? _phone;
   bool _locating = false;
@@ -394,6 +401,14 @@ class _MapTabState extends ConsumerState<MapTab> {
                 unit: distanceUnitFor(
                   WidgetsBinding.instance.platformDispatcher.locale,
                 ),
+                // The toolbar down the right (and the traffic card along
+                // the bottom, when it's on) sit over the map.
+                covered: EdgeInsets.fromLTRB(
+                  8,
+                  8,
+                  _toolbarRoom,
+                  traffic.on ? _trafficCardRoom : 8,
+                ),
               ),
             const TrafficLayer(),
             MarkerLayer(
@@ -487,7 +502,7 @@ class _MapTabState extends ConsumerState<MapTab> {
         if (traffic.on)
           Positioned(
             left: 12,
-            right: 84,
+            right: _toolbarRoom,
             bottom: 12,
             child: TrafficRouteCard(
               onTap: () {
