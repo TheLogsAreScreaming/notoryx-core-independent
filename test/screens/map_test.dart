@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart' show driftRuntimeOptions;
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -251,6 +252,15 @@ void main() {
           lastModified: 13,
           lastAdvert: old ~/ 1000,
         ),
+        // A clock that was never set: 1970, so its age is unknown.
+        contactFrame(
+          'Clockless',
+          keyByte: 5,
+          latitude: 35.60,
+          longitude: -80.20,
+          lastModified: 14,
+          lastAdvert: 1000,
+        ),
       ],
     );
     final stale = find.bySemanticsLabel(RegExp(r'^Old Hill, stale · '));
@@ -266,10 +276,12 @@ void main() {
     );
     // Never heard is never stale.
     expect(find.bySemanticsLabel('Ridge RPT'), findsOneWidget);
+    expect(find.bySemanticsLabel('Clockless'), findsOneWidget);
     // The Contacts list says so in words, with an icon.
     await tester.tap(find.text('Contacts'));
     await settle(tester);
     expect(find.text('stale · 3 days ago'), findsOneWidget);
+    expect(find.textContaining('stale ·'), findsOneWidget);
     expect(find.byIcon(Icons.history_toggle_off), findsOneWidget);
     await cleanUp(tester);
   });
@@ -284,6 +296,20 @@ void main() {
     expect(find.byType(RangeRingsLayer), findsOneWidget);
     expect(find.textContaining(RegExp(r'\d (m|km|mi)$')), findsNWidgets(4));
     expect(find.bySemanticsLabel(RegExp('^Range rings at ')), findsOneWidget);
+    // Every label sits inside the map and clear of the side toolbar.
+    final map = tester.getRect(find.byType(FlutterMap));
+    final labels = find.descendant(
+      of: find.byType(RangeRingsLayer),
+      matching: find.byType(Text),
+    );
+    expect(labels, findsAtLeastNWidgets(4));
+    for (final label in labels.evaluate()) {
+      final box = tester.getRect(find.byWidget(label.widget));
+      expect(box.left, greaterThanOrEqualTo(map.left));
+      expect(box.top, greaterThanOrEqualTo(map.top));
+      expect(box.right, lessThanOrEqualTo(map.right - 84));
+      expect(box.bottom, lessThanOrEqualTo(map.bottom));
+    }
     await tester.tap(find.byKey(const Key('map-options')));
     await settle(tester);
     await tester.tap(find.text('Hide range rings'));
