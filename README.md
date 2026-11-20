@@ -23,7 +23,7 @@ scratch for this repository, part of the NOTORYX family. MIT licensed.
 
 ## Status
 
-Test builds are out; the latest is **0.1.0 test 26**. Get it from
+Test builds are out; the latest is **0.1.0 test 34** (19 November 2026). Get it from
 [notoryx-core-independent-releases](https://github.com/TheLogsAreScreaming/notoryx-core-independent-releases/releases),
 which also explains which file to pick and how to get automatic updates
 with Obtainium.
@@ -67,6 +67,8 @@ and stays the one to use every day. The two install side by side:
   export, zone and trail alerts, wardrive coverage map.
 - **Terrain check:** ground profile between you and a node, with its
   Fresnel zone and a clear / partly blocked / blocked verdict.
+- **Live Traffic map** of packets heard, hop by hop, a stale-node badge and
+  range rings around your position.
 - **Compass:** an arrow to any node, from your radio's or your phone's
   position.
 - Node journal, timeline, path trace, route view and picker, path graph,
