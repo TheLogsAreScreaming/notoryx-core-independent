@@ -1511,5 +1511,6 @@
   "sarneg_tapToDecode": "SARNEG · 탭하여 디코딩",
   "sarneg_noWordSet": "SARNEG · 코드 단어 없음",
   "sarneg_decoded": "디코딩됨: {text}",
-  "sarneg_decodeA11y": "SARNEG 숫자 디코딩"
+  "sarneg_decodeA11y": "SARNEG 숫자 디코딩",
+  "sarneg_wordHidden": "코드 단어 숨겨짐"
 }

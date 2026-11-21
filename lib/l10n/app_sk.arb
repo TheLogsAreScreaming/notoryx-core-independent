@@ -1511,5 +1511,6 @@
   "sarneg_tapToDecode": "SARNEG · ťuknutím dekódujete",
   "sarneg_noWordSet": "SARNEG · kódové slovo nie je nastavené",
   "sarneg_decoded": "Dekódované: {text}",
-  "sarneg_decodeA11y": "Dekódovať čísla SARNEG"
+  "sarneg_decodeA11y": "Dekódovať čísla SARNEG",
+  "sarneg_wordHidden": "Kódové slovo skryté"
 }

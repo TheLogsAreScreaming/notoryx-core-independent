@@ -1511,5 +1511,6 @@
   "sarneg_tapToDecode": "SARNEG · koppints a dekódoláshoz",
   "sarneg_noWordSet": "SARNEG · nincs kódszó beállítva",
   "sarneg_decoded": "Dekódolva: {text}",
-  "sarneg_decodeA11y": "SARNEG számok dekódolása"
+  "sarneg_decodeA11y": "SARNEG számok dekódolása",
+  "sarneg_wordHidden": "Kódszó elrejtve"
 }

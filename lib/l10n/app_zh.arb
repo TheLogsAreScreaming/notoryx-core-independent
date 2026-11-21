@@ -1511,5 +1511,6 @@
   "sarneg_tapToDecode": "SARNEG · 点按解码",
   "sarneg_noWordSet": "SARNEG · 未设置代码词",
   "sarneg_decoded": "解码结果：{text}",
-  "sarneg_decodeA11y": "解码 SARNEG 数字"
+  "sarneg_decodeA11y": "解码 SARNEG 数字",
+  "sarneg_wordHidden": "代码词已隐藏"
 }

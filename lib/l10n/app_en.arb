@@ -3097,5 +3097,6 @@
       }
     }
   },
-  "sarneg_decodeA11y": "Decode SARNEG numbers"
+  "sarneg_decodeA11y": "Decode SARNEG numbers",
+  "sarneg_wordHidden": "Code word hidden"
 }
