@@ -3005,5 +3005,97 @@
   "rangeRingsHide": "Hide range rings",
   "rangeRingsNoPosition": "Your position isn’t known yet, so range rings can’t be drawn. Tap Locate, or give your radio a position.",
   "rangeRingsSpoken": "Range rings at {distances}",
-  "@rangeRingsSpoken": {"description": "Screen reader label for the distance rings on the map.", "placeholders": {"distances": {"type": "String"}}}
+  "@rangeRingsSpoken": {"description": "Screen reader label for the distance rings on the map.", "placeholders": {"distances": {"type": "String"}}},
+  "sarneg_title": "SARNEG code word",
+  "@sarneg_title": {
+    "description": "SARNEG: Search And Rescue Numerical Encryption Grid. Keep the word SARNEG untranslated."
+  },
+  "sarneg_toolSubtitle": "Send grids and frequencies as code letters",
+  "sarneg_intro": "Agree a 10-letter word with no repeated letter. Its first letter stands for 0, the next for 1, and so on, so the numbers in a message go out as letters.",
+  "sarneg_notEncryption": "SARNEG hides numbers (grids, frequencies, times) from a casual listener. It is not encryption: someone who hears a few messages can work out the word. Keep using private channels for anything that matters.",
+  "sarneg_noWord": "No code word on this phone yet.",
+  "sarneg_typeWord": "Type a word",
+  "sarneg_scanOrPaste": "Scan or paste",
+  "sarneg_change": "Change",
+  "sarneg_share": "Share",
+  "sarneg_forget": "Forget",
+  "sarneg_forgetTitle": "Forget the code words?",
+  "sarneg_forgetBody": "Messages already received stay as they are, but this phone can no longer decode them.",
+  "sarneg_cancel": "Cancel",
+  "sarneg_save": "Save",
+  "sarneg_done": "Done",
+  "sarneg_todayWord": "Today's word",
+  "sarneg_todayWordDated": "Today's word (dated)",
+  "sarneg_show": "Show the word",
+  "sarneg_hide": "Hide the word",
+  "sarneg_datedTitle": "Words for given days",
+  "sarneg_datedHint": "On these days the dated word replaces the main one. Old days are removed.",
+  "sarneg_addDay": "Add a day",
+  "sarneg_removeDay": "Remove {day}",
+  "@sarneg_removeDay": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "sarneg_dayPickerHelp": "Day for this word",
+  "sarneg_wordForDay": "Word for {day}",
+  "@sarneg_wordForDay": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "sarneg_maxDated": "At most {count} dated words",
+  "@sarneg_maxDated": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sarneg_setTitle": "Set the code word",
+  "sarneg_changeTitle": "Change the code word",
+  "sarneg_problemLength": "Use exactly 10 letters",
+  "sarneg_problemLetters": "Use only the letters A to Z",
+  "sarneg_problemRepeats": "No letter may appear twice",
+  "sarneg_tryTitle": "Encode or decode by hand",
+  "sarneg_numbersToEncode": "Numbers to encode",
+  "sarneg_lettersToDecode": "Letters to decode",
+  "sarneg_copy": "Copy",
+  "sarneg_copied": "Copied",
+  "sarneg_shareTitle": "Share the code word",
+  "sarneg_shareBody": "Show this to your team in person. Anyone who scans it can read your SARNEG messages.",
+  "sarneg_copyText": "Copy as text",
+  "sarneg_copiedPrivate": "Copied. Paste it only somewhere private.",
+  "sarneg_importTitle": "Get a code word",
+  "sarneg_scanQr": "Scan QR code",
+  "sarneg_pasteLabel": "Or paste the text",
+  "sarneg_useWord": "Use this word",
+  "sarneg_saved": "Code word saved",
+  "sarneg_badShare": "Not a valid SARNEG code word",
+  "sarneg_cameraOff": "Camera unavailable. Paste the text below.",
+  "sarneg_composeTitle": "Send numbers in SARNEG",
+  "sarneg_composeHint": "Digits go out as code letters. Other words are sent as they are.",
+  "sarneg_numbersToSend": "Numbers to send",
+  "sarneg_addPosition": "Add my position",
+  "sarneg_goesOutAs": "Goes out as",
+  "sarneg_putInMessage": "Put in message",
+  "sarneg_needWord": "Set your team's code word first. Everyone who should read the numbers needs the same word.",
+  "sarneg_locationOff": "Location is off for this app",
+  "sarneg_noFix": "No position fix yet. Try again in the open.",
+  "sarneg_composeTooltip": "Send numbers in SARNEG",
+  "sarneg_tapToDecode": "SARNEG · tap to decode",
+  "sarneg_noWordSet": "SARNEG · no code word set",
+  "sarneg_decoded": "Decoded: {text}",
+  "@sarneg_decoded": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "sarneg_decodeA11y": "Decode SARNEG numbers"
 }
