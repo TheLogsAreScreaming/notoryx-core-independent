@@ -57,6 +57,14 @@ and stays the one to use every day. The two install side by side:
   images from links (tap to load), and tiny photos over the mesh.
 - Signed SOS and channel posts, blocking, highlighted mentions, and
   opt-in community moderation.
+- **SARNEG code words** (Settings → SARNEG code word): send grid references,
+  frequencies and times as letters instead of digits, from a 10-letter word
+  your team agrees on (with BLACKHORSE, `[SARNEG] LRs KSAC` reads as 17S
+  4823). A SARNEG button codes the numbers before you press Send, received
+  `[SARNEG]` messages get a tap-to-decode line, and the word is shared by QR
+  code or text, with optional words for given days. The same format works in
+  every NOTORYX app. It keeps numbers away from a casual listener; it is
+  **not encryption**. In the next test build; not yet tried on a phone.
 
 **Nodes and the map**
 - Contacts with QR sharing, favourites, a contact meter, and ways to make
