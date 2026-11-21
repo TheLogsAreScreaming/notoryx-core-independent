@@ -1511,5 +1511,6 @@
   "sarneg_tapToDecode": "SARNEG · zum Dekodieren tippen",
   "sarneg_noWordSet": "SARNEG · kein Codewort festgelegt",
   "sarneg_decoded": "Dekodiert: {text}",
-  "sarneg_decodeA11y": "SARNEG-Zahlen dekodieren"
+  "sarneg_decodeA11y": "SARNEG-Zahlen dekodieren",
+  "sarneg_wordHidden": "Codewort verborgen"
 }

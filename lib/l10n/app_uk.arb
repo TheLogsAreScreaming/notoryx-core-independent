@@ -1511,5 +1511,6 @@
   "sarneg_tapToDecode": "SARNEG · торкніться, щоб розкодувати",
   "sarneg_noWordSet": "SARNEG · кодове слово не задано",
   "sarneg_decoded": "Розкодовано: {text}",
-  "sarneg_decodeA11y": "Розкодувати числа SARNEG"
+  "sarneg_decodeA11y": "Розкодувати числа SARNEG",
+  "sarneg_wordHidden": "Кодове слово приховано"
 }

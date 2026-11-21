@@ -1511,5 +1511,6 @@
   "sarneg_tapToDecode": "SARNEG · tapnite za dekodiranje",
   "sarneg_noWordSet": "SARNEG · kodna beseda ni nastavljena",
   "sarneg_decoded": "Dekodirano: {text}",
-  "sarneg_decodeA11y": "Dekodiraj števila SARNEG"
+  "sarneg_decodeA11y": "Dekodiraj števila SARNEG",
+  "sarneg_wordHidden": "Kodna beseda skrita"
 }

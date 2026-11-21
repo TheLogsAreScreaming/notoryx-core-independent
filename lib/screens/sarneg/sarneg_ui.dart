@@ -418,7 +418,9 @@ class _WordCardState extends State<_WordCard> {
             Text(
               _shown ? word : '••••••••••',
               style: _mono.copyWith(fontSize: 24, letterSpacing: 4),
-              semanticsLabel: _shown ? word.split('').join(' ') : t.sarneg_hide,
+              semanticsLabel: _shown
+                  ? word.split('').join(' ')
+                  : t.sarneg_wordHidden,
             ),
             if (_shown) ...[
               const SizedBox(height: 6),

@@ -1511,5 +1511,6 @@
   "sarneg_tapToDecode": "SARNEG · タップしてデコード",
   "sarneg_noWordSet": "SARNEG · コードワード未設定",
   "sarneg_decoded": "デコード結果: {text}",
-  "sarneg_decodeA11y": "SARNEGの数字をデコード"
+  "sarneg_decodeA11y": "SARNEGの数字をデコード",
+  "sarneg_wordHidden": "コードワードは非表示"
 }
