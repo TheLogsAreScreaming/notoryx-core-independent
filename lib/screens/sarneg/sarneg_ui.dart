@@ -595,6 +595,7 @@ class _ShareDialog extends StatelessWidget {
                 data: text,
                 size: 220,
                 backgroundColor: Colors.white,
+                padding: const EdgeInsets.all(12),
                 semanticsLabel: t.sarneg_shareTitle,
               ),
             ),
