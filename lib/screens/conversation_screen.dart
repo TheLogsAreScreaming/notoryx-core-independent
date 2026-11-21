@@ -41,6 +41,8 @@ import 'scheduled_screen.dart';
 import '../l10n/l10n.dart';
 import 'link_preview_card.dart';
 import 'mesh_photo_view.dart';
+import 'sarneg/sarneg.dart';
+import 'sarneg/sarneg_ui.dart';
 
 /// One direct or channel conversation with a box to reply.
 class ConversationScreen extends ConsumerStatefulWidget {
@@ -1138,6 +1140,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                         : null,
                     icon: const Icon(Icons.add_location_alt_outlined),
                   ),
+                  SarnegComposeButton(controller: _text, enabled: canReply),
                   Expanded(
                     child: TextField(
                       controller: _text,
@@ -1316,6 +1319,13 @@ class _Bubble extends StatelessWidget {
                     MeshPhotoView(id: id)
                   else
                     Text(body),
+                  if (isSarnegMessage(body))
+                    SarnegDecodeLine(
+                      text: body,
+                      at: DateTime.fromMillisecondsSinceEpoch(
+                        message.sentAt * 1000,
+                      ),
+                    ),
                   const SizedBox(height: 2),
                   Row(
                     mainAxisSize: MainAxisSize.min,
