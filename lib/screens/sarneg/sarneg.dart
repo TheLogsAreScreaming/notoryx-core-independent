@@ -5,7 +5,7 @@
 // is sent as LR. It hides numbers from a casual listener. It is NOT
 // encryption: anyone who hears a few messages can work the word out.
 //
-// Wire format shared by GhostWave and every NOTORYX app, so they can read
+// Wire format shared by every NOTORYX app, so they can read
 // each other's messages:
 //
 //   [SARNEG] LRs KSAC
