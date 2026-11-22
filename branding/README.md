@@ -1,14 +1,18 @@
 # App icon
 
-NOTORYX Independent uses the NOTORYX icon in **silver**: the same artwork
-as the other NOTORYX apps with the orange glow taken out, so it's easy to
-tell apart from NOTORYX Core on a phone or Mac.
+NOTORYX Independent uses the NOTORYX **BLACKOUT** mark: the steel eagle-N
+on a near-black (`#080808`) plate. Each NOTORYX app lights a different set
+of emblem parts; these files are Independent's set.
 
 | File | Used for |
 |---|---|
-| `notoryx-icon-silver.png` | Full icon: Android legacy launcher icons and iPhone icons (flattened onto `#141414`, since iOS icons can't be transparent) |
-| `notoryx-icon-foreground-silver.png` | Android adaptive icon foreground, inset 16% on a `#141414` background |
-| `notoryx-icon-macos-silver.png` | Mac app icon |
+| `android-adaptive-foreground.png` | Android adaptive icon foreground (432 x 432, artwork already inside the 66 dp safe zone, so no inset) on a `#080808` background |
+| `android-monochrome.png` | Android 13+ themed (monochrome) icon layer, and the white status-bar icon `ic_notification` |
+| `tile-1024.png` | Android legacy launcher icons (`mipmap-*/ic_launcher.png`) |
+| `google-play-icon-512.png` | Play Store listing icon (not built into the app) |
+| `ios-icon-1024.png` | iPhone/iPad icons (opaque, as iOS requires) |
+| `macos-icon-1024.png` | Mac app icon (Apple grid margins included) |
+| `windows.ico` | Windows app icon (16-256 px) |
 
-All three are 1024 x 1024. The originals are the NOTORYX app artwork with
-saturation set to 0.
+The masters live with the rest of the BLACKOUT brand kit; these copies are
+here so the app icons can be regenerated from the repo.
