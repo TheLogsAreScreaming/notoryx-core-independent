@@ -37,7 +37,7 @@ void main() {
     first.read(appearanceProvider);
     await first
         .read(appearanceProvider.notifier)
-        .setTheme(AppThemeChoice.night);
+        .setTheme(AppThemeChoice.trail);
     await first.read(appearanceProvider.notifier).setChatScale(1.3);
 
     final second = open();
@@ -45,7 +45,59 @@ void main() {
     second.read(appearanceProvider);
     await pumpEventQueue();
     await Future<void>.delayed(const Duration(milliseconds: 50));
-    expect(second.read(appearanceProvider).theme, AppThemeChoice.night);
+    expect(second.read(appearanceProvider).theme, AppThemeChoice.trail);
     expect(second.read(appearanceProvider).chatScale, 1.3);
+  });
+
+  test('BLACKOUT secondary text is readable on cards', () {
+    final s = schemeFor(AppThemeChoice.blackout, Brightness.dark);
+    expect(
+      _contrast(s.onSurfaceVariant, s.surfaceContainerHighest),
+      greaterThanOrEqualTo(4.5),
+    );
+    expect(_contrast(s.onSurfaceVariant, s.surface), greaterThanOrEqualTo(4.5));
+    expect(
+      _contrast(s.onSecondaryContainer, s.secondaryContainer),
+      greaterThanOrEqualTo(4.5),
+    );
+    expect(_contrast(s.onTertiary, s.tertiary), greaterThanOrEqualTo(4.5));
+    expect(
+      _contrast(s.onTertiaryContainer, s.tertiaryContainer),
+      greaterThanOrEqualTo(4.5),
+    );
+    // Caution and error stay coloured, not grey.
+    for (final c in [s.tertiary, s.error]) {
+      final hsl = HSLColor.fromColor(c);
+      expect(hsl.saturation, greaterThan(0.5));
+    }
+    expect(AppThemeChoice.blackout.mode, ThemeMode.dark);
+  });
+
+  Future<AppThemeChoice> loadWith(String? saved) async {
+    final db = MeshDatabase.inMemory();
+    addTearDown(db.close);
+    if (saved != null) await MeshStore(db).saveSetting(themeSetting, saved);
+    final c = ProviderContainer(
+      overrides: [databaseProvider.overrideWithValue(db)],
+    );
+    addTearDown(c.dispose);
+    c.read(appearanceProvider);
+    await pumpEventQueue();
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    return c.read(appearanceProvider).theme;
+  }
+
+  test('BLACKOUT is the default on a fresh install', () async {
+    expect(await loadWith(null), AppThemeChoice.blackout);
+  });
+
+  test('a removed or unknown saved theme falls back to BLACKOUT', () async {
+    for (final gone in ['light', 'dark', 'night', 'lake', 'nonsense']) {
+      expect(await loadWith(gone), AppThemeChoice.blackout, reason: gone);
+    }
+  });
+
+  test('a kept saved theme still loads', () async {
+    expect(await loadWith('automatic'), AppThemeChoice.automatic);
   });
 }
