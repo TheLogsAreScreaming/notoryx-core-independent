@@ -33,11 +33,11 @@ from scratch for this repository, part of the NOTORYX family. MIT licensed.
 
 ## Status
 
-Test builds are out; the latest is **0.1.0 test 37** (21 November 2026). Get it from
+Test builds are out; the latest is **0.1.0 test 38** (22 November 2026), the first
+with the BLACKOUT icon and default theme (not yet tested on a phone or radios). Get it from
 [notoryx-core-independent-releases](https://github.com/TheLogsAreScreaming/notoryx-core-independent-releases/releases),
 which also explains which file to pick and how to get automatic updates
-with Obtainium. The BLACKOUT icon and theme are on `main` and come in the
-next test build.
+with Obtainium.
 
 Many features have only been checked by automated tests and CI so far, not
 on real radios. Until this app matches the current NOTORYX Core, that one
