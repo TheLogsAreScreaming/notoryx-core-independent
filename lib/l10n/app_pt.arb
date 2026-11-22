@@ -1512,5 +1512,9 @@
   "sarneg_noWordSet": "SARNEG · nenhuma palavra-código",
   "sarneg_decoded": "Decodificado: {text}",
   "sarneg_decodeA11y": "Decodificar números SARNEG",
-  "sarneg_wordHidden": "Palavra-código oculta"
+  "sarneg_wordHidden": "Palavra-código oculta",
+  "sarneg_randomWord": "Palavra aleatória",
+  "sarneg_wellKnownWord": "Esta palavra aparece em guias públicos, por isso qualquer pessoa pode testá-la. Uma palavra aleatória é mais segura.",
+  "sarneg_clipboardClears": "A área de transferência é limpa em 1 minuto.",
+  "sarneg_autoClear": "Apaga-se após 1 minuto sem digitar."
 }

@@ -22,6 +22,8 @@
 // The first word is the default. Each dated entry replaces it on that
 // local calendar day, so a team can load a week of words at once.
 
+import 'dart:math';
+
 /// Put at the start of a message whose body is SARNEG-encoded.
 const String kSarnegMarker = '[SARNEG]';
 
@@ -30,6 +32,38 @@ const String kSarnegSharePrefix = 'SARNEG1:';
 
 /// Most dated words one code set holds.
 const int kSarnegMaxDailyWords = 62;
+
+/// How long a decoded result or a shown code word stays on screen.
+const Duration kSarnegShowFor = Duration(seconds: 60);
+
+/// How long a copied SARNEG text stays on the clipboard.
+const Duration kSarnegClipboardFor = Duration(seconds: 60);
+
+/// Code words printed as examples in public guides. Anyone can try them, so
+/// the setup screen warns about them.
+const Set<String> kSarnegWellKnownWords = {
+  'BLACKHORSE',
+  'AFTERSHOCK',
+  'CORNFLAKES',
+  'COMBATHELP',
+  'BACKGROUND',
+  'CUMBERLAND',
+  'DUMBWAITER',
+  'PATHFINDER',
+};
+
+/// Whether [word] is one of [kSarnegWellKnownWords].
+bool isWellKnownSarnegWord(String word) =>
+    kSarnegWellKnownWords.contains(normalizeSarnegWord(word));
+
+/// A new code word of 10 different letters, picked at random.
+///
+/// Uses [random] when given (for tests), otherwise [Random.secure].
+String randomSarnegWord([Random? random]) {
+  final letters = [for (var i = 0; i < 26; i++) String.fromCharCode(65 + i)]
+    ..shuffle(random ?? Random.secure());
+  return letters.take(10).join();
+}
 
 /// Why a code word cannot be used.
 enum SarnegWordProblem {

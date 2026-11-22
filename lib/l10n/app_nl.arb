@@ -1512,5 +1512,9 @@
   "sarneg_noWordSet": "SARNEG · geen codewoord ingesteld",
   "sarneg_decoded": "Gedecodeerd: {text}",
   "sarneg_decodeA11y": "SARNEG-getallen decoderen",
-  "sarneg_wordHidden": "Codewoord verborgen"
+  "sarneg_wordHidden": "Codewoord verborgen",
+  "sarneg_randomWord": "Willekeurig woord",
+  "sarneg_wellKnownWord": "Dit woord staat in openbare handleidingen, dus iedereen kan het proberen. Een willekeurig woord is veiliger.",
+  "sarneg_clipboardClears": "Het klembord wordt over 1 minuut gewist.",
+  "sarneg_autoClear": "Wordt gewist na 1 minuut zonder typen."
 }

@@ -1512,5 +1512,9 @@
   "sarneg_noWordSet": "SARNEG · no hay palabra clave",
   "sarneg_decoded": "Decodificado: {text}",
   "sarneg_decodeA11y": "Decodificar números SARNEG",
-  "sarneg_wordHidden": "Palabra clave oculta"
+  "sarneg_wordHidden": "Palabra clave oculta",
+  "sarneg_randomWord": "Palabra aleatoria",
+  "sarneg_wellKnownWord": "Esta palabra aparece en guías públicas, así que cualquiera puede probarla. Una palabra aleatoria es más segura.",
+  "sarneg_clipboardClears": "El portapapeles se vacía en 1 minuto.",
+  "sarneg_autoClear": "Se borra tras 1 minuto sin escribir."
 }

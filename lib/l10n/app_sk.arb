@@ -1512,5 +1512,9 @@
   "sarneg_noWordSet": "SARNEG · kódové slovo nie je nastavené",
   "sarneg_decoded": "Dekódované: {text}",
   "sarneg_decodeA11y": "Dekódovať čísla SARNEG",
-  "sarneg_wordHidden": "Kódové slovo skryté"
+  "sarneg_wordHidden": "Kódové slovo skryté",
+  "sarneg_randomWord": "Náhodné slovo",
+  "sarneg_wellKnownWord": "Toto slovo je vo verejných príručkách, takže ho môže skúsiť ktokoľvek. Náhodné slovo je bezpečnejšie.",
+  "sarneg_clipboardClears": "Schránka sa vymaže o 1 minútu.",
+  "sarneg_autoClear": "Vymaže sa po 1 minúte bez písania."
 }

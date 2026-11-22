@@ -1512,5 +1512,9 @@
   "sarneg_noWordSet": "SARNEG · brak słowa kodowego",
   "sarneg_decoded": "Odkodowano: {text}",
   "sarneg_decodeA11y": "Odkoduj liczby SARNEG",
-  "sarneg_wordHidden": "Słowo kodowe ukryte"
+  "sarneg_wordHidden": "Słowo kodowe ukryte",
+  "sarneg_randomWord": "Losowe słowo",
+  "sarneg_wellKnownWord": "To słowo jest w publicznych poradnikach, więc każdy może je wypróbować. Losowe słowo jest bezpieczniejsze.",
+  "sarneg_clipboardClears": "Schowek zostanie wyczyszczony za 1 minutę.",
+  "sarneg_autoClear": "Czyści się po 1 minucie bez pisania."
 }

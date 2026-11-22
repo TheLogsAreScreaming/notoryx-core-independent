@@ -1512,5 +1512,9 @@
   "sarneg_noWordSet": "SARNEG · 未设置代码词",
   "sarneg_decoded": "解码结果：{text}",
   "sarneg_decodeA11y": "解码 SARNEG 数字",
-  "sarneg_wordHidden": "代码词已隐藏"
+  "sarneg_wordHidden": "代码词已隐藏",
+  "sarneg_randomWord": "随机词",
+  "sarneg_wellKnownWord": "这个词出现在公开指南中，任何人都可以试用。随机词更安全。",
+  "sarneg_clipboardClears": "剪贴板将在 1 分钟后清空。",
+  "sarneg_autoClear": "1 分钟无输入后清空。"
 }
