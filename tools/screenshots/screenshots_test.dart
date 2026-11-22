@@ -29,6 +29,8 @@ import 'package:notoryx_core/main.dart';
 import 'package:notoryx_core/presets/area_presets_provider.dart';
 import 'package:notoryx_core/radio/radio.dart';
 import 'package:notoryx_core/screens/map_tab.dart';
+import 'package:notoryx_core/screens/sarneg/sarneg.dart';
+import 'package:notoryx_core/screens/sarneg/sarneg_ui.dart';
 
 import '../../test/support/fake_radio_link.dart';
 import '../../test/support/radio_frames.dart';
@@ -115,9 +117,13 @@ String _hexKey(int b) =>
     List.filled(32, b.toRadixString(16).padLeft(2, '0')).join();
 
 Future<void> _loadFonts() async {
+  // SCREENSHOT_FONTS can point at a folder with the same file names, for
+  // example Roboto with arrow glyphs added (the cached Roboto has no `→`,
+  // which phones draw from a system fallback font).
   final cache =
+      Platform.environment['SCREENSHOT_FONTS'] ??
       '${Platform.environment['HOME']}/flutter-stable/bin/cache/'
-      'artifacts/material_fonts';
+          'artifacts/material_fonts';
   Future<void> load(String family, List<String> files) async {
     final loader = FontLoader(family);
     for (final f in files) {
@@ -135,7 +141,17 @@ Future<void> _loadFonts() async {
     'Roboto-Italic.ttf',
   ]);
   await load('MaterialIcons', ['MaterialIcons-Regular.otf']);
+  // SARNEG letters use the platform monospace face; any mono font will do.
+  final mono = File('/System/Library/Fonts/Supplemental/Andale Mono.ttf');
+  if (mono.existsSync()) {
+    final loader = FontLoader('monospace')
+      ..addFont(Future.value(ByteData.sublistView(mono.readAsBytesSync())));
+    await loader.load();
+  }
 }
+
+/// A made-up team code word (not a well-known one).
+const _sarnegWord = 'LUMBERJACK';
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -149,6 +165,11 @@ void main() {
   setUp(() {
     db = MeshDatabase.inMemory();
     compass = _Compass();
+    SarnegKeys.instance = SarnegKeys(
+      storage: MemorySarnegStorage(
+        jsonEncode(SarnegKeySet(word: _sarnegWord).toJson()),
+      ),
+    );
   });
 
   Future<void> settle(WidgetTester tester, [int rounds = 12]) async {
@@ -258,6 +279,11 @@ void main() {
       _channelMessage('Ridge: snow line is down to 5,000 ft', 1, 42),
       _channelMessage('Maya: chains needed past the gate', 1, 31),
       _channelMessage('Ridge: copy, heading to the hut', 1, 12),
+      _channelMessage(
+        'Maya: ${SarnegCodec(_sarnegWord).encodeMessage('Camp at 17S 4823')}',
+        1,
+        9,
+      ),
       _channelMessage('Fire Tower: net check-in at 19:00', 0, 25),
       _channelMessage('Sam: anyone near the lake?', 0, 6),
     ]);
@@ -328,6 +354,48 @@ void main() {
     }
     await settle(tester);
     await shot(tester, 'compass');
+    await finish(tester);
+  });
+
+  testWidgets('radio settings, SARNEG and appearance', (tester) async {
+    await tester.runAsync(colours);
+    await start(tester);
+    await tester.tap(find.byTooltip('Radio settings'));
+    await settle(tester);
+    await shot(tester, 'settings');
+
+    final sarneg = find.text('SARNEG code word');
+    await tester.scrollUntilVisible(
+      sarneg,
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settle(tester, 4);
+    await tester.tap(sarneg);
+    await settle(tester);
+    await shot(tester, 'sarneg');
+    await tester.pageBack();
+    await settle(tester);
+
+    final appearance = find.text('Appearance');
+    await tester.scrollUntilVisible(
+      appearance,
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await settle(tester, 4);
+    await tester.tap(appearance);
+    await settle(tester);
+    final themes = find.text('BLACKOUT');
+    await tester.scrollUntilVisible(
+      themes,
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    // Put the theme list at the top of the screen.
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, -900));
+    await settle(tester);
+    await shot(tester, 'appearance');
     await finish(tester);
   });
 
