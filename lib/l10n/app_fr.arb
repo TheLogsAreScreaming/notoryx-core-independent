@@ -1512,5 +1512,9 @@
   "sarneg_noWordSet": "SARNEG · aucun mot de code",
   "sarneg_decoded": "Décodé : {text}",
   "sarneg_decodeA11y": "Décoder les nombres SARNEG",
-  "sarneg_wordHidden": "Mot de code masqué"
+  "sarneg_wordHidden": "Mot de code masqué",
+  "sarneg_randomWord": "Mot aléatoire",
+  "sarneg_wellKnownWord": "Ce mot figure dans des guides publics : n’importe qui peut l’essayer. Un mot aléatoire est plus sûr.",
+  "sarneg_clipboardClears": "Le presse-papiers est vidé dans 1 minute.",
+  "sarneg_autoClear": "S’efface après 1 minute sans saisie."
 }

@@ -1512,5 +1512,9 @@
   "sarneg_noWordSet": "SARNEG · inget kodord angivet",
   "sarneg_decoded": "Avkodat: {text}",
   "sarneg_decodeA11y": "Avkoda SARNEG-siffror",
-  "sarneg_wordHidden": "Kodordet är dolt"
+  "sarneg_wordHidden": "Kodordet är dolt",
+  "sarneg_randomWord": "Slumpat ord",
+  "sarneg_wellKnownWord": "Det här ordet finns i offentliga guider, så vem som helst kan prova det. Ett slumpat ord är säkrare.",
+  "sarneg_clipboardClears": "Urklippet töms om 1 minut.",
+  "sarneg_autoClear": "Rensas efter 1 minut utan inmatning."
 }

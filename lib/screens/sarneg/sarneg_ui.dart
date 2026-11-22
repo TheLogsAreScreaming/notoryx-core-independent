@@ -144,6 +144,37 @@ void _snack(BuildContext context, String text) {
     ..showSnackBar(SnackBar(content: Text(text)));
 }
 
+Timer? _clipboardTimer;
+
+/// Copies [value] and shows [message]. After [kSarnegClipboardFor] the
+/// clipboard is cleared, but only if it still holds [value].
+Future<void> _copySecret(
+  BuildContext context,
+  String value,
+  String message,
+) async {
+  final t = _t(context);
+  await Clipboard.setData(ClipboardData(text: value));
+  _clipboardTimer?.cancel();
+  _clipboardTimer = Timer(
+    kSarnegClipboardFor,
+    () => unawaited(_clearClipboardIf(value)),
+  );
+  if (context.mounted) _snack(context, '$message ${t.sarneg_clipboardClears}');
+}
+
+Future<void> _clearClipboardIf(String value) async {
+  try {
+    final now = await Clipboard.getData(Clipboard.kTextPlain);
+    if (now?.text == value) {
+      await Clipboard.setData(const ClipboardData(text: ''));
+    }
+  } on Exception catch (e) {
+    // Never log the text itself.
+    debugPrint('SARNEG: clipboard not cleared (${e.runtimeType})');
+  }
+}
+
 Widget _keysBuilder(Widget Function(BuildContext, SarnegKeys) builder) {
   final keys = SarnegKeys.instance;
   unawaited(keys.ensureLoaded());
@@ -282,6 +313,10 @@ class _Body extends StatelessWidget {
           ),
         ] else ...[
           _WordCard(keys: k, today: today),
+          if (isWellKnownSarnegWord(k.wordFor(today))) ...[
+            const SizedBox(height: 8),
+            _Warning(t.sarneg_wellKnownWord),
+          ],
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -387,6 +422,23 @@ class _WordCard extends StatefulWidget {
 
 class _WordCardState extends State<_WordCard> {
   bool _shown = false;
+  Timer? _hide;
+
+  void _toggle() {
+    _hide?.cancel();
+    setState(() => _shown = !_shown);
+    if (_shown) {
+      _hide = Timer(const Duration(seconds: 30), () {
+        if (mounted) setState(() => _shown = false);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _hide?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -411,7 +463,7 @@ class _WordCardState extends State<_WordCard> {
                 IconButton(
                   tooltip: _shown ? t.sarneg_hide : t.sarneg_show,
                   icon: Icon(_shown ? Icons.visibility_off : Icons.visibility),
-                  onPressed: () => setState(() => _shown = !_shown),
+                  onPressed: _toggle,
                 ),
               ],
             ),
@@ -446,9 +498,24 @@ class _TryIt extends StatefulWidget {
 class _TryItState extends State<_TryIt> {
   final _plain = TextEditingController();
   final _coded = TextEditingController();
+  Timer? _idle;
+
+  /// Restarts the countdown that clears both fields.
+  void _touched() {
+    _idle?.cancel();
+    setState(() {});
+    if (_plain.text.isEmpty && _coded.text.isEmpty) return;
+    _idle = Timer(kSarnegShowFor, () {
+      if (!mounted) return;
+      _plain.clear();
+      _coded.clear();
+      setState(() {});
+    });
+  }
 
   @override
   void dispose() {
+    _idle?.cancel();
     _plain.dispose();
     _coded.dispose();
     super.dispose();
@@ -466,10 +533,7 @@ class _TryItState extends State<_TryIt> {
           icon: const Icon(Icons.copy),
           onPressed: value.isEmpty
               ? null
-              : () async {
-                  await Clipboard.setData(ClipboardData(text: value));
-                  if (context.mounted) _snack(context, t.sarneg_copied);
-                },
+              : () => _copySecret(context, value, t.sarneg_copied),
         ),
       ],
     );
@@ -484,6 +548,7 @@ class _TryItState extends State<_TryIt> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(t.sarneg_tryTitle, style: Theme.of(context).textTheme.titleMedium),
+        Text(t.sarneg_autoClear, style: Theme.of(context).textTheme.bodySmall),
         const SizedBox(height: 8),
         TextField(
           controller: _plain,
@@ -491,7 +556,7 @@ class _TryItState extends State<_TryIt> {
             labelText: t.sarneg_numbersToEncode,
             hintText: '17S 4823',
           ),
-          onChanged: (_) => setState(() {}),
+          onChanged: (_) => _touched(),
         ),
         _result(
           context,
@@ -504,7 +569,7 @@ class _TryItState extends State<_TryIt> {
             labelText: t.sarneg_lettersToDecode,
             hintText: 'LRs KSAC',
           ),
-          onChanged: (_) => setState(() {}),
+          onChanged: (_) => _touched(),
         ),
         _result(context, body.trim().isEmpty ? '' : c.decode(body)),
       ],
@@ -525,6 +590,19 @@ class _WordDialog extends StatefulWidget {
 class _WordDialogState extends State<_WordDialog> {
   final _text = TextEditingController();
   String? _error;
+  bool _wellKnown = false;
+
+  void _random() {
+    final w = randomSarnegWord();
+    _text.value = TextEditingValue(
+      text: w,
+      selection: TextSelection.collapsed(offset: w.length),
+    );
+    setState(() {
+      _error = null;
+      _wellKnown = false;
+    });
+  }
 
   @override
   void dispose() {
@@ -555,13 +633,20 @@ class _WordDialogState extends State<_WordDialog> {
         textCapitalization: TextCapitalization.characters,
         maxLength: 12,
         style: _mono,
-        decoration: InputDecoration(hintText: 'BLACKHORSE', errorText: _error),
-        onChanged: (_) {
-          if (_error != null) setState(() => _error = null);
-        },
+        decoration: InputDecoration(
+          hintText: 'BLACKHORSE',
+          errorText: _error,
+          helperText: _wellKnown ? t.sarneg_wellKnownWord : null,
+          helperMaxLines: 4,
+        ),
+        onChanged: (v) => setState(() {
+          _error = null;
+          _wellKnown = isWellKnownSarnegWord(v);
+        }),
         onSubmitted: (_) => _done(),
       ),
       actions: [
+        TextButton(onPressed: _random, child: Text(t.sarneg_randomWord)),
         TextButton(
           onPressed: () => Navigator.pop(context),
           child: Text(t.sarneg_cancel),
@@ -606,10 +691,7 @@ class _ShareDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(
-          onPressed: () async {
-            await Clipboard.setData(ClipboardData(text: text));
-            if (context.mounted) _snack(context, t.sarneg_copiedPrivate);
-          },
+          onPressed: () => _copySecret(context, text, t.sarneg_copiedPrivate),
           child: Text(t.sarneg_copyText),
         ),
         TextButton(
@@ -971,6 +1053,23 @@ class SarnegDecodeLine extends StatefulWidget {
 
 class _SarnegDecodeLineState extends State<SarnegDecodeLine> {
   bool _open = false;
+  Timer? _close;
+
+  void _toggle() {
+    _close?.cancel();
+    setState(() => _open = !_open);
+    if (_open) {
+      _close = Timer(kSarnegShowFor, () {
+        if (mounted) setState(() => _open = false);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _close?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1001,7 +1100,7 @@ class _SarnegDecodeLineState extends State<SarnegDecodeLine> {
               );
               return;
             }
-            setState(() => _open = !_open);
+            _toggle();
           },
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: 32),

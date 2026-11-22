@@ -1,12 +1,18 @@
 // SARNEG: the codec and code sets, the setup screen, the composer button and
 // tap-to-decode.
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:notoryx_core/l10n/l10n.dart';
 import 'package:notoryx_core/screens/sarneg/sarneg.dart';
 import 'package:notoryx_core/screens/sarneg/sarneg_ui.dart';
+
+const String _wellKnown =
+    'This word is printed in public guides, so anyone can try it. '
+    'A random word is safer.';
 
 final DateTime t0 = DateTime(2026, 11, 21, 9);
 
@@ -114,6 +120,23 @@ void main() {
     });
   });
 
+  group('key strength', () {
+    test('random words are valid code words', () {
+      for (var seed = 0; seed < 50; seed++) {
+        expect(checkSarnegWord(randomSarnegWord(Random(seed))), isNull);
+      }
+      expect(checkSarnegWord(randomSarnegWord()), isNull);
+    });
+
+    test('well-known words are valid and recognised', () {
+      for (final w in kSarnegWellKnownWords) {
+        expect(checkSarnegWord(w), isNull, reason: w);
+      }
+      expect(isWellKnownSarnegWord(' black horse '), isTrue);
+      expect(isWellKnownSarnegWord('QZXWVJKMPY'), isFalse);
+    });
+  });
+
   group('screens', () {
     late MemorySarnegStorage storage;
 
@@ -168,6 +191,87 @@ void main() {
       await tester.pumpAndSettle();
       final field = tester.widget<TextField>(find.byType(TextField));
       expect(field.controller!.text, coded);
+    });
+
+    testWidgets('a well-known word warns; Random word fills a valid one', (
+      tester,
+    ) async {
+      useKeys(null);
+      await tester.pumpWidget(_app(const SarnegScreen()));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Type a word'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'blackhorse');
+      await tester.pump();
+      expect(find.text(_wellKnown), findsOneWidget);
+
+      await tester.tap(find.text('Random word'));
+      await tester.pump();
+      final word = tester
+          .widget<TextField>(find.byType(TextField))
+          .controller!
+          .text;
+      expect(checkSarnegWord(word), isNull);
+      expect(find.text(_wellKnown), findsNothing);
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+      expect(SarnegKeys.instance.keys!.word, word);
+    });
+
+    testWidgets('a saved well-known word shows the warning', (tester) async {
+      useKeys(SarnegKeySet(word: 'BLACKHORSE'));
+      await tester.pumpWidget(_app(const SarnegScreen()));
+      await tester.pumpAndSettle();
+      expect(find.text(_wellKnown), findsOneWidget);
+    });
+
+    testWidgets('typed numbers and the clipboard clear after a minute', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1200, 3000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      String? clip;
+      final messenger = tester.binding.defaultBinaryMessenger;
+      messenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
+        if (call.method == 'Clipboard.setData') {
+          clip = (call.arguments as Map)['text'] as String?;
+        } else if (call.method == 'Clipboard.getData') {
+          return <String, dynamic>{'text': clip};
+        }
+        return null;
+      });
+      addTearDown(
+        () => messenger.setMockMethodCallHandler(SystemChannels.platform, null),
+      );
+
+      useKeys(SarnegKeySet(word: 'BLACKHORSE'));
+      await tester.pumpWidget(_app(const SarnegScreen()));
+      await tester.pumpAndSettle();
+      final plain = find.widgetWithText(TextField, 'Numbers to encode');
+      await tester.enterText(plain, '906.875');
+      await tester.pump();
+      await tester.tap(find.byTooltip('Copy').first);
+      await tester.pump();
+      expect(clip, '[SARNEG] EBO.SRH');
+
+      await tester.pump(const Duration(seconds: 61));
+      await tester.pump();
+      expect(clip, '');
+      expect(tester.widget<TextField>(plain).controller!.text, isEmpty);
+    });
+
+    testWidgets('an opened decode closes again after a minute', (tester) async {
+      useKeys(SarnegKeySet(word: 'BLACKHORSE'));
+      final received = SarnegCodec('BLACKHORSE').encodeMessage('906.875');
+      await tester.pumpWidget(_app(_Chat(received: received)));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('SARNEG · tap to decode'));
+      await tester.pump();
+      expect(find.text('Decoded: 906.875'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 61));
+      expect(find.text('Decoded: 906.875'), findsNothing);
+      expect(find.text('SARNEG · tap to decode'), findsOneWidget);
     });
 
     testWidgets('without a word the sheet points to the setup', (tester) async {

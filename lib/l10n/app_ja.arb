@@ -1512,5 +1512,9 @@
   "sarneg_noWordSet": "SARNEG · コードワード未設定",
   "sarneg_decoded": "デコード結果: {text}",
   "sarneg_decodeA11y": "SARNEGの数字をデコード",
-  "sarneg_wordHidden": "コードワードは非表示"
+  "sarneg_wordHidden": "コードワードは非表示",
+  "sarneg_randomWord": "ランダムな単語",
+  "sarneg_wellKnownWord": "この単語は公開ガイドに載っているため、誰でも試せます。ランダムな単語のほうが安全です。",
+  "sarneg_clipboardClears": "クリップボードは1分後に消去されます。",
+  "sarneg_autoClear": "1分間入力がないと消去されます。"
 }

@@ -1512,5 +1512,9 @@
   "sarneg_noWordSet": "SARNEG · кодовое слово не задано",
   "sarneg_decoded": "Раскодировано: {text}",
   "sarneg_decodeA11y": "Раскодировать числа SARNEG",
-  "sarneg_wordHidden": "Кодовое слово скрыто"
+  "sarneg_wordHidden": "Кодовое слово скрыто",
+  "sarneg_randomWord": "Случайное слово",
+  "sarneg_wellKnownWord": "Это слово напечатано в открытых руководствах, поэтому его может попробовать любой. Случайное слово надёжнее.",
+  "sarneg_clipboardClears": "Буфер обмена очистится через 1 минуту.",
+  "sarneg_autoClear": "Очищается через 1 минуту без ввода."
 }

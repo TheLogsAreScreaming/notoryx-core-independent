@@ -1512,5 +1512,9 @@
   "sarneg_noWordSet": "SARNEG · kodna beseda ni nastavljena",
   "sarneg_decoded": "Dekodirano: {text}",
   "sarneg_decodeA11y": "Dekodiraj števila SARNEG",
-  "sarneg_wordHidden": "Kodna beseda skrita"
+  "sarneg_wordHidden": "Kodna beseda skrita",
+  "sarneg_randomWord": "Naključna beseda",
+  "sarneg_wellKnownWord": "Ta beseda je objavljena v javnih vodnikih, zato jo lahko poskusi kdorkoli. Naključna beseda je varnejša.",
+  "sarneg_clipboardClears": "Odložišče se izprazni čez 1 minuto.",
+  "sarneg_autoClear": "Izbriše se po 1 minuti brez tipkanja."
 }
