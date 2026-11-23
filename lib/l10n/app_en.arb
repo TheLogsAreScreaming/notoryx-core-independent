@@ -3129,5 +3129,29 @@
     }
   },
   "channelMismatchKeepRadio": "Keep radio's",
-  "channelMismatchRestore": "Write app's to radio"
+  "channelMismatchRestore": "Write app's to radio",
+  "serverHistoryTitle": "Status history",
+  "serverHistoryCount": "{count, plural, =0{No saved checks} =1{1 saved check} other{{count} saved checks}}",
+  "@serverHistoryCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "serverHistoryRssi": "RSSI",
+  "serverHistorySnr": "SNR",
+  "serverHistoryErrors": "Errors",
+  "serverHistoryEmpty": "Each status check you run is saved here, so you can see how this repeater changes over time.",
+  "serverHistoryNoneInRange": "No readings in this time range.",
+  "neighborSnrOpen": "Show SNR over time",
+  "neighborSnrTitle": "SNR of {name}",
+  "@neighborSnrTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "neighborSnrHint": "Every time this repeater answered Neighbours, from the replies kept in its console."
 }

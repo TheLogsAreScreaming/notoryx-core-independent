@@ -1522,5 +1522,15 @@
   "channelMismatchEmpty": "空",
   "channelMismatchKeyTag": "密钥 {fingerprint}",
   "channelMismatchKeepRadio": "保留电台的",
-  "channelMismatchRestore": "写入应用的"
+  "channelMismatchRestore": "写入应用的",
+  "serverHistoryTitle": "状态历史",
+  "serverHistoryCount": "{count, plural, =0{没有已保存的查询} other{已保存 {count} 次查询}}",
+  "serverHistoryRssi": "RSSI",
+  "serverHistorySnr": "SNR",
+  "serverHistoryErrors": "错误",
+  "serverHistoryEmpty": "每次状态查询都会保存在这里，便于查看此中继器随时间的变化。",
+  "serverHistoryNoneInRange": "此时间段内没有读数。",
+  "neighborSnrOpen": "查看 SNR 变化",
+  "neighborSnrTitle": "{name} 的 SNR",
+  "neighborSnrHint": "该中继器每次回复“邻居”的记录，来自其控制台中保存的回复。"
 }

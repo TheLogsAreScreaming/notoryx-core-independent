@@ -1522,5 +1522,15 @@
   "channelMismatchEmpty": "비어 있음",
   "channelMismatchKeyTag": "키 {fingerprint}",
   "channelMismatchKeepRadio": "무전기 것 유지",
-  "channelMismatchRestore": "앱 것을 무전기에 쓰기"
+  "channelMismatchRestore": "앱 것을 무전기에 쓰기",
+  "serverHistoryTitle": "상태 기록",
+  "serverHistoryCount": "{count, plural, =0{저장된 확인 없음} other{저장된 확인 {count}개}}",
+  "serverHistoryRssi": "RSSI",
+  "serverHistorySnr": "SNR",
+  "serverHistoryErrors": "오류",
+  "serverHistoryEmpty": "상태 확인 결과가 여기에 저장되어 이 중계기의 변화를 볼 수 있습니다.",
+  "serverHistoryNoneInRange": "이 기간에 값이 없습니다.",
+  "neighborSnrOpen": "시간별 SNR 보기",
+  "neighborSnrTitle": "{name}의 SNR",
+  "neighborSnrHint": "이 중계기가 이웃 요청에 응답한 기록(콘솔에 저장된 응답 기준)."
 }

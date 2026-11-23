@@ -1522,5 +1522,15 @@
   "channelMismatchEmpty": "Leer",
   "channelMismatchKeyTag": "Schlüssel {fingerprint}",
   "channelMismatchKeepRadio": "Funkgerät behalten",
-  "channelMismatchRestore": "App-Version schreiben"
+  "channelMismatchRestore": "App-Version schreiben",
+  "serverHistoryTitle": "Statusverlauf",
+  "serverHistoryCount": "{count, plural, =0{Keine gespeicherten Abfragen} =1{1 gespeicherte Abfrage} other{{count} gespeicherte Abfragen}}",
+  "serverHistoryRssi": "RSSI",
+  "serverHistorySnr": "SNR",
+  "serverHistoryErrors": "Fehler",
+  "serverHistoryEmpty": "Jede Statusabfrage wird hier gespeichert, damit du siehst, wie sich dieser Repeater mit der Zeit verändert.",
+  "serverHistoryNoneInRange": "Keine Werte in diesem Zeitraum.",
+  "neighborSnrOpen": "SNR-Verlauf zeigen",
+  "neighborSnrTitle": "SNR von {name}",
+  "neighborSnrHint": "Jede Antwort dieses Repeaters auf Nachbarn, aus den Antworten in seiner Konsole."
 }

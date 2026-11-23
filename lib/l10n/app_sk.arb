@@ -1522,5 +1522,15 @@
   "channelMismatchEmpty": "Prázdny",
   "channelMismatchKeyTag": "kľúč {fingerprint}",
   "channelMismatchKeepRadio": "Ponechať z rádia",
-  "channelMismatchRestore": "Zapísať z aplikácie"
+  "channelMismatchRestore": "Zapísať z aplikácie",
+  "serverHistoryTitle": "História stavu",
+  "serverHistoryCount": "{count, plural, =0{Žiadne uložené kontroly} other{Uložené kontroly: {count}}}",
+  "serverHistoryRssi": "RSSI",
+  "serverHistorySnr": "SNR",
+  "serverHistoryErrors": "Chyby",
+  "serverHistoryEmpty": "Každá kontrola stavu sa uloží sem, aby ste videli, ako sa opakovač mení v čase.",
+  "serverHistoryNoneInRange": "V tomto období nie sú údaje.",
+  "neighborSnrOpen": "Zobraziť SNR v čase",
+  "neighborSnrTitle": "SNR: {name}",
+  "neighborSnrHint": "Každá odpoveď opakovača na Susedia, z odpovedí uložených v jeho konzole."
 }

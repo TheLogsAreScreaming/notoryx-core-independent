@@ -6,6 +6,8 @@ import '../app/repeater_tools.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
 import '../l10n/l10n.dart';
+import '../app/server_history.dart';
+import 'history_chart.dart';
 
 /// One-tap, one-hop trace showing the signal in both directions.
 class RepeaterPingCard extends ConsumerStatefulWidget {
@@ -161,19 +163,66 @@ class RepeaterAdminTools extends ConsumerWidget {
           const SizedBox(height: 4),
           if (list.isEmpty) Text(context.l10n.itHasnTHeardAnyNeighbors),
           for (final n in list)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 2),
-              child: Text(
-                context.l10n.db(
-                  nameFor(n.prefix),
-                  n.snr.toStringAsFixed(1),
-                  _ago(context.l10n, n.secondsAgo),
+            InkWell(
+              key: Key('neighbor-${n.prefix}'),
+              onTap: () => _showSnrTrail(context, n.prefix, nameFor(n.prefix)),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        context.l10n.db(
+                          nameFor(n.prefix),
+                          n.snr.toStringAsFixed(1),
+                          _ago(context.l10n, n.secondsAgo),
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      Icons.show_chart,
+                      size: 18,
+                      semanticLabel: context.l10n.neighborSnrOpen,
+                    ),
+                  ],
                 ),
               ),
             ),
         ],
         const SizedBox(height: 8),
       ],
+    );
+  }
+
+  void _showSnrTrail(BuildContext context, String prefix, String name) {
+    final points = neighborSnrTrail(lines, prefix);
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                context.l10n.neighborSnrTitle(name),
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 4),
+              Text(context.l10n.neighborSnrHint),
+              const SizedBox(height: 12),
+              if (points.isNotEmpty)
+                HistoryChartCard(
+                  label: 'SNR',
+                  points: points,
+                  format: (v) => '${v.toStringAsFixed(1)} dB',
+                ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

@@ -1522,5 +1522,15 @@
   "channelMismatchEmpty": "Празно",
   "channelMismatchKeyTag": "ключ {fingerprint}",
   "channelMismatchKeepRadio": "Запази от радиото",
-  "channelMismatchRestore": "Запиши от приложението"
+  "channelMismatchRestore": "Запиши от приложението",
+  "serverHistoryTitle": "История на състоянието",
+  "serverHistoryCount": "{count, plural, =0{Няма запазени проверки} =1{1 запазена проверка} other{{count} запазени проверки}}",
+  "serverHistoryRssi": "RSSI",
+  "serverHistorySnr": "SNR",
+  "serverHistoryErrors": "Грешки",
+  "serverHistoryEmpty": "Всяка проверка на състоянието се пази тук, за да видите как се променя този ретранслатор.",
+  "serverHistoryNoneInRange": "Няма стойности в този период.",
+  "neighborSnrOpen": "Покажи SNR във времето",
+  "neighborSnrTitle": "SNR на {name}",
+  "neighborSnrHint": "Всеки отговор на ретранслатора за Съседи, от отговорите в конзолата му."
 }

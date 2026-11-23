@@ -1522,5 +1522,15 @@
   "channelMismatchEmpty": "Vazio",
   "channelMismatchKeyTag": "chave {fingerprint}",
   "channelMismatchKeepRadio": "Manter a do rádio",
-  "channelMismatchRestore": "Gravar a do app"
+  "channelMismatchRestore": "Gravar a do app",
+  "serverHistoryTitle": "Histórico de estado",
+  "serverHistoryCount": "{count, plural, =0{Sem verificações guardadas} =1{1 verificação guardada} other{{count} verificações guardadas}}",
+  "serverHistoryRssi": "RSSI",
+  "serverHistorySnr": "SNR",
+  "serverHistoryErrors": "Erros",
+  "serverHistoryEmpty": "Cada verificação de estado fica guardada aqui, para ver como este repetidor muda ao longo do tempo.",
+  "serverHistoryNoneInRange": "Sem leituras neste período.",
+  "neighborSnrOpen": "Ver SNR ao longo do tempo",
+  "neighborSnrTitle": "SNR de {name}",
+  "neighborSnrHint": "Cada resposta deste repetidor a Vizinhos, a partir das respostas guardadas na sua consola."
 }
