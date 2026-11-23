@@ -3097,6 +3097,55 @@
   "sarneg_wellKnownWord": "This word is printed in public guides, so anyone can try it. A random word is safer.",
   "sarneg_clipboardClears": "The clipboard is cleared in 1 minute.",
   "sarneg_autoClear": "Clears after 1 minute without typing.",
+  "sarneg_optionsTitle": "Options",
+  "sarneg_keepZone": "Keep grid zone in clear",
+  "sarneg_keepZoneHint": "17S 4823 goes out as 17s KSAC. The zone is rarely secret, and other SARNEG tools read it this way.",
+  "sarneg_noMarker": "Send without the [SARNEG] marker",
+  "sarneg_noMarkerHint": "Listeners can't tell that numbers are hidden. Your team must turn on Decode unmarked messages.",
+  "sarneg_readUnmarked": "Decode unmarked messages",
+  "sarneg_readUnmarkedHint": "A message without the marker gets a decode line when all its capital letters belong to the day's word.",
+  "sarneg_wipeAfter": "Delete all words after a day",
+  "sarneg_wipeAfterOff": "Off. Dated words are deleted once their day has passed.",
+  "sarneg_wipeAfterSet": "Every word is deleted after {day}.",
+  "@sarneg_wipeAfterSet": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "sarneg_remove": "Remove",
+  "sarneg_sardotTitle": "SARDOT reference point",
+  "sarneg_sardotHint": "Send a bearing and distance from a secret point instead of a position. Agree the point in person: it is never sent.",
+  "sarneg_sardotSet": "Reference point set",
+  "sarneg_sardotNone": "No reference point",
+  "sarneg_useMyPosition": "Use my position",
+  "sarneg_typePoint": "Type a point",
+  "sarneg_pointLabel": "Latitude, longitude",
+  "sarneg_pointInvalid": "Type latitude, longitude, for example 41.33, -73.09",
+  "sarneg_addSardot": "Add SARDOT from my position",
+  "sarneg_showOnMap": "Show on map",
+  "sarneg_mapTitle": "Decoded position",
+  "sarneg_authTitle": "Number and letter of the day",
+  "sarneg_authHint": "Challenge and reply: they say a number, you answer the number that adds up to the number of the day. Kept on this phone only.",
+  "sarneg_numberOfDay": "Number of the day (0 to 99)",
+  "sarneg_letterOfDay": "Letter of the day",
+  "sarneg_notSet": "Not set",
+  "sarneg_numberInvalid": "Use a number from 0 to 99",
+  "sarneg_letterInvalid": "Use one letter, A to Z",
+  "sarneg_challenge": "Number they said",
+  "sarneg_reply": "Reply: {number}",
+  "@sarneg_reply": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "sarneg_noReply": "No valid reply: that number is bigger than the number of the day.",
+  "sarneg_maybeUnmarked": "Maybe SARNEG · tap to decode",
+  "sarneg_guideTitle": "SARNEG or real encryption?",
+  "sarneg_guideBody": "SARNEG swaps digits for letters with one shared word. Anyone who hears a few messages can work the word out, so it only keeps numbers from a casual listener. It is not encryption.\n\nFor real secrecy, use a private channel with its own key. The radio encrypts everything on it, and only people with the key can read it.\n\nSARNEG still helps on top of that: on shared or public channels, through relays and bridges, in logs and screenshots, and against someone who has the channel key but not the code word.",
   "channelMismatchBanner": "{count, plural, =1{1 channel on the radio differs from the app} other{{count} channels on the radio differ from the app}}",
   "@channelMismatchBanner": {
     "placeholders": {

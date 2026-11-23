@@ -21,6 +21,16 @@
 //
 // The first word is the default. Each dated entry replaces it on that
 // local calendar day, so a team can load a week of words at once.
+//
+// Options that stay on this phone (never in the shared text):
+// - Keep the grid zone in clear: in `17S 4823` the zone `17` is sent as
+//   digits (`17s KSAC`). Digits always pass through decoding, so every
+//   decoder reads it.
+// - Send without the marker, and read unmarked messages: an unmarked
+//   message is offered for decoding only when its upper-case letters all
+//   belong to the day's word.
+// - SARDOT: `sardot 045 2.3km` is a bearing and distance from a secret
+//   reference point; with SARNEG on, its digits are coded like any others.
 
 import 'dart:math';
 
@@ -111,10 +121,15 @@ class SarnegCodec {
 
   /// [plain] with every digit replaced by its code letter (upper case) and
   /// every other letter in lower case.
-  String encode(String plain) {
+  ///
+  /// With [keepZone], the digits of an MGRS grid zone (`17S`, `4Q`) stay as
+  /// digits.
+  String encode(String plain, {bool keepZone = false}) {
+    final clear = keepZone ? sarnegZoneDigits(plain) : const <int>{};
     final out = StringBuffer();
-    for (final ch in plain.split('')) {
-      if (_digit.hasMatch(ch)) {
+    for (var i = 0; i < plain.length; i++) {
+      final ch = plain[i];
+      if (_digit.hasMatch(ch) && !clear.contains(i)) {
         out.write(word[int.parse(ch)]);
       } else {
         out.write(ch.toLowerCase());
@@ -135,8 +150,29 @@ class SarnegCodec {
   }
 
   /// A whole message ready to send: the marker, a space and [plain] encoded.
-  String encodeMessage(String plain) =>
-      '$kSarnegMarker ${encode(plain.trim())}';
+  /// Without [marker] only the coded text is sent.
+  String encodeMessage(
+    String plain, {
+    bool keepZone = false,
+    bool marker = true,
+  }) {
+    final coded = encode(plain.trim(), keepZone: keepZone);
+    return marker ? '$kSarnegMarker $coded' : coded;
+  }
+
+  /// Whether [text], which has no marker, may be SARNEG with this word: it
+  /// has two upper-case letters in a row, and every upper-case letter in it
+  /// belongs to the word.
+  bool mayBeUnmarked(String text) {
+    if (isSarnegMessage(text)) return false;
+    final upper = RegExp('[A-Z]').allMatches(text).map((m) => m[0]!);
+    if (upper.isEmpty || upper.any((c) => !word.contains(c))) return false;
+    return RegExp('[A-Z]{2}').hasMatch(text);
+  }
+
+  /// [message] decoded: the body after the marker, or the whole text when
+  /// it has none.
+  String decodeAny(String message) => decode(sarnegBody(message) ?? message);
 
   /// The plain text of [message], or null when it has no SARNEG marker.
   String? decodeMessage(String message) {
@@ -310,3 +346,210 @@ class SarnegKeySet {
     Object.hashAllUnordered(daily.entries.map((e) => '${e.key}=${e.value}')),
   );
 }
+
+/// Positions in [text] of the digits of MGRS grid zones (1 to 60 followed by
+/// a latitude band letter, then two square letters or the end of the word).
+Set<int> sarnegZoneDigits(String text) {
+  final out = <int>{};
+  final zone = RegExp(
+    r'(?<![0-9A-Za-z])(\d{1,2})(?=[C-HJ-NP-Xc-hj-np-x](?:[A-HJ-NP-Za-hj-np-z]{2})?(?![A-Za-z]))',
+  );
+  for (final m in zone.allMatches(text)) {
+    final n = int.parse(m[1]!);
+    if (n < 1 || n > 60) continue;
+    for (var i = m.start; i < m.end; i++) {
+      out.add(i);
+    }
+  }
+  return out;
+}
+
+/// Settings that stay on this phone. None of them are in the shared text.
+class SarnegOptions {
+  /// Creates options; every field is optional.
+  const SarnegOptions({
+    this.keepZone = false,
+    this.noMarker = false,
+    this.readUnmarked = false,
+    this.wipeAfter,
+    this.sardotLat,
+    this.sardotLon,
+    this.numberOfDay,
+    this.letterOfDay,
+  });
+
+  /// Send MGRS grid zones as digits.
+  final bool keepZone;
+
+  /// Send coded text without the `[SARNEG]` marker.
+  final bool noMarker;
+
+  /// Offer to decode messages without the marker.
+  final bool readUnmarked;
+
+  /// Every word is deleted after this local day (`yyyy-mm-dd`).
+  final String? wipeAfter;
+
+  /// SARDOT reference point (secret; never sent).
+  final double? sardotLat;
+
+  /// SARDOT reference point longitude.
+  final double? sardotLon;
+
+  /// Number of the day (0 to 99), for challenge and reply.
+  final int? numberOfDay;
+
+  /// Letter of the day (A to Z).
+  final String? letterOfDay;
+
+  /// Whether a SARDOT reference point is set.
+  bool get hasSardot => sardotLat != null && sardotLon != null;
+
+  /// A copy with the given changes. Pass [clearWipe], [clearSardot] or
+  /// [clearAuth] to remove those values.
+  SarnegOptions copyWith({
+    bool? keepZone,
+    bool? noMarker,
+    bool? readUnmarked,
+    String? wipeAfter,
+    bool clearWipe = false,
+    double? sardotLat,
+    double? sardotLon,
+    bool clearSardot = false,
+    int? numberOfDay,
+    String? letterOfDay,
+    bool clearAuth = false,
+  }) => SarnegOptions(
+    keepZone: keepZone ?? this.keepZone,
+    noMarker: noMarker ?? this.noMarker,
+    readUnmarked: readUnmarked ?? this.readUnmarked,
+    wipeAfter: clearWipe ? null : wipeAfter ?? this.wipeAfter,
+    sardotLat: clearSardot ? null : sardotLat ?? this.sardotLat,
+    sardotLon: clearSardot ? null : sardotLon ?? this.sardotLon,
+    numberOfDay: clearAuth ? null : numberOfDay ?? this.numberOfDay,
+    letterOfDay: clearAuth ? null : letterOfDay ?? this.letterOfDay,
+  );
+
+  /// For saving.
+  Map<String, Object> toJson() => {
+    if (keepZone) 'keepZone': true,
+    if (noMarker) 'noMarker': true,
+    if (readUnmarked) 'readUnmarked': true,
+    'wipeAfter': ?wipeAfter,
+    if (hasSardot) 'sardot': [sardotLat!, sardotLon!],
+    'nod': ?numberOfDay,
+    'lod': ?letterOfDay,
+  };
+
+  /// Reads [toJson] output; damaged values are dropped.
+  static SarnegOptions fromJson(Object? json) {
+    if (json is! Map) return const SarnegOptions();
+    final sardot = json['sardot'];
+    final ok =
+        sardot is List &&
+        sardot.length == 2 &&
+        sardot.every((v) => v is num) &&
+        validSarnegPoint(
+          (sardot[0] as num).toDouble(),
+          (sardot[1] as num).toDouble(),
+        );
+    final wipe = json['wipeAfter'];
+    final nod = json['nod'];
+    final lod = json['lod'];
+    return SarnegOptions(
+      keepZone: json['keepZone'] == true,
+      noMarker: json['noMarker'] == true,
+      readUnmarked: json['readUnmarked'] == true,
+      wipeAfter: wipe is String && RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(wipe)
+          ? wipe
+          : null,
+      sardotLat: ok ? (sardot[0] as num).toDouble() : null,
+      sardotLon: ok ? (sardot[1] as num).toDouble() : null,
+      numberOfDay: nod is int && nod >= 0 && nod <= 99 ? nod : null,
+      letterOfDay: lod is String && RegExp('^[A-Z]\$').hasMatch(lod)
+          ? lod
+          : null,
+    );
+  }
+}
+
+/// Whether [lat], [lon] is a position on Earth.
+bool validSarnegPoint(double lat, double lon) =>
+    lat.isFinite && lon.isFinite && lat.abs() <= 90 && lon.abs() <= 180;
+
+/// Reads `lat, lon` (decimal degrees) from [text]; null when there is none.
+(double, double)? parseSarnegPoint(String text) {
+  final m = RegExp(
+    r'(?<![\d.])(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)',
+  ).firstMatch(text);
+  if (m == null) return null;
+  final lat = double.parse(m[1]!);
+  final lon = double.parse(m[2]!);
+  return validSarnegPoint(lat, lon) ? (lat, lon) : null;
+}
+
+const double _earthM = 6371008.8;
+double _rad(double d) => d * pi / 180;
+double _deg(double r) => r * 180 / pi;
+
+/// Bearing (degrees from true north, 0 to 359) and distance (metres) from
+/// [from] to [to].
+(int, double) sardotFrom((double, double) from, (double, double) to) {
+  final p1 = _rad(from.$1), p2 = _rad(to.$1), dl = _rad(to.$2 - from.$2);
+  final y = sin(dl) * cos(p2);
+  final x = cos(p1) * sin(p2) - sin(p1) * cos(p2) * cos(dl);
+  final bearing = (_deg(atan2(y, x)) + 360).round() % 360;
+  final a =
+      pow(sin((p2 - p1) / 2), 2) + cos(p1) * cos(p2) * pow(sin(dl / 2), 2);
+  final d = 2 * _earthM * asin(min(1.0, sqrt(a.toDouble())));
+  return (bearing, d);
+}
+
+/// The point [metres] away from [from] on [bearing] degrees.
+(double, double) sardotTarget(
+  (double, double) from,
+  num bearing,
+  double metres,
+) {
+  final p1 = _rad(from.$1), l1 = _rad(from.$2), b = _rad(bearing.toDouble());
+  final dr = metres / _earthM;
+  final p2 = asin(sin(p1) * cos(dr) + cos(p1) * sin(dr) * cos(b));
+  final l2 =
+      l1 + atan2(sin(b) * sin(dr) * cos(p1), cos(dr) - sin(p1) * sin(p2));
+  return (_deg(p2), (_deg(l2) + 540) % 360 - 180);
+}
+
+/// SARDOT text for a bearing and distance: `sardot 045 2.3km`.
+String sardotText(int bearing, double metres) =>
+    'sardot ${bearing.toString().padLeft(3, '0')} '
+    '${(metres / 1000).toStringAsFixed(metres < 10000 ? 2 : 1)}km';
+
+/// Bearing and metres from SARDOT text in [text] (decoded); null when none.
+(int, double)? parseSardot(String text) {
+  final m = RegExp(
+    r'sardot\s+(\d{1,3})\s+(\d+(?:\.\d+)?)\s*km',
+    caseSensitive: false,
+  ).firstMatch(text);
+  if (m == null) return null;
+  final b = int.parse(m[1]!);
+  if (b > 359) return null;
+  return (b, double.parse(m[2]!) * 1000);
+}
+
+/// The position [decoded] text points at: a `lat, lon` pair, or SARDOT from
+/// [reference] when one is set. Null when it holds neither.
+(double, double)? sarnegPositionIn(
+  String decoded, {
+  (double, double)? reference,
+}) {
+  final dot = parseSardot(decoded);
+  if (dot != null && reference != null) {
+    return sardotTarget(reference, dot.$1, dot.$2);
+  }
+  return dot == null ? parseSarnegPoint(decoded) : null;
+}
+
+/// The reply to a number-of-the-day [challenge]: the number that adds up to
+/// [numberOfDay], or null when the challenge is bigger than it.
+int? sarnegReply(int numberOfDay, int challenge) =>
+    challenge < 0 || challenge > numberOfDay ? null : numberOfDay - challenge;

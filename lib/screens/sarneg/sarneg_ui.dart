@@ -8,8 +8,10 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -91,11 +93,15 @@ class SarnegKeys extends ChangeNotifier {
   final DateTime Function() clock;
 
   SarnegKeySet? _keys;
+  SarnegOptions _options = const SarnegOptions();
   bool _loaded = false;
   Future<void>? _loading;
 
   /// The code words; null when none are set.
   SarnegKeySet? get keys => _keys;
+
+  /// Settings kept with the words on this phone.
+  SarnegOptions get options => _options;
 
   /// Whether the saved words have been read.
   bool get loaded => _loaded;
@@ -106,24 +112,69 @@ class SarnegKeys extends ChangeNotifier {
   Future<void> _load() async {
     final raw = await _storage.read();
     SarnegKeySet? keys;
+    var options = const SarnegOptions();
     if (raw != null) {
       try {
-        keys = SarnegKeySet.fromJson(jsonDecode(raw));
+        final json = jsonDecode(raw);
+        keys = SarnegKeySet.fromJson(json);
+        if (json is Map) options = SarnegOptions.fromJson(json['options']);
       } on FormatException {
         keys = null;
       }
     }
-    _keys = keys?.withoutDaysBefore(sarnegDay(clock()));
+    _keys = keys;
+    _options = keys == null ? const SarnegOptions() : options;
+    _loaded = true;
+    await expire();
+    notifyListeners();
+  }
+
+  /// Deletes dated words for past days, and every word once the wipe day
+  /// has passed. Saves only when something changed.
+  Future<void> expire() async {
+    final k = _keys;
+    if (k == null) return;
+    final today = sarnegDay(clock());
+    final wipe = _options.wipeAfter;
+    if (wipe != null && today.compareTo(wipe) > 0) {
+      await save(null);
+      return;
+    }
+    final kept = k.withoutDaysBefore(today);
+    if (kept.daily.length != k.daily.length) await save(kept);
+  }
+
+  Future<void> _write() => _storage.write(
+    _keys == null
+        ? null
+        : jsonEncode({..._keys!.toJson(), 'options': _options.toJson()}),
+  );
+
+  /// Saves [keys] (null forgets them, with every option).
+  Future<void> save(SarnegKeySet? keys) async {
+    _keys = keys;
+    if (keys == null) _options = const SarnegOptions();
+    await _write();
     _loaded = true;
     notifyListeners();
   }
 
-  /// Saves [keys] (null forgets them).
-  Future<void> save(SarnegKeySet? keys) async {
-    await _storage.write(keys == null ? null : jsonEncode(keys.toJson()));
-    _keys = keys;
-    _loaded = true;
+  /// Saves [options] next to the words.
+  Future<void> saveOptions(SarnegOptions options) async {
+    _options = options;
+    await _write();
     notifyListeners();
+  }
+
+  /// Forgets every word and option and clears the clipboard now.
+  Future<void> burn() async {
+    _clipboardTimer?.cancel();
+    try {
+      await Clipboard.setData(const ClipboardData(text: ''));
+    } on Exception catch (e) {
+      debugPrint('SARNEG: clipboard not cleared (${e.runtimeType})');
+    }
+    await save(null);
   }
 
   /// The codec for [at] (today when null), or null when no word is set.
@@ -282,7 +333,7 @@ class _Body extends StatelessWidget {
         ],
       ),
     );
-    if (ok == true) await store.save(null);
+    if (ok == true) await store.burn();
   }
 
   @override
@@ -316,6 +367,8 @@ class _Body extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 16),
+          const _Guide(),
         ] else ...[
           _WordCard(keys: k, today: today),
           if (isWellKnownSarnegWord(k.wordFor(today))) ...[
@@ -380,7 +433,15 @@ class _Body extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          _TryIt(codec: k.codecFor(today)),
+          _TryIt(codec: k.codecFor(today), options: store.options),
+          const SizedBox(height: 24),
+          _Options(store: store),
+          const SizedBox(height: 16),
+          _Sardot(store: store),
+          const SizedBox(height: 24),
+          _Auth(store: store),
+          const SizedBox(height: 16),
+          const _Guide(),
         ],
       ],
     );
@@ -492,9 +553,12 @@ class _WordCardState extends State<_WordCard> {
 
 /// Encode and decode by hand with today's word.
 class _TryIt extends StatefulWidget {
-  const _TryIt({required this.codec});
+  const _TryIt({required this.codec, required this.options});
 
   final SarnegCodec codec;
+
+  /// How text is encoded.
+  final SarnegOptions options;
 
   @override
   State<_TryIt> createState() => _TryItState();
@@ -565,7 +629,13 @@ class _TryItState extends State<_TryIt> {
         ),
         _result(
           context,
-          _plain.text.trim().isEmpty ? '' : c.encodeMessage(_plain.text),
+          _plain.text.trim().isEmpty
+              ? ''
+              : c.encodeMessage(
+                  _plain.text,
+                  keepZone: widget.options.keepZone,
+                  marker: !widget.options.noMarker,
+                ),
         ),
         const SizedBox(height: 8),
         TextField(
@@ -893,6 +963,29 @@ class _ComposeSheetState extends State<_ComposeSheet> {
     }
   }
 
+  Future<void> _sardot(SarnegOptions o) async {
+    final t = _t(context);
+    setState(() => _locating = true);
+    try {
+      final p = await sarnegPositionSource();
+      if (!mounted) return;
+      if (p == null) {
+        _snack(context, t.sarneg_locationOff);
+        return;
+      }
+      final dot = sardotFrom((o.sardotLat!, o.sardotLon!), p);
+      final text = sardotText(dot.$1, dot.$2);
+      final s = _text.text.trim();
+      _text.text = s.isEmpty ? text : '$s $text';
+    } on TimeoutException {
+      if (mounted) _snack(context, t.sarneg_noFix);
+    } catch (_) {
+      if (mounted) _snack(context, t.sarneg_noFix);
+    } finally {
+      if (mounted) setState(() => _locating = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) =>
       NoScreenshots(child: Builder(builder: _buildScreen));
@@ -938,7 +1031,10 @@ class _ComposeSheetState extends State<_ComposeSheet> {
     }
     final codec = keys.codecFor(store.clock());
     final plain = _text.text.trim();
-    final coded = plain.isEmpty ? '' : codec.encodeMessage(plain);
+    final o = store.options;
+    final coded = plain.isEmpty
+        ? ''
+        : codec.encodeMessage(plain, keepZone: o.keepZone, marker: !o.noMarker);
     return SafeArea(
       child: Padding(
         padding: pad,
@@ -975,6 +1071,12 @@ class _ComposeSheetState extends State<_ComposeSheet> {
                   : const Icon(Icons.my_location),
               label: Text(t.sarneg_addPosition),
             ),
+            if (o.hasSardot)
+              TextButton.icon(
+                onPressed: _locating ? null : () => _sardot(o),
+                icon: const Icon(Icons.explore_outlined),
+                label: Text(t.sarneg_addSardot),
+              ),
             const SizedBox(height: 4),
             Text(
               t.sarneg_goesOutAs,
@@ -1028,7 +1130,12 @@ class SarnegComposeButton extends StatelessWidget {
             final current = controller.text.trim();
             final coded = await showSarnegComposeSheet(
               context,
-              initial: isSarnegMessage(current) ? '' : current,
+              initial:
+                  isSarnegMessage(current) ||
+                      (SarnegKeys.instance.codecFor()?.mayBeUnmarked(current) ??
+                          false)
+                  ? ''
+                  : current,
             );
             if (coded == null) return;
             controller.text = coded;
@@ -1092,61 +1199,557 @@ class _SarnegDecodeLineState extends State<SarnegDecodeLine> {
   }
 
   // The screen itself; [build] keeps screenshots off around it.
-  Widget _buildScreen(BuildContext context) {
-    if (!isSarnegMessage(widget.text)) return const SizedBox.shrink();
-    return _keysBuilder((context, store) {
-      final t = _t(context);
-      final decoded = store.keys
-          ?.codecFor(widget.at)
-          .decodeMessage(widget.text);
-      final label = !_open
-          ? t.sarneg_tapToDecode
-          : decoded == null
-          ? t.sarneg_noWordSet
-          : t.sarneg_decoded(decoded);
-      final color = widget.color ?? Theme.of(context).colorScheme.primary;
-      return Semantics(
-        button: true,
-        label: _open ? label : t.sarneg_decodeA11y,
-        excludeSemantics: true,
-        child: InkWell(
-          onTap: () {
-            if (_open && decoded == null) {
-              unawaited(
-                Navigator.push<void>(
-                  context,
-                  MaterialPageRoute(builder: (_) => const SarnegScreen()),
-                ),
-              );
-              return;
-            }
-            _toggle();
-          },
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 32),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  _open ? Icons.lock_open : Icons.pin_outlined,
-                  size: 16,
-                  color: color,
-                ),
-                const SizedBox(width: 6),
-                Flexible(
-                  child: Text(
-                    label,
-                    style: TextStyle(
-                      color: color,
-                      fontFamily: _open && decoded != null ? 'monospace' : null,
+  Widget _buildScreen(BuildContext context) => _keysBuilder((context, store) {
+    final marked = isSarnegMessage(widget.text);
+    final codec = store.keys?.codecFor(widget.at);
+    final unmarked =
+        !marked &&
+        store.options.readUnmarked &&
+        (codec?.mayBeUnmarked(widget.text) ?? false);
+    if (!marked && !unmarked) return const SizedBox.shrink();
+    final t = _t(context);
+    final o = store.options;
+    final decoded = codec?.decodeAny(widget.text);
+    final at = decoded == null
+        ? null
+        : sarnegPositionIn(
+            decoded,
+            reference: o.hasSardot ? (o.sardotLat!, o.sardotLon!) : null,
+          );
+    final label = !_open
+        ? (marked ? t.sarneg_tapToDecode : t.sarneg_maybeUnmarked)
+        : decoded == null
+        ? t.sarneg_noWordSet
+        : t.sarneg_decoded(decoded);
+    final color = widget.color ?? Theme.of(context).colorScheme.primary;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(
+          child: Semantics(
+            button: true,
+            label: _open ? label : t.sarneg_decodeA11y,
+            excludeSemantics: true,
+            child: InkWell(
+              onTap: () {
+                if (_open && decoded == null) {
+                  unawaited(
+                    Navigator.push<void>(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SarnegScreen()),
                     ),
-                  ),
+                  );
+                  return;
+                }
+                _toggle();
+              },
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 32),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      _open ? Icons.lock_open : Icons.pin_outlined,
+                      size: 16,
+                      color: color,
+                    ),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        label,
+                        style: TextStyle(
+                          color: color,
+                          fontFamily: _open && decoded != null
+                              ? 'monospace'
+                              : null,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
+        if (_open && at != null)
+          IconButton(
+            tooltip: t.sarneg_showOnMap,
+            visualDensity: VisualDensity.compact,
+            icon: Icon(Icons.map_outlined, size: 20, color: color),
+            onPressed: () => showSarnegMap(context, at),
+          ),
+      ],
+    );
+  });
+}
+
+/// Package name sent with map tile requests.
+const String _tileAgent = 'com.bastionmesh.notoryx_core';
+
+/// Shows [point] on a small map, with its coordinates and a copy button.
+Future<void> showSarnegMap(BuildContext context, (double, double) point) {
+  final t = _t(context);
+  final text = '${point.$1.toStringAsFixed(5)}, ${point.$2.toStringAsFixed(5)}';
+  final at = LatLng(point.$1, point.$2);
+  return showDialog<void>(
+    context: context,
+    builder: (d) => NoScreenshots(
+      child: AlertDialog(
+        title: Text(t.sarneg_mapTitle),
+        content: SizedBox(
+          width: 360,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 260,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: FlutterMap(
+                    options: MapOptions(initialCenter: at, initialZoom: 14),
+                    children: [
+                      TileLayer(
+                        urlTemplate:
+                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        userAgentPackageName: _tileAgent,
+                      ),
+                      MarkerLayer(
+                        markers: [
+                          Marker(
+                            point: at,
+                            width: 40,
+                            height: 40,
+                            alignment: Alignment.topCenter,
+                            child: Icon(
+                              Icons.location_pin,
+                              size: 40,
+                              color: Theme.of(d).colorScheme.error,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              SelectableText(text, style: _mono),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => _copySecret(d, text, t.sarneg_copied),
+            child: Text(t.sarneg_copy),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(d),
+            child: Text(t.sarneg_done),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+/// Asks for one value; [check] returns an error text or null when it's fine.
+class _AskDialog extends StatefulWidget {
+  const _AskDialog({
+    required this.title,
+    required this.label,
+    required this.check,
+    this.number = false,
+  });
+
+  final String title;
+  final String label;
+  final String? Function(String) check;
+  final bool number;
+
+  @override
+  State<_AskDialog> createState() => _AskDialogState();
+}
+
+class _AskDialogState extends State<_AskDialog> {
+  final _text = TextEditingController();
+  String? _error;
+
+  @override
+  void dispose() {
+    _text.dispose();
+    super.dispose();
+  }
+
+  void _done() {
+    final v = _text.text.trim();
+    final e = widget.check(v);
+    if (e != null) {
+      setState(() => _error = e);
+      return;
+    }
+    Navigator.pop(context, v);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = _t(context);
+    return AlertDialog(
+      title: Text(widget.title),
+      content: TextField(
+        controller: _text,
+        autofocus: true,
+        autocorrect: false,
+        enableSuggestions: false,
+        keyboardType: widget.number
+            ? const TextInputType.numberWithOptions(signed: true, decimal: true)
+            : TextInputType.text,
+        textCapitalization: TextCapitalization.characters,
+        decoration: InputDecoration(labelText: widget.label, errorText: _error),
+        onChanged: (_) => setState(() => _error = null),
+        onSubmitted: (_) => _done(),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(t.sarneg_cancel),
+        ),
+        TextButton(onPressed: _done, child: Text(t.sarneg_save)),
+      ],
+    );
+  }
+}
+
+Future<String?> _ask(
+  BuildContext context, {
+  required String title,
+  required String label,
+  required String? Function(String) check,
+  bool number = false,
+}) => showDialog<String>(
+  context: context,
+  builder: (_) =>
+      _AskDialog(title: title, label: label, check: check, number: number),
+);
+
+Widget _heading(BuildContext context, String text) =>
+    Text(text, style: Theme.of(context).textTheme.titleMedium);
+
+/// How messages are written and read, and when words are deleted.
+class _Options extends StatelessWidget {
+  const _Options({required this.store});
+
+  final SarnegKeys store;
+
+  Future<void> _pickWipe(BuildContext context) async {
+    final now = store.clock();
+    final day = await showDatePicker(
+      context: context,
+      firstDate: DateTime(now.year, now.month, now.day),
+      lastDate: now.add(const Duration(days: 366)),
+      helpText: _t(context).sarneg_wipeAfter,
+    );
+    if (day == null) return;
+    await store.saveOptions(store.options.copyWith(wipeAfter: sarnegDay(day)));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = _t(context);
+    final o = store.options;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _heading(context, t.sarneg_optionsTitle),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(t.sarneg_keepZone),
+          subtitle: Text(t.sarneg_keepZoneHint),
+          value: o.keepZone,
+          onChanged: (v) => store.saveOptions(o.copyWith(keepZone: v)),
+        ),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(t.sarneg_noMarker),
+          subtitle: Text(t.sarneg_noMarkerHint),
+          value: o.noMarker,
+          onChanged: (v) => store.saveOptions(o.copyWith(noMarker: v)),
+        ),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(t.sarneg_readUnmarked),
+          subtitle: Text(t.sarneg_readUnmarkedHint),
+          value: o.readUnmarked,
+          onChanged: (v) => store.saveOptions(o.copyWith(readUnmarked: v)),
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.auto_delete_outlined),
+          title: Text(t.sarneg_wipeAfter),
+          subtitle: Text(
+            o.wipeAfter == null
+                ? t.sarneg_wipeAfterOff
+                : t.sarneg_wipeAfterSet(o.wipeAfter!),
+          ),
+          onTap: () => _pickWipe(context),
+          trailing: o.wipeAfter == null
+              ? null
+              : IconButton(
+                  tooltip: t.sarneg_remove,
+                  icon: const Icon(Icons.close),
+                  onPressed: () =>
+                      store.saveOptions(o.copyWith(clearWipe: true)),
+                ),
+        ),
+      ],
+    );
+  }
+}
+
+String? _pointError(BuildContext context, String v) =>
+    parseSarnegPoint(v) == null ? _t(context).sarneg_pointInvalid : null;
+
+/// The secret SARDOT reference point.
+class _Sardot extends StatefulWidget {
+  const _Sardot({required this.store});
+
+  final SarnegKeys store;
+
+  @override
+  State<_Sardot> createState() => _SardotState();
+}
+
+class _SardotState extends State<_Sardot> {
+  bool _locating = false;
+
+  Future<void> _here() async {
+    final t = _t(context);
+    final store = widget.store;
+    setState(() => _locating = true);
+    try {
+      final p = await sarnegPositionSource();
+      if (!mounted) return;
+      if (p == null) {
+        _snack(context, t.sarneg_locationOff);
+        return;
+      }
+      await store.saveOptions(
+        store.options.copyWith(sardotLat: p.$1, sardotLon: p.$2),
       );
+    } catch (_) {
+      if (mounted) _snack(context, t.sarneg_noFix);
+    } finally {
+      if (mounted) setState(() => _locating = false);
+    }
+  }
+
+  Future<void> _type() async {
+    final t = _t(context);
+    final v = await _ask(
+      context,
+      title: t.sarneg_sardotTitle,
+      label: t.sarneg_pointLabel,
+      number: true,
+      check: (v) => _pointError(context, v),
+    );
+    final p = v == null ? null : parseSarnegPoint(v);
+    if (p == null) return;
+    final store = widget.store;
+    await store.saveOptions(
+      store.options.copyWith(sardotLat: p.$1, sardotLon: p.$2),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = _t(context);
+    final store = widget.store;
+    final o = store.options;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _heading(context, t.sarneg_sardotTitle),
+        const SizedBox(height: 4),
+        Text(t.sarneg_sardotHint),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Icon(o.hasSardot ? Icons.place : Icons.place_outlined, size: 18),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                o.hasSardot ? t.sarneg_sardotSet : t.sarneg_sardotNone,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            OutlinedButton.icon(
+              onPressed: _locating ? null : _here,
+              icon: const Icon(Icons.my_location),
+              label: Text(t.sarneg_useMyPosition),
+            ),
+            OutlinedButton.icon(
+              onPressed: _type,
+              icon: const Icon(Icons.edit_location_alt_outlined),
+              label: Text(t.sarneg_typePoint),
+            ),
+            if (o.hasSardot)
+              TextButton.icon(
+                onPressed: () =>
+                    store.saveOptions(o.copyWith(clearSardot: true)),
+                icon: const Icon(Icons.close),
+                label: Text(t.sarneg_remove),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Number and letter of the day, with the reply to a challenge.
+class _Auth extends StatefulWidget {
+  const _Auth({required this.store});
+
+  final SarnegKeys store;
+
+  @override
+  State<_Auth> createState() => _AuthState();
+}
+
+class _AuthState extends State<_Auth> {
+  final _challenge = TextEditingController();
+  Timer? _idle;
+
+  @override
+  void dispose() {
+    _idle?.cancel();
+    _challenge.dispose();
+    super.dispose();
+  }
+
+  void _touched() {
+    _idle?.cancel();
+    setState(() {});
+    _idle = Timer(kSarnegShowFor, () {
+      if (!mounted) return;
+      _challenge.clear();
+      setState(() {});
     });
+  }
+
+  Future<void> _setNumber() async {
+    final t = _t(context);
+    final v = await _ask(
+      context,
+      title: t.sarneg_numberOfDay,
+      label: t.sarneg_numberOfDay,
+      number: true,
+      check: (v) {
+        final n = int.tryParse(v);
+        return n == null || n < 0 || n > 99 ? t.sarneg_numberInvalid : null;
+      },
+    );
+    if (v == null) return;
+    final store = widget.store;
+    await store.saveOptions(store.options.copyWith(numberOfDay: int.parse(v)));
+  }
+
+  Future<void> _setLetter() async {
+    final t = _t(context);
+    final v = await _ask(
+      context,
+      title: t.sarneg_letterOfDay,
+      label: t.sarneg_letterOfDay,
+      check: (v) =>
+          RegExp(r'^[A-Za-z]$').hasMatch(v) ? null : t.sarneg_letterInvalid,
+    );
+    if (v == null) return;
+    final store = widget.store;
+    await store.saveOptions(
+      store.options.copyWith(letterOfDay: v.toUpperCase()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = _t(context);
+    final o = widget.store.options;
+    final nod = o.numberOfDay;
+    final asked = int.tryParse(_challenge.text.trim());
+    final reply = nod == null || asked == null ? null : sarnegReply(nod, asked);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _heading(context, t.sarneg_authTitle),
+        const SizedBox(height: 4),
+        Text(t.sarneg_authHint),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.tag),
+          title: Text(t.sarneg_numberOfDay),
+          subtitle: Text(nod == null ? t.sarneg_notSet : '$nod', style: _mono),
+          onTap: _setNumber,
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.abc),
+          title: Text(t.sarneg_letterOfDay),
+          subtitle: Text(o.letterOfDay ?? t.sarneg_notSet, style: _mono),
+          onTap: _setLetter,
+        ),
+        if (nod != null) ...[
+          TextField(
+            controller: _challenge,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(labelText: t.sarneg_challenge),
+            onChanged: (_) => _touched(),
+          ),
+          const SizedBox(height: 4),
+          if (asked != null)
+            Text(
+              reply == null ? t.sarneg_noReply : t.sarneg_reply(reply),
+              style: reply == null ? null : _mono,
+            ),
+        ],
+        if (nod != null || o.letterOfDay != null)
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TextButton.icon(
+              onPressed: () {
+                _challenge.clear();
+                unawaited(
+                  widget.store.saveOptions(o.copyWith(clearAuth: true)),
+                );
+              },
+              icon: const Icon(Icons.close),
+              label: Text(t.sarneg_remove),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// What SARNEG does and doesn't protect, next to real encryption.
+class _Guide extends StatelessWidget {
+  const _Guide();
+
+  @override
+  Widget build(BuildContext context) {
+    final t = _t(context);
+    return ExpansionTile(
+      tilePadding: EdgeInsets.zero,
+      childrenPadding: const EdgeInsets.only(bottom: 8),
+      leading: const Icon(Icons.shield_outlined),
+      title: Text(t.sarneg_guideTitle),
+      expandedCrossAxisAlignment: CrossAxisAlignment.start,
+      children: [Text(t.sarneg_guideBody)],
+    );
   }
 }
