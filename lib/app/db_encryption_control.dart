@@ -27,9 +27,32 @@ class DbEncryption extends AsyncNotifier<bool> {
     } else {
       await decryptDatabase(db, file, keys);
     }
+    await ref
+        .read(storeProvider)
+        .saveSetting(dbEncryptionChoiceSetting, on ? 'on' : 'off');
     state = AsyncData(on);
   }
 }
+
+/// Encrypts the database once at startup where that's the default (phones
+/// and Macs) and the person hasn't chosen otherwise. Never throws.
+final dbEncryptionDefaultProvider = FutureProvider<EncryptionDefault>((
+  ref,
+) async {
+  try {
+    final result = await applyEncryptionDefault(
+      ref.read(databaseProvider),
+      await meshDatabaseFile(),
+      ref.read(dbKeyStoreProvider),
+    );
+    if (result == EncryptionDefault.encrypted) {
+      ref.invalidate(dbEncryptionProvider);
+    }
+    return result;
+  } on Object {
+    return EncryptionDefault.notHere;
+  }
+});
 
 final dbEncryptionProvider = AsyncNotifierProvider<DbEncryption, bool>(
   DbEncryption.new,

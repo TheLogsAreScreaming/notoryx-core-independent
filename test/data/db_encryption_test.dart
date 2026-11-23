@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:drift/native.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:notoryx_core/data/backup.dart';
 import 'package:notoryx_core/data/data.dart';
@@ -164,6 +165,63 @@ void main() {
     final read = readPayload(payload, currentSchema: db.schemaVersion);
     await restoreDatabase(db, read.sqlite, temp: dir);
     expect(await saved(db), 'from backup');
+    await db.close();
+  });
+
+  test('phones and Macs encrypt by default; others leave it to the person', () {
+    expect(encryptsByDefault(TargetPlatform.android), isTrue);
+    expect(encryptsByDefault(TargetPlatform.iOS), isTrue);
+    expect(encryptsByDefault(TargetPlatform.macOS), isTrue);
+    expect(encryptsByDefault(TargetPlatform.linux), isFalse);
+    expect(encryptsByDefault(TargetPlatform.windows), isFalse);
+  });
+
+  test(
+    'by default a plain database is encrypted once, keeping its data',
+    () async {
+      final db = open(null);
+      expect(
+        await applyEncryptionDefault(db, file, keys, byDefault: true),
+        EncryptionDefault.encrypted,
+      );
+      expect(await saved(db), 'kept');
+      expect(
+        await applyEncryptionDefault(db, file, keys, byDefault: true),
+        EncryptionDefault.alreadyEncrypted,
+      );
+      await db.close();
+      expect(isPlainDatabase(file), isFalse);
+      final again = open(keys.value);
+      expect(await saved(again), 'kept');
+      await again.close();
+    },
+  );
+
+  test('the person turning it off, or a failure, is respected', () async {
+    final db = open(null);
+    expect(
+      await applyEncryptionDefault(db, file, keys, byDefault: false),
+      EncryptionDefault.notHere,
+    );
+    await MeshStore(db).saveSetting(dbEncryptionChoiceSetting, 'off');
+    expect(
+      await applyEncryptionDefault(db, file, keys, byDefault: true),
+      EncryptionDefault.personChose,
+    );
+    await MeshStore(db).removeSetting(dbEncryptionChoiceSetting);
+
+    keys.broken = true;
+    expect(
+      await applyEncryptionDefault(db, file, keys, byDefault: true),
+      EncryptionDefault.failed,
+    );
+    keys.broken = false;
+    expect(
+      await applyEncryptionDefault(db, file, keys, byDefault: true),
+      EncryptionDefault.failedBefore,
+    );
+    expect(isPlainDatabase(file), isTrue);
+    expect(await saved(db), 'kept');
     await db.close();
   });
 }
