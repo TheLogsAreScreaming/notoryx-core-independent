@@ -493,8 +493,9 @@ class MeshSync {
     List<ChannelInfo> fetched,
     int count,
   ) async {
-    final saved = await _store.watchChannels(key).first;
-    final waiting = decodeMismatches(await _store.setting(mismatchKey(key)));
+    final saved = await _store.channels(key);
+    final stored = await _store.setting(mismatchKey(key));
+    final waiting = decodeMismatches(stored);
     final found = compareSlots(
       mine: [
         for (final c in saved)
@@ -508,10 +509,11 @@ class MeshSync {
       waiting: [for (final w in waiting) w.mine],
     );
     if (found.isEmpty) {
-      await _store.removeSetting(mismatchKey(key));
-    } else {
-      await _store.saveSetting(mismatchKey(key), encodeMismatches(found));
+      if (stored != null) await _store.removeSetting(mismatchKey(key));
+      return;
     }
+    final encoded = encodeMismatches(found);
+    if (encoded != stored) await _store.saveSetting(mismatchKey(key), encoded);
   }
 
   Future<void> _dropMismatch(String key, int slot) async {
