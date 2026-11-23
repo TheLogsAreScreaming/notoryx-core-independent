@@ -5,6 +5,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 
+import '../app/channel_conflicts.dart';
 import '../app/region_tag.dart';
 import '../radio/protocol/mesh_photo.dart';
 import '../radio/protocol/region_scope.dart';
@@ -181,7 +182,9 @@ class MeshSync {
 
     await _syncContacts();
     final slots = started.device.maxChannels ?? 8;
-    await _store.saveChannels(key, await _session.fetchChannels(slots));
+    final fetched = await _session.fetchChannels(slots);
+    await _noteChannelMismatches(key, fetched, slots);
+    await _store.saveChannels(key, fetched);
 
     for (final event in List.of(_early)) {
       _handle(event);
@@ -478,7 +481,63 @@ class MeshSync {
   Future<void> _writeChannel(int slot, String name, List<int> secret) async {
     final key = _requireKey();
     await _session.run(SetChannel(index: slot, name: name, secret: secret));
+    await _dropMismatch(key, slot);
     await _store.saveChannels(key, await _session.fetchChannels(channelSlots));
+  }
+
+  /// Keeps aside every slot where the radio no longer holds what this
+  /// device last saved, so the user can pick a side. Slots still waiting
+  /// from an earlier connect are compared against the radio again.
+  Future<void> _noteChannelMismatches(
+    String key,
+    List<ChannelInfo> fetched,
+    int count,
+  ) async {
+    final saved = await _store.watchChannels(key).first;
+    final waiting = decodeMismatches(await _store.setting(mismatchKey(key)));
+    final found = compareSlots(
+      mine: [
+        for (final c in saved)
+          (slot: c.slot, name: c.name, secret: Uint8List.fromList(c.secret)),
+      ],
+      radio: [
+        for (final f in fetched)
+          (slot: f.index, name: f.name, secret: f.secret),
+      ],
+      count: count,
+      waiting: [for (final w in waiting) w.mine],
+    );
+    if (found.isEmpty) {
+      await _store.removeSetting(mismatchKey(key));
+    } else {
+      await _store.saveSetting(mismatchKey(key), encodeMismatches(found));
+    }
+  }
+
+  Future<void> _dropMismatch(String key, int slot) async {
+    final list = decodeMismatches(await _store.setting(mismatchKey(key)));
+    final rest = [
+      for (final m in list)
+        if (m.mine.slot != slot) m,
+    ];
+    if (rest.length == list.length) return;
+    if (rest.isEmpty) {
+      await _store.removeSetting(mismatchKey(key));
+    } else {
+      await _store.saveSetting(mismatchKey(key), encodeMismatches(rest));
+    }
+  }
+
+  /// Keeps what the radio has in [slot]; this device's old copy goes.
+  Future<void> keepRadioChannel(int slot) => _dropMismatch(_requireKey(), slot);
+
+  /// Writes this device's saved copy of [slot] back to the radio.
+  Future<void> restoreSavedChannel(int slot) async {
+    final key = _requireKey();
+    final list = decodeMismatches(await _store.setting(mismatchKey(key)));
+    final m = list.where((m) => m.mine.slot == slot).firstOrNull;
+    if (m == null) return;
+    await _writeChannel(slot, m.mine.name, m.mine.secret);
   }
 
   // Contacts

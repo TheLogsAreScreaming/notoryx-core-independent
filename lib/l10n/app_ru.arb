@@ -1510,5 +1510,17 @@
   "sarneg_randomWord": "Случайное слово",
   "sarneg_wellKnownWord": "Это слово напечатано в открытых руководствах, поэтому его может попробовать любой. Случайное слово надёжнее.",
   "sarneg_clipboardClears": "Буфер обмена очистится через 1 минуту.",
-  "sarneg_autoClear": "Очищается через 1 минуту без ввода."
+  "sarneg_autoClear": "Очищается через 1 минуту без ввода.",
+  "channelMismatchBanner": "{count, plural, =1{1 канал в радио отличается от приложения} other{Каналов в радио, отличающихся от приложения: {count}}}",
+  "channelMismatchReview": "Проверить",
+  "channelMismatchTitle": "Расхождения каналов",
+  "channelMismatchExplain": "В этих слотах радио хранит другое имя или ключ, чем сохранило приложение. Возможно, их изменили через другое приложение, или копия в приложении устарела. Выберите, какую версию оставить для каждого слота.",
+  "channelMismatchNone": "Теперь все слоты совпадают.",
+  "channelMismatchSlot": "Слот {index}",
+  "channelMismatchRadioSide": "В радио",
+  "channelMismatchDeviceSide": "Сохранено в приложении",
+  "channelMismatchEmpty": "Пусто",
+  "channelMismatchKeyTag": "ключ {fingerprint}",
+  "channelMismatchKeepRadio": "Оставить из радио",
+  "channelMismatchRestore": "Записать из приложения"
 }
