@@ -8,9 +8,11 @@ library;
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'database.dart';
+import 'mesh_store.dart';
 
 /// Where the database key is kept.
 abstract interface class DbKeyStore {
@@ -153,4 +155,63 @@ Future<void> decryptDatabase(
     throw const DbEncryptionException('Decrypting didn’t take effect.');
   }
   await store.delete();
+}
+
+/// The setting holding the person's own choice ('on' or 'off'), once they
+/// have used the switch. Their choice always wins over the default.
+const dbEncryptionChoiceSetting = 'db_encryption_choice_v1';
+
+/// Set when encrypting by default failed, so it isn't retried every start.
+const dbEncryptionDefaultFailedSetting = 'db_encryption_default_failed_v1';
+
+/// Whether this platform encrypts the database without being asked:
+/// phones and Macs, whose keystores dependably keep the key. Elsewhere it
+/// stays the person's choice.
+bool encryptsByDefault([TargetPlatform? platform]) =>
+    !kIsWeb &&
+    switch (platform ?? defaultTargetPlatform) {
+      TargetPlatform.android ||
+      TargetPlatform.iOS ||
+      TargetPlatform.macOS => true,
+      _ => false,
+    };
+
+/// What [applyEncryptionDefault] did.
+enum EncryptionDefault {
+  encrypted,
+  alreadyEncrypted,
+  personChose,
+  failedBefore,
+  failed,
+  notHere,
+}
+
+/// Encrypts the open database [db] at [file] in place, once, where that is
+/// the default and the person hasn't chosen otherwise. Existing chats are
+/// kept (a safety copy guards the change). A failure is remembered and the
+/// database stays as it was.
+Future<EncryptionDefault> applyEncryptionDefault(
+  MeshDatabase db,
+  File file,
+  DbKeyStore keys, {
+  bool? byDefault,
+}) async {
+  if (!(byDefault ?? encryptsByDefault())) return EncryptionDefault.notHere;
+  final store = MeshStore(db);
+  // Opens the database, so a new install has its file before the check.
+  if (await store.setting(dbEncryptionChoiceSetting) != null) {
+    return EncryptionDefault.personChose;
+  }
+  if (!file.existsSync()) return EncryptionDefault.notHere;
+  if (!isPlainDatabase(file)) return EncryptionDefault.alreadyEncrypted;
+  if (await store.setting(dbEncryptionDefaultFailedSetting) != null) {
+    return EncryptionDefault.failedBefore;
+  }
+  try {
+    await encryptDatabase(db, file, keys);
+    return EncryptionDefault.encrypted;
+  } on Object catch (e) {
+    await store.saveSetting(dbEncryptionDefaultFailedSetting, '$e');
+    return EncryptionDefault.failed;
+  }
 }

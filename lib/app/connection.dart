@@ -9,6 +9,7 @@ import '../l10n/l10n.dart';
 import '../radio/radio.dart';
 import 'connection_log.dart';
 import 'radio_connector.dart';
+import 'channel_conflicts.dart';
 
 /// Where the app is with its radio.
 sealed class RadioConnectionState {
@@ -465,6 +466,20 @@ final savedRadiosProvider = StreamProvider<List<Radio>>(
 final contactsProvider = StreamProvider.family<List<Contact>, String>(
   (ref, radioKey) => ref.watch(storeProvider).watchContacts(radioKey),
 );
+
+/// Channel slots the radio changed since this device last saw them, waiting
+/// for the user to choose a side.
+final channelMismatchesProvider =
+    StreamProvider.family<List<SlotMismatch>, String>(
+      (ref, radioKey) => ref
+          .watch(storeProvider)
+          .watchSettingsWithPrefix(mismatchKey(radioKey))
+          .map((m) => decodeMismatches(m['']))
+          .distinct(_sameMismatches),
+    );
+
+bool _sameMismatches(List<SlotMismatch> a, List<SlotMismatch> b) =>
+    encodeMismatches(a) == encodeMismatches(b);
 
 final channelsProvider = StreamProvider.family<List<Channel>, String>(
   (ref, radioKey) => ref.watch(storeProvider).watchChannels(radioKey),

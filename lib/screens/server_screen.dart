@@ -11,6 +11,8 @@ import 'conversation_screen.dart';
 import 'node_avatar.dart';
 import 'node_details.dart';
 import 'repeater_tools.dart';
+import 'server_history_card.dart';
+import '../app/server_history.dart';
 import 'telemetry_screen.dart';
 import '../l10n/l10n.dart';
 
@@ -32,6 +34,7 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
   bool _loadingStatus = false;
   bool _sending = false;
   ServerStatus? _status;
+  int _checks = 0;
   String? _statusNote;
 
   PublicKey get _key => PublicKey.fromHex(widget.node.publicKey);
@@ -107,6 +110,17 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
     });
     try {
       final status = await sync.requestStatus(_key);
+      final radioKey = ref.read(radioKeyProvider);
+      if (status != null && radioKey != null) {
+        await keepServerCheck(
+          ref.read(storeProvider),
+          radioKey,
+          widget.node.publicKey,
+          status,
+          DateTime.now(),
+        );
+        _checks++;
+      }
       if (!mounted) return;
       setState(() {
         _status = status ?? _status;
@@ -280,6 +294,12 @@ class _ServerScreenState extends ConsumerState<ServerScreen> {
               ),
             ),
           ),
+          if (radioKey != null)
+            ServerHistoryCard(
+              radioKey: radioKey,
+              nodeKey: widget.node.publicKey,
+              version: _checks,
+            ),
 
           Card(
             child: ListTile(

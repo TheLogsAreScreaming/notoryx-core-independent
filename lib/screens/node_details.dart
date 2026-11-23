@@ -17,6 +17,7 @@ import 'route_screen.dart';
 import 'terrain_profile_screen.dart';
 import 'trace_screen.dart';
 import '../l10n/l10n.dart';
+import 'follow_screen.dart';
 
 /// What the app knows about one node, whether it's a contact or only heard
 /// nearby. Built from either kind of row.
@@ -201,6 +202,22 @@ Future<void> showNodeDetails(
                             title: node.name,
                           ),
                         ),
+                      );
+                    },
+                  ),
+                if (node.isContact && position != null)
+                  OutlinedButton.icon(
+                    key: const Key('follow-node'),
+                    icon: const Icon(Icons.radar),
+                    label: Text(context.l10n.followButton),
+                    onPressed: () {
+                      Navigator.pop(sheet);
+                      openFollow(
+                        context,
+                        ref,
+                        nodeKey: node.publicKey,
+                        name: node.name,
+                        lastKnown: position,
                       );
                     },
                   ),
