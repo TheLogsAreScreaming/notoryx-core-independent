@@ -111,4 +111,17 @@ void main() {
     final again = container();
     expect((await loaded(again)).settings.enabled, isFalse);
   });
+
+  test('Wi-Fi or a cable counts; mobile data alone does not', () {
+    bool on(List<String> names, {bool usable = true}) =>
+        onWifiOrCable([for (final n in names) (name: n, usable: usable)]);
+    expect(on(['rmnet_data0', 'lo']), isFalse);
+    expect(on(['pdp_ip0']), isFalse);
+    expect(on(['ccmni1']), isFalse);
+    expect(on(['wlan0', 'rmnet_data0']), isTrue);
+    expect(on(['en0', 'pdp_ip0']), isTrue);
+    expect(on(['Wi-Fi']), isTrue);
+    expect(on(['Ethernet 2']), isTrue);
+    expect(on(['wlan0'], usable: false), isFalse);
+  });
 }

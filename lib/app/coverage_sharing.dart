@@ -7,7 +7,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
@@ -173,11 +172,32 @@ final coverageCellOfProvider = Provider<String? Function(double, double)>(
 /// Whether the phone is on Wi-Fi (or a cable). Tests replace this.
 final coverageOnWifiProvider = Provider<Future<bool> Function()>(
   (ref) => () async {
-    final kinds = await Connectivity().checkConnectivity();
-    return kinds.contains(ConnectivityResult.wifi) ||
-        kinds.contains(ConnectivityResult.ethernet);
+    try {
+      final interfaces = await NetworkInterface.list(
+        type: InternetAddressType.any,
+      );
+      return onWifiOrCable([
+        for (final i in interfaces)
+          (
+            name: i.name,
+            usable: i.addresses.any((a) => !a.isLoopback && !a.isLinkLocal),
+          ),
+      ]);
+    } on Object {
+      return false;
+    }
   },
 );
+
+/// Whether any of [interfaces] with a usable address is Wi-Fi or a cable,
+/// going by the names the systems give them: `wlan*` on Android, `en*` on
+/// iOS and macOS, `eth*` for cables. Mobile data shows up as `rmnet*`,
+/// `ccmni*` or `pdp_ip*` and doesn't count. Windows uses names like
+/// `Wi-Fi` and `Ethernet`.
+bool onWifiOrCable(Iterable<({String name, bool usable})> interfaces) =>
+    interfaces.any((i) => i.usable && _wifiOrCable.hasMatch(i.name));
+
+final _wifiOrCable = RegExp(r'^(wlan|wl|en|eth|wi-?fi)', caseSensitive: false);
 
 /// Sends to the coverage server. Tests replace this.
 final coveragePostProvider = Provider<CoveragePost>((ref) => _ioPost);

@@ -65,7 +65,6 @@ dependencies:
   google_mlkit_translation: ^1.0.3
   google_mlkit_language_id: ^1.0.3
   h3_flutter: ^0.7.1
-  connectivity_plus: ^7.3.1
   url_launcher: ^6.3.3
 
 dev_dependencies:
