@@ -3096,5 +3096,86 @@
   "sarneg_randomWord": "Random word",
   "sarneg_wellKnownWord": "This word is printed in public guides, so anyone can try it. A random word is safer.",
   "sarneg_clipboardClears": "The clipboard is cleared in 1 minute.",
-  "sarneg_autoClear": "Clears after 1 minute without typing."
+  "sarneg_autoClear": "Clears after 1 minute without typing.",
+  "followTitle": "Following {name}",
+  "@followTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "followAskNow": "Ask for position now",
+  "followFromYou": "{distance} {direction} ({degrees}°) from you",
+  "@followFromYou": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      },
+      "direction": {
+        "type": "String"
+      },
+      "degrees": {
+        "type": "int"
+      }
+    }
+  },
+  "followWaiting": "Waiting for a position…",
+  "followNoOwnPosition": "Your own position isn't known, so distance and bearing can't be shown.",
+  "followTimeLeft": "{minutes, plural, =1{About 1 minute left} other{About {minutes} minutes left}}",
+  "@followTimeLeft": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "followLastFix": "last position {ago}",
+  "@followLastFix": {
+    "placeholders": {
+      "ago": {
+        "type": "String"
+      }
+    }
+  },
+  "followSecondsAgo": "{n} s ago",
+  "@followSecondsAgo": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "followMinutesAgo": "{n} min ago",
+  "@followMinutesAgo": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "followAnswers": "{answered}/{asked} requests answered",
+  "@followAnswers": {
+    "placeholders": {
+      "answered": {
+        "type": "int"
+      },
+      "asked": {
+        "type": "int"
+      }
+    }
+  },
+  "followPoints": "{count, plural, =1{1 point} other{{count} points}}",
+  "@followPoints": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "followHint": "Stops by itself after 15 minutes. The contact must allow location in its telemetry settings, or it only moves when it sends an advert.",
+  "followStop": "Stop",
+  "followStopped": "Not following. Start again to ask for its position for another 15 minutes.",
+  "followButton": "Follow 15 min",
+  "followYou": "You"
 }

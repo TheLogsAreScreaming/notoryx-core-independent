@@ -1510,5 +1510,21 @@
   "sarneg_randomWord": "Naključna beseda",
   "sarneg_wellKnownWord": "Ta beseda je objavljena v javnih vodnikih, zato jo lahko poskusi kdorkoli. Naključna beseda je varnejša.",
   "sarneg_clipboardClears": "Odložišče se izprazni čez 1 minuto.",
-  "sarneg_autoClear": "Izbriše se po 1 minuti brez tipkanja."
+  "sarneg_autoClear": "Izbriše se po 1 minuti brez tipkanja.",
+  "followTitle": "Sledenje: {name}",
+  "followAskNow": "Vprašaj za položaj zdaj",
+  "followFromYou": "{distance} proti {direction} ({degrees}°) od vas",
+  "followWaiting": "Čakam na položaj…",
+  "followNoOwnPosition": "Vaš položaj ni znan, zato razdalje in smeri ni mogoče prikazati.",
+  "followTimeLeft": "{minutes, plural, other{Še približno {minutes} min}}",
+  "followLastFix": "zadnji položaj {ago}",
+  "followSecondsAgo": "pred {n} s",
+  "followMinutesAgo": "pred {n} min",
+  "followAnswers": "odgovori: {answered}/{asked}",
+  "followPoints": "{count, plural, other{točke: {count}}}",
+  "followHint": "Po 15 minutah se ustavi samo. Stik mora v telemetriji dovoliti lokacijo, sicer se položaj spremeni le ob oglasu.",
+  "followStop": "Ustavi",
+  "followStopped": "Sledenje je ustavljeno. Začnite znova za nadaljnjih 15 minut.",
+  "followButton": "Sledi 15 min",
+  "followYou": "Vi"
 }

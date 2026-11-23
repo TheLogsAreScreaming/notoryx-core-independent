@@ -1510,5 +1510,21 @@
   "sarneg_randomWord": "Случайное слово",
   "sarneg_wellKnownWord": "Это слово напечатано в открытых руководствах, поэтому его может попробовать любой. Случайное слово надёжнее.",
   "sarneg_clipboardClears": "Буфер обмена очистится через 1 минуту.",
-  "sarneg_autoClear": "Очищается через 1 минуту без ввода."
+  "sarneg_autoClear": "Очищается через 1 минуту без ввода.",
+  "followTitle": "Слежение: {name}",
+  "followAskNow": "Запросить позицию сейчас",
+  "followFromYou": "{distance} на {direction} ({degrees}°) от вас",
+  "followWaiting": "Ожидание позиции…",
+  "followNoOwnPosition": "Ваша позиция неизвестна, поэтому расстояние и направление недоступны.",
+  "followTimeLeft": "{minutes, plural, other{Осталось около {minutes} мин}}",
+  "followLastFix": "последняя позиция {ago}",
+  "followSecondsAgo": "{n} с назад",
+  "followMinutesAgo": "{n} мин назад",
+  "followAnswers": "ответов: {answered}/{asked}",
+  "followPoints": "{count, plural, other{точек: {count}}}",
+  "followHint": "Останавливается сам через 15 минут. Контакт должен разрешить местоположение в телеметрии, иначе позиция обновится только по его объявлениям.",
+  "followStop": "Стоп",
+  "followStopped": "Слежение остановлено. Запустите снова, чтобы запрашивать позицию ещё 15 минут.",
+  "followButton": "Следить 15 мин",
+  "followYou": "Вы"
 }

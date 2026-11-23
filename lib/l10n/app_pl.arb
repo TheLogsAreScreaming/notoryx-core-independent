@@ -1510,5 +1510,21 @@
   "sarneg_randomWord": "Losowe słowo",
   "sarneg_wellKnownWord": "To słowo jest w publicznych poradnikach, więc każdy może je wypróbować. Losowe słowo jest bezpieczniejsze.",
   "sarneg_clipboardClears": "Schowek zostanie wyczyszczony za 1 minutę.",
-  "sarneg_autoClear": "Czyści się po 1 minucie bez pisania."
+  "sarneg_autoClear": "Czyści się po 1 minucie bez pisania.",
+  "followTitle": "Śledzenie: {name}",
+  "followAskNow": "Zapytaj o pozycję teraz",
+  "followFromYou": "{distance} na {direction} ({degrees}°) od ciebie",
+  "followWaiting": "Czekam na pozycję…",
+  "followNoOwnPosition": "Twoja pozycja jest nieznana, więc nie ma odległości ani kierunku.",
+  "followTimeLeft": "{minutes, plural, other{Zostało ok. {minutes} min}}",
+  "followLastFix": "ostatnia pozycja {ago}",
+  "followSecondsAgo": "{n} s temu",
+  "followMinutesAgo": "{n} min temu",
+  "followAnswers": "odpowiedzi: {answered}/{asked}",
+  "followPoints": "{count, plural, other{punkty: {count}}}",
+  "followHint": "Zatrzymuje się samo po 15 minutach. Kontakt musi zezwolić na lokalizację w telemetrii, inaczej pozycja zmienia się tylko przy ogłoszeniach.",
+  "followStop": "Zatrzymaj",
+  "followStopped": "Śledzenie zatrzymane. Uruchom ponownie, aby pytać o pozycję kolejne 15 minut.",
+  "followButton": "Śledź 15 min",
+  "followYou": "Ty"
 }

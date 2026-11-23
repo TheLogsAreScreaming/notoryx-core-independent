@@ -1510,5 +1510,21 @@
   "sarneg_randomWord": "Случайна дума",
   "sarneg_wellKnownWord": "Тази дума е публикувана в публични ръководства, затова всеки може да я опита. Случайна дума е по-сигурна.",
   "sarneg_clipboardClears": "Клипбордът се изчиства след 1 минута.",
-  "sarneg_autoClear": "Изчиства се след 1 минута без въвеждане."
+  "sarneg_autoClear": "Изчиства се след 1 минута без въвеждане.",
+  "followTitle": "Следване на {name}",
+  "followAskNow": "Поискай позиция сега",
+  "followFromYou": "{distance} на {direction} ({degrees}°) от вас",
+  "followWaiting": "Изчакване на позиция…",
+  "followNoOwnPosition": "Собствената ви позиция не е известна, затова няма разстояние и посока.",
+  "followTimeLeft": "{minutes, plural, =1{Остава около 1 минута} other{Остават около {minutes} минути}}",
+  "followLastFix": "последна позиция {ago}",
+  "followSecondsAgo": "преди {n} с",
+  "followMinutesAgo": "преди {n} мин",
+  "followAnswers": "{answered}/{asked} отговорени заявки",
+  "followPoints": "{count, plural, =1{1 точка} other{{count} точки}}",
+  "followHint": "Спира само след 15 минути. Контактът трябва да разрешава местоположение в телеметрията, иначе се мести само при обявяване.",
+  "followStop": "Спри",
+  "followStopped": "Следването е спряно. Стартирайте отново за още 15 минути.",
+  "followButton": "Следвай 15 мин",
+  "followYou": "Вие"
 }

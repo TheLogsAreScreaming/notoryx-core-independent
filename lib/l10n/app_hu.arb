@@ -1510,5 +1510,21 @@
   "sarneg_randomWord": "Véletlen szó",
   "sarneg_wellKnownWord": "Ez a szó nyilvános útmutatókban szerepel, így bárki kipróbálhatja. Egy véletlen szó biztonságosabb.",
   "sarneg_clipboardClears": "A vágólap 1 perc múlva törlődik.",
-  "sarneg_autoClear": "1 perc gépelés nélkül törlődik."
+  "sarneg_autoClear": "1 perc gépelés nélkül törlődik.",
+  "followTitle": "{name} követése",
+  "followAskNow": "Helyzet lekérése most",
+  "followFromYou": "{distance} {direction} ({degrees}°) tőled",
+  "followWaiting": "Helyzetre várva…",
+  "followNoOwnPosition": "A saját helyzeted ismeretlen, így a távolság és irány nem látható.",
+  "followTimeLeft": "{minutes, plural, other{Kb. {minutes} perc van hátra}}",
+  "followLastFix": "utolsó helyzet {ago}",
+  "followSecondsAgo": "{n} mp-e",
+  "followMinutesAgo": "{n} perce",
+  "followAnswers": "{answered}/{asked} kérésre jött válasz",
+  "followPoints": "{count, plural, other{{count} pont}}",
+  "followHint": "15 perc után magától leáll. A kapcsolatnak engedélyeznie kell a helyzetet a telemetriában, különben csak hirdetéskor mozdul.",
+  "followStop": "Leállítás",
+  "followStopped": "Nincs követés. Indítsd újra további 15 percre.",
+  "followButton": "Követés 15 perc",
+  "followYou": "Te"
 }

@@ -1510,5 +1510,21 @@
   "sarneg_randomWord": "Náhodné slovo",
   "sarneg_wellKnownWord": "Toto slovo je vo verejných príručkách, takže ho môže skúsiť ktokoľvek. Náhodné slovo je bezpečnejšie.",
   "sarneg_clipboardClears": "Schránka sa vymaže o 1 minútu.",
-  "sarneg_autoClear": "Vymaže sa po 1 minúte bez písania."
+  "sarneg_autoClear": "Vymaže sa po 1 minúte bez písania.",
+  "followTitle": "Sledovanie: {name}",
+  "followAskNow": "Požiadať o polohu teraz",
+  "followFromYou": "{distance} na {direction} ({degrees}°) od vás",
+  "followWaiting": "Čaká sa na polohu…",
+  "followNoOwnPosition": "Vaša poloha nie je známa, preto nie je vzdialenosť ani smer.",
+  "followTimeLeft": "{minutes, plural, other{Zostáva asi {minutes} min}}",
+  "followLastFix": "posledná poloha {ago}",
+  "followSecondsAgo": "pred {n} s",
+  "followMinutesAgo": "pred {n} min",
+  "followAnswers": "odpovede: {answered}/{asked}",
+  "followPoints": "{count, plural, other{body: {count}}}",
+  "followHint": "Po 15 minútach sa zastaví samo. Kontakt musí povoliť polohu v telemetrii, inak sa poloha mení len pri ohláseniach.",
+  "followStop": "Zastaviť",
+  "followStopped": "Sledovanie je zastavené. Spustite znova na ďalších 15 minút.",
+  "followButton": "Sledovať 15 min",
+  "followYou": "Vy"
 }

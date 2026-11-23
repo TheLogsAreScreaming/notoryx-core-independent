@@ -1510,5 +1510,21 @@
   "sarneg_randomWord": "Palavra aleatória",
   "sarneg_wellKnownWord": "Esta palavra aparece em guias públicos, por isso qualquer pessoa pode testá-la. Uma palavra aleatória é mais segura.",
   "sarneg_clipboardClears": "A área de transferência é limpa em 1 minuto.",
-  "sarneg_autoClear": "Apaga-se após 1 minuto sem digitar."
+  "sarneg_autoClear": "Apaga-se após 1 minuto sem digitar.",
+  "followTitle": "A seguir {name}",
+  "followAskNow": "Pedir posição agora",
+  "followFromYou": "A {distance} {direction} ({degrees}°) de si",
+  "followWaiting": "À espera de uma posição…",
+  "followNoOwnPosition": "A sua posição é desconhecida, por isso não há distância nem rumo.",
+  "followTimeLeft": "{minutes, plural, =1{Falta cerca de 1 minuto} other{Faltam cerca de {minutes} minutos}}",
+  "followLastFix": "última posição {ago}",
+  "followSecondsAgo": "há {n} s",
+  "followMinutesAgo": "há {n} min",
+  "followAnswers": "{answered}/{asked} pedidos respondidos",
+  "followPoints": "{count, plural, =1{1 ponto} other{{count} pontos}}",
+  "followHint": "Para sozinho após 15 minutos. O contacto tem de permitir a localização na telemetria; caso contrário só se move quando envia um anúncio.",
+  "followStop": "Parar",
+  "followStopped": "Sem seguimento. Volte a iniciar para pedir a posição mais 15 minutos.",
+  "followButton": "Seguir 15 min",
+  "followYou": "Você"
 }
