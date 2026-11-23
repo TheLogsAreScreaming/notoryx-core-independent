@@ -1510,5 +1510,20 @@
   "sarneg_randomWord": "Slumpat ord",
   "sarneg_wellKnownWord": "Det här ordet finns i offentliga guider, så vem som helst kan prova det. Ett slumpat ord är säkrare.",
   "sarneg_clipboardClears": "Urklippet töms om 1 minut.",
-  "sarneg_autoClear": "Rensas efter 1 minut utan inmatning."
+  "sarneg_autoClear": "Rensas efter 1 minut utan inmatning.",
+  "telemetryNoAlert": "Inget larm",
+  "telemetryAlertWhenAbove": "Larm över {value}",
+  "telemetryAlertWhenBelow": "Larm under {value}",
+  "telemetrySetAlert": "Larm…",
+  "telemetryAlertDialogHint": "Du får en avisering när ett nytt värde passerar en gräns. Lämna ett fält tomt för att inte använda det.",
+  "telemetryAbove": "Över",
+  "telemetryBelow": "Under",
+  "telemetryBelowMustBeLower": "Måste vara lägre än övre gränsen",
+  "telemetryRemoveAlert": "Ta bort",
+  "telemetryAlertTitle": "Sensorlarm",
+  "telemetryAlertAbove": "{name}: {what} är {value}, över {limit}",
+  "telemetryAlertBelow": "{name}: {what} är {value}, under {limit}",
+  "range1h": "1 h",
+  "range6h": "6 h",
+  "telemetryAlertDialogTitle": "Larm för {name}"
 }

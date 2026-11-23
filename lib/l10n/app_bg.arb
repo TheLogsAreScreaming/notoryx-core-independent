@@ -1510,5 +1510,20 @@
   "sarneg_randomWord": "Случайна дума",
   "sarneg_wellKnownWord": "Тази дума е публикувана в публични ръководства, затова всеки може да я опита. Случайна дума е по-сигурна.",
   "sarneg_clipboardClears": "Клипбордът се изчиства след 1 минута.",
-  "sarneg_autoClear": "Изчиства се след 1 минута без въвеждане."
+  "sarneg_autoClear": "Изчиства се след 1 минута без въвеждане.",
+  "telemetryNoAlert": "Без известие",
+  "telemetryAlertWhenAbove": "Известие над {value}",
+  "telemetryAlertWhenBelow": "Известие под {value}",
+  "telemetrySetAlert": "Известие…",
+  "telemetryAlertDialogHint": "Получавате известие, когато нова стойност премине граница. Оставете поле празно, за да не се ползва.",
+  "telemetryAbove": "Над",
+  "telemetryBelow": "Под",
+  "telemetryBelowMustBeLower": "Трябва да е под горната граница",
+  "telemetryRemoveAlert": "Премахни",
+  "telemetryAlertTitle": "Известие от сензор",
+  "telemetryAlertAbove": "{name}: {what} е {value}, над {limit}",
+  "telemetryAlertBelow": "{name}: {what} е {value}, под {limit}",
+  "range1h": "1 ч",
+  "range6h": "6 ч",
+  "telemetryAlertDialogTitle": "Известие за {name}"
 }

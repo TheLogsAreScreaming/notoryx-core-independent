@@ -1510,5 +1510,20 @@
   "sarneg_randomWord": "Випадкове слово",
   "sarneg_wellKnownWord": "Це слово надруковане у відкритих посібниках, тож будь-хто може його спробувати. Випадкове слово надійніше.",
   "sarneg_clipboardClears": "Буфер обміну очиститься за 1 хвилину.",
-  "sarneg_autoClear": "Очищається через 1 хвилину без введення."
+  "sarneg_autoClear": "Очищається через 1 хвилину без введення.",
+  "telemetryNoAlert": "Без сповіщення",
+  "telemetryAlertWhenAbove": "Сповіщення вище {value}",
+  "telemetryAlertWhenBelow": "Сповіщення нижче {value}",
+  "telemetrySetAlert": "Сповіщення…",
+  "telemetryAlertDialogHint": "Сповіщення надійде, коли нове значення перетне межу. Залиште поле порожнім, щоб не використовувати його.",
+  "telemetryAbove": "Вище",
+  "telemetryBelow": "Нижче",
+  "telemetryBelowMustBeLower": "Має бути нижче верхньої межі",
+  "telemetryRemoveAlert": "Прибрати",
+  "telemetryAlertTitle": "Сповіщення датчика",
+  "telemetryAlertAbove": "{name}: {what} = {value}, вище {limit}",
+  "telemetryAlertBelow": "{name}: {what} = {value}, нижче {limit}",
+  "range1h": "1 год",
+  "range6h": "6 год",
+  "telemetryAlertDialogTitle": "Сповіщення: {name}"
 }

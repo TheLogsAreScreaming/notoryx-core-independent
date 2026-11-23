@@ -1510,5 +1510,20 @@
   "sarneg_randomWord": "Случайное слово",
   "sarneg_wellKnownWord": "Это слово напечатано в открытых руководствах, поэтому его может попробовать любой. Случайное слово надёжнее.",
   "sarneg_clipboardClears": "Буфер обмена очистится через 1 минуту.",
-  "sarneg_autoClear": "Очищается через 1 минуту без ввода."
+  "sarneg_autoClear": "Очищается через 1 минуту без ввода.",
+  "telemetryNoAlert": "Без оповещения",
+  "telemetryAlertWhenAbove": "Оповещение выше {value}",
+  "telemetryAlertWhenBelow": "Оповещение ниже {value}",
+  "telemetrySetAlert": "Оповещение…",
+  "telemetryAlertDialogHint": "Уведомление придёт, когда новое значение пересечёт предел. Оставьте поле пустым, чтобы не использовать его.",
+  "telemetryAbove": "Выше",
+  "telemetryBelow": "Ниже",
+  "telemetryBelowMustBeLower": "Должно быть ниже верхнего предела",
+  "telemetryRemoveAlert": "Убрать",
+  "telemetryAlertTitle": "Оповещение датчика",
+  "telemetryAlertAbove": "{name}: {what} = {value}, выше {limit}",
+  "telemetryAlertBelow": "{name}: {what} = {value}, ниже {limit}",
+  "range1h": "1 ч",
+  "range6h": "6 ч",
+  "telemetryAlertDialogTitle": "Оповещение: {name}"
 }

@@ -1510,5 +1510,20 @@
   "sarneg_randomWord": "Palavra aleatória",
   "sarneg_wellKnownWord": "Esta palavra aparece em guias públicos, por isso qualquer pessoa pode testá-la. Uma palavra aleatória é mais segura.",
   "sarneg_clipboardClears": "A área de transferência é limpa em 1 minuto.",
-  "sarneg_autoClear": "Apaga-se após 1 minuto sem digitar."
+  "sarneg_autoClear": "Apaga-se após 1 minuto sem digitar.",
+  "telemetryNoAlert": "Sem alerta",
+  "telemetryAlertWhenAbove": "Alerta acima de {value}",
+  "telemetryAlertWhenBelow": "Alerta abaixo de {value}",
+  "telemetrySetAlert": "Alerta…",
+  "telemetryAlertDialogHint": "Recebe uma notificação quando uma nova leitura passa um limite. Deixe um campo vazio para não o usar.",
+  "telemetryAbove": "Acima de",
+  "telemetryBelow": "Abaixo de",
+  "telemetryBelowMustBeLower": "Tem de ser menor que o limite superior",
+  "telemetryRemoveAlert": "Remover",
+  "telemetryAlertTitle": "Alerta de sensor",
+  "telemetryAlertAbove": "{name}: {what} está em {value}, acima de {limit}",
+  "telemetryAlertBelow": "{name}: {what} está em {value}, abaixo de {limit}",
+  "range1h": "1 h",
+  "range6h": "6 h",
+  "telemetryAlertDialogTitle": "Alerta de {name}"
 }

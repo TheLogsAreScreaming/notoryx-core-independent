@@ -1510,5 +1510,20 @@
   "sarneg_randomWord": "Zufallswort",
   "sarneg_wellKnownWord": "Dieses Wort steht in öffentlichen Anleitungen, also kann es jeder ausprobieren. Ein Zufallswort ist sicherer.",
   "sarneg_clipboardClears": "Die Zwischenablage wird nach 1 Minute geleert.",
-  "sarneg_autoClear": "Wird nach 1 Minute ohne Eingabe geleert."
+  "sarneg_autoClear": "Wird nach 1 Minute ohne Eingabe geleert.",
+  "telemetryNoAlert": "Kein Alarm",
+  "telemetryAlertWhenAbove": "Alarm über {value}",
+  "telemetryAlertWhenBelow": "Alarm unter {value}",
+  "telemetrySetAlert": "Alarm…",
+  "telemetryAlertDialogHint": "Du bekommst eine Benachrichtigung, wenn ein neuer Wert eine Grenze überschreitet. Leere Felder werden nicht genutzt.",
+  "telemetryAbove": "Über",
+  "telemetryBelow": "Unter",
+  "telemetryBelowMustBeLower": "Muss unter der oberen Grenze liegen",
+  "telemetryRemoveAlert": "Entfernen",
+  "telemetryAlertTitle": "Sensoralarm",
+  "telemetryAlertAbove": "{name}: {what} ist {value}, über {limit}",
+  "telemetryAlertBelow": "{name}: {what} ist {value}, unter {limit}",
+  "range1h": "1 h",
+  "range6h": "6 h",
+  "telemetryAlertDialogTitle": "Alarm für {name}"
 }

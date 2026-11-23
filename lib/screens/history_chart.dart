@@ -7,6 +7,8 @@ import '../l10n/l10n.dart';
 
 /// How far back the charts reach.
 enum TelemetryRange {
+  hour(Duration(hours: 1)),
+  sixHours(Duration(hours: 6)),
   day(Duration(hours: 24)),
   week(Duration(days: 7)),
   all(null);
@@ -15,6 +17,8 @@ enum TelemetryRange {
 
   /// The range's name in the app's language.
   String label(AppLocalizations l10n) => switch (this) {
+    hour => l10n.range1h,
+    sixHours => l10n.range6h,
     day => l10n.range24h,
     week => l10n.range7Days,
     all => l10n.rangeAll,

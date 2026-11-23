@@ -1510,5 +1510,20 @@
   "sarneg_randomWord": "Naključna beseda",
   "sarneg_wellKnownWord": "Ta beseda je objavljena v javnih vodnikih, zato jo lahko poskusi kdorkoli. Naključna beseda je varnejša.",
   "sarneg_clipboardClears": "Odložišče se izprazni čez 1 minuto.",
-  "sarneg_autoClear": "Izbriše se po 1 minuti brez tipkanja."
+  "sarneg_autoClear": "Izbriše se po 1 minuti brez tipkanja.",
+  "telemetryNoAlert": "Brez opozorila",
+  "telemetryAlertWhenAbove": "Opozorilo nad {value}",
+  "telemetryAlertWhenBelow": "Opozorilo pod {value}",
+  "telemetrySetAlert": "Opozorilo…",
+  "telemetryAlertDialogHint": "Obvestilo dobite, ko nova meritev prestopi mejo. Prazno polje se ne uporabi.",
+  "telemetryAbove": "Nad",
+  "telemetryBelow": "Pod",
+  "telemetryBelowMustBeLower": "Mora biti nižje od zgornje meje",
+  "telemetryRemoveAlert": "Odstrani",
+  "telemetryAlertTitle": "Opozorilo senzorja",
+  "telemetryAlertAbove": "{name}: {what} je {value}, nad {limit}",
+  "telemetryAlertBelow": "{name}: {what} je {value}, pod {limit}",
+  "range1h": "1 h",
+  "range6h": "6 h",
+  "telemetryAlertDialogTitle": "Opozorilo: {name}"
 }

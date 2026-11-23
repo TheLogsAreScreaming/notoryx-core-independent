@@ -1510,5 +1510,20 @@
   "sarneg_randomWord": "Parola casuale",
   "sarneg_wellKnownWord": "Questa parola compare in guide pubbliche, quindi chiunque può provarla. Una parola casuale è più sicura.",
   "sarneg_clipboardClears": "Gli appunti vengono svuotati tra 1 minuto.",
-  "sarneg_autoClear": "Si cancella dopo 1 minuto senza digitare."
+  "sarneg_autoClear": "Si cancella dopo 1 minuto senza digitare.",
+  "telemetryNoAlert": "Nessun avviso",
+  "telemetryAlertWhenAbove": "Avviso sopra {value}",
+  "telemetryAlertWhenBelow": "Avviso sotto {value}",
+  "telemetrySetAlert": "Avviso…",
+  "telemetryAlertDialogHint": "Ricevi una notifica quando una nuova lettura supera un limite. Lascia vuoto un campo per non usarlo.",
+  "telemetryAbove": "Sopra",
+  "telemetryBelow": "Sotto",
+  "telemetryBelowMustBeLower": "Deve essere inferiore al limite superiore",
+  "telemetryRemoveAlert": "Rimuovi",
+  "telemetryAlertTitle": "Avviso sensore",
+  "telemetryAlertAbove": "{name}: {what} è {value}, sopra {limit}",
+  "telemetryAlertBelow": "{name}: {what} è {value}, sotto {limit}",
+  "range1h": "1 h",
+  "range6h": "6 h",
+  "telemetryAlertDialogTitle": "Avviso su {name}"
 }

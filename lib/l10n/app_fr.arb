@@ -1510,5 +1510,20 @@
   "sarneg_randomWord": "Mot aléatoire",
   "sarneg_wellKnownWord": "Ce mot figure dans des guides publics : n’importe qui peut l’essayer. Un mot aléatoire est plus sûr.",
   "sarneg_clipboardClears": "Le presse-papiers est vidé dans 1 minute.",
-  "sarneg_autoClear": "S’efface après 1 minute sans saisie."
+  "sarneg_autoClear": "S’efface après 1 minute sans saisie.",
+  "telemetryNoAlert": "Pas d'alerte",
+  "telemetryAlertWhenAbove": "Alerte au-dessus de {value}",
+  "telemetryAlertWhenBelow": "Alerte en dessous de {value}",
+  "telemetrySetAlert": "Alerte…",
+  "telemetryAlertDialogHint": "Vous recevez une notification quand une nouvelle mesure franchit une limite. Laissez un champ vide pour ne pas l'utiliser.",
+  "telemetryAbove": "Au-dessus de",
+  "telemetryBelow": "En dessous de",
+  "telemetryBelowMustBeLower": "Doit être inférieur à la limite haute",
+  "telemetryRemoveAlert": "Supprimer",
+  "telemetryAlertTitle": "Alerte capteur",
+  "telemetryAlertAbove": "{name} : {what} vaut {value}, au-dessus de {limit}",
+  "telemetryAlertBelow": "{name} : {what} vaut {value}, en dessous de {limit}",
+  "range1h": "1 h",
+  "range6h": "6 h",
+  "telemetryAlertDialogTitle": "Alerte sur {name}"
 }

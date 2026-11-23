@@ -1510,5 +1510,20 @@
   "sarneg_randomWord": "Véletlen szó",
   "sarneg_wellKnownWord": "Ez a szó nyilvános útmutatókban szerepel, így bárki kipróbálhatja. Egy véletlen szó biztonságosabb.",
   "sarneg_clipboardClears": "A vágólap 1 perc múlva törlődik.",
-  "sarneg_autoClear": "1 perc gépelés nélkül törlődik."
+  "sarneg_autoClear": "1 perc gépelés nélkül törlődik.",
+  "telemetryNoAlert": "Nincs riasztás",
+  "telemetryAlertWhenAbove": "Riasztás {value} felett",
+  "telemetryAlertWhenBelow": "Riasztás {value} alatt",
+  "telemetrySetAlert": "Riasztás…",
+  "telemetryAlertDialogHint": "Értesítést kapsz, ha egy új adat átlépi a határt. Az üres mezőt nem használjuk.",
+  "telemetryAbove": "Felett",
+  "telemetryBelow": "Alatt",
+  "telemetryBelowMustBeLower": "Kisebbnek kell lennie a felső határnál",
+  "telemetryRemoveAlert": "Eltávolítás",
+  "telemetryAlertTitle": "Szenzorriasztás",
+  "telemetryAlertAbove": "{name}: {what} értéke {value}, {limit} felett",
+  "telemetryAlertBelow": "{name}: {what} értéke {value}, {limit} alatt",
+  "range1h": "1 ó",
+  "range6h": "6 ó",
+  "telemetryAlertDialogTitle": "Riasztás: {name}"
 }

@@ -781,6 +781,13 @@ class MeshStore {
         );
       });
 
+  /// The newest telemetry reply saved for any node, as replies arrive.
+  Stream<TelemetrySample?> watchNewestTelemetry() =>
+      (_db.select(_db.telemetrySamples)
+            ..orderBy([(t) => OrderingTerm.desc(t.id)])
+            ..limit(1))
+          .watchSingleOrNull();
+
   /// A node's telemetry history, oldest first.
   Stream<List<TelemetrySample>> watchTelemetry(
     String radioKey,

@@ -3096,5 +3096,73 @@
   "sarneg_randomWord": "Random word",
   "sarneg_wellKnownWord": "This word is printed in public guides, so anyone can try it. A random word is safer.",
   "sarneg_clipboardClears": "The clipboard is cleared in 1 minute.",
-  "sarneg_autoClear": "Clears after 1 minute without typing."
+  "sarneg_autoClear": "Clears after 1 minute without typing.",
+  "telemetryNoAlert": "No alert",
+  "telemetryAlertWhenAbove": "Alert above {value}",
+  "@telemetryAlertWhenAbove": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "telemetryAlertWhenBelow": "Alert below {value}",
+  "@telemetryAlertWhenBelow": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "telemetrySetAlert": "Alert…",
+  "telemetryAlertDialogHint": "You get a notification when a new reading crosses a limit. Leave a field empty to not use it.",
+  "telemetryAbove": "Above",
+  "telemetryBelow": "Below",
+  "telemetryBelowMustBeLower": "Must be lower than the upper limit",
+  "telemetryRemoveAlert": "Remove",
+  "telemetryAlertTitle": "Sensor alert",
+  "telemetryAlertAbove": "{name}: {what} is {value}, above {limit}",
+  "@telemetryAlertAbove": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "what": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "telemetryAlertBelow": "{name}: {what} is {value}, below {limit}",
+  "@telemetryAlertBelow": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "what": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "range1h": "1 h",
+  "range6h": "6 h",
+  "telemetryAlertDialogTitle": "Alert on {name}",
+  "@telemetryAlertDialogTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -1510,5 +1510,20 @@
   "sarneg_randomWord": "Náhodné slovo",
   "sarneg_wellKnownWord": "Toto slovo je vo verejných príručkách, takže ho môže skúsiť ktokoľvek. Náhodné slovo je bezpečnejšie.",
   "sarneg_clipboardClears": "Schránka sa vymaže o 1 minútu.",
-  "sarneg_autoClear": "Vymaže sa po 1 minúte bez písania."
+  "sarneg_autoClear": "Vymaže sa po 1 minúte bez písania.",
+  "telemetryNoAlert": "Bez upozornenia",
+  "telemetryAlertWhenAbove": "Upozornenie nad {value}",
+  "telemetryAlertWhenBelow": "Upozornenie pod {value}",
+  "telemetrySetAlert": "Upozornenie…",
+  "telemetryAlertDialogHint": "Upozornenie dostanete, keď nový údaj prekročí hranicu. Prázdne pole sa nepoužije.",
+  "telemetryAbove": "Nad",
+  "telemetryBelow": "Pod",
+  "telemetryBelowMustBeLower": "Musí byť nižšie ako horná hranica",
+  "telemetryRemoveAlert": "Odstrániť",
+  "telemetryAlertTitle": "Upozornenie senzora",
+  "telemetryAlertAbove": "{name}: {what} je {value}, nad {limit}",
+  "telemetryAlertBelow": "{name}: {what} je {value}, pod {limit}",
+  "range1h": "1 h",
+  "range6h": "6 h",
+  "telemetryAlertDialogTitle": "Upozornenie: {name}"
 }

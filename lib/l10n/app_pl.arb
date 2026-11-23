@@ -1510,5 +1510,20 @@
   "sarneg_randomWord": "Losowe słowo",
   "sarneg_wellKnownWord": "To słowo jest w publicznych poradnikach, więc każdy może je wypróbować. Losowe słowo jest bezpieczniejsze.",
   "sarneg_clipboardClears": "Schowek zostanie wyczyszczony za 1 minutę.",
-  "sarneg_autoClear": "Czyści się po 1 minucie bez pisania."
+  "sarneg_autoClear": "Czyści się po 1 minucie bez pisania.",
+  "telemetryNoAlert": "Brak alertu",
+  "telemetryAlertWhenAbove": "Alert powyżej {value}",
+  "telemetryAlertWhenBelow": "Alert poniżej {value}",
+  "telemetrySetAlert": "Alert…",
+  "telemetryAlertDialogHint": "Dostaniesz powiadomienie, gdy nowy odczyt przekroczy próg. Zostaw pole puste, by go nie używać.",
+  "telemetryAbove": "Powyżej",
+  "telemetryBelow": "Poniżej",
+  "telemetryBelowMustBeLower": "Musi być niższe niż górny próg",
+  "telemetryRemoveAlert": "Usuń",
+  "telemetryAlertTitle": "Alert czujnika",
+  "telemetryAlertAbove": "{name}: {what} = {value}, powyżej {limit}",
+  "telemetryAlertBelow": "{name}: {what} = {value}, poniżej {limit}",
+  "range1h": "1 godz.",
+  "range6h": "6 godz.",
+  "telemetryAlertDialogTitle": "Alert: {name}"
 }

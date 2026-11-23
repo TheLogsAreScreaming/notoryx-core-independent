@@ -1510,5 +1510,20 @@
   "sarneg_randomWord": "Willekeurig woord",
   "sarneg_wellKnownWord": "Dit woord staat in openbare handleidingen, dus iedereen kan het proberen. Een willekeurig woord is veiliger.",
   "sarneg_clipboardClears": "Het klembord wordt over 1 minuut gewist.",
-  "sarneg_autoClear": "Wordt gewist na 1 minuut zonder typen."
+  "sarneg_autoClear": "Wordt gewist na 1 minuut zonder typen.",
+  "telemetryNoAlert": "Geen melding",
+  "telemetryAlertWhenAbove": "Melding boven {value}",
+  "telemetryAlertWhenBelow": "Melding onder {value}",
+  "telemetrySetAlert": "Melding…",
+  "telemetryAlertDialogHint": "Je krijgt een melding als een nieuwe meting een grens passeert. Laat een veld leeg om het niet te gebruiken.",
+  "telemetryAbove": "Boven",
+  "telemetryBelow": "Onder",
+  "telemetryBelowMustBeLower": "Moet lager zijn dan de bovengrens",
+  "telemetryRemoveAlert": "Verwijderen",
+  "telemetryAlertTitle": "Sensormelding",
+  "telemetryAlertAbove": "{name}: {what} is {value}, boven {limit}",
+  "telemetryAlertBelow": "{name}: {what} is {value}, onder {limit}",
+  "range1h": "1 h",
+  "range6h": "6 h",
+  "telemetryAlertDialogTitle": "Melding voor {name}"
 }

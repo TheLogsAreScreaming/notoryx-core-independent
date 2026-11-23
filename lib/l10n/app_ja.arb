@@ -1510,5 +1510,20 @@
   "sarneg_randomWord": "ランダムな単語",
   "sarneg_wellKnownWord": "この単語は公開ガイドに載っているため、誰でも試せます。ランダムな単語のほうが安全です。",
   "sarneg_clipboardClears": "クリップボードは1分後に消去されます。",
-  "sarneg_autoClear": "1分間入力がないと消去されます。"
+  "sarneg_autoClear": "1分間入力がないと消去されます。",
+  "telemetryNoAlert": "アラートなし",
+  "telemetryAlertWhenAbove": "{value}超でアラート",
+  "telemetryAlertWhenBelow": "{value}未満でアラート",
+  "telemetrySetAlert": "アラート…",
+  "telemetryAlertDialogHint": "新しい値が上限・下限を超えると通知します。使わない欄は空のままにしてください。",
+  "telemetryAbove": "上限",
+  "telemetryBelow": "下限",
+  "telemetryBelowMustBeLower": "上限より低くしてください",
+  "telemetryRemoveAlert": "削除",
+  "telemetryAlertTitle": "センサーアラート",
+  "telemetryAlertAbove": "{name}: {what}が{value}（{limit}超）",
+  "telemetryAlertBelow": "{name}: {what}が{value}（{limit}未満）",
+  "range1h": "1時間",
+  "range6h": "6時間",
+  "telemetryAlertDialogTitle": "{name}のアラート"
 }
