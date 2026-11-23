@@ -41,7 +41,7 @@ void main() {
   });
 
   test('follows: asks, takes adverts, merges small moves, stops', () async {
-    final contacts = StreamController<List<Contact>>();
+    final contacts = StreamController<List<Contact>>.broadcast();
     var answer = const LatLng(45.51, -122.6);
     final c = ProviderContainer(
       overrides: [
@@ -49,8 +49,13 @@ void main() {
         contactsProvider.overrideWith((ref, _) => contacts.stream),
       ],
     );
-    addTearDown(c.dispose);
+    // Teardowns run last first: the container lets go of the stream, then
+    // the stream can close.
     addTearDown(contacts.close);
+    addTearDown(c.dispose);
+    // Like the follow screen: a provider nobody listens to is paused.
+    final watching = c.listen(followProvider, (_, _) {});
+    addTearDown(watching.close);
     final follow = c.read(followProvider.notifier);
 
     follow.start(
@@ -69,6 +74,11 @@ void main() {
 
     answer = const LatLng(45.51001, -122.6);
     await follow.askNow();
+    expect(c.read(followProvider)!.trail, hasLength(2));
+
+    // The same advert again after a fresher reply adds nothing.
+    contacts.add([_at(45.5, -122.6)]);
+    await pumpEventQueue();
     expect(c.read(followProvider)!.trail, hasLength(2));
 
     contacts.add([_at(45.53, -122.6)]);

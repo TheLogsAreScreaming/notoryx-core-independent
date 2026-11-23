@@ -70,6 +70,10 @@ class FollowController extends Notifier<FollowSession?> {
   Timer? _endTimer;
   ProviderSubscription<AsyncValue<List<Contact>>>? _contacts;
 
+  /// The position the node last advertised, so only a new advert adds a
+  /// point (a fresher reply is never pushed back by an old advert).
+  LatLng? _advertised;
+
   /// Moves shorter than this only refresh the last point.
   static const minMoveMetres = 5.0;
 
@@ -99,6 +103,7 @@ class FollowController extends Notifier<FollowSession?> {
     LatLng? lastKnown,
   }) {
     _cancel();
+    _advertised = lastKnown;
     state = (
       radioKey: radioKey,
       nodeKey: nodeKey,
@@ -116,7 +121,10 @@ class FollowController extends Notifier<FollowSession?> {
       for (final c in list) {
         if (c.publicKey != nodeKey) continue;
         if (c.latitude == null || c.longitude == null) return;
-        _add(LatLng(c.latitude!, c.longitude!), asked: false);
+        final seen = LatLng(c.latitude!, c.longitude!);
+        if (seen == _advertised) return;
+        _advertised = seen;
+        _add(seen, asked: false);
         return;
       }
     });
@@ -167,7 +175,6 @@ class FollowController extends Notifier<FollowSession?> {
     final point = (at: _now, where: where, asked: asked);
     if (trail.isNotEmpty) {
       final last = trail.last;
-      if (!asked && last.where == where) return;
       final metres = const Distance().as(LengthUnit.Meter, last.where, where);
       if (metres < minMoveMetres) {
         trail[trail.length - 1] = point;
