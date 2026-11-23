@@ -3097,6 +3097,39 @@
   "sarneg_wellKnownWord": "This word is printed in public guides, so anyone can try it. A random word is safer.",
   "sarneg_clipboardClears": "The clipboard is cleared in 1 minute.",
   "sarneg_autoClear": "Clears after 1 minute without typing.",
+  "channelMismatchBanner": "{count, plural, =1{1 channel on the radio differs from the app} other{{count} channels on the radio differ from the app}}",
+  "@channelMismatchBanner": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "channelMismatchReview": "Review",
+  "channelMismatchTitle": "Channel differences",
+  "channelMismatchExplain": "The radio holds a different name or key in these slots than the app saved. Someone may have changed them with another app, or the app's copy is old. Choose which version to keep for each slot.",
+  "channelMismatchNone": "All slots match now.",
+  "channelMismatchSlot": "Slot {index}",
+  "@channelMismatchSlot": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "channelMismatchRadioSide": "On the radio",
+  "channelMismatchDeviceSide": "Saved in the app",
+  "channelMismatchEmpty": "Empty",
+  "channelMismatchKeyTag": "key {fingerprint}",
+  "@channelMismatchKeyTag": {
+    "placeholders": {
+      "fingerprint": {
+        "type": "String"
+      }
+    }
+  },
+  "channelMismatchKeepRadio": "Keep radio's",
+  "channelMismatchRestore": "Write app's to radio",
   "serverHistoryTitle": "Status history",
   "serverHistoryCount": "{count, plural, =0{No saved checks} =1{1 saved check} other{{count} saved checks}}",
   "@serverHistoryCount": {
