@@ -1510,5 +1510,15 @@
   "sarneg_randomWord": "Palabra aleatoria",
   "sarneg_wellKnownWord": "Esta palabra aparece en guías públicas, así que cualquiera puede probarla. Una palabra aleatoria es más segura.",
   "sarneg_clipboardClears": "El portapapeles se vacía en 1 minuto.",
-  "sarneg_autoClear": "Se borra tras 1 minuto sin escribir."
+  "sarneg_autoClear": "Se borra tras 1 minuto sin escribir.",
+  "serverHistoryTitle": "Historial de estado",
+  "serverHistoryCount": "{count, plural, =0{Sin consultas guardadas} =1{1 consulta guardada} other{{count} consultas guardadas}}",
+  "serverHistoryRssi": "RSSI",
+  "serverHistorySnr": "SNR",
+  "serverHistoryErrors": "Errores",
+  "serverHistoryEmpty": "Cada consulta de estado se guarda aquí, para ver cómo cambia este repetidor con el tiempo.",
+  "serverHistoryNoneInRange": "No hay lecturas en este periodo.",
+  "neighborSnrOpen": "Ver SNR en el tiempo",
+  "neighborSnrTitle": "SNR de {name}",
+  "neighborSnrHint": "Cada vez que este repetidor respondió a Vecinos, según las respuestas guardadas en su consola."
 }

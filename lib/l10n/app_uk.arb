@@ -1510,5 +1510,15 @@
   "sarneg_randomWord": "Випадкове слово",
   "sarneg_wellKnownWord": "Це слово надруковане у відкритих посібниках, тож будь-хто може його спробувати. Випадкове слово надійніше.",
   "sarneg_clipboardClears": "Буфер обміну очиститься за 1 хвилину.",
-  "sarneg_autoClear": "Очищається через 1 хвилину без введення."
+  "sarneg_autoClear": "Очищається через 1 хвилину без введення.",
+  "serverHistoryTitle": "Історія стану",
+  "serverHistoryCount": "{count, plural, =0{Немає збережених перевірок} other{Збережено перевірок: {count}}}",
+  "serverHistoryRssi": "RSSI",
+  "serverHistorySnr": "SNR",
+  "serverHistoryErrors": "Помилки",
+  "serverHistoryEmpty": "Кожна перевірка стану зберігається тут, щоб бачити, як змінюється ретранслятор з часом.",
+  "serverHistoryNoneInRange": "Немає даних за цей період.",
+  "neighborSnrOpen": "Показати SNR у часі",
+  "neighborSnrTitle": "SNR: {name}",
+  "neighborSnrHint": "Кожна відповідь ретранслятора на «Сусіди» з відповідей, збережених у його консолі."
 }

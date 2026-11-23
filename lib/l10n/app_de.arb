@@ -1510,5 +1510,15 @@
   "sarneg_randomWord": "Zufallswort",
   "sarneg_wellKnownWord": "Dieses Wort steht in öffentlichen Anleitungen, also kann es jeder ausprobieren. Ein Zufallswort ist sicherer.",
   "sarneg_clipboardClears": "Die Zwischenablage wird nach 1 Minute geleert.",
-  "sarneg_autoClear": "Wird nach 1 Minute ohne Eingabe geleert."
+  "sarneg_autoClear": "Wird nach 1 Minute ohne Eingabe geleert.",
+  "serverHistoryTitle": "Statusverlauf",
+  "serverHistoryCount": "{count, plural, =0{Keine gespeicherten Abfragen} =1{1 gespeicherte Abfrage} other{{count} gespeicherte Abfragen}}",
+  "serverHistoryRssi": "RSSI",
+  "serverHistorySnr": "SNR",
+  "serverHistoryErrors": "Fehler",
+  "serverHistoryEmpty": "Jede Statusabfrage wird hier gespeichert, damit du siehst, wie sich dieser Repeater mit der Zeit verändert.",
+  "serverHistoryNoneInRange": "Keine Werte in diesem Zeitraum.",
+  "neighborSnrOpen": "SNR-Verlauf zeigen",
+  "neighborSnrTitle": "SNR von {name}",
+  "neighborSnrHint": "Jede Antwort dieses Repeaters auf Nachbarn, aus den Antworten in seiner Konsole."
 }

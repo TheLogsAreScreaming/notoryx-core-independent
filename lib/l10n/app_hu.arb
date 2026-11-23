@@ -1510,5 +1510,15 @@
   "sarneg_randomWord": "Véletlen szó",
   "sarneg_wellKnownWord": "Ez a szó nyilvános útmutatókban szerepel, így bárki kipróbálhatja. Egy véletlen szó biztonságosabb.",
   "sarneg_clipboardClears": "A vágólap 1 perc múlva törlődik.",
-  "sarneg_autoClear": "1 perc gépelés nélkül törlődik."
+  "sarneg_autoClear": "1 perc gépelés nélkül törlődik.",
+  "serverHistoryTitle": "Állapotelőzmények",
+  "serverHistoryCount": "{count, plural, =0{Nincs mentett lekérdezés} other{{count} mentett lekérdezés}}",
+  "serverHistoryRssi": "RSSI",
+  "serverHistorySnr": "SNR",
+  "serverHistoryErrors": "Hibák",
+  "serverHistoryEmpty": "Minden állapotlekérdezés ide kerül, így látod, hogyan változik az átjátszó idővel.",
+  "serverHistoryNoneInRange": "Nincs adat ebben az időszakban.",
+  "neighborSnrOpen": "SNR időbeli alakulása",
+  "neighborSnrTitle": "{name} SNR-je",
+  "neighborSnrHint": "Az átjátszó minden Szomszédok-válasza, a konzolban tárolt válaszokból."
 }

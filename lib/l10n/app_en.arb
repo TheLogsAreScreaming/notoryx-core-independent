@@ -3096,5 +3096,29 @@
   "sarneg_randomWord": "Random word",
   "sarneg_wellKnownWord": "This word is printed in public guides, so anyone can try it. A random word is safer.",
   "sarneg_clipboardClears": "The clipboard is cleared in 1 minute.",
-  "sarneg_autoClear": "Clears after 1 minute without typing."
+  "sarneg_autoClear": "Clears after 1 minute without typing.",
+  "serverHistoryTitle": "Status history",
+  "serverHistoryCount": "{count, plural, =0{No saved checks} =1{1 saved check} other{{count} saved checks}}",
+  "@serverHistoryCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "serverHistoryRssi": "RSSI",
+  "serverHistorySnr": "SNR",
+  "serverHistoryErrors": "Errors",
+  "serverHistoryEmpty": "Each status check you run is saved here, so you can see how this repeater changes over time.",
+  "serverHistoryNoneInRange": "No readings in this time range.",
+  "neighborSnrOpen": "Show SNR over time",
+  "neighborSnrTitle": "SNR of {name}",
+  "@neighborSnrTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "neighborSnrHint": "Every time this repeater answered Neighbours, from the replies kept in its console."
 }

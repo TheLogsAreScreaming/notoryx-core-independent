@@ -1510,5 +1510,15 @@
   "sarneg_randomWord": "随机词",
   "sarneg_wellKnownWord": "这个词出现在公开指南中，任何人都可以试用。随机词更安全。",
   "sarneg_clipboardClears": "剪贴板将在 1 分钟后清空。",
-  "sarneg_autoClear": "1 分钟无输入后清空。"
+  "sarneg_autoClear": "1 分钟无输入后清空。",
+  "serverHistoryTitle": "状态历史",
+  "serverHistoryCount": "{count, plural, =0{没有已保存的查询} other{已保存 {count} 次查询}}",
+  "serverHistoryRssi": "RSSI",
+  "serverHistorySnr": "SNR",
+  "serverHistoryErrors": "错误",
+  "serverHistoryEmpty": "每次状态查询都会保存在这里，便于查看此中继器随时间的变化。",
+  "serverHistoryNoneInRange": "此时间段内没有读数。",
+  "neighborSnrOpen": "查看 SNR 变化",
+  "neighborSnrTitle": "{name} 的 SNR",
+  "neighborSnrHint": "该中继器每次回复“邻居”的记录，来自其控制台中保存的回复。"
 }

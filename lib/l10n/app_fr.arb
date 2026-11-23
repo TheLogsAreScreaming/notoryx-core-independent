@@ -1510,5 +1510,15 @@
   "sarneg_randomWord": "Mot aléatoire",
   "sarneg_wellKnownWord": "Ce mot figure dans des guides publics : n’importe qui peut l’essayer. Un mot aléatoire est plus sûr.",
   "sarneg_clipboardClears": "Le presse-papiers est vidé dans 1 minute.",
-  "sarneg_autoClear": "S’efface après 1 minute sans saisie."
+  "sarneg_autoClear": "S’efface après 1 minute sans saisie.",
+  "serverHistoryTitle": "Historique d'état",
+  "serverHistoryCount": "{count, plural, =0{Aucune vérification enregistrée} =1{1 vérification enregistrée} other{{count} vérifications enregistrées}}",
+  "serverHistoryRssi": "RSSI",
+  "serverHistorySnr": "SNR",
+  "serverHistoryErrors": "Erreurs",
+  "serverHistoryEmpty": "Chaque vérification d'état est enregistrée ici, pour voir l'évolution de ce répéteur.",
+  "serverHistoryNoneInRange": "Aucune mesure sur cette période.",
+  "neighborSnrOpen": "Voir le SNR dans le temps",
+  "neighborSnrTitle": "SNR de {name}",
+  "neighborSnrHint": "Chaque réponse de ce répéteur à Voisins, d'après les réponses gardées dans sa console."
 }

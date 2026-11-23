@@ -1510,5 +1510,15 @@
   "sarneg_randomWord": "ランダムな単語",
   "sarneg_wellKnownWord": "この単語は公開ガイドに載っているため、誰でも試せます。ランダムな単語のほうが安全です。",
   "sarneg_clipboardClears": "クリップボードは1分後に消去されます。",
-  "sarneg_autoClear": "1分間入力がないと消去されます。"
+  "sarneg_autoClear": "1分間入力がないと消去されます。",
+  "serverHistoryTitle": "ステータス履歴",
+  "serverHistoryCount": "{count, plural, =0{保存された確認なし} other{保存された確認 {count}件}}",
+  "serverHistoryRssi": "RSSI",
+  "serverHistorySnr": "SNR",
+  "serverHistoryErrors": "エラー",
+  "serverHistoryEmpty": "ステータス確認の結果はここに保存され、このリピーターの変化を確認できます。",
+  "serverHistoryNoneInRange": "この期間のデータはありません。",
+  "neighborSnrOpen": "SNRの推移を表示",
+  "neighborSnrTitle": "{name}のSNR",
+  "neighborSnrHint": "このリピーターが「隣接ノード」に応答した記録（コンソールに保存された応答から）。"
 }

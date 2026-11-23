@@ -1510,5 +1510,15 @@
   "sarneg_randomWord": "Naključna beseda",
   "sarneg_wellKnownWord": "Ta beseda je objavljena v javnih vodnikih, zato jo lahko poskusi kdorkoli. Naključna beseda je varnejša.",
   "sarneg_clipboardClears": "Odložišče se izprazni čez 1 minuto.",
-  "sarneg_autoClear": "Izbriše se po 1 minuti brez tipkanja."
+  "sarneg_autoClear": "Izbriše se po 1 minuti brez tipkanja.",
+  "serverHistoryTitle": "Zgodovina stanja",
+  "serverHistoryCount": "{count, plural, =0{Ni shranjenih preverjanj} other{Shranjena preverjanja: {count}}}",
+  "serverHistoryRssi": "RSSI",
+  "serverHistorySnr": "SNR",
+  "serverHistoryErrors": "Napake",
+  "serverHistoryEmpty": "Vsako preverjanje stanja se shrani tukaj, da vidite, kako se repetitor spreminja.",
+  "serverHistoryNoneInRange": "V tem obdobju ni meritev.",
+  "neighborSnrOpen": "Prikaži SNR skozi čas",
+  "neighborSnrTitle": "SNR: {name}",
+  "neighborSnrHint": "Vsak odgovor repetitorja na Sosedi, iz odgovorov, shranjenih v njegovi konzoli."
 }

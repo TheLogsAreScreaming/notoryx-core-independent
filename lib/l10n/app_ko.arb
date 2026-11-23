@@ -1510,5 +1510,15 @@
   "sarneg_randomWord": "무작위 단어",
   "sarneg_wellKnownWord": "이 단어는 공개 안내서에 나와 있어 누구나 시도할 수 있습니다. 무작위 단어가 더 안전합니다.",
   "sarneg_clipboardClears": "클립보드는 1분 후에 지워집니다.",
-  "sarneg_autoClear": "1분 동안 입력이 없으면 지워집니다."
+  "sarneg_autoClear": "1분 동안 입력이 없으면 지워집니다.",
+  "serverHistoryTitle": "상태 기록",
+  "serverHistoryCount": "{count, plural, =0{저장된 확인 없음} other{저장된 확인 {count}개}}",
+  "serverHistoryRssi": "RSSI",
+  "serverHistorySnr": "SNR",
+  "serverHistoryErrors": "오류",
+  "serverHistoryEmpty": "상태 확인 결과가 여기에 저장되어 이 중계기의 변화를 볼 수 있습니다.",
+  "serverHistoryNoneInRange": "이 기간에 값이 없습니다.",
+  "neighborSnrOpen": "시간별 SNR 보기",
+  "neighborSnrTitle": "{name}의 SNR",
+  "neighborSnrHint": "이 중계기가 이웃 요청에 응답한 기록(콘솔에 저장된 응답 기준)."
 }
