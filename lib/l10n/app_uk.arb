@@ -1532,5 +1532,21 @@
   "serverHistoryNoneInRange": "Немає даних за цей період.",
   "neighborSnrOpen": "Показати SNR у часі",
   "neighborSnrTitle": "SNR: {name}",
-  "neighborSnrHint": "Кожна відповідь ретранслятора на «Сусіди» з відповідей, збережених у його консолі."
+  "neighborSnrHint": "Кожна відповідь ретранслятора на «Сусіди» з відповідей, збережених у його консолі.",
+  "followTitle": "Стеження: {name}",
+  "followAskNow": "Запитати позицію зараз",
+  "followFromYou": "{distance} на {direction} ({degrees}°) від вас",
+  "followWaiting": "Очікування позиції…",
+  "followNoOwnPosition": "Ваша позиція невідома, тому відстань і напрямок недоступні.",
+  "followTimeLeft": "{minutes, plural, other{Залишилося близько {minutes} хв}}",
+  "followLastFix": "остання позиція {ago}",
+  "followSecondsAgo": "{n} с тому",
+  "followMinutesAgo": "{n} хв тому",
+  "followAnswers": "відповідей: {answered}/{asked}",
+  "followPoints": "{count, plural, other{точок: {count}}}",
+  "followHint": "Зупиняється сам через 15 хвилин. Контакт має дозволити місцезнаходження в телеметрії, інакше позиція оновиться лише з його оголошень.",
+  "followStop": "Стоп",
+  "followStopped": "Стеження зупинено. Запустіть знову, щоб запитувати позицію ще 15 хвилин.",
+  "followButton": "Стежити 15 хв",
+  "followYou": "Ви"
 }

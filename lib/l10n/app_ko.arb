@@ -1532,5 +1532,21 @@
   "serverHistoryNoneInRange": "이 기간에 값이 없습니다.",
   "neighborSnrOpen": "시간별 SNR 보기",
   "neighborSnrTitle": "{name}의 SNR",
-  "neighborSnrHint": "이 중계기가 이웃 요청에 응답한 기록(콘솔에 저장된 응답 기준)."
+  "neighborSnrHint": "이 중계기가 이웃 요청에 응답한 기록(콘솔에 저장된 응답 기준).",
+  "followTitle": "{name} 따라가는 중",
+  "followAskNow": "지금 위치 요청",
+  "followFromYou": "내 위치에서 {direction}({degrees}°) {distance}",
+  "followWaiting": "위치를 기다리는 중…",
+  "followNoOwnPosition": "내 위치를 알 수 없어 거리와 방위를 표시할 수 없습니다.",
+  "followTimeLeft": "{minutes, plural, other{약 {minutes}분 남음}}",
+  "followLastFix": "마지막 위치 {ago}",
+  "followSecondsAgo": "{n}초 전",
+  "followMinutesAgo": "{n}분 전",
+  "followAnswers": "요청 {asked}개 중 {answered}개 응답",
+  "followPoints": "{count, plural, other{{count}개 지점}}",
+  "followHint": "15분 후 자동으로 멈춥니다. 상대가 텔레메트리에서 위치를 허용해야 하며, 그렇지 않으면 광고를 보낼 때만 갱신됩니다.",
+  "followStop": "중지",
+  "followStopped": "따라가지 않는 중입니다. 다시 시작하면 15분 더 위치를 요청합니다.",
+  "followButton": "15분 따라가기",
+  "followYou": "나"
 }

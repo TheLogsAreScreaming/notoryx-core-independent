@@ -1532,5 +1532,21 @@
   "serverHistoryNoneInRange": "この期間のデータはありません。",
   "neighborSnrOpen": "SNRの推移を表示",
   "neighborSnrTitle": "{name}のSNR",
-  "neighborSnrHint": "このリピーターが「隣接ノード」に応答した記録（コンソールに保存された応答から）。"
+  "neighborSnrHint": "このリピーターが「隣接ノード」に応答した記録（コンソールに保存された応答から）。",
+  "followTitle": "{name}を追跡中",
+  "followAskNow": "今すぐ位置を問い合わせ",
+  "followFromYou": "あなたから{direction}（{degrees}°）へ{distance}",
+  "followWaiting": "位置を待っています…",
+  "followNoOwnPosition": "自分の位置が不明なため、距離と方位は表示できません。",
+  "followTimeLeft": "{minutes, plural, other{残り約{minutes}分}}",
+  "followLastFix": "最終位置 {ago}",
+  "followSecondsAgo": "{n}秒前",
+  "followMinutesAgo": "{n}分前",
+  "followAnswers": "{asked}件中{answered}件に応答",
+  "followPoints": "{count, plural, other{{count}地点}}",
+  "followHint": "15分後に自動で停止します。相手がテレメトリで位置の共有を許可していない場合、アドバート送信時のみ更新されます。",
+  "followStop": "停止",
+  "followStopped": "追跡していません。もう一度開始すると、さらに15分間位置を問い合わせます。",
+  "followButton": "15分追跡",
+  "followYou": "あなた"
 }

@@ -1532,5 +1532,21 @@
   "serverHistoryNoneInRange": "Нет данных за этот период.",
   "neighborSnrOpen": "Показать SNR во времени",
   "neighborSnrTitle": "SNR: {name}",
-  "neighborSnrHint": "Каждый ответ ретранслятора на «Соседи» из ответов, сохранённых в его консоли."
+  "neighborSnrHint": "Каждый ответ ретранслятора на «Соседи» из ответов, сохранённых в его консоли.",
+  "followTitle": "Слежение: {name}",
+  "followAskNow": "Запросить позицию сейчас",
+  "followFromYou": "{distance} на {direction} ({degrees}°) от вас",
+  "followWaiting": "Ожидание позиции…",
+  "followNoOwnPosition": "Ваша позиция неизвестна, поэтому расстояние и направление недоступны.",
+  "followTimeLeft": "{minutes, plural, other{Осталось около {minutes} мин}}",
+  "followLastFix": "последняя позиция {ago}",
+  "followSecondsAgo": "{n} с назад",
+  "followMinutesAgo": "{n} мин назад",
+  "followAnswers": "ответов: {answered}/{asked}",
+  "followPoints": "{count, plural, other{точек: {count}}}",
+  "followHint": "Останавливается сам через 15 минут. Контакт должен разрешить местоположение в телеметрии, иначе позиция обновится только по его объявлениям.",
+  "followStop": "Стоп",
+  "followStopped": "Слежение остановлено. Запустите снова, чтобы запрашивать позицию ещё 15 минут.",
+  "followButton": "Следить 15 мин",
+  "followYou": "Вы"
 }

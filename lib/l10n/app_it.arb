@@ -1532,5 +1532,21 @@
   "serverHistoryNoneInRange": "Nessuna lettura in questo intervallo.",
   "neighborSnrOpen": "Mostra SNR nel tempo",
   "neighborSnrTitle": "SNR di {name}",
-  "neighborSnrHint": "Ogni risposta di questo ripetitore a Vicini, dalle risposte salvate nella sua console."
+  "neighborSnrHint": "Ogni risposta di questo ripetitore a Vicini, dalle risposte salvate nella sua console.",
+  "followTitle": "Seguendo {name}",
+  "followAskNow": "Chiedi la posizione ora",
+  "followFromYou": "A {distance} {direction} ({degrees}°) da te",
+  "followWaiting": "In attesa di una posizione…",
+  "followNoOwnPosition": "La tua posizione non è nota, quindi distanza e direzione non sono disponibili.",
+  "followTimeLeft": "{minutes, plural, =1{Circa 1 minuto rimasto} other{Circa {minutes} minuti rimasti}}",
+  "followLastFix": "ultima posizione {ago}",
+  "followSecondsAgo": "{n} s fa",
+  "followMinutesAgo": "{n} min fa",
+  "followAnswers": "{answered}/{asked} richieste con risposta",
+  "followPoints": "{count, plural, =1{1 punto} other{{count} punti}}",
+  "followHint": "Si ferma da solo dopo 15 minuti. Il contatto deve consentire la posizione nella telemetria, altrimenti si muove solo con gli annunci.",
+  "followStop": "Ferma",
+  "followStopped": "Non lo segui. Riavvia per chiedere la posizione per altri 15 minuti.",
+  "followButton": "Segui 15 min",
+  "followYou": "Tu"
 }

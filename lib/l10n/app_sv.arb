@@ -1532,5 +1532,21 @@
   "serverHistoryNoneInRange": "Inga värden under den här perioden.",
   "neighborSnrOpen": "Visa SNR över tid",
   "neighborSnrTitle": "SNR för {name}",
-  "neighborSnrHint": "Varje gång repeatern svarade på Grannar, från svaren som sparats i dess konsol."
+  "neighborSnrHint": "Varje gång repeatern svarade på Grannar, från svaren som sparats i dess konsol.",
+  "followTitle": "Följer {name}",
+  "followAskNow": "Fråga efter position nu",
+  "followFromYou": "{distance} {direction} ({degrees}°) från dig",
+  "followWaiting": "Väntar på en position…",
+  "followNoOwnPosition": "Din egen position är okänd, så avstånd och riktning kan inte visas.",
+  "followTimeLeft": "{minutes, plural, =1{Ungefär 1 minut kvar} other{Ungefär {minutes} minuter kvar}}",
+  "followLastFix": "senaste position {ago}",
+  "followSecondsAgo": "{n} s sedan",
+  "followMinutesAgo": "{n} min sedan",
+  "followAnswers": "{answered}/{asked} förfrågningar besvarade",
+  "followPoints": "{count, plural, =1{1 punkt} other{{count} punkter}}",
+  "followHint": "Stoppar av sig själv efter 15 minuter. Kontakten måste tillåta position i telemetrin, annars flyttar den sig bara vid annonser.",
+  "followStop": "Stoppa",
+  "followStopped": "Följer inte. Starta igen för att fråga efter positionen i 15 minuter till.",
+  "followButton": "Följ 15 min",
+  "followYou": "Du"
 }

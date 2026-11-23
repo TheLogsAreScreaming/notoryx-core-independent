@@ -1532,5 +1532,21 @@
   "serverHistoryNoneInRange": "Keine Werte in diesem Zeitraum.",
   "neighborSnrOpen": "SNR-Verlauf zeigen",
   "neighborSnrTitle": "SNR von {name}",
-  "neighborSnrHint": "Jede Antwort dieses Repeaters auf Nachbarn, aus den Antworten in seiner Konsole."
+  "neighborSnrHint": "Jede Antwort dieses Repeaters auf Nachbarn, aus den Antworten in seiner Konsole.",
+  "followTitle": "{name} folgen",
+  "followAskNow": "Position jetzt abfragen",
+  "followFromYou": "{distance} {direction} ({degrees}°) von dir",
+  "followWaiting": "Warte auf eine Position…",
+  "followNoOwnPosition": "Deine eigene Position ist unbekannt, daher keine Entfernung und Richtung.",
+  "followTimeLeft": "{minutes, plural, =1{Noch etwa 1 Minute} other{Noch etwa {minutes} Minuten}}",
+  "followLastFix": "letzte Position {ago}",
+  "followSecondsAgo": "vor {n} s",
+  "followMinutesAgo": "vor {n} Min.",
+  "followAnswers": "{answered}/{asked} Anfragen beantwortet",
+  "followPoints": "{count, plural, =1{1 Punkt} other{{count} Punkte}}",
+  "followHint": "Endet nach 15 Minuten von selbst. Der Kontakt muss den Standort in seinen Telemetrie-Einstellungen freigeben, sonst bewegt er sich nur bei Adverts.",
+  "followStop": "Stopp",
+  "followStopped": "Folgen beendet. Starte erneut, um weitere 15 Minuten die Position abzufragen.",
+  "followButton": "15 Min. folgen",
+  "followYou": "Du"
 }

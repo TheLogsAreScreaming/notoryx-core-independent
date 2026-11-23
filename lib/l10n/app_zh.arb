@@ -1532,5 +1532,21 @@
   "serverHistoryNoneInRange": "此时间段内没有读数。",
   "neighborSnrOpen": "查看 SNR 变化",
   "neighborSnrTitle": "{name} 的 SNR",
-  "neighborSnrHint": "该中继器每次回复“邻居”的记录，来自其控制台中保存的回复。"
+  "neighborSnrHint": "该中继器每次回复“邻居”的记录，来自其控制台中保存的回复。",
+  "followTitle": "正在跟随 {name}",
+  "followAskNow": "立即请求位置",
+  "followFromYou": "距你 {distance}，方位 {direction}（{degrees}°）",
+  "followWaiting": "正在等待位置…",
+  "followNoOwnPosition": "未知你自己的位置，无法显示距离和方位。",
+  "followTimeLeft": "{minutes, plural, other{剩余约 {minutes} 分钟}}",
+  "followLastFix": "最后位置 {ago}",
+  "followSecondsAgo": "{n} 秒前",
+  "followMinutesAgo": "{n} 分钟前",
+  "followAnswers": "已应答 {answered}/{asked} 次请求",
+  "followPoints": "{count, plural, other{{count} 个点}}",
+  "followHint": "15 分钟后自动停止。对方需在遥测设置中允许位置，否则只有在发送广播时才会更新。",
+  "followStop": "停止",
+  "followStopped": "未在跟随。重新开始可再请求 15 分钟位置。",
+  "followButton": "跟随 15 分钟",
+  "followYou": "你"
 }
