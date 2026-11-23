@@ -1548,5 +1548,20 @@
   "followStop": "Zastaviť",
   "followStopped": "Sledovanie je zastavené. Spustite znova na ďalších 15 minút.",
   "followButton": "Sledovať 15 min",
-  "followYou": "Vy"
+  "followYou": "Vy",
+  "telemetryNoAlert": "Bez upozornenia",
+  "telemetryAlertWhenAbove": "Upozornenie nad {value}",
+  "telemetryAlertWhenBelow": "Upozornenie pod {value}",
+  "telemetrySetAlert": "Upozornenie…",
+  "telemetryAlertDialogHint": "Upozornenie dostanete, keď nový údaj prekročí hranicu. Prázdne pole sa nepoužije.",
+  "telemetryAbove": "Nad",
+  "telemetryBelow": "Pod",
+  "telemetryBelowMustBeLower": "Musí byť nižšie ako horná hranica",
+  "telemetryRemoveAlert": "Odstrániť",
+  "telemetryAlertTitle": "Upozornenie senzora",
+  "telemetryAlertAbove": "{name}: {what} je {value}, nad {limit}",
+  "telemetryAlertBelow": "{name}: {what} je {value}, pod {limit}",
+  "range1h": "1 h",
+  "range6h": "6 h",
+  "telemetryAlertDialogTitle": "Upozornenie: {name}"
 }

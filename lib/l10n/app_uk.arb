@@ -1548,5 +1548,20 @@
   "followStop": "Стоп",
   "followStopped": "Стеження зупинено. Запустіть знову, щоб запитувати позицію ще 15 хвилин.",
   "followButton": "Стежити 15 хв",
-  "followYou": "Ви"
+  "followYou": "Ви",
+  "telemetryNoAlert": "Без сповіщення",
+  "telemetryAlertWhenAbove": "Сповіщення вище {value}",
+  "telemetryAlertWhenBelow": "Сповіщення нижче {value}",
+  "telemetrySetAlert": "Сповіщення…",
+  "telemetryAlertDialogHint": "Сповіщення надійде, коли нове значення перетне межу. Залиште поле порожнім, щоб не використовувати його.",
+  "telemetryAbove": "Вище",
+  "telemetryBelow": "Нижче",
+  "telemetryBelowMustBeLower": "Має бути нижче верхньої межі",
+  "telemetryRemoveAlert": "Прибрати",
+  "telemetryAlertTitle": "Сповіщення датчика",
+  "telemetryAlertAbove": "{name}: {what} = {value}, вище {limit}",
+  "telemetryAlertBelow": "{name}: {what} = {value}, нижче {limit}",
+  "range1h": "1 год",
+  "range6h": "6 год",
+  "telemetryAlertDialogTitle": "Сповіщення: {name}"
 }

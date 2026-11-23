@@ -7,6 +7,7 @@ import '../data/data.dart';
 import '../radio/radio.dart';
 import 'history_chart.dart';
 import '../l10n/l10n.dart';
+import '../app/telemetry_alerts.dart';
 
 export 'history_chart.dart' show TelemetryRange;
 
@@ -93,6 +94,30 @@ class _TelemetryScreenState extends ConsumerState<TelemetryScreen> {
     await ref.read(storeProvider).clearTelemetry(radioKey, widget.nodeKey);
   }
 
+  Future<void> _editLimit(
+    String radioKey,
+    TelemetrySeriesKey key,
+    Map<String, TelemetryLimit> limits,
+  ) async {
+    final id = limitId(key.channel, key.kind);
+    final current = limits[id];
+    final result = await showDialog<TelemetryLimit>(
+      context: context,
+      builder: (_) => _LimitDialog(
+        title: seriesLabel(key, axis: false, l10n: context.l10n),
+        current: current,
+      ),
+    );
+    if (result == null) return;
+    await saveTelemetryLimit(
+      ref.read(storeProvider),
+      radioKey: radioKey,
+      nodeKey: widget.nodeKey,
+      id: id,
+      limit: result,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final radioKey = ref.watch(radioKeyProvider);
@@ -108,6 +133,17 @@ class _TelemetryScreenState extends ConsumerState<TelemetryScreen> {
                   .value ??
               const <TelemetrySample>[];
     final theme = Theme.of(context);
+    final limits = radioKey == null
+        ? const <String, TelemetryLimit>{}
+        : ref
+                  .watch(
+                    telemetryLimitsProvider((
+                      radioKey: radioKey,
+                      nodeKey: widget.nodeKey,
+                    )),
+                  )
+                  .value ??
+              const <String, TelemetryLimit>{};
 
     final cutoff = switch (_range.span) {
       final span? => DateTime.now().subtract(span).millisecondsSinceEpoch,
@@ -180,7 +216,14 @@ class _TelemetryScreenState extends ConsumerState<TelemetryScreen> {
                 child: Text(context.l10n.noReadingsInThisRange),
               ),
             for (final entry in series.entries)
-              _SeriesCard(seriesKey: entry.key, points: entry.value),
+              _SeriesCard(
+                seriesKey: entry.key,
+                points: entry.value,
+                limit: limits[limitId(entry.key.channel, entry.key.kind)],
+                onSetLimit: radioKey == null || entry.key.index != 0
+                    ? null
+                    : () => _editLimit(radioKey, entry.key, limits),
+              ),
           ],
         ],
       ),
@@ -241,15 +284,146 @@ String _when(AppLocalizations l10n, DateTime at) {
 }
 
 class _SeriesCard extends StatelessWidget {
-  const _SeriesCard({required this.seriesKey, required this.points});
+  const _SeriesCard({
+    required this.seriesKey,
+    required this.points,
+    this.limit,
+    this.onSetLimit,
+  });
 
   final TelemetrySeriesKey seriesKey;
   final List<TelemetryPoint> points;
+  final TelemetryLimit? limit;
+
+  /// Opens the alert limits; null where alerts aren't offered.
+  final VoidCallback? onSetLimit;
 
   @override
-  Widget build(BuildContext context) => HistoryChartCard(
-    label: seriesLabel(seriesKey, l10n: context.l10n),
-    points: points,
-    format: (v) => formatValue(seriesKey.kind, v),
+  Widget build(BuildContext context) {
+    final chart = HistoryChartCard(
+      label: seriesLabel(seriesKey, l10n: context.l10n),
+      points: points,
+      format: (v) => formatValue(seriesKey.kind, v),
+    );
+    final set = onSetLimit;
+    if (set == null) return chart;
+    final l10n = context.l10n;
+    final l = limit;
+    String f(double v) => formatValue(seriesKey.kind, v);
+    final text = l == null
+        ? l10n.telemetryNoAlert
+        : [
+            if (l.above case final a?) l10n.telemetryAlertWhenAbove(f(a)),
+            if (l.below case final b?) l10n.telemetryAlertWhenBelow(f(b)),
+          ].join(' · ');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        chart,
+        Padding(
+          padding: const EdgeInsets.only(left: 12, bottom: 8),
+          child: Row(
+            children: [
+              Icon(
+                l == null
+                    ? Icons.notifications_none
+                    : Icons.notifications_active,
+                size: 18,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(text, style: Theme.of(context).textTheme.bodySmall),
+              ),
+              TextButton(
+                key: Key('alert-${seriesKey.channel}-${seriesKey.kind.name}'),
+                onPressed: set,
+                child: Text(l10n.telemetrySetAlert),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Upper and lower limits for one value.
+class _LimitDialog extends StatefulWidget {
+  const _LimitDialog({required this.title, this.current});
+
+  final String title;
+  final TelemetryLimit? current;
+
+  @override
+  State<_LimitDialog> createState() => _LimitDialogState();
+}
+
+class _LimitDialogState extends State<_LimitDialog> {
+  late final _above = TextEditingController(
+    text: widget.current?.above?.toString() ?? '',
   );
+  late final _below = TextEditingController(
+    text: widget.current?.below?.toString() ?? '',
+  );
+
+  @override
+  void dispose() {
+    _above.dispose();
+    _below.dispose();
+    super.dispose();
+  }
+
+  double? _read(String t) => double.tryParse(t.trim().replaceAll(',', '.'));
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final above = _read(_above.text), below = _read(_below.text);
+    final wrong = above != null && below != null && below >= above;
+    const keys = TextInputType.numberWithOptions(decimal: true, signed: true);
+    return AlertDialog(
+      title: Text(l10n.telemetryAlertDialogTitle(widget.title)),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(l10n.telemetryAlertDialogHint),
+          TextField(
+            key: const Key('limit-above'),
+            controller: _above,
+            keyboardType: keys,
+            decoration: InputDecoration(labelText: l10n.telemetryAbove),
+            onChanged: (_) => setState(() {}),
+          ),
+          TextField(
+            key: const Key('limit-below'),
+            controller: _below,
+            keyboardType: keys,
+            decoration: InputDecoration(
+              labelText: l10n.telemetryBelow,
+              errorText: wrong ? l10n.telemetryBelowMustBeLower : null,
+            ),
+            onChanged: (_) => setState(() {}),
+          ),
+        ],
+      ),
+      actions: [
+        if (widget.current != null)
+          TextButton(
+            onPressed: () => Navigator.pop(context, (above: null, below: null)),
+            child: Text(l10n.telemetryRemoveAlert),
+          ),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          key: const Key('limit-save'),
+          onPressed: wrong
+              ? null
+              : () => Navigator.pop(context, (above: above, below: below)),
+          child: Text(l10n.save),
+        ),
+      ],
+    );
+  }
 }

@@ -26,6 +26,7 @@ import 'screens/conversation_screen.dart';
 import 'screens/background_layer.dart';
 import 'screens/home_screen.dart';
 import 'screens/safety_screen.dart';
+import 'app/telemetry_alerts.dart';
 import 'app/db_encryption_control.dart';
 
 void main() {
@@ -128,6 +129,7 @@ class _RadioGateState extends ConsumerState<_RadioGate> {
     ref.listen(pathRecorderProvider, (_, _) {});
     ref.listen(journalRecorderProvider, (_, _) {});
     ref.listen(zoneWatcherProvider, (_, _) {});
+    ref.listen(telemetryAlertWatcherProvider, (_, _) {});
     ref.listen(dbEncryptionDefaultProvider, (_, _) {});
     ref.listen(mqttBridgeProvider, (_, _) {});
     ref.listen(homeWidgetSyncProvider, (_, _) {});

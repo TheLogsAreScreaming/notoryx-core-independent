@@ -1548,5 +1548,20 @@
   "followStop": "중지",
   "followStopped": "따라가지 않는 중입니다. 다시 시작하면 15분 더 위치를 요청합니다.",
   "followButton": "15분 따라가기",
-  "followYou": "나"
+  "followYou": "나",
+  "telemetryNoAlert": "알림 없음",
+  "telemetryAlertWhenAbove": "{value} 초과 시 알림",
+  "telemetryAlertWhenBelow": "{value} 미만 시 알림",
+  "telemetrySetAlert": "알림…",
+  "telemetryAlertDialogHint": "새 값이 한계를 넘으면 알림을 받습니다. 사용하지 않을 칸은 비워 두세요.",
+  "telemetryAbove": "초과",
+  "telemetryBelow": "미만",
+  "telemetryBelowMustBeLower": "상한보다 낮아야 합니다",
+  "telemetryRemoveAlert": "삭제",
+  "telemetryAlertTitle": "센서 알림",
+  "telemetryAlertAbove": "{name}: {what} {value}, {limit} 초과",
+  "telemetryAlertBelow": "{name}: {what} {value}, {limit} 미만",
+  "range1h": "1시간",
+  "range6h": "6시간",
+  "telemetryAlertDialogTitle": "{name} 알림"
 }

@@ -1548,5 +1548,20 @@
   "followStop": "Detener",
   "followStopped": "Sin seguimiento. Vuelve a empezar para pedir su posición otros 15 minutos.",
   "followButton": "Seguir 15 min",
-  "followYou": "Tú"
+  "followYou": "Tú",
+  "telemetryNoAlert": "Sin alerta",
+  "telemetryAlertWhenAbove": "Alerta por encima de {value}",
+  "telemetryAlertWhenBelow": "Alerta por debajo de {value}",
+  "telemetrySetAlert": "Alerta…",
+  "telemetryAlertDialogHint": "Recibirás una notificación cuando una lectura nueva cruce un límite. Deja un campo vacío para no usarlo.",
+  "telemetryAbove": "Por encima de",
+  "telemetryBelow": "Por debajo de",
+  "telemetryBelowMustBeLower": "Debe ser menor que el límite superior",
+  "telemetryRemoveAlert": "Quitar",
+  "telemetryAlertTitle": "Alerta de sensor",
+  "telemetryAlertAbove": "{name}: {what} es {value}, por encima de {limit}",
+  "telemetryAlertBelow": "{name}: {what} es {value}, por debajo de {limit}",
+  "range1h": "1 h",
+  "range6h": "6 h",
+  "telemetryAlertDialogTitle": "Alerta de {name}"
 }

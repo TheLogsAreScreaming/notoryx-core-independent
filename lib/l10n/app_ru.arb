@@ -1548,5 +1548,20 @@
   "followStop": "Стоп",
   "followStopped": "Слежение остановлено. Запустите снова, чтобы запрашивать позицию ещё 15 минут.",
   "followButton": "Следить 15 мин",
-  "followYou": "Вы"
+  "followYou": "Вы",
+  "telemetryNoAlert": "Без оповещения",
+  "telemetryAlertWhenAbove": "Оповещение выше {value}",
+  "telemetryAlertWhenBelow": "Оповещение ниже {value}",
+  "telemetrySetAlert": "Оповещение…",
+  "telemetryAlertDialogHint": "Уведомление придёт, когда новое значение пересечёт предел. Оставьте поле пустым, чтобы не использовать его.",
+  "telemetryAbove": "Выше",
+  "telemetryBelow": "Ниже",
+  "telemetryBelowMustBeLower": "Должно быть ниже верхнего предела",
+  "telemetryRemoveAlert": "Убрать",
+  "telemetryAlertTitle": "Оповещение датчика",
+  "telemetryAlertAbove": "{name}: {what} = {value}, выше {limit}",
+  "telemetryAlertBelow": "{name}: {what} = {value}, ниже {limit}",
+  "range1h": "1 ч",
+  "range6h": "6 ч",
+  "telemetryAlertDialogTitle": "Оповещение: {name}"
 }
