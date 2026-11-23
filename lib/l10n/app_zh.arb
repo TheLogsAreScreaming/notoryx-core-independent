@@ -1510,5 +1510,17 @@
   "sarneg_randomWord": "随机词",
   "sarneg_wellKnownWord": "这个词出现在公开指南中，任何人都可以试用。随机词更安全。",
   "sarneg_clipboardClears": "剪贴板将在 1 分钟后清空。",
-  "sarneg_autoClear": "1 分钟无输入后清空。"
+  "sarneg_autoClear": "1 分钟无输入后清空。",
+  "channelMismatchBanner": "{count, plural, other{电台上有 {count} 个频道与应用不一致}}",
+  "channelMismatchReview": "查看",
+  "channelMismatchTitle": "频道差异",
+  "channelMismatchExplain": "这些槽位中电台的名称或密钥与应用保存的不同。可能有人用其他应用修改过，或应用中的副本已过时。请为每个槽位选择要保留的版本。",
+  "channelMismatchNone": "所有槽位现已一致。",
+  "channelMismatchSlot": "槽位 {index}",
+  "channelMismatchRadioSide": "电台上",
+  "channelMismatchDeviceSide": "应用中保存",
+  "channelMismatchEmpty": "空",
+  "channelMismatchKeyTag": "密钥 {fingerprint}",
+  "channelMismatchKeepRadio": "保留电台的",
+  "channelMismatchRestore": "写入应用的"
 }

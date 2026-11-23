@@ -1510,5 +1510,17 @@
   "sarneg_randomWord": "Mot aléatoire",
   "sarneg_wellKnownWord": "Ce mot figure dans des guides publics : n’importe qui peut l’essayer. Un mot aléatoire est plus sûr.",
   "sarneg_clipboardClears": "Le presse-papiers est vidé dans 1 minute.",
-  "sarneg_autoClear": "S’efface après 1 minute sans saisie."
+  "sarneg_autoClear": "S’efface après 1 minute sans saisie.",
+  "channelMismatchBanner": "{count, plural, =1{1 canal de la radio diffère de l'appli} other{{count} canaux de la radio diffèrent de l'appli}}",
+  "channelMismatchReview": "Vérifier",
+  "channelMismatchTitle": "Différences de canaux",
+  "channelMismatchExplain": "La radio contient un nom ou une clé différents de ceux enregistrés par l'appli dans ces emplacements. Quelqu'un les a peut-être changés avec une autre appli, ou la copie de l'appli est ancienne. Choisissez la version à garder pour chaque emplacement.",
+  "channelMismatchNone": "Tous les emplacements correspondent maintenant.",
+  "channelMismatchSlot": "Emplacement {index}",
+  "channelMismatchRadioSide": "Sur la radio",
+  "channelMismatchDeviceSide": "Enregistré dans l'appli",
+  "channelMismatchEmpty": "Vide",
+  "channelMismatchKeyTag": "clé {fingerprint}",
+  "channelMismatchKeepRadio": "Garder celle de la radio",
+  "channelMismatchRestore": "Écrire celle de l'appli"
 }

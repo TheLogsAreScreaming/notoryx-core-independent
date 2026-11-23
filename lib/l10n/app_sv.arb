@@ -1510,5 +1510,17 @@
   "sarneg_randomWord": "Slumpat ord",
   "sarneg_wellKnownWord": "Det här ordet finns i offentliga guider, så vem som helst kan prova det. Ett slumpat ord är säkrare.",
   "sarneg_clipboardClears": "Urklippet töms om 1 minut.",
-  "sarneg_autoClear": "Rensas efter 1 minut utan inmatning."
+  "sarneg_autoClear": "Rensas efter 1 minut utan inmatning.",
+  "channelMismatchBanner": "{count, plural, =1{1 kanal i radion skiljer sig från appen} other{{count} kanaler i radion skiljer sig från appen}}",
+  "channelMismatchReview": "Granska",
+  "channelMismatchTitle": "Kanalskillnader",
+  "channelMismatchExplain": "Radion har ett annat namn eller en annan nyckel i dessa platser än appen sparade. Någon kan ha ändrat dem med en annan app, eller så är appens kopia gammal. Välj vilken version som ska behållas för varje plats.",
+  "channelMismatchNone": "Alla platser stämmer nu.",
+  "channelMismatchSlot": "Plats {index}",
+  "channelMismatchRadioSide": "I radion",
+  "channelMismatchDeviceSide": "Sparad i appen",
+  "channelMismatchEmpty": "Tom",
+  "channelMismatchKeyTag": "nyckel {fingerprint}",
+  "channelMismatchKeepRadio": "Behåll radions",
+  "channelMismatchRestore": "Skriv appens till radion"
 }

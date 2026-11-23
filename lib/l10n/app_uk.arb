@@ -1510,5 +1510,17 @@
   "sarneg_randomWord": "Випадкове слово",
   "sarneg_wellKnownWord": "Це слово надруковане у відкритих посібниках, тож будь-хто може його спробувати. Випадкове слово надійніше.",
   "sarneg_clipboardClears": "Буфер обміну очиститься за 1 хвилину.",
-  "sarneg_autoClear": "Очищається через 1 хвилину без введення."
+  "sarneg_autoClear": "Очищається через 1 хвилину без введення.",
+  "channelMismatchBanner": "{count, plural, =1{1 канал у радіо відрізняється від застосунку} other{Каналів у радіо, що відрізняються від застосунку: {count}}}",
+  "channelMismatchReview": "Переглянути",
+  "channelMismatchTitle": "Розбіжності каналів",
+  "channelMismatchExplain": "У цих слотах радіо має іншу назву або ключ, ніж зберіг застосунок. Можливо, їх змінили іншим застосунком, або копія в застосунку застаріла. Оберіть, яку версію залишити для кожного слота.",
+  "channelMismatchNone": "Тепер усі слоти збігаються.",
+  "channelMismatchSlot": "Слот {index}",
+  "channelMismatchRadioSide": "У радіо",
+  "channelMismatchDeviceSide": "Збережено в застосунку",
+  "channelMismatchEmpty": "Порожньо",
+  "channelMismatchKeyTag": "ключ {fingerprint}",
+  "channelMismatchKeepRadio": "Залишити з радіо",
+  "channelMismatchRestore": "Записати із застосунку"
 }

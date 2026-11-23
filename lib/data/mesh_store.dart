@@ -249,6 +249,13 @@ class MeshStore {
     });
   }
 
+  /// [radioKey]'s saved channel slots, in slot order, read once.
+  Future<List<Channel>> channels(String radioKey) =>
+      (_db.select(_db.channels)
+            ..where((c) => c.radioKey.equals(radioKey))
+            ..orderBy([(c) => OrderingTerm.asc(c.slot)]))
+          .get();
+
   Stream<List<Channel>> watchChannels(String radioKey) =>
       (_db.select(_db.channels)
             ..where((c) => c.radioKey.equals(radioKey))

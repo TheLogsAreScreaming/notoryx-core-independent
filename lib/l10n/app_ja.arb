@@ -1510,5 +1510,17 @@
   "sarneg_randomWord": "ランダムな単語",
   "sarneg_wellKnownWord": "この単語は公開ガイドに載っているため、誰でも試せます。ランダムな単語のほうが安全です。",
   "sarneg_clipboardClears": "クリップボードは1分後に消去されます。",
-  "sarneg_autoClear": "1分間入力がないと消去されます。"
+  "sarneg_autoClear": "1分間入力がないと消去されます。",
+  "channelMismatchBanner": "{count, plural, other{無線機の{count}件のチャンネルがアプリと異なります}}",
+  "channelMismatchReview": "確認",
+  "channelMismatchTitle": "チャンネルの相違",
+  "channelMismatchExplain": "これらのスロットでは、無線機の名前またはキーがアプリの保存内容と異なります。別のアプリで変更されたか、アプリのコピーが古い可能性があります。スロットごとに残すバージョンを選んでください。",
+  "channelMismatchNone": "すべてのスロットが一致しました。",
+  "channelMismatchSlot": "スロット {index}",
+  "channelMismatchRadioSide": "無線機",
+  "channelMismatchDeviceSide": "アプリに保存",
+  "channelMismatchEmpty": "空",
+  "channelMismatchKeyTag": "キー {fingerprint}",
+  "channelMismatchKeepRadio": "無線機の方を残す",
+  "channelMismatchRestore": "アプリの方を書き込む"
 }

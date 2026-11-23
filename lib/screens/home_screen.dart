@@ -29,6 +29,7 @@ import 'search_screen.dart';
 import 'server_screen.dart';
 import 'safety_screen.dart';
 import 'scheduled_screen.dart';
+import 'channel_mismatch_banner.dart';
 
 /// A radio's chats and contacts. While the radio is being reconnected a
 /// banner says so and the stored chats stay readable.
@@ -286,11 +287,14 @@ class _ChatsTab extends ConsumerWidget {
     final drafts = ref.watch(draftsProvider(radioKey)).value ?? const {};
     final direct = latest.where((m) => m.kind == MessageKind.direct).toList();
 
-    if (channels.isEmpty && direct.isEmpty) {
+    final mismatches =
+        ref.watch(channelMismatchesProvider(radioKey)).value ?? const [];
+    if (channels.isEmpty && direct.isEmpty && mismatches.isEmpty) {
       return _Empty(context.l10n.noChatsYet);
     }
     return ListView(
       children: [
+        ChannelMismatchBanner(radioKey: radioKey),
         for (final channel in channels)
           _ThreadTile(
             icon: Icons.tag,
