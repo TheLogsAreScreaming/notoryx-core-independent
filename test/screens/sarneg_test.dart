@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:notoryx_core/app/screen_privacy.dart';
 import 'package:notoryx_core/l10n/l10n.dart';
 import 'package:notoryx_core/screens/sarneg/sarneg.dart';
 import 'package:notoryx_core/screens/sarneg/sarneg_ui.dart';
@@ -166,6 +167,38 @@ void main() {
       await tester.tap(find.byTooltip('Show the word'));
       await tester.pump();
       expect(find.text('BLACKHORSE'), findsOneWidget);
+    });
+
+    testWidgets('screenshots are blocked on the SARNEG screen', (tester) async {
+      useKeys(null);
+      await tester.pumpWidget(_app(const SarnegScreen()));
+      await tester.pumpAndSettle();
+      expect(ScreenPrivacy.secure, isTrue);
+      await tester.pumpWidget(const SizedBox());
+      expect(ScreenPrivacy.secure, isFalse);
+      expect(ScreenPrivacy.holders, 0);
+    });
+
+    testWidgets('a decoded line blocks screenshots only while open', (
+      tester,
+    ) async {
+      useKeys(SarnegKeySet(word: 'BLACKHORSE'));
+      final received = '[SARNEG] ${SarnegCodec('BLACKHORSE').encode('42')}';
+      await tester.pumpWidget(_app(_Chat(received: received)));
+      await tester.pumpAndSettle();
+      expect(ScreenPrivacy.secure, isFalse);
+      await tester.tap(find.text('SARNEG · tap to decode'));
+      await tester.pump();
+      expect(ScreenPrivacy.secure, isTrue);
+      await tester.tap(find.text('Decoded: 42'));
+      await tester.pump();
+      expect(ScreenPrivacy.secure, isFalse);
+
+      await tester.tap(find.byTooltip('Send numbers in SARNEG'));
+      await tester.pumpAndSettle();
+      expect(ScreenPrivacy.secure, isTrue, reason: 'the compose sheet');
+      await tester.pumpWidget(const SizedBox());
+      expect(ScreenPrivacy.holders, 0);
     });
 
     testWidgets('composer button and tap-to-decode', (tester) async {

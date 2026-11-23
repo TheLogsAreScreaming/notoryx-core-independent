@@ -14,6 +14,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../l10n/l10n.dart';
+import '../../app/no_screenshots.dart';
 import 'sarneg.dart';
 
 AppLocalizations _t(BuildContext context) => context.l10n;
@@ -191,7 +192,11 @@ class SarnegScreen extends StatelessWidget {
   const SarnegScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) =>
+      NoScreenshots(child: Builder(builder: _buildScreen));
+
+  // The screen itself; [build] keeps screenshots off around it.
+  Widget _buildScreen(BuildContext context) => Scaffold(
     appBar: AppBar(title: Text(_t(context).sarneg_title)),
     body: _keysBuilder(
       (context, store) => !store.loaded
@@ -742,7 +747,11 @@ class _SarnegImportScreenState extends State<SarnegImportScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      NoScreenshots(child: Builder(builder: _buildScreen));
+
+  // The screen itself; [build] keeps screenshots off around it.
+  Widget _buildScreen(BuildContext context) {
     final t = _t(context);
     return Scaffold(
       appBar: AppBar(title: Text(t.sarneg_importTitle)),
@@ -885,7 +894,11 @@ class _ComposeSheetState extends State<_ComposeSheet> {
   }
 
   @override
-  Widget build(BuildContext context) => _keysBuilder((context, store) {
+  Widget build(BuildContext context) =>
+      NoScreenshots(child: Builder(builder: _buildScreen));
+
+  // The screen itself; [build] keeps screenshots off around it.
+  Widget _buildScreen(BuildContext context) => _keysBuilder((context, store) {
     final t = _t(context);
     final keys = store.keys;
     final pad = EdgeInsets.fromLTRB(
@@ -1073,6 +1086,13 @@ class _SarnegDecodeLineState extends State<SarnegDecodeLine> {
 
   @override
   Widget build(BuildContext context) {
+    // Decoded numbers on screen: no screenshots until it closes again.
+    final child = _buildScreen(context);
+    return _open ? NoScreenshots(child: child) : child;
+  }
+
+  // The screen itself; [build] keeps screenshots off around it.
+  Widget _buildScreen(BuildContext context) {
     if (!isSarnegMessage(widget.text)) return const SizedBox.shrink();
     return _keysBuilder((context, store) {
       final t = _t(context);
