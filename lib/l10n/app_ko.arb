@@ -1415,6 +1415,7 @@
   "trafficOther": "기타",
   "trafficListening": "패킷 수신 대기 중…",
   "trafficHeardFrom": "{name}에게서 수신 · {snr} dB",
+  "trafficLastHop": "마지막 홉 {name} · {snr} dB",
   "trafficSnr": "{snr} dB",
   "trafficFlood": "플러드 {hops}",
   "trafficDirect": "직접 {hops}",

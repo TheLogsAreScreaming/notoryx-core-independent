@@ -1415,6 +1415,7 @@
   "trafficOther": "Övrigt",
   "trafficListening": "Lyssnar efter paket…",
   "trafficHeardFrom": "Hört från {name} · {snr} dB",
+  "trafficLastHop": "Sista hopp {name} · {snr} dB",
   "trafficSnr": "{snr} dB",
   "trafficFlood": "Flood {hops}",
   "trafficDirect": "Direkt {hops}",

@@ -2955,6 +2955,8 @@
   "trafficListening": "Listening for packets…",
   "trafficHeardFrom": "Heard from {name} · {snr} dB",
   "@trafficHeardFrom": {"placeholders": {"name": {"type": "String"}, "snr": {"type": "String"}}},
+  "trafficLastHop": "Last hop {name} · {snr} dB",
+  "@trafficLastHop": {"placeholders": {"name": {"type": "String"}, "snr": {"type": "String"}}},
   "trafficSnr": "{snr} dB",
   "@trafficSnr": {"placeholders": {"snr": {"type": "String"}}},
   "trafficFlood": "Flood {hops}",

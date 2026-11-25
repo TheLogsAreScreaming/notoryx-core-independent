@@ -1415,6 +1415,7 @@
   "trafficOther": "Drugo",
   "trafficListening": "Poslušanje paketov…",
   "trafficHeardFrom": "Slišano od {name} · {snr} dB",
+  "trafficLastHop": "Zadnji skok {name} · {snr} dB",
   "trafficSnr": "{snr} dB",
   "trafficFlood": "Razpošiljanje {hops}",
   "trafficDirect": "Neposredno {hops}",

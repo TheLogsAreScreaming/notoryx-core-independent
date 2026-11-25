@@ -155,6 +155,9 @@ final class TrafficRoute {
     return stops[stops.length - 2];
   }
 
+  /// Whether [heardFrom] is a repeater that passed it on, not the sender.
+  bool get heardFromRelay => heardFrom != null && stops.length > 2;
+
   /// The route as text, `Origin → hop → … → last`.
   String get summary => stops.map((s) => s.label).join(' → ');
 }

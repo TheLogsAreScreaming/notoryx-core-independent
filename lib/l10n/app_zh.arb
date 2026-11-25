@@ -1415,6 +1415,7 @@
   "trafficOther": "其他",
   "trafficListening": "正在监听数据包…",
   "trafficHeardFrom": "收到来自 {name} · {snr} dB",
+  "trafficLastHop": "最后一跳 {name} · {snr} dB",
   "trafficSnr": "{snr} dB",
   "trafficFlood": "泛洪 {hops}",
   "trafficDirect": "直连 {hops}",

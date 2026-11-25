@@ -1415,6 +1415,7 @@
   "trafficOther": "その他",
   "trafficListening": "パケットを待ち受け中…",
   "trafficHeardFrom": "{name} から受信 · {snr} dB",
+  "trafficLastHop": "最終ホップ {name} · {snr} dB",
   "trafficSnr": "{snr} dB",
   "trafficFlood": "フラッド {hops}",
   "trafficDirect": "直接 {hops}",

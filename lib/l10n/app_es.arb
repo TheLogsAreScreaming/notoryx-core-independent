@@ -1415,6 +1415,7 @@
   "trafficOther": "Otro",
   "trafficListening": "Escuchando paquetes…",
   "trafficHeardFrom": "Oído de {name} · {snr} dB",
+  "trafficLastHop": "Último salto {name} · {snr} dB",
   "trafficSnr": "{snr} dB",
   "trafficFlood": "Inundación {hops}",
   "trafficDirect": "Directo {hops}",
