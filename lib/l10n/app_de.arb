@@ -1631,5 +1631,6 @@
   "coverageStop": "Teilen beenden",
   "coverageStopConfirm": "Teilen beenden und noch nicht gesendete Messungen löschen? Bereits Gesendetes bleibt auf der Karte, bis du es löschst.",
   "coverageOpenMap": "Abdeckungskarte öffnen",
-  "coverageOpenFailed": "{url} konnte nicht geöffnet werden"
+  "coverageOpenFailed": "{url} konnte nicht geöffnet werden",
+  "contactsFullWarning": "Die Kontaktliste dieses Funkgeräts ist voll, daher kann es keine neuen Knoten hinzufügen. Entferne einige Kontakte, um Platz zu schaffen."
 }

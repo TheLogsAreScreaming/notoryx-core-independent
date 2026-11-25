@@ -149,6 +149,34 @@ void main() {
     },
   );
 
+  test('channel posts leave room for the name the radio adds', () async {
+    final key = (await sync.start(now: now)).key;
+    // "Base: " takes 6 of the 160 bytes.
+    expect(sync.maxChannelTextBytes, 154);
+    expect(() => sync.sendChannel(0, 'x' * 155, now: now), throwsArgumentError);
+    await sync.sendChannel(0, 'x' * 154, now: now);
+    expect(
+      (await store.watchThread(key, Threads.channel(0)).first).single.body,
+      hasLength(154),
+    );
+  });
+
+  test('a full contact list is flagged until the radio drops one', () async {
+    await sync.start(now: now);
+    final changes = <bool>[];
+    sync.contactsFullChanges.listen(changes.add);
+    expect(sync.contactsFull, isFalse);
+
+    link.emit([PushCode.contactsFull]);
+    await pumpEventQueue();
+    expect(sync.contactsFull, isTrue);
+
+    link.emit([PushCode.contactDeleted, ...List.filled(32, 7)]);
+    await pumpEventQueue();
+    expect(sync.contactsFull, isFalse);
+    expect(changes, [true, false]);
+  });
+
   group('SMAZ', () {
     const text = 'the weather is clear on the ridge tonight';
     String onAir() =>

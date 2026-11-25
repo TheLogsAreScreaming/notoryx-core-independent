@@ -1631,5 +1631,6 @@
   "coverageStop": "Sluta dela",
   "coverageStopConfirm": "Sluta dela och radera mätningar som inte skickats än? Det som redan skickats ligger kvar på kartan tills du raderar det.",
   "coverageOpenMap": "Öppna täckningskartan",
-  "coverageOpenFailed": "Kunde inte öppna {url}"
+  "coverageOpenFailed": "Kunde inte öppna {url}",
+  "contactsFullWarning": "Radions kontaktlista är full, så den kan inte lägga till nya noder. Ta bort några kontakter för att frigöra plats."
 }

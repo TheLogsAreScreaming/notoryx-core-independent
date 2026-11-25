@@ -87,6 +87,7 @@ class RadioSession {
   _Request? _current;
   bool _closed = false;
   bool _syncing = false;
+  bool _syncAgain = false;
 
   final _pushes = StreamController<PushFrame>.broadcast();
   final _messages = StreamController<ReplyFrame>.broadcast();
@@ -257,16 +258,35 @@ class RadioSession {
   }
 
   Future<void> _autoSync() async {
-    if (_syncing) return;
+    if (_syncing) {
+      // The sync under way may already have passed the new message, so go
+      // round once more when it ends.
+      _syncAgain = true;
+      return;
+    }
     _syncing = true;
+    var failures = 0;
     try {
-      await syncMessages();
-    } on RadioRequestException {
-      // A later "messages waiting" push will try again.
+      do {
+        _syncAgain = false;
+        try {
+          await syncMessages();
+          failures = 0;
+        } on RadioRequestException {
+          if (_closed || ++failures > _maxSyncRetries) break;
+          // Messages are still waiting on the radio; try again shortly
+          // rather than leaving them there until the next push.
+          _syncAgain = true;
+          await Future<void>.delayed(_syncRetryDelay * failures);
+        }
+      } while (_syncAgain && !_closed);
     } finally {
       _syncing = false;
     }
   }
+
+  static const _maxSyncRetries = 3;
+  static const _syncRetryDelay = Duration(seconds: 2);
 
   void _onLinkClosed() {
     if (_closed) return;
