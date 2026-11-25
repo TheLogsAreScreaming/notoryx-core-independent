@@ -1031,6 +1031,22 @@ void main() {
     await cleanUp(tester);
   });
 
+  testWidgets('a wrong reply at connect says another app may hold the radio', (
+    tester,
+  ) async {
+    radioSetup = (radio) => radio.wrongStartReply = true;
+    await connect(tester);
+    expect(
+      find.text(
+        "The radio didn't reply as expected. Another app may be connected "
+        'to it: close that app, then try again.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.textContaining('RadioUnexpectedReply'), findsNothing);
+    await cleanUp(tester);
+  });
+
   testWidgets('a dropped radio reconnects while the chats stay open', (
     tester,
   ) async {

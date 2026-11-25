@@ -1264,6 +1264,7 @@
   "errRadioDisconnected": "Радиото прекъсна връзката.",
   "errRadioDidNotAnswer": "Радиото не отговори.",
   "errClosedBeforeSetup": "Връзката беше затворена преди края на настройката.",
+  "errRadioUnexpectedReply": "Радиото не отговори както трябва. Може би друго приложение е свързано с него: затворете го и опитайте отново.",
   "errCouldNotConnect": "Не може да се свърже: {error}",
   "sensorBatteryOwn": "Батерия",
   "sensorChipTemperatureOwn": "Температура на чипа",

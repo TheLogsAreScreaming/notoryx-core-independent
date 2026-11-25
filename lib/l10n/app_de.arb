@@ -1264,6 +1264,7 @@
   "errRadioDisconnected": "Das Funkgerät hat die Verbindung getrennt.",
   "errRadioDidNotAnswer": "Das Funkgerät hat nicht geantwortet.",
   "errClosedBeforeSetup": "Die Verbindung wurde vor Ende der Einrichtung geschlossen.",
+  "errRadioUnexpectedReply": "Das Funkgerät hat nicht wie erwartet geantwortet. Vielleicht ist eine andere App damit verbunden: Schließe diese App und versuche es dann erneut.",
   "errCouldNotConnect": "Verbindung fehlgeschlagen: {error}",
   "sensorBatteryOwn": "Akku",
   "sensorChipTemperatureOwn": "Chiptemperatur",

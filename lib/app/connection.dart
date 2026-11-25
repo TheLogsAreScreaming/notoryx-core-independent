@@ -416,6 +416,7 @@ class ConnectionController extends Notifier<RadioConnectionState> {
   static String _describe(Object error) => switch (error) {
     BluetoothUnavailable() => error.message,
     RadioTimeout() => _radioDidNotAnswer,
+    RadioUnexpectedReply() => _unexpectedReply,
     RadioDisconnected() || LinkClosedException() => _closedBeforeSetup,
     _ => '$_couldNotConnect$error',
   };
@@ -426,6 +427,8 @@ class ConnectionController extends Notifier<RadioConnectionState> {
 const _radioDisconnected = 'The radio disconnected.';
 const _radioDidNotAnswer = 'The radio did not answer.';
 const _closedBeforeSetup = 'The connection closed before setup finished.';
+// Usually another app is talking to the same radio over Bluetooth.
+const _unexpectedReply = "The radio didn't reply as expected.";
 const _couldNotConnect = 'Could not connect: ';
 
 /// [error] from the connection state, in [l10n]'s language where known.
@@ -434,6 +437,7 @@ String connectionErrorText(AppLocalizations l10n, String error) =>
       _radioDisconnected => l10n.errRadioDisconnected,
       _radioDidNotAnswer => l10n.errRadioDidNotAnswer,
       _closedBeforeSetup => l10n.errClosedBeforeSetup,
+      _unexpectedReply => l10n.errRadioUnexpectedReply,
       _ when error.startsWith(_couldNotConnect) => l10n.errCouldNotConnect(
         error.substring(_couldNotConnect.length),
       ),

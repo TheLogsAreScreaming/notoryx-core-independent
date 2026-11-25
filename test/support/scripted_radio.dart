@@ -49,6 +49,10 @@ class ScriptedRadio {
   }
 
   final getContactsSince = <int?>[];
+
+  /// Answers the start command with the wrong frame, as when another app
+  /// is talking to the same radio.
+  bool wrongStartReply = false;
   bool refuseText = false;
 
   /// Whether the firmware supports area-limited posts (flood corridor).
@@ -76,6 +80,7 @@ class ScriptedRadio {
     34 || 62 => [
       [0],
     ],
+    CommandCode.appStart when wrongStartReply => [okFrame()],
     CommandCode.appStart => [
       selfInfoFrame(
         name: name,

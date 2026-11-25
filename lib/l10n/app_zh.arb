@@ -1264,6 +1264,7 @@
   "errRadioDisconnected": "电台已断开连接。",
   "errRadioDidNotAnswer": "电台没有回应。",
   "errClosedBeforeSetup": "设置完成前连接已关闭。",
+  "errRadioUnexpectedReply": "电台的回应不符合预期。可能有其他应用已连接到它：请关闭该应用，然后重试。",
   "errCouldNotConnect": "无法连接：{error}",
   "sensorBatteryOwn": "电池",
   "sensorChipTemperatureOwn": "芯片温度",

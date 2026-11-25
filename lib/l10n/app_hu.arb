@@ -1264,6 +1264,7 @@
   "errRadioDisconnected": "A rádió leválasztódott.",
   "errRadioDidNotAnswer": "A rádió nem válaszolt.",
   "errClosedBeforeSetup": "A kapcsolat a beállítás befejezése előtt bezárult.",
+  "errRadioUnexpectedReply": "A rádió nem a várt módon válaszolt. Lehet, hogy egy másik alkalmazás csatlakozik hozzá: zárd be azt, majd próbáld újra.",
   "errCouldNotConnect": "Nem sikerült csatlakozni: {error}",
   "sensorBatteryOwn": "Akkumulátor",
   "sensorChipTemperatureOwn": "Chiphőmérséklet",
