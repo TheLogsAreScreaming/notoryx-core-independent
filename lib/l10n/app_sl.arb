@@ -629,6 +629,8 @@
   "sntAppeal": "Pritožba",
   "sntAppealOther": "Pritožba na primer po številki",
   "sntYourReports": "Vaše nedavne prijave",
+  "sntStateReview": "V pregledu pri moderatorjih",
+  "sntStateClosed": "Zaključeno pri moderatorjih",
   "sntReport": "Prijavi moderatorjem",
   "sntReportTitle": "Prijavi {name}",
   "sntReasonSpam": "Neželena pošta ali oglaševanje",

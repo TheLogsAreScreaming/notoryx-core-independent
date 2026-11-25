@@ -629,6 +629,8 @@
   "sntAppeal": "Odwołanie",
   "sntAppealOther": "Odwołaj się od sprawy po numerze",
   "sntYourReports": "Twoje ostatnie zgłoszenia",
+  "sntStateReview": "W trakcie sprawdzania przez moderatorów",
+  "sntStateClosed": "Zamknięte przez moderatorów",
   "sntReport": "Zgłoś moderatorom",
   "sntReportTitle": "Zgłoś {name}",
   "sntReasonSpam": "Spam lub reklama",

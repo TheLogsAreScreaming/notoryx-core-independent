@@ -629,6 +629,8 @@
   "sntAppeal": "異議申し立て",
   "sntAppealOther": "案件番号で異議申し立て",
   "sntYourReports": "最近の報告",
+  "sntStateReview": "モデレーターが確認中",
+  "sntStateClosed": "モデレーターが対応を完了",
   "sntReport": "モデレーターに報告",
   "sntReportTitle": "{name} を報告",
   "sntReasonSpam": "スパムまたは広告",

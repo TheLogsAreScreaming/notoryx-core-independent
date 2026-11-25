@@ -194,6 +194,60 @@ String _randomRef() {
   ).join();
 }
 
+/// Where a report the user sent stands, as far as the relay will say.
+/// Deliberately coarse: never the outcome of the case.
+enum SentinelReportState { underReview, closed }
+
+/// A report this phone sent, kept so the user can see it was received.
+@immutable
+class SentinelSentReport {
+  const SentinelSentReport({
+    required this.caseRef,
+    required this.at,
+    this.nodeName,
+    this.externalRef,
+    this.state,
+  });
+
+  final String caseRef;
+  final String? nodeName;
+  final DateTime at;
+
+  /// The report's own reference, used to ask the relay for its status.
+  /// Null for reports saved by older app versions.
+  final String? externalRef;
+  final SentinelReportState? state;
+
+  SentinelSentReport withState(SentinelReportState? s) => SentinelSentReport(
+    caseRef: caseRef,
+    nodeName: nodeName,
+    at: at,
+    externalRef: externalRef,
+    state: s,
+  );
+
+  Map<String, Object?> toJson() => {
+    'caseRef': caseRef,
+    'nodeName': nodeName,
+    'at': at.toUtc().toIso8601String(),
+    if (externalRef != null) 'ref': externalRef,
+    if (state != null) 'state': state!.name,
+  };
+
+  static SentinelSentReport? fromJson(Object? j) {
+    if (j is! Map || j['caseRef'] is! String) return null;
+    final at = DateTime.tryParse('${j['at']}');
+    if (at == null) return null;
+    return SentinelSentReport(
+      caseRef: j['caseRef'] as String,
+      nodeName: j['nodeName'] is String ? j['nodeName'] as String : null,
+      at: at,
+      externalRef: j['ref'] is String ? j['ref'] as String : null,
+      state: SentinelReportState.values.asNameMap()[j['state']],
+    );
+  }
+}
+
 /// Opt-in link to NOTORYX Sentinel, the human-reviewed moderation service,
 /// for MeshCore: files spam reports (queued while offline), keeps the
 /// advisory lists of banned nodes, and relays appeals.
@@ -239,7 +293,7 @@ class SentinelService extends ChangeNotifier {
   Map<String, SentinelBan> _bans = const {};
   DateTime? _syncedAt;
   List<SentinelReport> _queue = const [];
-  List<({String caseRef, String? nodeName, DateTime at})> _sent = const [];
+  List<SentinelSentReport> _sent = const [];
   Timer? _timer;
   bool _syncing = false;
   Future<bool>? _inflight;
@@ -254,8 +308,7 @@ class SentinelService extends ChangeNotifier {
   bool get syncing => _syncing;
   int get queuedCount => _queue.length;
   int get flaggedCount => _bans.length;
-  List<({String caseRef, String? nodeName, DateTime at})> get sentReports =>
-      List.unmodifiable(_sent);
+  List<SentinelSentReport> get sentReports => List.unmodifiable(_sent);
 
   /// The ban on the contact with this public key (hex), if any.
   SentinelBan? banForKey(String publicKeyHex) =>
@@ -336,26 +389,12 @@ class SentinelService extends ChangeNotifier {
     }
   }
 
-  static List<({String caseRef, String? nodeName, DateTime at})> _decodeSent(
-    String? raw,
-  ) {
+  static List<SentinelSentReport> _decodeSent(String? raw) {
     if (raw == null) return const [];
     try {
       final list = jsonDecode(raw);
       if (list is! List) return const [];
-      return [
-        for (final j in list)
-          if (j is Map &&
-              j['caseRef'] is String &&
-              DateTime.tryParse('${j['at']}') != null)
-            (
-              caseRef: j['caseRef'] as String,
-              nodeName: j['nodeName'] is String
-                  ? j['nodeName'] as String
-                  : null,
-              at: DateTime.parse('${j['at']}'),
-            ),
-      ];
+      return [for (final j in list) ?SentinelSentReport.fromJson(j)];
     } on FormatException {
       return const [];
     }
@@ -399,6 +438,7 @@ class SentinelService extends ChangeNotifier {
     if (!_enabled) return;
     await syncDecisions(force: force);
     await flushQueue();
+    await checkReportStatus(force: force);
   }
 
   Uri _uri(String route) => Uri.parse('$_base/v1/$sentinelNetwork/$route');
@@ -495,7 +535,7 @@ class SentinelService extends ChangeNotifier {
         final body = jsonDecode(res.body);
         final ref = body is Map ? body['caseRef'] : null;
         if (ref is String) {
-          await _remember(ref, r.nodeName);
+          await _remember(ref, r.nodeName, r.externalRef);
           return SentinelReportSent(ref);
         }
         return const SentinelReportQueued();
@@ -518,23 +558,70 @@ class SentinelService extends ChangeNotifier {
     }
   }
 
-  Future<void> _remember(String caseRef, String? nodeName) async {
+  Future<void> _remember(
+    String caseRef,
+    String? nodeName,
+    String externalRef,
+  ) async {
     if (_sent.any((s) => s.caseRef == caseRef)) return;
     _sent = [
-      (caseRef: caseRef, nodeName: nodeName, at: _now()),
+      SentinelSentReport(
+        caseRef: caseRef,
+        nodeName: nodeName,
+        at: _now(),
+        externalRef: externalRef,
+        state: SentinelReportState.underReview,
+      ),
       ..._sent,
     ].take(maxSentHistory).toList();
-    await _set(
-      prefSent,
-      jsonEncode([
-        for (final s in _sent)
-          {
-            'caseRef': s.caseRef,
-            'nodeName': s.nodeName,
-            'at': s.at.toUtc().toIso8601String(),
-          },
-      ]),
-    );
+    await _saveSent();
+    _notify();
+  }
+
+  Future<void> _saveSent() =>
+      _set(prefSent, jsonEncode([for (final s in _sent) s.toJson()]));
+
+  DateTime? _statusCheckedAt;
+
+  /// Asks the relay whether each recent report is still under review
+  /// (at most once every five minutes unless [force]d). Reports that are
+  /// already closed, or that older versions saved without a reference,
+  /// are not asked about again.
+  Future<void> checkReportStatus({bool force = false}) async {
+    if (!_enabled || _sent.isEmpty) return;
+    final last = _statusCheckedAt;
+    if (!force && last != null && _now().difference(last) < _minSyncGap) return;
+    _statusCheckedAt = _now();
+    var changed = false;
+    final next = <SentinelSentReport>[];
+    for (final r in _sent) {
+      final ref = r.externalRef;
+      if (ref == null || r.state == SentinelReportState.closed) {
+        next.add(r);
+        continue;
+      }
+      var state = r.state;
+      try {
+        final res = await _transport(
+          'GET',
+          _uri('reports/${Uri.encodeComponent(ref)}'),
+          null,
+        ).timeout(_timeout);
+        if (res.status == 200) {
+          final body = jsonDecode(res.body);
+          final s = body is Map ? body['state'] : null;
+          if (s == 'closed') state = SentinelReportState.closed;
+          if (s == 'under_review') state = SentinelReportState.underReview;
+        }
+      } on Object {
+        // Offline or unexpected reply: keep what we knew.
+      }
+      if (state != r.state) changed = true;
+      next.add(r.withState(state));
+    }
+    if (!changed) return;
+    _sent = next;
+    await _saveSent();
     _notify();
   }
 

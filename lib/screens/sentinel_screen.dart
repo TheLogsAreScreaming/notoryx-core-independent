@@ -423,7 +423,15 @@ class SentinelPage extends StatelessWidget {
                       dense: true,
                       leading: const Icon(Icons.flag_outlined),
                       title: Text(r.nodeName ?? r.caseRef),
-                      subtitle: Text('${r.caseRef} · ${when(r.at)}'),
+                      subtitle: Text(
+                        [
+                          '${r.caseRef} · ${when(r.at)}',
+                          if (r.state == SentinelReportState.underReview)
+                            l.sntStateReview,
+                          if (r.state == SentinelReportState.closed)
+                            l.sntStateClosed,
+                        ].join('\n'),
+                      ),
                     ),
                 ],
               ],

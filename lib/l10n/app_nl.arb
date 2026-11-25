@@ -629,6 +629,8 @@
   "sntAppeal": "Beroep",
   "sntAppealOther": "Beroep aantekenen op een zaaknummer",
   "sntYourReports": "Je recente meldingen",
+  "sntStateReview": "Wordt beoordeeld door moderators",
+  "sntStateClosed": "Afgesloten door moderators",
   "sntReport": "Melden bij moderators",
   "sntReportTitle": "{name} melden",
   "sntReasonSpam": "Spam of reclame",

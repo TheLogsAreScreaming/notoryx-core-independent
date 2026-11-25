@@ -629,6 +629,8 @@
   "sntAppeal": "Recorrer",
   "sntAppealOther": "Recorrer de um caso pelo número",
   "sntYourReports": "Suas denúncias recentes",
+  "sntStateReview": "Em análise pelos moderadores",
+  "sntStateClosed": "Encerrada pelos moderadores",
   "sntReport": "Denunciar aos moderadores",
   "sntReportTitle": "Denunciar {name}",
   "sntReasonSpam": "Spam ou propaganda",
