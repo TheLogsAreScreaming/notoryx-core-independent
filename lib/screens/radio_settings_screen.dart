@@ -124,12 +124,7 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(connectionProvider);
-    if (state is! Connected) {
-      return Scaffold(
-        appBar: AppBar(title: Text(context.l10n.radioSettings)),
-        body: Center(child: Text(context.l10n.connectToTheRadioToChange)),
-      );
-    }
+    if (state is! Connected) return const _OfflineSettings();
     final self = state.radio.self;
     final device = state.radio.device;
     final autoAdd = _autoAdd;
@@ -606,6 +601,147 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
         v == v.roundToDouble() ? v.toStringAsFixed(0) : '$v';
     return '${s.frequencyMhz.toStringAsFixed(3)} MHz · BW ${trim(s.bandwidthKhz)} kHz'
         ' · SF${s.spreadingFactor} · CR 4/${s.codingRate}';
+  }
+}
+
+/// Radio settings with no radio connected: the radio's own settings wait
+/// for a connection, but everything kept on this device still opens.
+class _OfflineSettings extends StatelessWidget {
+  const _OfflineSettings();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    Widget open(
+      String key,
+      IconData icon,
+      String title,
+      String? subtitle,
+      Widget Function() page,
+    ) => ListTile(
+      key: ValueKey('offline-$key'),
+      leading: Icon(icon),
+      title: Text(title),
+      subtitle: subtitle == null ? null : Text(subtitle),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () =>
+          Navigator.of(context)
+              .push(MaterialPageRoute<void>(builder: (_) => page())),
+    );
+
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.radioSettings)),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720),
+          child: ListView(
+            children: [
+              ListTile(
+                key: const ValueKey('offline-note'),
+                leading: Icon(
+                  Icons.link_off,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                title: Text(l10n.connectToTheRadioToChange),
+              ),
+              const Divider(),
+              open(
+                'appearance',
+                Icons.palette_outlined,
+                l10n.appearance,
+                l10n.themeAndChatTextSize,
+                () => const AppearanceScreen(),
+              ),
+              open(
+                'sarneg',
+                Icons.dialpad,
+                l10n.sarneg_title,
+                l10n.sarneg_toolSubtitle,
+                () => const SarnegScreen(),
+              ),
+              open(
+                'app-lock',
+                Icons.lock_outline,
+                l10n.appLock,
+                l10n.fingerprintFaceOrScreenLock,
+                () => const AppLockSettingsScreen(),
+              ),
+              open(
+                'backup',
+                Icons.backup_outlined,
+                l10n.backupAndRestore,
+                null,
+                () => const BackupScreen(),
+              ),
+              open(
+                'blocked',
+                Icons.block,
+                l10n.blockedSenders,
+                null,
+                () => const BlockedScreen(),
+              ),
+              open(
+                'auto-replies',
+                Icons.smart_toy_outlined,
+                l10n.autoReplies,
+                l10n.botsAndAwayMessages,
+                () => const BotsScreen(),
+              ),
+              open(
+                'node-journal',
+                Icons.menu_book_outlined,
+                l10n.nodeJournal,
+                l10n.nodeJournalSubtitle,
+                () => const NodeJournalScreen(),
+              ),
+              open(
+                'timeline',
+                Icons.view_timeline_outlined,
+                l10n.timeline,
+                l10n.timelineSubtitle,
+                () => const TimelineScreen(),
+              ),
+              open(
+                'path-graph',
+                Icons.account_tree_outlined,
+                l10n.pathGraph,
+                l10n.pathGraphSubtitle,
+                () => const PathGraphScreen(),
+              ),
+              open(
+                'repeater-names',
+                Icons.alt_route,
+                l10n.repeaterNames,
+                l10n.repeaterNamesSubtitle,
+                () => const HopNamesScreen(),
+              ),
+              open(
+                'repeater-ids',
+                Icons.pin_outlined,
+                l10n.repeaterIDs,
+                l10n.whoUsesAnIDAndWhich,
+                () => const RepeaterIdsScreen(),
+              ),
+              open(
+                'area-messages',
+                Icons.radar,
+                l10n.areaMessages,
+                l10n.areaMessagesSubtitle,
+                () => const AreaMessagesScreen(),
+              ),
+              open(
+                'about',
+                Icons.info_outline,
+                l10n.aboutThisApp,
+                null,
+                () => const AboutScreen(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
