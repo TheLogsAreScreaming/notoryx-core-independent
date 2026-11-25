@@ -7,7 +7,6 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
@@ -18,6 +17,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../l10n/l10n.dart';
 import '../../app/no_screenshots.dart';
 import 'sarneg.dart';
+import 'secret_clipboard.dart';
 
 AppLocalizations _t(BuildContext context) => context.l10n;
 
@@ -170,7 +170,7 @@ class SarnegKeys extends ChangeNotifier {
   Future<void> burn() async {
     _clipboardTimer?.cancel();
     try {
-      await Clipboard.setData(const ClipboardData(text: ''));
+      await clearClipboard();
     } on Exception catch (e) {
       debugPrint('SARNEG: clipboard not cleared (${e.runtimeType})');
     }
@@ -206,25 +206,13 @@ Future<void> _copySecret(
   String message,
 ) async {
   final t = _t(context);
-  await Clipboard.setData(ClipboardData(text: value));
+  await copySecretText(value);
   _clipboardTimer?.cancel();
   _clipboardTimer = Timer(
     kSarnegClipboardFor,
-    () => unawaited(_clearClipboardIf(value)),
+    () => unawaited(clearClipboardIfStill(value)),
   );
   if (context.mounted) _snack(context, '$message ${t.sarneg_clipboardClears}');
-}
-
-Future<void> _clearClipboardIf(String value) async {
-  try {
-    final now = await Clipboard.getData(Clipboard.kTextPlain);
-    if (now?.text == value) {
-      await Clipboard.setData(const ClipboardData(text: ''));
-    }
-  } on Exception catch (e) {
-    // Never log the text itself.
-    debugPrint('SARNEG: clipboard not cleared (${e.runtimeType})');
-  }
 }
 
 Widget _keysBuilder(Widget Function(BuildContext, SarnegKeys) builder) {
