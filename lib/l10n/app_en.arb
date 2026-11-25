@@ -3390,5 +3390,6 @@
   "coverageStopConfirm": "Stop sharing and delete the readings not sent yet? What was already sent stays on the map until you erase it.",
   "coverageOpenMap": "Open the coverage map",
   "coverageOpenFailed": "Couldn't open {url}",
-  "@coverageOpenFailed": {"placeholders": {"url": {"type": "String"}}}
+  "@coverageOpenFailed": {"placeholders": {"url": {"type": "String"}}},
+  "contactsFullWarning": "This radio's contact list is full, so it can't add new nodes. Remove some contacts to make room."
 }

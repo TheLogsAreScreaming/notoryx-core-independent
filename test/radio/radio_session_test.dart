@@ -201,6 +201,64 @@ void main() {
     expect(link.sentCodes, List.filled(3, CommandCode.syncNextMessage));
   });
 
+  test(
+    'a message that lands while a sync is ending is still fetched',
+    () async {
+      final queued = [channelMessageFrame('Ridge: first')];
+      var emptyReplies = 0;
+      link.onSend = (frame) {
+        if (frame[0] != CommandCode.syncNextMessage) return [];
+        if (queued.isNotEmpty) return [queued.removeAt(0)];
+        // The radio hears a new message and pushes "messages waiting" just
+        // as it answers this request with "no more", from its old count.
+        if (emptyReplies++ == 0) {
+          queued.add(channelMessageFrame('Ridge: second'));
+          return [
+            [PushCode.messagesWaiting],
+            [ResponseCode.noMoreMessages],
+          ];
+        }
+        return [
+          [ResponseCode.noMoreMessages],
+        ];
+      };
+      final received = <ReplyFrame>[];
+      session.messages.listen(received.add);
+
+      link.emit([PushCode.messagesWaiting]);
+      await pumpEventQueue();
+
+      expect(received.cast<ChannelMessage>().map((m) => m.senderAndBody.body), [
+        'first',
+        'second',
+      ]);
+    },
+  );
+
+  test('a sync that times out tries again instead of stalling', () {
+    fakeAsync((async) {
+      final link = FakeRadioLink();
+      final session = RadioSession(link, timeout: const Duration(seconds: 5));
+      final queued = [channelMessageFrame('Ridge: late')];
+      var calls = 0;
+      link.onSend = (frame) {
+        if (frame[0] != CommandCode.syncNextMessage) return [];
+        // The first request goes unanswered.
+        if (calls++ == 0) return [];
+        return [
+          queued.isEmpty ? [ResponseCode.noMoreMessages] : queued.removeAt(0),
+        ];
+      };
+      final received = <ReplyFrame>[];
+      session.messages.listen(received.add);
+
+      link.emit([PushCode.messagesWaiting]);
+      async.elapse(const Duration(seconds: 10));
+
+      expect(received.cast<ChannelMessage>().single.senderAndBody.body, 'late');
+    });
+  });
+
   test('pushes arriving mid-request do not disturb the reply', () async {
     link.onSend = (_) => [
       [PushCode.advert, ...testKey],

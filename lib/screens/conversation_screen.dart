@@ -532,6 +532,49 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
     }
   }
 
+  /// The message box, with a byte counter once the text gets near what one
+  /// message can carry.
+  Widget _composerField(
+    BuildContext context,
+    String text, {
+    required bool canReply,
+    required bool connected,
+    required String? radioKey,
+  }) {
+    final state = ref.watch(connectionProvider);
+    final max = widget.isChannel && state is Connected
+        ? state.sync.maxChannelTextBytes
+        : maxDirectTextBytes;
+    final used = utf8.encode(text.trim()).length;
+    final showCount = used > max * 3 ~/ 4;
+    return TextField(
+      controller: _text,
+      enabled: canReply,
+      textCapitalization: TextCapitalization.sentences,
+      minLines: 1,
+      maxLines: 4,
+      decoration: InputDecoration(
+        hintText: canReply && _inArea
+            ? context.l10n.areaMessageHint(
+                areaKmLabel(ref.watch(areaMessagesProvider).radiusKm),
+              )
+            : canReply
+            ? context.l10n.message
+            : connected
+            ? context.l10n.addSenderToReply
+            : radioKey != null
+            ? context.l10n.waitingForReconnect
+            : context.l10n.mqttNotConnected,
+        border: const OutlineInputBorder(),
+        counterText: showCount ? '$used/$max' : null,
+        counterStyle: used > max
+            ? TextStyle(color: Theme.of(context).colorScheme.error)
+            : null,
+      ),
+      onSubmitted: (_) => _send(),
+    );
+  }
+
   /// Takes what's in the box and sets it to go out later.
   Future<void> _schedule() async {
     final text = _text.text.trim();
@@ -1142,29 +1185,15 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen>
                   ),
                   SarnegComposeButton(controller: _text, enabled: canReply),
                   Expanded(
-                    child: TextField(
-                      controller: _text,
-                      enabled: canReply,
-                      textCapitalization: TextCapitalization.sentences,
-                      minLines: 1,
-                      maxLines: 4,
-                      decoration: InputDecoration(
-                        hintText: canReply && _inArea
-                            ? context.l10n.areaMessageHint(
-                                areaKmLabel(
-                                  ref.watch(areaMessagesProvider).radiusKm,
-                                ),
-                              )
-                            : canReply
-                            ? context.l10n.message
-                            : connected
-                            ? context.l10n.addSenderToReply
-                            : radioKey != null
-                            ? context.l10n.waitingForReconnect
-                            : context.l10n.mqttNotConnected,
-                        border: const OutlineInputBorder(),
+                    child: ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: _text,
+                      builder: (context, value, _) => _composerField(
+                        context,
+                        value.text,
+                        canReply: canReply,
+                        connected: connected,
+                        radioKey: radioKey,
                       ),
-                      onSubmitted: (_) => _send(),
                     ),
                   ),
                   const SizedBox(width: 8),

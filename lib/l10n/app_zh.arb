@@ -1631,5 +1631,6 @@
   "coverageStop": "停止共享",
   "coverageStopConfirm": "停止共享并删除尚未发送的记录？已发送的内容会保留在地图上，直到你删除。",
   "coverageOpenMap": "打开覆盖地图",
-  "coverageOpenFailed": "无法打开 {url}"
+  "coverageOpenFailed": "无法打开 {url}",
+  "contactsFullWarning": "此电台的联系人列表已满，无法添加新节点。请删除一些联系人以腾出空间。"
 }

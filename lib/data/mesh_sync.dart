@@ -134,6 +134,7 @@ class MeshSync {
   final _ackOwner = <int, int>{};
 
   final _retryingChanges = StreamController<Set<int>>.broadcast();
+  final _contactsFullChanges = StreamController<bool>.broadcast();
   final _incoming = StreamController<Message>.broadcast();
 
   final _subscriptions = <StreamSubscription<Object>>[];
@@ -165,6 +166,20 @@ class MeshSync {
 
   /// Emits [retrying] whenever it changes.
   Stream<Set<int>> get retryingChanges => _retryingChanges.stream;
+
+  /// Whether the radio has said its contact list is full, so it can't add
+  /// new nodes until one is removed.
+  bool get contactsFull => _contactsFull;
+  bool _contactsFull = false;
+
+  /// [contactsFull] each time it changes.
+  Stream<bool> get contactsFullChanges => _contactsFullChanges.stream;
+
+  void _setContactsFull(bool full) {
+    if (_contactsFull == full) return;
+    _contactsFull = full;
+    if (!_contactsFullChanges.isClosed) _contactsFullChanges.add(full);
+  }
 
   /// Opens the session and brings the store up to date.
   Future<ConnectedRadio> start({DateTime? now}) async {
@@ -444,6 +459,14 @@ class MeshSync {
 
   // Channels
 
+  /// Longest channel post in UTF-8 bytes. The radio puts "`name`: " in front
+  /// of the text and cuts anything past [maxDirectTextBytes], so our name
+  /// takes that much room away.
+  int get maxChannelTextBytes {
+    final name = utf8.encode(_radio?.self.name ?? '').length;
+    return (maxDirectTextBytes - name - 2).clamp(0, maxDirectTextBytes);
+  }
+
   /// Number of channel slots on the radio.
   int get channelSlots => _radio?.device.maxChannels ?? 8;
 
@@ -578,6 +601,7 @@ class MeshSync {
   Future<void> removeContact(PublicKey publicKey) async {
     final key = _requireKey();
     await _session.run(RemoveContact(publicKey));
+    _setContactsFull(false);
     await _store.removeContact(key, publicKey);
   }
 
@@ -896,6 +920,13 @@ class MeshSync {
     final wire = compress && !signed
         ? await _onAir(Threads.channel(slot), text)
         : text;
+    if (utf8.encode(wire).length > maxChannelTextBytes) {
+      throw ArgumentError.value(
+        text,
+        'text',
+        'longer than $maxChannelTextBytes bytes',
+      );
+    }
     final plain = SendChannelText(channel: slot, text: wire, timestamp: sentAt);
     final limited = area == null || area.isEmpty
         ? null
@@ -981,6 +1012,7 @@ class MeshSync {
       await _fail(job);
     }
     await _retryingChanges.close();
+    await _contactsFullChanges.close();
     await _incoming.close();
     await _errors.close();
   }
@@ -1189,7 +1221,10 @@ class MeshSync {
         // The radio only sends this for nodes it did NOT add, so it belongs
         // in "heard nearby", not in the contact list.
         await _store.saveDiscovered(key, contact);
+      case ContactsFull():
+        _setContactsFull(true);
       case ContactDeleted(:final publicKey):
+        _setContactsFull(false);
         await _store.removeContact(key, publicKey);
       case SendConfirmed(:final ackCode):
         await _delivered(key, ackCode);

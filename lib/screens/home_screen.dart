@@ -17,6 +17,7 @@ import 'contact_cleanup_screen.dart';
 import 'area_screen.dart';
 import '../l10n/l10n.dart';
 import 'battery_banner.dart';
+import 'contacts_full_banner.dart';
 import 'own_status_strip.dart';
 import 'conversation_screen.dart';
 import 'manage_actions.dart';
@@ -179,6 +180,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             _ReconnectBanner(attempt: attempt, error: error),
           if (connection is ViewingSaved) const _ViewingSavedBanner(),
           const BatteryBanner(),
+          const ContactsFullBanner(),
           const AreaBanner(),
           if (_tab == 0)
             OwnStatusStrip(radioKey: key, radioName: widget.radioName),

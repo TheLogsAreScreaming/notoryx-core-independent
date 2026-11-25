@@ -1631,5 +1631,6 @@
   "coverageStop": "Deixar de partilhar",
   "coverageStopConfirm": "Deixar de partilhar e apagar as leituras ainda não enviadas? O que já foi enviado fica no mapa até o apagar.",
   "coverageOpenMap": "Abrir o mapa de cobertura",
-  "coverageOpenFailed": "Não foi possível abrir {url}"
+  "coverageOpenFailed": "Não foi possível abrir {url}",
+  "contactsFullWarning": "A lista de contatos deste rádio está cheia, então ele não pode adicionar novos nós. Remova alguns contatos para liberar espaço."
 }
