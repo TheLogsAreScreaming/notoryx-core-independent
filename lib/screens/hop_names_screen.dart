@@ -14,9 +14,15 @@ class HopNamesScreen extends ConsumerStatefulWidget {
 }
 
 class _HopNamesScreenState extends ConsumerState<HopNamesScreen> {
-  late final _server = TextEditingController(
-    text: ref.read(hopNamesProvider).server,
-  );
+  // Made in initState, not lazily: a lazy field first read in dispose()
+  // would read the provider after the screen is gone.
+  late final TextEditingController _server;
+
+  @override
+  void initState() {
+    super.initState();
+    _server = TextEditingController(text: ref.read(hopNamesProvider).server);
+  }
 
   @override
   void dispose() {
