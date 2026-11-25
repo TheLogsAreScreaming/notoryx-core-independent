@@ -1264,6 +1264,7 @@
   "errRadioDisconnected": "無線機が切断されました。",
   "errRadioDidNotAnswer": "無線機が応答しませんでした。",
   "errClosedBeforeSetup": "セットアップの完了前に接続が閉じられました。",
+  "errRadioUnexpectedReply": "無線機から想定外の応答がありました。別のアプリが接続している可能性があります。そのアプリを閉じてから、もう一度お試しください。",
   "errCouldNotConnect": "接続できませんでした: {error}",
   "sensorBatteryOwn": "バッテリー",
   "sensorChipTemperatureOwn": "チップ温度",

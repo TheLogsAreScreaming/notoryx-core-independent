@@ -1264,6 +1264,7 @@
   "errRadioDisconnected": "무전기 연결이 끊겼습니다.",
   "errRadioDidNotAnswer": "무전기가 응답하지 않았습니다.",
   "errClosedBeforeSetup": "설정이 끝나기 전에 연결이 닫혔습니다.",
+  "errRadioUnexpectedReply": "무전기가 예상과 다르게 응답했습니다. 다른 앱이 연결되어 있을 수 있습니다. 그 앱을 닫은 뒤 다시 시도하세요.",
   "errCouldNotConnect": "연결할 수 없음: {error}",
   "sensorBatteryOwn": "배터리",
   "sensorChipTemperatureOwn": "칩 온도",

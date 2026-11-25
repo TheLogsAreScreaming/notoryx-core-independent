@@ -1264,6 +1264,7 @@
   "errRadioDisconnected": "Radio je prekinil povezavo.",
   "errRadioDidNotAnswer": "Radio ni odgovoril.",
   "errClosedBeforeSetup": "Povezava se je zaprla pred koncem nastavitve.",
+  "errRadioUnexpectedReply": "Radio ni odgovoril, kot je bilo pričakovano. Morda je z njim povezana druga aplikacija: zapri jo in poskusi znova.",
   "errCouldNotConnect": "Povezava ni uspela: {error}",
   "sensorBatteryOwn": "Baterija",
   "sensorChipTemperatureOwn": "Temperatura čipa",

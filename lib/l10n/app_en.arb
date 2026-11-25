@@ -2777,6 +2777,7 @@
   "errRadioDisconnected": "The radio disconnected.",
   "errRadioDidNotAnswer": "The radio did not answer.",
   "errClosedBeforeSetup": "The connection closed before setup finished.",
+  "errRadioUnexpectedReply": "The radio didn't reply as expected. Another app may be connected to it: close that app, then try again.",
   "errCouldNotConnect": "Could not connect: {error}",
   "@errCouldNotConnect": {"placeholders": {"error": {"type": "Object"}}},
   "sensorBatteryOwn": "Battery",

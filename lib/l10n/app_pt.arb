@@ -1264,6 +1264,7 @@
   "errRadioDisconnected": "O rádio desconectou.",
   "errRadioDidNotAnswer": "O rádio não respondeu.",
   "errClosedBeforeSetup": "A conexão fechou antes de terminar a configuração.",
+  "errRadioUnexpectedReply": "O rádio não respondeu como esperado. Outro app pode estar conectado a ele: feche esse app e tente de novo.",
   "errCouldNotConnect": "Não foi possível conectar: {error}",
   "sensorBatteryOwn": "Bateria",
   "sensorChipTemperatureOwn": "Temperatura do chip",

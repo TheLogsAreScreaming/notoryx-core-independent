@@ -1264,6 +1264,7 @@
   "errRadioDisconnected": "Радио отключилось.",
   "errRadioDidNotAnswer": "Радио не ответило.",
   "errClosedBeforeSetup": "Соединение закрылось до завершения настройки.",
+  "errRadioUnexpectedReply": "Радио ответило не так, как ожидалось. Возможно, к нему подключено другое приложение: закройте его и попробуйте снова.",
   "errCouldNotConnect": "Не удалось подключиться: {error}",
   "sensorBatteryOwn": "Батарея",
   "sensorChipTemperatureOwn": "Температура чипа",

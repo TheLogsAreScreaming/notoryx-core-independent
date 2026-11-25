@@ -1264,6 +1264,7 @@
   "errRadioDisconnected": "Radion kopplades från.",
   "errRadioDidNotAnswer": "Radion svarade inte.",
   "errClosedBeforeSetup": "Anslutningen stängdes innan inställningen var klar.",
+  "errRadioUnexpectedReply": "Radion svarade inte som väntat. En annan app kan vara ansluten till den: stäng den appen och försök igen.",
   "errCouldNotConnect": "Kunde inte ansluta: {error}",
   "sensorBatteryOwn": "Batteri",
   "sensorChipTemperatureOwn": "Chiptemperatur",

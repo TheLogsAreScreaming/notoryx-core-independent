@@ -1264,6 +1264,7 @@
   "errRadioDisconnected": "De radio heeft de verbinding verbroken.",
   "errRadioDidNotAnswer": "De radio antwoordde niet.",
   "errClosedBeforeSetup": "De verbinding werd gesloten voordat de installatie klaar was.",
+  "errRadioUnexpectedReply": "De radio antwoordde niet zoals verwacht. Misschien is een andere app ermee verbonden: sluit die app en probeer het opnieuw.",
   "errCouldNotConnect": "Kon niet verbinden: {error}",
   "sensorBatteryOwn": "Batterij",
   "sensorChipTemperatureOwn": "Chiptemperatuur",

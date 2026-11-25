@@ -1264,6 +1264,7 @@
   "errRadioDisconnected": "Rádio sa odpojilo.",
   "errRadioDidNotAnswer": "Rádio neodpovedalo.",
   "errClosedBeforeSetup": "Spojenie sa zavrelo pred dokončením nastavenia.",
+  "errRadioUnexpectedReply": "Rádio neodpovedalo podľa očakávania. Možno je k nemu pripojená iná aplikácia: zavri ju a skús to znova.",
   "errCouldNotConnect": "Nepodarilo sa pripojiť: {error}",
   "sensorBatteryOwn": "Batéria",
   "sensorChipTemperatureOwn": "Teplota čipu",
