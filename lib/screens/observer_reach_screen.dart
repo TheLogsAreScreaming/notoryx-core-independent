@@ -24,12 +24,20 @@ class ObserverReachScreen extends ConsumerStatefulWidget {
 }
 
 class _ObserverReachScreenState extends ConsumerState<ObserverReachScreen> {
-  late final _server = TextEditingController(
-    text: ref.read(observerReachProvider).server,
-  );
+  // Made in initState, not lazily: a lazy field first read in dispose()
+  // would read the provider after the screen is gone.
+  late final TextEditingController _server;
   ReachResult? _result;
   bool _busy = false;
   bool _badServer = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _server = TextEditingController(
+      text: ref.read(observerReachProvider).server,
+    );
+  }
 
   @override
   void dispose() {

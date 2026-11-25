@@ -18,6 +18,7 @@ import 'package:notoryx_core/app/keep_alive.dart';
 import 'package:notoryx_core/app/mesh_links.dart';
 import 'package:notoryx_core/app/notifications.dart';
 import 'package:notoryx_core/app/radio_connector.dart';
+import 'package:notoryx_core/app/appearance.dart';
 import 'package:notoryx_core/data/data.dart';
 import 'package:notoryx_core/main.dart';
 import 'package:notoryx_core/screens/map_tab.dart';
@@ -520,6 +521,123 @@ void main() {
       await tester.tap(find.byTooltip('Radio settings'));
       await settle(tester);
       await check(tester, 'radio settings');
+      await cleanUp(tester);
+    });
+
+    testWidgets('every screen under Radio settings labels its controls', (
+      tester,
+    ) async {
+      await connect(tester);
+      await tester.tap(find.byTooltip('Radio settings'));
+      await settle(tester);
+      // In the order they appear, top to bottom.
+      const screens = [
+        'Local mesh settings',
+        'Battery and sensor history',
+        'Repeater names',
+        'Observer reach',
+        'Area-limited messages (experimental)',
+        'Identity key',
+        'Backup and restore',
+        'Blocked senders',
+        'About this app',
+        'App lock',
+        'Command line',
+        'MQTT bridge',
+        'Nearby repeater test',
+        'Path graph',
+        'Node journal',
+        'Timeline',
+        'SARNEG code word',
+        'Repeater IDs',
+        'Auto-replies',
+        'Appearance',
+        'Noise floor history',
+      ];
+      final failed = <String>[];
+      for (final title in screens) {
+        final tile = find.text(title);
+        await tester.scrollUntilVisible(
+          tile,
+          200,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.tap(tile);
+        await settle(tester);
+        final handle = tester.ensureSemantics();
+        await tester.pump();
+        for (final (name, g) in [
+          ('labels', labeledTapTargetGuideline),
+          ('tap size', androidTapTargetGuideline),
+          ('contrast', textContrastGuideline),
+        ]) {
+          final result = await g.evaluate(tester);
+          if (!result.passed) failed.add('$title [$name]: ${result.reason}');
+        }
+        handle.dispose();
+        await tester.pageBack();
+        await settle(tester);
+      }
+      expect(failed, isEmpty, reason: failed.join('\n\n'));
+      await cleanUp(tester);
+    });
+
+    for (final theme in AppThemeChoice.values) {
+      testWidgets('text is readable in the ${theme.name} theme', (
+        tester,
+      ) async {
+        await tester.runAsync(
+          () => MeshStore(db).saveSetting(themeSetting, theme.name),
+        );
+        await connect(tester);
+        final failed = <String>[];
+        Future<void> contrast(String where) async {
+          final handle = tester.ensureSemantics();
+          await tester.pump();
+          final result = await textContrastGuideline.evaluate(tester);
+          if (!result.passed) failed.add('$where: ${result.reason}');
+          handle.dispose();
+        }
+
+        await contrast('chats');
+        await tester.tap(find.text('Contacts'));
+        await settle(tester);
+        await contrast('contacts');
+        await tester.tap(find.text('Chats'));
+        await settle(tester);
+        await tester.tap(find.text('#trail'));
+        await settle(tester);
+        await contrast('conversation');
+        await tester.pageBack();
+        await settle(tester);
+        await tester.tap(find.byTooltip('Radio settings'));
+        await settle(tester);
+        await contrast('radio settings');
+        expect(failed, isEmpty, reason: failed.join('\n\n'));
+        await cleanUp(tester);
+      });
+    }
+
+    testWidgets('main screens fit at twice the text size', (tester) async {
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await connect(tester);
+      await tester.tap(find.text('Contacts'));
+      await settle(tester);
+      await tester.tap(find.text('Map'));
+      await settle(tester);
+      await tester.tap(find.text('Chats'));
+      await settle(tester);
+      await tester.tap(find.text('#trail'));
+      await settle(tester);
+      await tester.pageBack();
+      await settle(tester);
+      await tester.tap(find.byTooltip('Safety: SOS and check-ins'));
+      await settle(tester);
+      await tester.pageBack();
+      await settle(tester);
+      await tester.tap(find.byTooltip('Radio settings'));
+      await settle(tester);
       await cleanUp(tester);
     });
 
