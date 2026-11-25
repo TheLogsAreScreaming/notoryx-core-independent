@@ -172,7 +172,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.text('Ridge RPT → 7F → Base'), findsOneWidget);
     expect(find.text('Channel message'), findsWidgets);
-    expect(find.text('Heard from 7F · 6.50 dB'), findsOneWidget);
+    expect(find.text('Last hop 7F · 6.50 dB'), findsOneWidget);
     expect(find.textContaining('Flood 2 · -88 dBm'), findsOneWidget);
     expect(find.text('Not on map: 7F'), findsOneWidget);
 

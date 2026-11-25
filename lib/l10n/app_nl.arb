@@ -1414,6 +1414,7 @@
   "trafficOther": "Overig",
   "trafficListening": "Luisteren naar pakketten…",
   "trafficHeardFrom": "Gehoord van {name} · {snr} dB",
+  "trafficLastHop": "Laatste hop {name} · {snr} dB",
   "trafficSnr": "{snr} dB",
   "trafficFlood": "Flood {hops}",
   "trafficDirect": "Direct {hops}",

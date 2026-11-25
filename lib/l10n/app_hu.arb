@@ -1414,6 +1414,7 @@
   "trafficOther": "Egyéb",
   "trafficListening": "Csomagok figyelése…",
   "trafficHeardFrom": "Hallva tőle: {name} · {snr} dB",
+  "trafficLastHop": "Utolsó ugrás {name} · {snr} dB",
   "trafficSnr": "{snr} dB",
   "trafficFlood": "Elárasztás {hops}",
   "trafficDirect": "Közvetlen {hops}",

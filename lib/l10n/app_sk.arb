@@ -1414,6 +1414,7 @@
   "trafficOther": "Iné",
   "trafficListening": "Počúvajú sa pakety…",
   "trafficHeardFrom": "Zachytené od {name} · {snr} dB",
+  "trafficLastHop": "Posledný skok {name} · {snr} dB",
   "trafficSnr": "{snr} dB",
   "trafficFlood": "Plošne {hops}",
   "trafficDirect": "Priamo {hops}",

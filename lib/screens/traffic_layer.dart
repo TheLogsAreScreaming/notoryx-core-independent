@@ -376,6 +376,12 @@ class _TrafficRouteCardState extends ConsumerState<TrafficRouteCard> {
                     Text(
                       route.heardFrom == null
                           ? l10n.trafficSnr(route.snr.toStringAsFixed(2))
+                          // A relay's SNR is only the last leg.
+                          : route.heardFromRelay
+                          ? l10n.trafficLastHop(
+                              route.heardFrom!.label,
+                              route.snr.toStringAsFixed(2),
+                            )
                           : l10n.trafficHeardFrom(
                               route.heardFrom!.label,
                               route.snr.toStringAsFixed(2),

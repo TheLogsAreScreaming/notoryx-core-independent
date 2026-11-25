@@ -1414,6 +1414,7 @@
   "trafficOther": "Інше",
   "trafficListening": "Прослуховування пакетів…",
   "trafficHeardFrom": "Почуто від {name} · {snr} дБ",
+  "trafficLastHop": "Останній перехід {name} · {snr} дБ",
   "trafficSnr": "{snr} дБ",
   "trafficFlood": "Розсилка {hops}",
   "trafficDirect": "Напряму {hops}",
