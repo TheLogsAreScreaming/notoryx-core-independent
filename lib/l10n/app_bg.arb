@@ -629,6 +629,8 @@
   "sntAppeal": "Обжалване",
   "sntAppealOther": "Обжалване на случай по номер",
   "sntYourReports": "Вашите скорошни доклади",
+  "sntStateReview": "Преглежда се от модераторите",
+  "sntStateClosed": "Затворен от модераторите",
   "sntReport": "Докладване на модераторите",
   "sntReportTitle": "Докладване на {name}",
   "sntReasonSpam": "Спам или реклама",

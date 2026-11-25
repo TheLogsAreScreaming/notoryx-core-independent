@@ -629,6 +629,8 @@
   "sntAppeal": "Апеляція",
   "sntAppealOther": "Оскаржити справу за номером",
   "sntYourReports": "Ваші нещодавні скарги",
+  "sntStateReview": "На розгляді в модераторів",
+  "sntStateClosed": "Закрито модераторами",
   "sntReport": "Поскаржитися модераторам",
   "sntReportTitle": "Поскаржитися на {name}",
   "sntReasonSpam": "Спам або реклама",

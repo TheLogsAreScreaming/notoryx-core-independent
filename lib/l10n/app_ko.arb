@@ -629,6 +629,8 @@
   "sntAppeal": "이의 제기",
   "sntAppealOther": "사건 번호로 이의 제기",
   "sntYourReports": "최근 신고",
+  "sntStateReview": "운영진이 검토 중",
+  "sntStateClosed": "운영진이 처리 완료",
   "sntReport": "관리자에게 신고",
   "sntReportTitle": "{name} 신고",
   "sntReasonSpam": "스팸 또는 광고",

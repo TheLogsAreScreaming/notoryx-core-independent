@@ -629,6 +629,8 @@
   "sntAppeal": "申诉",
   "sntAppealOther": "按编号申诉案件",
   "sntYourReports": "你最近的举报",
+  "sntStateReview": "版主审核中",
+  "sntStateClosed": "版主已处理完毕",
   "sntReport": "向管理员举报",
   "sntReportTitle": "举报 {name}",
   "sntReasonSpam": "垃圾信息或广告",

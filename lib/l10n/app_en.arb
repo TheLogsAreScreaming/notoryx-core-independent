@@ -1672,6 +1672,8 @@
   "sntAppeal": "Appeal",
   "sntAppealOther": "Appeal a case by number",
   "sntYourReports": "Your recent reports",
+  "sntStateReview": "Under review by moderators",
+  "sntStateClosed": "Closed by moderators",
   "sntReport": "Report to moderators",
   "sntReportTitle": "Report {name}",
   "@sntReportTitle": {"placeholders": {"name": {"type": "String"}}},

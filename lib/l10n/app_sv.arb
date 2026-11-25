@@ -629,6 +629,8 @@
   "sntAppeal": "Överklaga",
   "sntAppealOther": "Överklaga ett ärende via nummer",
   "sntYourReports": "Dina senaste rapporter",
+  "sntStateReview": "Granskas av moderatorer",
+  "sntStateClosed": "Avslutad av moderatorer",
   "sntReport": "Rapportera till moderatorer",
   "sntReportTitle": "Rapportera {name}",
   "sntReasonSpam": "Spam eller reklam",

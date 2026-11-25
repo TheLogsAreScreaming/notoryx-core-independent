@@ -179,6 +179,64 @@ void main() {
     },
   );
 
+  test(
+    'sent reports show whether moderators are still reviewing them',
+    () async {
+      var state = 'under_review';
+      respond = (r) {
+        if (r.method == 'POST' && r.url.path.endsWith('/reports')) {
+          return json(201, {'caseRef': 'SNT-1001'});
+        }
+        if (r.url.path.endsWith('/reports/ref-1')) {
+          return json(200, {'ref': 'ref-1', 'state': state});
+        }
+        if (r.url.path.contains('/reports/')) {
+          return json(404, {'error': 'Report not found'});
+        }
+        return json(200, decisions(const []));
+      };
+      final s = make();
+      await s.start();
+      await s.setEnabled(true);
+      await s.report(nodeId: _key, reason: SentinelReason.spam);
+      expect(s.sentReports.single.state, SentinelReportState.underReview);
+      expect(s.sentReports.single.externalRef, 'ref-1');
+
+      state = 'closed';
+      await s.checkReportStatus(force: true);
+      expect(s.sentReports.single.state, SentinelReportState.closed);
+      expect(requests.last.method, 'GET');
+      expect(
+        requests.last.url.toString(),
+        'https://relay.test/v1/meshcore/reports/ref-1',
+      );
+
+      // Closed reports are not asked about again; the state survives a restart.
+      requests.clear();
+      await s.checkReportStatus(force: true);
+      expect(requests, isEmpty);
+      s.dispose();
+      final again = make();
+      await again.start();
+      expect(again.sentReports.single.state, SentinelReportState.closed);
+      again.dispose();
+    },
+  );
+
+  test('reports saved by older versions load and are not looked up', () async {
+    prefs[SentinelService.prefSent] = jsonEncode([
+      {'caseRef': 'SNT-1000', 'nodeName': 'Old', 'at': '2026-11-13T10:00:00Z'},
+    ]);
+    final s = make();
+    await s.start();
+    await s.setEnabled(true);
+    expect(s.sentReports.single.caseRef, 'SNT-1000');
+    expect(s.sentReports.single.state, isNull);
+    await s.checkReportStatus(force: true);
+    expect(requests.where((r) => r.url.path.contains('/reports/')), isEmpty);
+    s.dispose();
+  });
+
   test('400 is dropped; 429 and 5xx are queued; appeals map codes', () async {
     var status = 400;
     respond = (r) => r.method == 'POST'

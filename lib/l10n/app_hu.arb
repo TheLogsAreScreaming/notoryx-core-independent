@@ -629,6 +629,8 @@
   "sntAppeal": "Fellebbezés",
   "sntAppealOther": "Fellebbezés ügyszám alapján",
   "sntYourReports": "Legutóbbi jelentéseid",
+  "sntStateReview": "A moderátorok vizsgálják",
+  "sntStateClosed": "A moderátorok lezárták",
   "sntReport": "Jelentés a moderátoroknak",
   "sntReportTitle": "{name} jelentése",
   "sntReasonSpam": "Spam vagy reklám",
