@@ -206,7 +206,7 @@ Future<void> _copySecret(
   String message,
 ) async {
   final t = _t(context);
-  await copySecretText(value);
+  await copySecretText(value, clearAfter: kSarnegClipboardFor);
   _clipboardTimer?.cancel();
   _clipboardTimer = Timer(
     kSarnegClipboardFor,
