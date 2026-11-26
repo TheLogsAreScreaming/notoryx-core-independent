@@ -1489,7 +1489,65 @@ class _Options extends StatelessWidget {
                       store.saveOptions(o.copyWith(clearWipe: true)),
                 ),
         ),
+        const _ExactClearTile(),
       ],
+    );
+  }
+}
+
+/// On Android 12+, whether copied text is cleared right on the minute, and
+/// a way to allow it. Hidden where it doesn't apply.
+class _ExactClearTile extends StatefulWidget {
+  const _ExactClearTile();
+
+  @override
+  State<_ExactClearTile> createState() => _ExactClearTileState();
+}
+
+class _ExactClearTileState extends State<_ExactClearTile>
+    with WidgetsBindingObserver {
+  ExactClearStatus? _status;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    unawaited(_refresh());
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // Coming back from Android's settings page: show the new answer.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) unawaited(_refresh());
+  }
+
+  Future<void> _refresh() async {
+    final status = await exactClearStatus();
+    if (mounted) setState(() => _status = status);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final status = _status;
+    if (status == null || status == ExactClearStatus.notNeeded) {
+      return const SizedBox.shrink();
+    }
+    final t = _t(context);
+    final allowed = status == ExactClearStatus.allowed;
+    return ListTile(
+      key: const ValueKey('sarneg-exact-clear'),
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(allowed ? Icons.timer_outlined : Icons.timer_off_outlined),
+      title: Text(t.sarneg_exactClear),
+      subtitle: Text(allowed ? t.sarneg_exactClearOn : t.sarneg_exactClearOff),
+      trailing: allowed ? null : const Icon(Icons.open_in_new),
+      onTap: allowed ? null : () => unawaited(openExactClearSettings()),
     );
   }
 }

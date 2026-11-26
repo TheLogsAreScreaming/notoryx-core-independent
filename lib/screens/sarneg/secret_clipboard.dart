@@ -72,3 +72,42 @@ Future<void> clearClipboardIfStill(String value) async {
     debugPrint('SARNEG: clipboard not cleared (${e.runtimeType})');
   }
 }
+
+/// Whether Android can clear copied text right on time.
+enum ExactClearStatus {
+  /// Android before 12: always on time, nothing to allow.
+  notNeeded,
+
+  /// Allowed under "Alarms & reminders".
+  allowed,
+
+  /// Not allowed: the clear may run up to about a minute late.
+  notAllowed,
+}
+
+/// The exact-clear status, or null off Android (other platforms clear with
+/// the app's own timer).
+Future<ExactClearStatus?> exactClearStatus() async {
+  if (!_android) return null;
+  try {
+    final status = await _channel.invokeMethod<String>('exactClearStatus');
+    return ExactClearStatus.values.asNameMap()[status];
+  } on MissingPluginException {
+    return null;
+  } on PlatformException catch (e) {
+    debugPrint('SARNEG: exact clear status failed (${e.code})');
+    return null;
+  }
+}
+
+/// Opens Android's "Alarms & reminders" page for this app.
+Future<void> openExactClearSettings() async {
+  if (!_android) return;
+  try {
+    await _channel.invokeMethod<void>('openExactClearSettings');
+  } on MissingPluginException {
+    // Older native build: nothing to open.
+  } on PlatformException catch (e) {
+    debugPrint('SARNEG: could not open alarm settings (${e.code})');
+  }
+}

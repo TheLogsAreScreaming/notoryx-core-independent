@@ -8,7 +8,9 @@ import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.os.PersistableBundle
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodChannel
@@ -21,7 +23,8 @@ import java.security.MessageDigest
  * Samsung phones freeze an app about half a minute after it leaves the
  * screen and may kill it soon after, so a timer inside the app can't be
  * trusted. The clear is scheduled with AlarmManager instead, which starts
- * [ClipboardClearReceiver] on time. As a backstop, an overdue clear also
+ * [ClipboardClearReceiver]: to the second when exact alarms are allowed,
+ * otherwise up to about a minute late (measured ~105 s on a Galaxy A15). As a backstop, an overdue clear also
  * runs the next time the app comes to the front.
  *
  * Only a SHA-256 of the copied text is kept, never the text itself. When the
@@ -39,6 +42,7 @@ object SecretClipboard {
 
     fun register(context: Context, messenger: BinaryMessenger) {
         val app = context.applicationContext
+        val activity = context
         MethodChannel(messenger, "notoryx/clipboard").setMethodCallHandler { call, result ->
             when (call.method) {
                 "copySensitive" -> {
@@ -59,6 +63,17 @@ object SecretClipboard {
                 }
                 "clear" -> {
                     clear(app)
+                    result.success(null)
+                }
+                "exactClearStatus" -> result.success(exactStatus(app))
+                "openExactClearSettings" -> {
+                    if (Build.VERSION.SDK_INT >= 31) {
+                        activity.startActivity(
+                            Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                                .setData(Uri.parse("package:" + app.packageName))
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                        )
+                    }
                     result.success(null)
                 }
                 else -> result.notImplemented()
@@ -82,7 +97,13 @@ object SecretClipboard {
                 .putLong(KEY_DUE, due)
                 .putString(KEY_HASH, sha256(text))
                 .commit()
-            alarms(context).setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, due, pending(context))
+            val am = alarms(context)
+            if (canExact(am)) {
+                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, due, pending(context))
+            } else {
+                // Android may run this up to about a minute late.
+                am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, due, pending(context))
+            }
         } else {
             cancel(context)
         }
@@ -106,6 +127,20 @@ object SecretClipboard {
     fun clearIfDue(context: Context) {
         val due = prefs(context).getLong(KEY_DUE, 0L)
         if (due > 0L && System.currentTimeMillis() >= due) clearScheduled(context)
+    }
+
+    /**
+     * Whether the clear can be scheduled to the second. Before Android 12 it
+     * always can; from 12 on, the person allows it under "Alarms & reminders".
+     */
+    private fun canExact(am: AlarmManager): Boolean =
+        Build.VERSION.SDK_INT < 31 || am.canScheduleExactAlarms()
+
+    /** "notNeeded" before Android 12, else "allowed" or "notAllowed". */
+    private fun exactStatus(context: Context): String = when {
+        Build.VERSION.SDK_INT < 31 -> "notNeeded"
+        alarms(context).canScheduleExactAlarms() -> "allowed"
+        else -> "notAllowed"
     }
 
     private fun cancel(context: Context) {
