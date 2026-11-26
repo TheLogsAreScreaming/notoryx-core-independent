@@ -8,14 +8,26 @@ import 'package:flutter/services.dart';
 
 const _channel = MethodChannel('notoryx/clipboard');
 
-bool get _android => !kIsWeb && Platform.isAndroid;
+/// Tests set this to act as Android (true) or not (false).
+@visibleForTesting
+bool? debugActAsAndroid;
+
+bool get _android => debugActAsAndroid ?? (!kIsWeb && Platform.isAndroid);
 
 /// Copies [text]. On Android it is marked sensitive, so the system and
-/// keyboards don't show it in previews or keep it in clipboard history.
-Future<void> copySecretText(String text) async {
+/// well-behaved keyboards don't show it in previews or keep it in history.
+///
+/// With [clearAfter], Android also schedules the clear itself, so it still
+/// happens if the app is frozen or killed first (Samsung does both within a
+/// minute of leaving the screen). Callers keep their own timer too, for
+/// other platforms and older native builds.
+Future<void> copySecretText(String text, {Duration? clearAfter}) async {
   if (_android) {
     try {
-      await _channel.invokeMethod<void>('copySensitive', text);
+      await _channel.invokeMethod<void>('copySensitive', <String, Object>{
+        'text': text,
+        'clearAfterMs': clearAfter?.inMilliseconds ?? 0,
+      });
       return;
     } on MissingPluginException {
       // Older native build: fall through to the plain copy.

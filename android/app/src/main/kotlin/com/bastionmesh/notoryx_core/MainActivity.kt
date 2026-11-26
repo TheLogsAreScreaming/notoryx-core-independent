@@ -15,7 +15,7 @@ class MainActivity : FlutterFragmentActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        SecretClipboardChannel.register(this, flutterEngine.dartExecutor.binaryMessenger)
+        SecretClipboard.register(this, flutterEngine.dartExecutor.binaryMessenger)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "notoryx/keep_alive")
             .setMethodCallHandler { call, result ->
                 when (call.method) {
@@ -78,6 +78,12 @@ class MainActivity : FlutterFragmentActivity() {
                 else -> result.notImplemented()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Backstop for the scheduled clipboard clear (see SecretClipboard).
+        SecretClipboard.clearIfDue(this)
     }
 
     override fun onNewIntent(intent: Intent) {

@@ -51,6 +51,9 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/status_widget_info" />
         </receiver>
+        <receiver
+            android:name=".ClipboardClearReceiver"
+            android:exported="false" />
         <service
             android:name=".KeepAliveService"
             android:exported="false"

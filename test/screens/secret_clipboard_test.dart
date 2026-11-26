@@ -50,4 +50,43 @@ void main() {
     await clearClipboardIfStill('[SARNEG] LRs KSAC');
     expect(clip, '');
   });
+
+  group('on Android', () {
+    final calls = <MethodCall>[];
+    const channel = MethodChannel('notoryx/clipboard');
+
+    setUp(() {
+      calls.clear();
+      debugActAsAndroid = true;
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (call) async {
+            calls.add(call);
+            return null;
+          });
+    });
+
+    tearDown(() {
+      debugActAsAndroid = null;
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, null);
+    });
+
+    test('copying hands Android the text and when to clear it', () async {
+      await copySecretText(
+        '[SARNEG] LRs KSAC',
+        clearAfter: const Duration(seconds: 60),
+      );
+      expect(calls.single.method, 'copySensitive');
+      expect(calls.single.arguments, {
+        'text': '[SARNEG] LRs KSAC',
+        'clearAfterMs': 60000,
+      });
+      expect(clip, isNull, reason: 'Android copies it, not Flutter');
+    });
+
+    test('clearing goes through Android', () async {
+      await clearClipboard();
+      expect(calls.single.method, 'clear');
+    });
+  });
 }
