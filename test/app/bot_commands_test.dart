@@ -42,7 +42,7 @@ void main() {
   test('ping and trace describe how a message came', () {
     expect(
       botCommandReply('!ping', pathLength: 2, snr: 6.25, now: DateTime(2026)),
-      'pong. Your message came through 2 repeaters, last hop 6.3 dB.',
+      '2⃣ Your message came through 2 repeaters, last hop 6.3 dB.',
     );
     expect(
       botCommandReply('!trace', pathLength: 0, snr: null, now: DateTime(2026)),
