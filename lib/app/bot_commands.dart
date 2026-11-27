@@ -83,7 +83,17 @@ String? diceText(String spec, math.Random rng) {
       : '🎲 $total (${rolls.join(' + ')})';
 }
 
-/// How a message arrived, for `!ping` and `!trace`.
+/// 🎯 direct, 1⃣–9⃣, 🔟 ten, 🦘 for eleven or more hops.
+String hopEmoji(int? pathLength) {
+  if (pathLength == null || pathLength == 0xFF) return '🎯';
+  final hops = pathLength & 0x3F;
+  if (hops == 0) return '🎯';
+  if (hops > 10) return '🦘';
+  const digits = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣', '🔟'];
+  return digits[hops - 1];
+}
+
+/// How a message arrived, for `!trace`.
 String routeText({required int? pathLength, required double? snr}) {
   final hops = pathLength == null || pathLength == 0xFF
       ? null
@@ -120,7 +130,7 @@ String? botCommandReply(
 
   switch (words.first.substring(1).toLowerCase()) {
     case 'ping':
-      return 'pong. ${routeText(pathLength: pathLength, snr: snr)}';
+      return '${hopEmoji(pathLength)} ${routeText(pathLength: pathLength, snr: snr)}';
     case 'trace':
       return routeText(pathLength: pathLength, snr: snr);
     case 'sun':
