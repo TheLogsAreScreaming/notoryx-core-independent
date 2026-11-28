@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app/refresh_rate.dart';
 import '../app/connection.dart';
+import '../app/radio_connector.dart';
 import '../radio/radio.dart';
 import 'area_screen.dart';
 import 'radio_noise_screen.dart';

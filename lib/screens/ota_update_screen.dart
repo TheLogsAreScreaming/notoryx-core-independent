@@ -37,13 +37,11 @@ class _OtaUpdateScreenState extends State<OtaUpdateScreen> {
   String? _errorMessage;
 
   Future<void> _pickFile() async {
-    final result = await FilePicker.platform.pickFiles(
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: const ['zip'],
     );
-    if (result == null || result.files.isEmpty) return;
-    final file = result.files.first;
-    if (file.path == null) return;
+    if (file == null || file.path == null) return;
     setState(() {
       _filePath = file.path;
       _fileName = file.name;
@@ -61,7 +59,7 @@ class _OtaUpdateScreenState extends State<OtaUpdateScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l10n.cancelLabel),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -87,18 +85,18 @@ class _OtaUpdateScreenState extends State<OtaUpdateScreen> {
         _filePath!,
         fileInAsset: false,
         forceDfu: false,
-        progressListener: DefaultDfuProgressListenerAdapter(
-          onProgressChangedHandle: (_, percent, __, ___, ____, _____) {
+        dfuEventHandler: DfuEventHandler(
+          onProgressChanged: (_, percent, _, _, _, _) {
             if (mounted) setState(() => _progress = percent);
           },
-          onDfuCompletedHandle: (_) {
+          onDfuCompleted: (_) {
             if (mounted) setState(() => _state = _OtaState.done);
           },
-          onErrorHandle: (_, error, __, message) {
+          onError: (_, error, _, message) {
             if (mounted) {
               setState(() {
                 _state = _OtaState.error;
-                _errorMessage = message ?? 'Error $error';
+                _errorMessage = message;
               });
             }
           },
