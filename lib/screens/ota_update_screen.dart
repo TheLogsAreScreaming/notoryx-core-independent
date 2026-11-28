@@ -151,17 +151,16 @@ class _OtaUpdateScreenState extends State<OtaUpdateScreen> {
                   _state == _OtaState.error) ...[
                 OutlinedButton.icon(
                   icon: const Icon(Icons.folder_open),
-                  label: Text(
-                    _fileName ?? l10n.otaPickFile,
-                  ),
+                  label: Text(_fileName ?? l10n.otaPickFile),
                   onPressed: _pickFile,
                 ),
                 const SizedBox(height: 16),
                 if (_state == _OtaState.done)
                   _StatusCard(
                     color: Theme.of(context).colorScheme.secondaryContainer,
-                    textColor:
-                        Theme.of(context).colorScheme.onSecondaryContainer,
+                    textColor: Theme.of(context)
+                        .colorScheme
+                        .onSecondaryContainer,
                     text: l10n.otaDone,
                   ),
                 if (_state == _OtaState.error && _errorMessage != null)
