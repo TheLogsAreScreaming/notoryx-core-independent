@@ -15,6 +15,7 @@ import 'package:notoryx_core/radio/radio.dart';
 import '../support/fake_notifier.dart';
 import '../support/fake_radio_link.dart';
 import '../support/scripted_radio.dart';
+import 'package:notoryx_core/app/deep_link_handler.dart';
 
 class _Connector implements RadioConnector {
   _Connector(this.newLink);
@@ -69,6 +70,7 @@ void main() {
           reconnectDelaysProvider.overrideWithValue(const [
             Duration(milliseconds: 100),
           ]),
+          deepLinkProvider.overrideWith((ref) => Stream.empty()),
         ],
         child: const NotoryxApp(),
       ),
