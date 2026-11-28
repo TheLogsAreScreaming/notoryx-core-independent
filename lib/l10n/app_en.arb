@@ -3421,6 +3421,8 @@
   "whoRepeatsMeTitle": "Who repeats me",
   "whoRepeatsMeSubtitle": "Repeaters relaying your messages in the mesh",
   "whoRepeatsMeIntro": "Repeaters your radio hears directly are part of your relay chain. When you transmit, these nodes forward your messages into the mesh.",
+  "arrivedVia": "{count, plural, =0{direct} =1{arrived via 1 hop} other{arrived via {count} hops}}",
+  "@arrivedVia": {"placeholders": {"count": {"type": "num"}}},
   "reachabilityLabel": "Reachability",
   "reachabilityTwoWay": "Two-way",
   "reachabilityTheyHeardYou": "They've heard you",
