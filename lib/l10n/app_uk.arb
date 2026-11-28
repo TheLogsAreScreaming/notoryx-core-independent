@@ -1639,12 +1639,9 @@
   "coverageStopConfirm": "Припинити ділитися й видалити ще не надіслані вимірювання? Уже надіслане залишиться на карті, доки ви його не видалите.",
   "coverageOpenMap": "Відкрити карту покриття",
   "coverageOpenFailed": "Не вдалося відкрити {url}",
-  "contactsFullWarning": "Список контактів цієї рації заповнений, тому вона не може додавати нові вузли. Видаліть кілька контактів, щоб звільнити місце."
-,
-  "arrivedVia": "{count, plural, =0{direct} =1{arrived via 1 hop} other{arrived via {count} hops}}",
-  "@arrivedVia": {"placeholders": {"count": {"type": "num"}}}
-},
   "contactsFullWarning": "Список контактів цієї рації заповнений, тому вона не може додавати нові вузли. Видаліть кілька контактів, щоб звільнити місце.",
+  "arrivedVia": "{count, plural, =0{direct} =1{arrived via 1 hop} other{arrived via {count} hops}}",
+  "@arrivedVia": {"placeholders": {"count": {"type": "num"}}},
   "reachabilityLabel": "Reachability",
   "reachabilityTwoWay": "Two-way",
   "reachabilityTheyHeardYou": "They've heard you",
