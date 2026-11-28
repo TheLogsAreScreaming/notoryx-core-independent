@@ -354,12 +354,7 @@ class _ChatsTabState extends ConsumerState<_ChatsTab> {
           direct: null,
         ),
       for (final m in direct)
-        (
-          thread: m.thread,
-          isChannel: false,
-          channel: null,
-          direct: m,
-        ),
+        (thread: m.thread, isChannel: false, channel: null, direct: m),
     ];
     entries.sort((a, b) {
       final ta = byThread[a.thread]?.sentAt ?? -1;
@@ -390,12 +385,8 @@ class _ChatsTabState extends ConsumerState<_ChatsTab> {
           unread: u,
           draft: draft,
           muted: isMuted,
-          onLongPress: () => showChannelActions(
-            context,
-            ref,
-            radioKey: radioKey,
-            channel: ch,
-          ),
+          onLongPress: () =>
+              showChannelActions(context, ref, radioKey: radioKey, channel: ch),
           onTap: () => _openThread(
             context,
             thread: e.thread,
