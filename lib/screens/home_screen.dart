@@ -125,7 +125,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // Handle incoming meshcore:// deep links by opening the add-contact /
     // add-channel flow, exactly as if the user had pasted the link manually.
     ref.listen<AsyncValue<MeshLink?>>(deepLinkProvider, (_, next) {
-      final link = next.valueOrNull;
+      final link = next.value;
       if (link != null && context.mounted) {
         addLink(context, ref, link);
       }
