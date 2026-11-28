@@ -33,8 +33,13 @@ from scratch for this repository, part of the NOTORYX family. MIT licensed.
 
 ## Status
 
-Test builds are out; the latest is **0.1.0 test 38** (22 November 2026), the first
-with the BLACKOUT icon and default theme (not yet tested on a phone or radios). Get it from
+Test builds are out; the latest is **0.1.0 test 53** (28 November 2026). Tests 52 and 53
+added sort chats by most-recent message, scroll to oldest unread, a CLI firmware guard and
+confirmation for destructive commands, a **reachability label** for contacts, telemetry subscribe
+on connect (firmware v1.18+), **in-app nRF52 firmware updates** over Bluetooth (Nordic DFU),
+a **Who Relays Me** screen, a **relay attribution badge** on messages, **deep-link sharing**
+(open a contact or position from a link or QR code), and **path trace on the map** (tap a node
+to see the route its messages took). Get it from
 [notoryx-core-independent-releases](https://github.com/TheLogsAreScreaming/notoryx-core-independent-releases/releases),
 which also explains which file to pick and how to get automatic updates
 with Obtainium.
@@ -58,6 +63,8 @@ and stays the one to use every day. The two install side by side:
 - Reconnects by itself, and stays connected in the background on Android.
 - Change the radio's name, position, power and LoRa settings, or pick your
   area's usual settings from local and community presets.
+- **In-app nRF52 firmware updates** over Bluetooth (Nordic DFU) for supported
+  radios.
 
 **Messages**
 - Channel and direct messages with retries, flood fallback and resend,
@@ -69,6 +76,8 @@ and stays the one to use every day. The two install side by side:
   mesh.
 - Signed SOS and channel posts, blocking, highlighted mentions, and
   opt-in community moderation.
+- **Relay attribution badge** on messages (which repeater carried each
+  received message).
 - **SARNEG code words** (Radio settings → SARNEG code word): send grid
   references, frequencies and times as letters instead of digits, from a
   10-letter word your team agrees on. A SARNEG button codes the numbers
@@ -92,9 +101,14 @@ and stays the one to use every day. The two install side by side:
   range rings around your position.
 - **Compass:** an arrow to any node, from your radio's or your phone's
   position.
-- Node journal, timeline, telemetry and noise-floor history, path trace,
+- Node journal, timeline, telemetry and noise-floor history, path trace and
+  **path trace on the map** (tap a node to see the route its messages took),
   route view and picker, path graph, observer reach, packet log, and a
   nearby repeater test.
+- **Reachability label** on each contact (can this node be reached right now).
+- **Who Relays Me** screen (which repeaters carry your traffic).
+- **Deep-link sharing**: open a contact or position from a link, QR code or
+  another app.
 
 **Repeaters and rooms**
 - Log in, status, console, ping, neighbours, access control, repeater
