@@ -761,6 +761,32 @@ class MeshStore {
       ..orderBy([(m) => OrderingTerm.asc(m.id)]);
   }
 
+  /// Whether bi-directional communication has been established with [publicKey].
+  Stream<ContactReachability> watchReachability(
+    String radioKey,
+    String publicKey,
+  ) {
+    final thread = Threads.direct(publicKey);
+    return (_db.select(_db.messages)..where(
+          (m) =>
+              m.radioKey.equals(radioKey) &
+              m.thread.equals(thread) &
+              _db.messages.textType.equals(TextType.cliData.value).not(),
+        ))
+        .watch()
+        .map((msgs) {
+          if (msgs.any((m) => !m.outgoing)) {
+            return ContactReachability.twoWay;
+          }
+          if (msgs.any(
+            (m) => m.outgoing && m.status == MessageStatus.delivered,
+          )) {
+            return ContactReachability.theyHeardYou;
+          }
+          return ContactReachability.noAnswerYet;
+        });
+  }
+
   // Telemetry
 
   /// How many readings are kept per node. Older ones are dropped.
