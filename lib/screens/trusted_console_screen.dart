@@ -38,8 +38,9 @@ class _TrustedConsoleScreenState extends ConsumerState<TrustedConsoleScreen> {
     final text = _command.text.trim();
     final state = ref.read(connectionProvider);
     if (text.isEmpty || state is! Connected || _sending) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     if (_isDestructive(text)) {
-      final l10n = context.l10n;
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (_) => AlertDialog(
@@ -59,8 +60,6 @@ class _TrustedConsoleScreenState extends ConsumerState<TrustedConsoleScreen> {
       );
       if (confirmed != true) return;
     }
-    final messenger = ScaffoldMessenger.of(context);
-    final l10n = context.l10n;
     setState(() => _sending = true);
     try {
       await state.sync.sendCommand(
