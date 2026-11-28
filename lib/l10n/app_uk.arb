@@ -1640,4 +1640,8 @@
   "coverageOpenMap": "Відкрити карту покриття",
   "coverageOpenFailed": "Не вдалося відкрити {url}",
   "contactsFullWarning": "Список контактів цієї рації заповнений, тому вона не може додавати нові вузли. Видаліть кілька контактів, щоб звільнити місце."
+,
+  "whoRepeatsMeTitle": "Who repeats me",
+  "whoRepeatsMeSubtitle": "Repeaters relaying your messages in the mesh",
+  "whoRepeatsMeIntro": "Repeaters your radio hears directly are part of your relay chain. When you transmit, these nodes forward your messages into the mesh."
 }

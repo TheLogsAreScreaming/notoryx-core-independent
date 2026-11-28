@@ -1640,4 +1640,8 @@
   "coverageOpenMap": "Abrir o mapa de cobertura",
   "coverageOpenFailed": "Não foi possível abrir {url}",
   "contactsFullWarning": "A lista de contatos deste rádio está cheia, então ele não pode adicionar novos nós. Remova alguns contatos para liberar espaço."
+,
+  "whoRepeatsMeTitle": "Who repeats me",
+  "whoRepeatsMeSubtitle": "Repeaters relaying your messages in the mesh",
+  "whoRepeatsMeIntro": "Repeaters your radio hears directly are part of your relay chain. When you transmit, these nodes forward your messages into the mesh."
 }

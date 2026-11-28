@@ -1640,4 +1640,8 @@
   "coverageOpenMap": "Отвори картата на покритието",
   "coverageOpenFailed": "{url} не може да се отвори",
   "contactsFullWarning": "Списъкът с контакти на това радио е пълен и не може да добавя нови възли. Премахнете някои контакти, за да освободите място."
+,
+  "whoRepeatsMeTitle": "Who repeats me",
+  "whoRepeatsMeSubtitle": "Repeaters relaying your messages in the mesh",
+  "whoRepeatsMeIntro": "Repeaters your radio hears directly are part of your relay chain. When you transmit, these nodes forward your messages into the mesh."
 }
