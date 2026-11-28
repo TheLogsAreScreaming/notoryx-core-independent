@@ -1234,12 +1234,8 @@ class MeshSync {
         await _store.removeContact(key, publicKey);
       case SendConfirmed(:final ackCode):
         await _delivered(key, ackCode);
-      case TelemetryResponse(:final nodePrefix, :final data):
-        // Unsolicited push from the radio — save it straight to the cache.
-        // Prefer the full key from the contact record; fall back to the prefix.
-        final contact = await _store.contactByPrefix(key, nodePrefix);
-        final nodeKey = contact?.publicKey ?? toHex(nodePrefix);
-        await _store.saveTelemetry(key, nodeKey, data);
+      case TelemetryResponse():
+        break; // Saved by requestTelemetry(); nothing to do here.
       case AdvertHeard() || PathUpdated():
         _scheduleContactRefresh();
     }
