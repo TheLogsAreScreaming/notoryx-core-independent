@@ -1658,8 +1658,7 @@
   "otaKeepClose": "Keep the phone next to the radio until the update finishes.",
   "otaDone": "Firmware updated. The radio will restart.",
   "otaError": "Update failed: {message}",
-  "@otaError": {"placeholders": {"message": {"type": "String"}}}
-},
+  "@otaError": {"placeholders": {"message": {"type": "String"}}},
   "contactsFullWarning": "Seznam stikov tega radia je poln, zato ne more dodajati novih vozlišč. Odstranite nekaj stikov, da sprostite prostor.",
   "cliOlderFirmware": "The command line needs firmware with version code 14 or later. This radio reports version code {code}.",
   "cliDestructiveTitle": "Run this command?",
