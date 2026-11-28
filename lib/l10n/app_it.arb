@@ -1639,5 +1639,9 @@
   "coverageStopConfirm": "Smettere di condividere ed eliminare i rilevamenti non ancora inviati? Ciò che è già stato inviato resta sulla mappa finché non lo cancelli.",
   "coverageOpenMap": "Apri la mappa di copertura",
   "coverageOpenFailed": "Impossibile aprire {url}",
-  "contactsFullWarning": "L'elenco contatti di questa radio è pieno, quindi non può aggiungere nuovi nodi. Rimuovi alcuni contatti per fare spazio."
+  "contactsFullWarning": "L'elenco contatti di questa radio è pieno, quindi non può aggiungere nuovi nodi. Rimuovi alcuni contatti per fare spazio.",
+  "cliOlderFirmware": "The command line needs firmware with version code 14 or later. This radio reports version code {code}.",
+  "cliDestructiveTitle": "Run this command?",
+  "cliDestructiveBody": "'{command}' can't be undone.",
+  "cliRunIt": "Run it"
 }
