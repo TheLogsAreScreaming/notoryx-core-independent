@@ -823,13 +823,42 @@ class MeshSync {
     }
   }
 
+  Future<List<LppReading>?>? _pendingSelfTelemetry;
+
   /// Asks [node] for its sensor readings, or the connected radio itself
   /// when [node] is null, and stores the reply in the telemetry history.
   /// Null if nothing arrives in time. Repeaters and rooms only answer after
   /// a login.
   Future<List<LppReading>?> requestTelemetry([PublicKey? node]) async {
+    if (node == null) {
+      // Coalesce concurrent self-requests: the auto-call in start() and an
+      // explicit call both subscribe to the same broadcast stream with .first
+      // and would each capture the same push — share the in-flight future.
+      return _pendingSelfTelemetry ??= _fetchSelfTelemetry().whenComplete(
+        () => _pendingSelfTelemetry = null,
+      );
+    }
     final key = _requireKey();
-    final nodeKey = node ?? PublicKey.fromHex(key);
+    final prefix = node.prefix();
+    final reply = _session.pushes
+        .where(
+          (p) => p is TelemetryResponse && _sameBytes(p.nodePrefix, prefix),
+        )
+        .first;
+    reply.ignore();
+    final sent = await _session.request<SentReply>(SendTelemetryRequest(node));
+    try {
+      final push = await reply.timeout(_replyWait(sent)) as TelemetryResponse;
+      await _store.saveTelemetry(key, node.hex, push.data);
+      return decodeLpp(push.data);
+    } on TimeoutException {
+      return null;
+    }
+  }
+
+  Future<List<LppReading>?> _fetchSelfTelemetry() async {
+    final key = _requireKey();
+    final nodeKey = PublicKey.fromHex(key);
     final prefix = nodeKey.prefix();
     final reply = _session.pushes
         .where(
@@ -837,19 +866,10 @@ class MeshSync {
         )
         .first;
     reply.ignore();
-    final Duration wait;
-    if (node == null) {
-      // The radio answers itself with the push alone, no other reply.
-      await _session.sendOnly(const SendTelemetryRequest());
-      wait = selfTelemetryWait;
-    } else {
-      final sent = await _session.request<SentReply>(
-        SendTelemetryRequest(node),
-      );
-      wait = _replyWait(sent);
-    }
+    // The radio answers itself with the push alone, no sent reply.
+    await _session.sendOnly(const SendTelemetryRequest());
     try {
-      final push = await reply.timeout(wait) as TelemetryResponse;
+      final push = await reply.timeout(selfTelemetryWait) as TelemetryResponse;
       await _store.saveTelemetry(key, nodeKey.hex, push.data);
       return decodeLpp(push.data);
     } on TimeoutException {
