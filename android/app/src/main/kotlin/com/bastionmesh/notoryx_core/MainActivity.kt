@@ -12,6 +12,7 @@ import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterFragmentActivity() {
     private var widgetChannel: MethodChannel? = null
+    private var deepLinkSink: EventChannel.EventSink? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -59,6 +60,19 @@ class MainActivity : FlutterFragmentActivity() {
             .setStreamHandler(heading)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "notoryx/compass")
             .setMethodCallHandler(heading::handle)
+        // Deep links: streams incoming meshcore:// URIs to Flutter.
+        EventChannel(flutterEngine.dartExecutor.binaryMessenger, "notoryx/deeplink")
+            .setStreamHandler(object : EventChannel.StreamHandler {
+                override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+                    deepLinkSink = events
+                    // Cold-start link: app opened directly via a meshcore:// URI.
+                    intent?.data?.takeIf { it.scheme == "meshcore" }?.let { uri ->
+                        events?.success(uri.toString())
+                        intent.data = null
+                    }
+                }
+                override fun onCancel(arguments: Any?) { deepLinkSink = null }
+            })
         widgetChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "notoryx/widget")
         widgetChannel?.setMethodCallHandler { call, result ->
             when (call.method) {
@@ -90,6 +104,10 @@ class MainActivity : FlutterFragmentActivity() {
         super.onNewIntent(intent)
         if (intent.action == StatusWidget.ACTION_OPEN_SAFETY) {
             widgetChannel?.invokeMethod("openSafety", null)
+        }
+        // Hot-start link: app already running, another app sends meshcore://.
+        intent.data?.takeIf { it.scheme == "meshcore" }?.let { uri ->
+            deepLinkSink?.success(uri.toString())
         }
     }
 
