@@ -3417,7 +3417,7 @@
   "otaKeepClose": "Keep the phone next to the radio until the update finishes.",
   "otaDone": "Firmware updated. The radio will restart.",
   "otaError": "Update failed: {message}",
-  "@otaError": {"placeholders": {"message": {"type": "String"}}},,
+  "@otaError": {"placeholders": {"message": {"type": "String"}}},
   "reachabilityLabel": "Reachability",
   "reachabilityTwoWay": "Two-way",
   "reachabilityTheyHeardYou": "They've heard you",
