@@ -61,7 +61,7 @@ void main() {
           radioConnectorProvider.overrideWithValue(
             _Connector(() {
               final link = FakeRadioLink();
-              ScriptedRadio(link)..versionCode = 14;
+              ScriptedRadio(link).versionCode = 14;
               return link;
             }),
           ),
