@@ -209,6 +209,7 @@ class _RadioConsoleScreenState extends ConsumerState<RadioConsoleScreen> {
     ),
   );
 }
+}
 
 class _WifiDialog extends StatefulWidget {
   const _WifiDialog();
