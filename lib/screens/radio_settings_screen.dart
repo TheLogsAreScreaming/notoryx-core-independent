@@ -33,6 +33,7 @@ import 'repeater_test_screen.dart';
 import 'mqtt_screen.dart';
 import 'sarneg/sarneg_ui.dart';
 import 'ota_update_screen.dart';
+import 'who_repeats_me_screen.dart';
 
 /// Standard LoRa bandwidths the firmware accepts, in kHz.
 const loraBandwidths = [
@@ -507,6 +508,18 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
                   builder: (_) => const PathGraphScreen(),
+                ),
+              ),
+            ),
+            ListTile(
+              key: const ValueKey('settings-who-repeats-me'),
+              leading: const Icon(Icons.cell_tower),
+              title: Text(context.l10n.whoRepeatsMeTitle),
+              subtitle: Text(context.l10n.whoRepeatsMeSubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const WhoRepeatsMeScreen(),
                 ),
               ),
             ),
