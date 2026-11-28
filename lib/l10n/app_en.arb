@@ -3403,5 +3403,11 @@
   "reachabilityLabel": "Reachability",
   "reachabilityTwoWay": "Two-way",
   "reachabilityTheyHeardYou": "They've heard you",
-  "reachabilityNoAnswerYet": "No answer yet"
+  "reachabilityNoAnswerYet": "No answer yet",
+  "cliOlderFirmware": "The command line needs firmware with version code 14 or later. This radio reports version code {code}.",
+  "@cliOlderFirmware": {"placeholders": {"code": {"type": "Object"}}},
+  "cliDestructiveTitle": "Run this command?",
+  "cliDestructiveBody": "'{command}' can't be undone.",
+  "@cliDestructiveBody": {"placeholders": {"command": {"type": "String"}}},
+  "cliRunIt": "Run it"
 }
