@@ -32,7 +32,11 @@ class WhoRepeatsMeScreen extends ConsumerWidget {
         if (d.type == repeaterType) (name: d.name, publicKey: d.publicKey),
     ];
 
-    final hints = hopHints(ref, radioKey, onlineLabel: context.l10n.foundOnline);
+    final hints = hopHints(
+      ref,
+      radioKey,
+      onlineLabel: context.l10n.foundOnline,
+    );
     final unknown = <String>{};
 
     String resolvedName(String hash) {
