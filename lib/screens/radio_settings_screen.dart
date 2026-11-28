@@ -31,6 +31,7 @@ import 'path_graph_screen.dart';
 import 'repeater_test_screen.dart';
 import 'mqtt_screen.dart';
 import 'sarneg/sarneg_ui.dart';
+import 'ota_update_screen.dart';
 
 /// Standard LoRa bandwidths the firmware accepts, in kHz.
 const loraBandwidths = [
@@ -315,6 +316,24 @@ class _RadioSettingsScreenState extends ConsumerState<RadioSettingsScreen> {
             ),
             if (device.buildDate case final date? when date.isNotEmpty)
               _Info(context.l10n.infoBuilt, date),
+            if (state.target case BleTarget(:final deviceId)) ...[
+              ListTile(
+                key: const ValueKey('settings-ota-update'),
+                leading: const Icon(Icons.system_update_alt),
+                title: Text(context.l10n.otaTitle),
+                subtitle: Text(context.l10n.otaSubtitle),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => OtaUpdateScreen(
+                      deviceId: deviceId,
+                      deviceName: state.target.label,
+                      firmwareVersionCode: device.firmwareVersionCode,
+                    ),
+                  ),
+                ),
+              ),
+            ],
             _Info(
               context.l10n.infoCapacity,
               context.l10n.capacityText(

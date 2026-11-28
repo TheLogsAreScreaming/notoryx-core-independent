@@ -1640,4 +1640,23 @@
   "coverageOpenMap": "Otvoriť mapu pokrytia",
   "coverageOpenFailed": "Nepodarilo sa otvoriť {url}",
   "contactsFullWarning": "Zoznam kontaktov tohto rádia je plný, takže nemôže pridávať nové uzly. Odstráňte niekoľko kontaktov, aby ste uvoľnili miesto."
+,
+  "otaTitle": "Update firmware",
+  "otaSubtitle": "Flash new firmware over Bluetooth",
+  "otaIntro": "Connect your radio ({deviceName}) and pick a Nordic DFU .zip package to flash new firmware wirelessly.",
+  "@otaIntro": {"placeholders": {"deviceName": {"type": "String"}}},
+  "otaOlderFirmware": "This radio's firmware (protocol {code}) is too old for in-app updates. Update to v1.15.0 or later first.",
+  "@otaOlderFirmware": {"placeholders": {"code": {"type": "Object"}}},
+  "otaPickFile": "Pick a .zip file",
+  "otaStartFlash": "Flash firmware",
+  "otaConfirmTitle": "Flash this firmware?",
+  "otaConfirmBody": "This will write {fileName} to the radio. Keep the phone next to the radio until it finishes.",
+  "@otaConfirmBody": {"placeholders": {"fileName": {"type": "String"}}},
+  "otaFlashIt": "Flash it",
+  "otaProgress": "Flashing… {percent}%",
+  "@otaProgress": {"placeholders": {"percent": {"type": "int"}}},
+  "otaKeepClose": "Keep the phone next to the radio until the update finishes.",
+  "otaDone": "Firmware updated. The radio will restart.",
+  "otaError": "Update failed: {message}",
+  "@otaError": {"placeholders": {"message": {"type": "String"}}}
 }
