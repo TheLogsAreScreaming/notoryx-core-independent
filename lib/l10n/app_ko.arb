@@ -1639,13 +1639,10 @@
   "coverageStopConfirm": "공유를 중지하고 아직 보내지 않은 기록을 지울까요? 이미 보낸 것은 지울 때까지 지도에 남습니다.",
   "coverageOpenMap": "커버리지 지도 열기",
   "coverageOpenFailed": "{url}을(를) 열 수 없습니다",
-  "contactsFullWarning": "이 무전기의 연락처 목록이 가득 차서 새 노드를 추가할 수 없습니다. 연락처를 일부 삭제해 공간을 확보하세요."
-,
+  "contactsFullWarning": "이 무전기의 연락처 목록이 가득 차서 새 노드를 추가할 수 없습니다. 연락처를 일부 삭제해 공간을 확보하세요.",
   "whoRepeatsMeTitle": "Who repeats me",
   "whoRepeatsMeSubtitle": "Repeaters relaying your messages in the mesh",
-  "whoRepeatsMeIntro": "Repeaters your radio hears directly are part of your relay chain. When you transmit, these nodes forward your messages into the mesh."
-},
-  "contactsFullWarning": "이 무전기의 연락처 목록이 가득 차서 새 노드를 추가할 수 없습니다. 연락처를 일부 삭제해 공간을 확보하세요.",
+  "whoRepeatsMeIntro": "Repeaters your radio hears directly are part of your relay chain. When you transmit, these nodes forward your messages into the mesh.",
   "reachabilityLabel": "Reachability",
   "reachabilityTwoWay": "Two-way",
   "reachabilityTheyHeardYou": "They've heard you",

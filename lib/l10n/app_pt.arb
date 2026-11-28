@@ -1639,13 +1639,10 @@
   "coverageStopConfirm": "Deixar de partilhar e apagar as leituras ainda não enviadas? O que já foi enviado fica no mapa até o apagar.",
   "coverageOpenMap": "Abrir o mapa de cobertura",
   "coverageOpenFailed": "Não foi possível abrir {url}",
-  "contactsFullWarning": "A lista de contatos deste rádio está cheia, então ele não pode adicionar novos nós. Remova alguns contatos para liberar espaço."
-,
+  "contactsFullWarning": "A lista de contatos deste rádio está cheia, então ele não pode adicionar novos nós. Remova alguns contatos para liberar espaço.",
   "whoRepeatsMeTitle": "Who repeats me",
   "whoRepeatsMeSubtitle": "Repeaters relaying your messages in the mesh",
-  "whoRepeatsMeIntro": "Repeaters your radio hears directly are part of your relay chain. When you transmit, these nodes forward your messages into the mesh."
-},
-  "contactsFullWarning": "A lista de contatos deste rádio está cheia, então ele não pode adicionar novos nós. Remova alguns contatos para liberar espaço.",
+  "whoRepeatsMeIntro": "Repeaters your radio hears directly are part of your relay chain. When you transmit, these nodes forward your messages into the mesh.",
   "reachabilityLabel": "Reachability",
   "reachabilityTwoWay": "Two-way",
   "reachabilityTheyHeardYou": "They've heard you",

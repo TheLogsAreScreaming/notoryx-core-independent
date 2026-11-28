@@ -1639,13 +1639,10 @@
   "coverageStopConfirm": "Sluta dela och radera mätningar som inte skickats än? Det som redan skickats ligger kvar på kartan tills du raderar det.",
   "coverageOpenMap": "Öppna täckningskartan",
   "coverageOpenFailed": "Kunde inte öppna {url}",
-  "contactsFullWarning": "Radions kontaktlista är full, så den kan inte lägga till nya noder. Ta bort några kontakter för att frigöra plats."
-,
+  "contactsFullWarning": "Radions kontaktlista är full, så den kan inte lägga till nya noder. Ta bort några kontakter för att frigöra plats.",
   "whoRepeatsMeTitle": "Who repeats me",
   "whoRepeatsMeSubtitle": "Repeaters relaying your messages in the mesh",
-  "whoRepeatsMeIntro": "Repeaters your radio hears directly are part of your relay chain. When you transmit, these nodes forward your messages into the mesh."
-},
-  "contactsFullWarning": "Radions kontaktlista är full, så den kan inte lägga till nya noder. Ta bort några kontakter för att frigöra plats.",
+  "whoRepeatsMeIntro": "Repeaters your radio hears directly are part of your relay chain. When you transmit, these nodes forward your messages into the mesh.",
   "reachabilityLabel": "Reachability",
   "reachabilityTwoWay": "Two-way",
   "reachabilityTheyHeardYou": "They've heard you",

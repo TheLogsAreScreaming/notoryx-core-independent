@@ -1639,13 +1639,10 @@
   "coverageStopConfirm": "Prestať zdieľať a vymazať ešte neodoslané merania? Čo už bolo odoslané, zostane na mape, kým to nevymažeš.",
   "coverageOpenMap": "Otvoriť mapu pokrytia",
   "coverageOpenFailed": "Nepodarilo sa otvoriť {url}",
-  "contactsFullWarning": "Zoznam kontaktov tohto rádia je plný, takže nemôže pridávať nové uzly. Odstráňte niekoľko kontaktov, aby ste uvoľnili miesto."
-,
+  "contactsFullWarning": "Zoznam kontaktov tohto rádia je plný, takže nemôže pridávať nové uzly. Odstráňte niekoľko kontaktov, aby ste uvoľnili miesto.",
   "whoRepeatsMeTitle": "Who repeats me",
   "whoRepeatsMeSubtitle": "Repeaters relaying your messages in the mesh",
-  "whoRepeatsMeIntro": "Repeaters your radio hears directly are part of your relay chain. When you transmit, these nodes forward your messages into the mesh."
-},
-  "contactsFullWarning": "Zoznam kontaktov tohto rádia je plný, takže nemôže pridávať nové uzly. Odstráňte niekoľko kontaktov, aby ste uvoľnili miesto.",
+  "whoRepeatsMeIntro": "Repeaters your radio hears directly are part of your relay chain. When you transmit, these nodes forward your messages into the mesh.",
   "reachabilityLabel": "Reachability",
   "reachabilityTwoWay": "Two-way",
   "reachabilityTheyHeardYou": "They've heard you",

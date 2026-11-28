@@ -1639,13 +1639,10 @@
   "coverageStopConfirm": "停止共享并删除尚未发送的记录？已发送的内容会保留在地图上，直到你删除。",
   "coverageOpenMap": "打开覆盖地图",
   "coverageOpenFailed": "无法打开 {url}",
-  "contactsFullWarning": "此电台的联系人列表已满，无法添加新节点。请删除一些联系人以腾出空间。"
-,
+  "contactsFullWarning": "此电台的联系人列表已满，无法添加新节点。请删除一些联系人以腾出空间。",
   "whoRepeatsMeTitle": "Who repeats me",
   "whoRepeatsMeSubtitle": "Repeaters relaying your messages in the mesh",
-  "whoRepeatsMeIntro": "Repeaters your radio hears directly are part of your relay chain. When you transmit, these nodes forward your messages into the mesh."
-},
-  "contactsFullWarning": "此电台的联系人列表已满，无法添加新节点。请删除一些联系人以腾出空间。",
+  "whoRepeatsMeIntro": "Repeaters your radio hears directly are part of your relay chain. When you transmit, these nodes forward your messages into the mesh.",
   "reachabilityLabel": "Reachability",
   "reachabilityTwoWay": "Two-way",
   "reachabilityTheyHeardYou": "They've heard you",
