@@ -1659,4 +1659,10 @@
   "otaDone": "Firmware updated. The radio will restart.",
   "otaError": "Update failed: {message}",
   "@otaError": {"placeholders": {"message": {"type": "String"}}}
+},
+  "contactsFullWarning": "Lista kontaktów tego radia jest pełna, więc nie może dodawać nowych węzłów. Usuń kilka kontaktów, aby zrobić miejsce.",
+  "cliOlderFirmware": "The command line needs firmware with version code 14 or later. This radio reports version code {code}.",
+  "cliDestructiveTitle": "Run this command?",
+  "cliDestructiveBody": "'{command}' can't be undone.",
+  "cliRunIt": "Run it"
 }
