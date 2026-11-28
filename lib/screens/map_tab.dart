@@ -17,7 +17,9 @@ import '../app/track_log.dart';
 import '../app/traffic.dart';
 import '../data/data.dart';
 import '../radio/radio.dart';
+import '../app/hop_names.dart';
 import '../app/node_look.dart';
+import '../app/path_graph.dart';
 import 'node_details.dart';
 import 'map_packs_screen.dart';
 import 'zone_alerts_screen.dart';
@@ -102,6 +104,16 @@ class _MapTabState extends ConsumerState<MapTab> {
   void _onMove(MapCamera camera) {
     final zoom = (camera.zoom * 2).floorToDouble() / 2;
     if (zoom != _zoom && mounted) setState(() => _zoom = zoom);
+  }
+
+  /// Resolves a short hop [hash] to a map position by prefix-matching
+  /// against the full public keys in [positions].
+  LatLng? _resolveHop(String hash, Map<String, LatLng> positions) {
+    final id = hash.toLowerCase();
+    for (final entry in positions.entries) {
+      if (entry.key.startsWith(id)) return entry.value;
+    }
+    return null;
   }
 
   /// The connected radio's own position, if it has one.
@@ -358,6 +370,37 @@ class _MapTabState extends ConsumerState<MapTab> {
               LatLng(p.latitude, p.longitude),
           ];
     final radio = _radioPosition();
+    final heardPaths =
+        ref.watch(heardPathsProvider(widget.radioKey)).value ?? const [];
+    final hints = hopHints(ref, widget.radioKey);
+    final pathLines = <Polyline>[];
+    if (radio != null) {
+      final seen = <String>{};
+      for (final row in heardPaths) {
+        final hops = pathHops(row.hops);
+        if (hops.isEmpty || !seen.add(row.hops)) continue;
+        // Build the chain from this radio outward: nearest hop first.
+        final pts = <LatLng>[radio];
+        var full = true;
+        for (final hash in hops.reversed) {
+          final pos = _resolveHop(hash, hints.positions);
+          if (pos == null) {
+            full = false;
+            break;
+          }
+          pts.add(pos);
+        }
+        if (full && pts.length > 1) {
+          pathLines.add(
+            Polyline(
+              points: pts,
+              strokeWidth: 2,
+              color: Colors.orange.withAlpha(160),
+            ),
+          );
+        }
+      }
+    }
     // "Me" on the map: the phone once located, otherwise the radio.
     final me = _phone ?? radio;
     final rings = ref.watch(rangeRingsProvider).value ?? false;
@@ -417,6 +460,7 @@ class _MapTabState extends ConsumerState<MapTab> {
                   ),
                 ],
               ),
+            if (pathLines.isNotEmpty) PolylineLayer(polylines: pathLines),
             if (rings && me != null)
               RangeRingsLayer(
                 centre: me,
