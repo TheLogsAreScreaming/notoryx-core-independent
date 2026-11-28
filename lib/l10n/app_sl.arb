@@ -1640,4 +1640,7 @@
   "coverageOpenMap": "Odpri zemljevid pokritosti",
   "coverageOpenFailed": "Ni mogoče odpreti {url}",
   "contactsFullWarning": "Seznam stikov tega radia je poln, zato ne more dodajati novih vozlišč. Odstranite nekaj stikov, da sprostite prostor."
+,
+  "arrivedVia": "{count, plural, =0{direct} =1{arrived via 1 hop} other{arrived via {count} hops}}",
+  "@arrivedVia": {"placeholders": {"count": {"type": "num"}}}
 }

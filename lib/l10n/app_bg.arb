@@ -1640,4 +1640,7 @@
   "coverageOpenMap": "Отвори картата на покритието",
   "coverageOpenFailed": "{url} не може да се отвори",
   "contactsFullWarning": "Списъкът с контакти на това радио е пълен и не може да добавя нови възли. Премахнете някои контакти, за да освободите място."
+,
+  "arrivedVia": "{count, plural, =0{direct} =1{arrived via 1 hop} other{arrived via {count} hops}}",
+  "@arrivedVia": {"placeholders": {"count": {"type": "num"}}}
 }

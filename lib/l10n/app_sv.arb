@@ -1640,4 +1640,7 @@
   "coverageOpenMap": "Öppna täckningskartan",
   "coverageOpenFailed": "Kunde inte öppna {url}",
   "contactsFullWarning": "Radions kontaktlista är full, så den kan inte lägga till nya noder. Ta bort några kontakter för att frigöra plats."
+,
+  "arrivedVia": "{count, plural, =0{direct} =1{arrived via 1 hop} other{arrived via {count} hops}}",
+  "@arrivedVia": {"placeholders": {"count": {"type": "num"}}}
 }

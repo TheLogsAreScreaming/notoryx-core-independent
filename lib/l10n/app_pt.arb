@@ -1640,4 +1640,7 @@
   "coverageOpenMap": "Abrir o mapa de cobertura",
   "coverageOpenFailed": "Não foi possível abrir {url}",
   "contactsFullWarning": "A lista de contatos deste rádio está cheia, então ele não pode adicionar novos nós. Remova alguns contatos para liberar espaço."
+,
+  "arrivedVia": "{count, plural, =0{direct} =1{arrived via 1 hop} other{arrived via {count} hops}}",
+  "@arrivedVia": {"placeholders": {"count": {"type": "num"}}}
 }

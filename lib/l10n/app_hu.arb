@@ -1640,4 +1640,7 @@
   "coverageOpenMap": "Lefedettségi térkép megnyitása",
   "coverageOpenFailed": "Nem nyitható meg: {url}",
   "contactsFullWarning": "A rádió névjegylistája megtelt, ezért nem tud új node-okat felvenni. Törölj néhány névjegyet, hogy legyen hely."
+,
+  "arrivedVia": "{count, plural, =0{direct} =1{arrived via 1 hop} other{arrived via {count} hops}}",
+  "@arrivedVia": {"placeholders": {"count": {"type": "num"}}}
 }

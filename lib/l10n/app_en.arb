@@ -3399,5 +3399,7 @@
   "coverageOpenMap": "Open the coverage map",
   "coverageOpenFailed": "Couldn't open {url}",
   "@coverageOpenFailed": {"placeholders": {"url": {"type": "String"}}},
-  "contactsFullWarning": "This radio's contact list is full, so it can't add new nodes. Remove some contacts to make room."
+  "contactsFullWarning": "This radio's contact list is full, so it can't add new nodes. Remove some contacts to make room.",
+  "arrivedVia": "{count, plural, =0{direct} =1{arrived via 1 hop} other{arrived via {count} hops}}",
+  "@arrivedVia": {"placeholders": {"count": {"type": "num"}}}
 }

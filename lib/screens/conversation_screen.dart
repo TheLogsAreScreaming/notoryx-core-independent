@@ -1280,8 +1280,8 @@ class _Bubble extends StatelessWidget {
       time,
       if (message.region case final region?) '📍 $region',
       ?signedBy,
-      if (!mine && message.kind == MessageKind.channel)
-        ?_hops(context.l10n, message.pathLength),
+      if (!mine) ?_arrivedVia(context.l10n, message.pathLength),
+      if (mine) ?_relayBadge(message.pathLength),
       if (mine && retrying) context.l10n.tryNumber(message.attempts),
       if (mine && message.status == MessageStatus.failed)
         context.l10n.holdForDetails,
@@ -1438,11 +1438,19 @@ class _Bubble extends StatelessWidget {
     );
   }
 
-  /// "direct", "1 hop", "3 hops" for a channel message's path.
-  static String? _hops(AppLocalizations l10n, int? pathLength) {
+  /// "arrived via direct / 1 hop / N hops" for a received message.
+  static String? _arrivedVia(AppLocalizations l10n, int? pathLength) {
     if (pathLength == null) return null;
-    if (pathLength == 0xFF) return l10n.hopsCount(0);
-    return l10n.hopsCount(pathLength & 0x3F);
+    final hops = pathLength == 0xFF ? 0 : pathLength & 0x3F;
+    return l10n.arrivedVia(hops);
+  }
+
+  /// "↻ N" compact relay badge for an outgoing message sent via a route.
+  static String? _relayBadge(int? pathLength) {
+    if (pathLength == null) return null;
+    final hops = pathLength == 0xFF ? 0 : pathLength & 0x3F;
+    if (hops == 0) return null;
+    return '↻ $hops';
   }
 }
 

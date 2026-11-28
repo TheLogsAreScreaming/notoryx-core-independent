@@ -1640,4 +1640,7 @@
   "coverageOpenMap": "Ouvrir la carte de couverture",
   "coverageOpenFailed": "Impossible d'ouvrir {url}",
   "contactsFullWarning": "La liste de contacts de cette radio est pleine : elle ne peut plus ajouter de nouveaux nœuds. Supprimez des contacts pour faire de la place."
+,
+  "arrivedVia": "{count, plural, =0{direct} =1{arrived via 1 hop} other{arrived via {count} hops}}",
+  "@arrivedVia": {"placeholders": {"count": {"type": "num"}}}
 }
