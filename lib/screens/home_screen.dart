@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quick_actions/quick_actions.dart';
 
+import '../app/deep_link_handler.dart';
 import '../app/favourites_view.dart';
 import '../app/connection.dart';
 import '../app/contact_room.dart';
@@ -120,6 +121,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final key = widget.radioKey;
+    // Handle incoming meshcore:// deep links by opening the add-contact /
+    // add-channel flow, exactly as if the user had pasted the link manually.
+    ref.listen<AsyncValue<MeshLink?>>(deepLinkProvider, (_, next) {
+      final link = next.valueOrNull;
+      if (link != null && context.mounted) {
+        addLink(context, ref, link);
+      }
+    });
     final connection = ref.watch(connectionProvider);
     return Scaffold(
       appBar: AppBar(
