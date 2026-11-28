@@ -7,18 +7,11 @@ import '../l10n/l10n.dart';
 
 const _minVersionCode = 14;
 
-const _destructiveCommands = [
-  'reboot',
-  'factory_reset',
-  'format',
-  'wipefs',
-];
+const _destructiveCommands = ['reboot', 'factory_reset', 'format', 'wipefs'];
 
 bool _isDestructive(String command) {
   final lower = command.trim().toLowerCase();
-  return _destructiveCommands.any(
-    (d) => lower == d || lower.startsWith('$d '),
-  );
+  return _destructiveCommands.any((d) => lower == d || lower.startsWith('$d '));
 }
 
 /// The connected radio's own command line, and Wi-Fi setup for radios
@@ -145,9 +138,7 @@ class _RadioConsoleScreenState extends ConsumerState<RadioConsoleScreen> {
                     children: [
                       Icon(
                         Icons.warning_amber_rounded,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onErrorContainer,
+                        color: Theme.of(context).colorScheme.onErrorContainer,
                         size: 20,
                       ),
                       const SizedBox(width: 8),
@@ -155,9 +146,9 @@ class _RadioConsoleScreenState extends ConsumerState<RadioConsoleScreen> {
                         child: Text(
                           l10n.cliOlderFirmware(versionCode),
                           style: TextStyle(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onErrorContainer,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onErrorContainer,
                           ),
                         ),
                       ),
@@ -166,49 +157,51 @@ class _RadioConsoleScreenState extends ConsumerState<RadioConsoleScreen> {
                 ),
               ),
             Expanded(
-            child: _lines.isEmpty
-                ? Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(24),
-                      child: Text(context.l10n.commandsRunOnYourRadioNot),
+              child: _lines.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(24),
+                        child: Text(context.l10n.commandsRunOnYourRadioNot),
+                      ),
+                    )
+                  : ListView.builder(
+                      reverse: true,
+                      padding: const EdgeInsets.all(12),
+                      itemCount: _lines.length,
+                      itemBuilder: (_, i) => SelectableText(
+                        _lines[_lines.length - 1 - i],
+                        style: const TextStyle(fontFamily: 'monospace'),
+                      ),
                     ),
-                  )
-                : ListView.builder(
-                    reverse: true,
-                    padding: const EdgeInsets.all(12),
-                    itemCount: _lines.length,
-                    itemBuilder: (_, i) => SelectableText(
-                      _lines[_lines.length - 1 - i],
-                      style: const TextStyle(fontFamily: 'monospace'),
-                    ),
-                  ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _command,
-                    autocorrect: false,
-                    style: const TextStyle(fontFamily: 'monospace'),
-                    decoration: InputDecoration(hintText: context.l10n.command),
-                    onSubmitted: (_) => _send(),
-                  ),
-                ),
-                IconButton(
-                  tooltip: context.l10n.runCommand,
-                  onPressed: _busy ? null : _send,
-                  icon: const Icon(Icons.send),
-                ),
-              ],
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _command,
+                      autocorrect: false,
+                      style: const TextStyle(fontFamily: 'monospace'),
+                      decoration: InputDecoration(
+                        hintText: context.l10n.command,
+                      ),
+                      onSubmitted: (_) => _send(),
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: context.l10n.runCommand,
+                    onPressed: _busy ? null : _send,
+                    icon: const Icon(Icons.send),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }
 
 class _WifiDialog extends StatefulWidget {

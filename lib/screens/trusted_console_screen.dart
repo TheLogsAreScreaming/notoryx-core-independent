@@ -6,18 +6,11 @@ import '../data/data.dart';
 import '../radio/radio.dart';
 import '../l10n/l10n.dart';
 
-const _destructiveCommands = [
-  'reboot',
-  'factory_reset',
-  'format',
-  'wipefs',
-];
+const _destructiveCommands = ['reboot', 'factory_reset', 'format', 'wipefs'];
 
 bool _isDestructive(String command) {
   final lower = command.trim().toLowerCase();
-  return _destructiveCommands.any(
-    (d) => lower == d || lower.startsWith('$d '),
-  );
+  return _destructiveCommands.any((d) => lower == d || lower.startsWith('$d '));
 }
 
 /// Runs commands on a trusted contact's radio, if they've allowed you.
