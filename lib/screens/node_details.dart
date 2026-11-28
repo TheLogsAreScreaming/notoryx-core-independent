@@ -138,303 +138,304 @@ Future<void> showNodeDetails(
       builder: (ctx, sheetRef, _) {
         final radioKey = sheetRef.watch(radioKeyProvider);
         final ContactReachability? reachability =
-            (node.isContact &&
-                    node.type == NodeType.chat &&
-                    radioKey != null)
-                ? sheetRef
-                      .watch(
-                        reachabilityProvider((
-                          radioKey: radioKey,
-                          publicKey: node.publicKey,
-                        )),
-                      )
-                      .valueOrNull
-                : null;
+            (node.isContact && node.type == NodeType.chat && radioKey != null)
+            ? sheetRef
+                  .watch(
+                    reachabilityProvider((
+                      radioKey: radioKey,
+                      publicKey: node.publicKey,
+                    )),
+                  )
+                  .value
+            : null;
 
         final l10n = context.l10n;
         return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: NodeAvatar(
-                publicKey: node.publicKey,
-                name: node.name,
-                type: node.type,
-              ),
-              title: Text(node.name, style: theme.textTheme.titleLarge),
-              subtitle: Text(
-                node.isContact
-                    ? nodeKind(node.type, l10n)
-                    : l10n.kindHeardNotAdded(
-                        nodeKind(node.type, l10n),
-                      ),
-              ),
-              trailing: node.favourite
-                  ? Icon(Icons.star, semanticLabel: l10n.favourite2)
-                  : null,
-            ),
-            _Row(
-              l10n.lastAdvertLabel,
-              timeAgo(node.lastAdvert, DateTime.now(), l10n),
-            ),
-            if (node.isContact)
-              _Row(
-                l10n.routeLabel,
-                routeText(node.outPathLength, l10n),
-              ),
-            if (reachability != null)
-              _Row(
-                l10n.reachabilityLabel,
-                switch (reachability) {
-                  ContactReachability.twoWay => l10n.reachabilityTwoWay,
-                  ContactReachability.theyHeardYou =>
-                    l10n.reachabilityTheyHeardYou,
-                  ContactReachability.noAnswerYet =>
-                    l10n.reachabilityNoAnswerYet,
-                },
-              ),
-            _Row(
-              context.l10n.positionLabel,
-              position == null
-                  ? context.l10n.notShared
-                  : '${position.latitude.toStringAsFixed(5)}, '
-                        '${position.longitude.toStringAsFixed(5)}',
-              onTap: position == null ? null : openCompass,
-            ),
-            if (position != null && from != null)
-              _Row(
-                context.l10n.distanceFromYourRadio,
-                distanceText(from, position),
-                onTap: openCompass,
-              ),
-            _Row(context.l10n.keyLabel, '${node.publicKey.substring(0, 16)}…'),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (node.isContact && node.type == NodeType.chat)
-                  FilledButton.icon(
-                    icon: const Icon(Icons.chat_bubble_outline),
-                    label: Text(context.l10n.message),
-                    onPressed: () {
-                      Navigator.pop(sheet);
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => ConversationScreen(
-                            thread: Threads.direct(node.publicKey),
-                            title: node.name,
-                          ),
-                        ),
-                      );
-                    },
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: NodeAvatar(
+                    publicKey: node.publicKey,
+                    name: node.name,
+                    type: node.type,
                   ),
-                if (node.isContact && position != null)
-                  OutlinedButton.icon(
-                    key: const Key('follow-node'),
-                    icon: const Icon(Icons.radar),
-                    label: Text(context.l10n.followButton),
-                    onPressed: () {
-                      Navigator.pop(sheet);
-                      openFollow(
-                        context,
-                        ref,
-                        nodeKey: node.publicKey,
-                        name: node.name,
-                        lastKnown: position,
-                      );
-                    },
+                  title: Text(node.name, style: theme.textTheme.titleLarge),
+                  subtitle: Text(
+                    node.isContact
+                        ? nodeKind(node.type, l10n)
+                        : l10n.kindHeardNotAdded(nodeKind(node.type, l10n)),
                   ),
-                if (node.isContact &&
-                    (node.type == NodeType.repeater ||
-                        node.type == NodeType.room))
-                  FilledButton.icon(
-                    icon: const Icon(Icons.login),
-                    label: Text(context.l10n.open),
-                    onPressed: () {
-                      Navigator.pop(sheet);
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => ServerScreen(node: node),
-                        ),
-                      );
-                    },
-                  ),
-                if (!node.isContact)
-                  FilledButton.icon(
-                    icon: const Icon(Icons.person_add_alt),
-                    label: Text(context.l10n.addContact),
-                    onPressed: () async {
-                      Navigator.pop(sheet);
-                      final key = ref.read(radioKeyProvider);
-                      if (key == null) return;
-                      final rows = await ref
-                          .read(storeProvider)
-                          .watchDiscovered(key)
-                          .first;
-                      final row = rows
-                          .where((d) => d.publicKey == node.publicKey)
-                          .firstOrNull;
-                      if (row != null && context.mounted) {
-                        await addDiscovered(context, ref, row);
-                      }
-                    },
-                  ),
-                if (node.isContact &&
-                    node.outPathLength != null &&
-                    node.outPathLength != pathUnknown &&
-                    (node.outPathLength! & 0x3F > 0 ||
-                        node.type == NodeType.repeater ||
-                        node.type == NodeType.room))
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.route),
-                    label: Text(context.l10n.traceRoute),
-                    onPressed: () async {
-                      Navigator.pop(sheet);
-                      final key = ref.read(radioKeyProvider);
-                      if (key == null) return;
-                      final row = await ref
-                          .read(storeProvider)
-                          .contact(key, node.publicKey);
-                      if (row != null && context.mounted) {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => TraceScreen(contact: row),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                if (node.isContact)
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.alt_route),
-                    label: Text(context.l10n.routeButton),
-                    onPressed: () async {
-                      Navigator.pop(sheet);
-                      final key = ref.read(radioKeyProvider);
-                      if (key == null) return;
-                      final row = await ref
-                          .read(storeProvider)
-                          .contact(key, node.publicKey);
-                      if (row != null && context.mounted) {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => RouteScreen(contact: row),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                if (position != null)
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.navigation_outlined),
-                    label: Text(context.l10n.compassButton),
-                    onPressed: openCompass,
-                  ),
-                if (position != null)
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.terrain),
-                    label: Text(context.l10n.terrainButton),
-                    onPressed: () {
-                      final radio = ref.read(radioPositionProvider);
-                      final start =
-                          from ??
-                          (radio == null ? null : LatLng(radio.lat, radio.lon));
-                      if (start == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(context.l10n.terrainNeedsPosition),
-                          ),
-                        );
-                        return;
-                      }
-                      Navigator.pop(sheet);
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => TerrainProfileScreen(
-                            from: start,
-                            to: position,
-                            name: node.name,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.palette_outlined),
-                  label: Text(context.l10n.nodeLookButton),
-                  onPressed: () {
-                    Navigator.pop(sheet);
-                    showNodeLookPicker(
-                      context,
-                      ref,
-                      publicKey: node.publicKey,
-                      name: node.name,
-                      type: node.type,
-                    );
-                  },
+                  trailing: node.favourite
+                      ? Icon(Icons.star, semanticLabel: l10n.favourite2)
+                      : null,
                 ),
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.menu_book_outlined),
-                  label: Text(context.l10n.journalButton),
-                  onPressed: () {
-                    final key = ref.read(radioKeyProvider);
-                    if (key == null) return;
-                    Navigator.pop(sheet);
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => JournalNodeScreen(
-                          radioKey: key,
-                          nodeKey: node.publicKey.toLowerCase(),
-                        ),
+                _Row(
+                  l10n.lastAdvertLabel,
+                  timeAgo(node.lastAdvert, DateTime.now(), l10n),
+                ),
+                if (node.isContact)
+                  _Row(l10n.routeLabel, routeText(node.outPathLength, l10n)),
+                if (reachability != null)
+                  _Row(l10n.reachabilityLabel, switch (reachability) {
+                    ContactReachability.twoWay => l10n.reachabilityTwoWay,
+                    ContactReachability.theyHeardYou =>
+                      l10n.reachabilityTheyHeardYou,
+                    ContactReachability.noAnswerYet =>
+                      l10n.reachabilityNoAnswerYet,
+                  }),
+                _Row(
+                  context.l10n.positionLabel,
+                  position == null
+                      ? context.l10n.notShared
+                      : '${position.latitude.toStringAsFixed(5)}, '
+                            '${position.longitude.toStringAsFixed(5)}',
+                  onTap: position == null ? null : openCompass,
+                ),
+                if (position != null && from != null)
+                  _Row(
+                    context.l10n.distanceFromYourRadio,
+                    distanceText(from, position),
+                    onTap: openCompass,
+                  ),
+                _Row(
+                  context.l10n.keyLabel,
+                  '${node.publicKey.substring(0, 16)}…',
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    if (node.isContact && node.type == NodeType.chat)
+                      FilledButton.icon(
+                        icon: const Icon(Icons.chat_bubble_outline),
+                        label: Text(context.l10n.message),
+                        onPressed: () {
+                          Navigator.pop(sheet);
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => ConversationScreen(
+                                thread: Threads.direct(node.publicKey),
+                                title: node.name,
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-                if (node.isContact)
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.sensors),
-                    label: Text(context.l10n.telemetry),
-                    onPressed: () {
-                      Navigator.pop(sheet);
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => TelemetryScreen(
+                    if (node.isContact && position != null)
+                      OutlinedButton.icon(
+                        key: const Key('follow-node'),
+                        icon: const Icon(Icons.radar),
+                        label: Text(context.l10n.followButton),
+                        onPressed: () {
+                          Navigator.pop(sheet);
+                          openFollow(
+                            context,
+                            ref,
                             nodeKey: node.publicKey,
                             name: node.name,
-                            type: node.type,
+                            lastKnown: position,
+                          );
+                        },
+                      ),
+                    if (node.isContact &&
+                        (node.type == NodeType.repeater ||
+                            node.type == NodeType.room))
+                      FilledButton.icon(
+                        icon: const Icon(Icons.login),
+                        label: Text(context.l10n.open),
+                        onPressed: () {
+                          Navigator.pop(sheet);
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => ServerScreen(node: node),
+                            ),
+                          );
+                        },
+                      ),
+                    if (!node.isContact)
+                      FilledButton.icon(
+                        icon: const Icon(Icons.person_add_alt),
+                        label: Text(context.l10n.addContact),
+                        onPressed: () async {
+                          Navigator.pop(sheet);
+                          final key = ref.read(radioKeyProvider);
+                          if (key == null) return;
+                          final rows = await ref
+                              .read(storeProvider)
+                              .watchDiscovered(key)
+                              .first;
+                          final row = rows
+                              .where((d) => d.publicKey == node.publicKey)
+                              .firstOrNull;
+                          if (row != null && context.mounted) {
+                            await addDiscovered(context, ref, row);
+                          }
+                        },
+                      ),
+                    if (node.isContact &&
+                        node.outPathLength != null &&
+                        node.outPathLength != pathUnknown &&
+                        (node.outPathLength! & 0x3F > 0 ||
+                            node.type == NodeType.repeater ||
+                            node.type == NodeType.room))
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.route),
+                        label: Text(context.l10n.traceRoute),
+                        onPressed: () async {
+                          Navigator.pop(sheet);
+                          final key = ref.read(radioKeyProvider);
+                          if (key == null) return;
+                          final row = await ref
+                              .read(storeProvider)
+                              .contact(key, node.publicKey);
+                          if (row != null && context.mounted) {
+                            await Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => TraceScreen(contact: row),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    if (node.isContact)
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.alt_route),
+                        label: Text(context.l10n.routeButton),
+                        onPressed: () async {
+                          Navigator.pop(sheet);
+                          final key = ref.read(radioKeyProvider);
+                          if (key == null) return;
+                          final row = await ref
+                              .read(storeProvider)
+                              .contact(key, node.publicKey);
+                          if (row != null && context.mounted) {
+                            await Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => RouteScreen(contact: row),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    if (position != null)
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.navigation_outlined),
+                        label: Text(context.l10n.compassButton),
+                        onPressed: openCompass,
+                      ),
+                    if (position != null)
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.terrain),
+                        label: Text(context.l10n.terrainButton),
+                        onPressed: () {
+                          final radio = ref.read(radioPositionProvider);
+                          final start =
+                              from ??
+                              (radio == null
+                                  ? null
+                                  : LatLng(radio.lat, radio.lon));
+                          if (start == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  context.l10n.terrainNeedsPosition,
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+                          Navigator.pop(sheet);
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => TerrainProfileScreen(
+                                from: start,
+                                to: position,
+                                name: node.name,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.palette_outlined),
+                      label: Text(context.l10n.nodeLookButton),
+                      onPressed: () {
+                        Navigator.pop(sheet);
+                        showNodeLookPicker(
+                          context,
+                          ref,
+                          publicKey: node.publicKey,
+                          name: node.name,
+                          type: node.type,
+                        );
+                      },
+                    ),
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.menu_book_outlined),
+                      label: Text(context.l10n.journalButton),
+                      onPressed: () {
+                        final key = ref.read(radioKeyProvider);
+                        if (key == null) return;
+                        Navigator.pop(sheet);
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => JournalNodeScreen(
+                              radioKey: key,
+                              nodeKey: node.publicKey.toLowerCase(),
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                if (node.isContact)
-                  OutlinedButton.icon(
-                    icon: const Icon(Icons.more_horiz),
-                    label: Text(context.l10n.more),
-                    onPressed: () async {
-                      Navigator.pop(sheet);
-                      final key = ref.read(radioKeyProvider);
-                      if (key == null) return;
-                      final row = await ref
-                          .read(storeProvider)
-                          .contact(key, node.publicKey);
-                      if (row != null && context.mounted) {
-                        await showContactActions(context, ref, contact: row);
-                      }
-                    },
-                  ),
+                        );
+                      },
+                    ),
+                    if (node.isContact)
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.sensors),
+                        label: Text(context.l10n.telemetry),
+                        onPressed: () {
+                          Navigator.pop(sheet);
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => TelemetryScreen(
+                                nodeKey: node.publicKey,
+                                name: node.name,
+                                type: node.type,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    if (node.isContact)
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.more_horiz),
+                        label: Text(context.l10n.more),
+                        onPressed: () async {
+                          Navigator.pop(sheet);
+                          final key = ref.read(radioKeyProvider);
+                          if (key == null) return;
+                          final row = await ref
+                              .read(storeProvider)
+                              .contact(key, node.publicKey);
+                          if (row != null && context.mounted) {
+                            await showContactActions(
+                              context,
+                              ref,
+                              contact: row,
+                            );
+                          }
+                        },
+                      ),
+                  ],
+                ),
               ],
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        );
       },
     );
   },

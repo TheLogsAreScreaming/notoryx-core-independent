@@ -569,9 +569,11 @@ final consoleProvider =
           .watchThread(id.radioKey, id.thread, console: true),
     );
 
-final reachabilityProvider = StreamProvider.family<ContactReachability,
-    ({String radioKey, String publicKey})>(
-  (ref, id) => ref
-      .watch(storeProvider)
-      .watchReachability(id.radioKey, id.publicKey),
-);
+final reachabilityProvider =
+    StreamProvider.family<
+      ContactReachability,
+      ({String radioKey, String publicKey})
+    >(
+      (ref, id) =>
+          ref.watch(storeProvider).watchReachability(id.radioKey, id.publicKey),
+    );

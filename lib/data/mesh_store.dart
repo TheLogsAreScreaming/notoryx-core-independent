@@ -767,15 +767,12 @@ class MeshStore {
     String publicKey,
   ) {
     final thread = Threads.direct(publicKey);
-    return (_db.select(_db.messages)
-          ..where(
-            (m) =>
-                m.radioKey.equals(radioKey) &
-                m.thread.equals(thread) &
-                _db.messages.textType
-                    .equals(TextType.cliData.value)
-                    .not(),
-          ))
+    return (_db.select(_db.messages)..where(
+          (m) =>
+              m.radioKey.equals(radioKey) &
+              m.thread.equals(thread) &
+              _db.messages.textType.equals(TextType.cliData.value).not(),
+        ))
         .watch()
         .map((msgs) {
           if (msgs.any((m) => !m.outgoing)) {
