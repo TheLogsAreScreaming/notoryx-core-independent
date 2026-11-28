@@ -5,6 +5,15 @@ import '../app/connection.dart';
 import '../radio/radio.dart';
 import '../l10n/l10n.dart';
 
+const _minVersionCode = 14;
+
+const _destructiveCommands = ['reboot', 'factory_reset', 'format', 'wipefs'];
+
+bool _isDestructive(String command) {
+  final lower = command.trim().toLowerCase();
+  return _destructiveCommands.any((d) => lower == d || lower.startsWith('$d '));
+}
+
 /// The connected radio's own command line, and Wi-Fi setup for radios
 /// built with it. Commands go over the cable or Bluetooth, not the mesh.
 class RadioConsoleScreen extends ConsumerStatefulWidget {
@@ -54,6 +63,27 @@ class _RadioConsoleScreenState extends ConsumerState<RadioConsoleScreen> {
   Future<void> _send() async {
     final text = _command.text.trim();
     if (text.isEmpty || _busy) return;
+    if (_isDestructive(text)) {
+      final l10n = context.l10n;
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text(l10n.cliDestructiveTitle),
+          content: Text(l10n.cliDestructiveBody(text.split(' ').first)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l10n.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(l10n.cliRunIt),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
+    }
     _command.clear();
     await _run(text);
   }
@@ -72,63 +102,106 @@ class _RadioConsoleScreenState extends ConsumerState<RadioConsoleScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      title: Text(context.l10n.commandLine),
-      actions: [
-        IconButton(
-          tooltip: context.l10n.wiFiSetup,
-          onPressed: _busy ? null : _wifi,
-          icon: const Icon(Icons.wifi),
-        ),
-      ],
-    ),
-    body: SafeArea(
-      child: Column(
-        children: [
-          Expanded(
-            child: _lines.isEmpty
-                ? Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(24),
-                      child: Text(context.l10n.commandsRunOnYourRadioNot),
-                    ),
-                  )
-                : ListView.builder(
-                    reverse: true,
-                    padding: const EdgeInsets.all(12),
-                    itemCount: _lines.length,
-                    itemBuilder: (_, i) => SelectableText(
-                      _lines[_lines.length - 1 - i],
-                      style: const TextStyle(fontFamily: 'monospace'),
-                    ),
-                  ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _command,
-                    autocorrect: false,
-                    style: const TextStyle(fontFamily: 'monospace'),
-                    decoration: InputDecoration(hintText: context.l10n.command),
-                    onSubmitted: (_) => _send(),
-                  ),
-                ),
-                IconButton(
-                  tooltip: context.l10n.runCommand,
-                  onPressed: _busy ? null : _send,
-                  icon: const Icon(Icons.send),
-                ),
-              ],
-            ),
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final connection = ref.watch(connectionProvider);
+    final int? versionCode = switch (connection) {
+      Connected(:final radio) => radio.device.firmwareVersionCode,
+      _ => null,
+    };
+    final bool olderFirmware =
+        versionCode != null && versionCode < _minVersionCode;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.commandLine),
+        actions: [
+          IconButton(
+            tooltip: l10n.wiFiSetup,
+            onPressed: _busy ? null : _wifi,
+            icon: const Icon(Icons.wifi),
           ),
         ],
       ),
-    ),
-  );
+      body: SafeArea(
+        child: Column(
+          children: [
+            if (olderFirmware)
+              Material(
+                color: Theme.of(context).colorScheme.errorContainer,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.warning_amber_rounded,
+                        color: Theme.of(context).colorScheme.onErrorContainer,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          l10n.cliOlderFirmware(versionCode),
+                          style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onErrorContainer,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            Expanded(
+              child: _lines.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(24),
+                        child: Text(context.l10n.commandsRunOnYourRadioNot),
+                      ),
+                    )
+                  : ListView.builder(
+                      reverse: true,
+                      padding: const EdgeInsets.all(12),
+                      itemCount: _lines.length,
+                      itemBuilder: (_, i) => SelectableText(
+                        _lines[_lines.length - 1 - i],
+                        style: const TextStyle(fontFamily: 'monospace'),
+                      ),
+                    ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _command,
+                      autocorrect: false,
+                      style: const TextStyle(fontFamily: 'monospace'),
+                      decoration: InputDecoration(
+                        hintText: context.l10n.command,
+                      ),
+                      onSubmitted: (_) => _send(),
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: context.l10n.runCommand,
+                    onPressed: _busy ? null : _send,
+                    icon: const Icon(Icons.send),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _WifiDialog extends StatefulWidget {

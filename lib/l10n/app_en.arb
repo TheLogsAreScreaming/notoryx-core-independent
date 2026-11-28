@@ -3399,5 +3399,15 @@
   "coverageOpenMap": "Open the coverage map",
   "coverageOpenFailed": "Couldn't open {url}",
   "@coverageOpenFailed": {"placeholders": {"url": {"type": "String"}}},
-  "contactsFullWarning": "This radio's contact list is full, so it can't add new nodes. Remove some contacts to make room."
+  "contactsFullWarning": "This radio's contact list is full, so it can't add new nodes. Remove some contacts to make room.",
+  "reachabilityLabel": "Reachability",
+  "reachabilityTwoWay": "Two-way",
+  "reachabilityTheyHeardYou": "They've heard you",
+  "reachabilityNoAnswerYet": "No answer yet",
+  "cliOlderFirmware": "The command line needs firmware with version code 14 or later. This radio reports version code {code}.",
+  "@cliOlderFirmware": {"placeholders": {"code": {"type": "Object"}}},
+  "cliDestructiveTitle": "Run this command?",
+  "cliDestructiveBody": "'{command}' can't be undone.",
+  "@cliDestructiveBody": {"placeholders": {"command": {"type": "String"}}},
+  "cliRunIt": "Run it"
 }
