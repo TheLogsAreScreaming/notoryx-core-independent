@@ -6,6 +6,7 @@ import 'package:quick_actions/quick_actions.dart';
 
 import '../app/deep_link_handler.dart';
 import '../app/favourites_view.dart';
+import '../app/mesh_links.dart';
 import '../app/connection.dart';
 import '../app/contact_room.dart';
 import '../app/quick_messages.dart';
