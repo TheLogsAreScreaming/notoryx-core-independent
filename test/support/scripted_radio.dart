@@ -55,6 +55,10 @@ class ScriptedRadio {
   bool wrongStartReply = false;
   bool refuseText = false;
 
+  /// Firmware version code returned by DeviceQuery. Default 13 keeps the
+  /// auto-telemetry-seed in MeshSync.start() from firing in most tests.
+  int versionCode = 13;
+
   /// Whether the firmware supports area-limited posts (flood corridor).
   /// Stock firmware, the default, answers those commands "unsupported".
   bool areaLimits = false;
@@ -99,7 +103,11 @@ class ScriptedRadio {
     ],
     CommandCode.setRadioParams => _setRadio(frame),
     CommandCode.deviceQuery => [
-      deviceInfoFrame(maxChannels: 3, maxContacts: contactLimit),
+      deviceInfoFrame(
+        versionCode: versionCode,
+        maxChannels: 3,
+        maxContacts: contactLimit,
+      ),
     ],
     CommandCode.setDeviceTime => [okFrame()],
     CommandCode.getContacts => _contacts(frame),
