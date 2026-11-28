@@ -167,12 +167,14 @@ class _OtaUpdateScreenState extends State<OtaUpdateScreen> {
                     textColor: Theme.of(context).colorScheme.onErrorContainer,
                     text: l10n.otaError(_errorMessage!),
                   ),
-                const SizedBox(height: 8),
-                FilledButton.icon(
-                  icon: const Icon(Icons.system_update_alt),
-                  label: Text(l10n.otaStartFlash),
-                  onPressed: _filePath != null ? _confirmAndStart : null,
-                ),
+                if (_filePath != null) ...[
+                  const SizedBox(height: 8),
+                  FilledButton.icon(
+                    icon: const Icon(Icons.system_update_alt),
+                    label: Text(l10n.otaStartFlash),
+                    onPressed: _confirmAndStart,
+                  ),
+                ],
               ],
 
               if (_state == _OtaState.inProgress) ...[
