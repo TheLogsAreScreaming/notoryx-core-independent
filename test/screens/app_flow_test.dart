@@ -533,6 +533,7 @@ void main() {
       // In the order they appear, top to bottom.
       const screens = [
         'Local mesh settings',
+        'Update firmware',
         'Battery and sensor history',
         'Repeater names',
         'Observer reach',
