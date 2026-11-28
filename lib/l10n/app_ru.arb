@@ -1639,5 +1639,9 @@
   "coverageStopConfirm": "Перестать делиться и удалить ещё не отправленные измерения? Уже отправленное останется на карте, пока вы его не удалите.",
   "coverageOpenMap": "Открыть карту покрытия",
   "coverageOpenFailed": "Не удалось открыть {url}",
-  "contactsFullWarning": "Список контактов этой рации заполнен, поэтому она не может добавлять новые узлы. Удалите несколько контактов, чтобы освободить место."
+  "contactsFullWarning": "Список контактов этой рации заполнен, поэтому она не может добавлять новые узлы. Удалите несколько контактов, чтобы освободить место.",
+  "cliOlderFirmware": "The command line needs firmware with version code 14 or later. This radio reports version code {code}.",
+  "cliDestructiveTitle": "Run this command?",
+  "cliDestructiveBody": "'{command}' can't be undone.",
+  "cliRunIt": "Run it"
 }

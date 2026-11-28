@@ -6,6 +6,20 @@ import '../data/data.dart';
 import '../radio/radio.dart';
 import '../l10n/l10n.dart';
 
+const _destructiveCommands = [
+  'reboot',
+  'factory_reset',
+  'format',
+  'wipefs',
+];
+
+bool _isDestructive(String command) {
+  final lower = command.trim().toLowerCase();
+  return _destructiveCommands.any(
+    (d) => lower == d || lower.startsWith('$d '),
+  );
+}
+
 /// Runs commands on a trusted contact's radio, if they've allowed you.
 class TrustedConsoleScreen extends ConsumerStatefulWidget {
   const TrustedConsoleScreen({required this.contact, super.key});
@@ -31,6 +45,27 @@ class _TrustedConsoleScreenState extends ConsumerState<TrustedConsoleScreen> {
     final text = _command.text.trim();
     final state = ref.read(connectionProvider);
     if (text.isEmpty || state is! Connected || _sending) return;
+    if (_isDestructive(text)) {
+      final l10n = context.l10n;
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text(l10n.cliDestructiveTitle),
+          content: Text(l10n.cliDestructiveBody(text.split(' ').first)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l10n.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(l10n.cliRunIt),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
+    }
     final messenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
     setState(() => _sending = true);

@@ -1639,5 +1639,9 @@
   "coverageStopConfirm": "Prestať zdieľať a vymazať ešte neodoslané merania? Čo už bolo odoslané, zostane na mape, kým to nevymažeš.",
   "coverageOpenMap": "Otvoriť mapu pokrytia",
   "coverageOpenFailed": "Nepodarilo sa otvoriť {url}",
-  "contactsFullWarning": "Zoznam kontaktov tohto rádia je plný, takže nemôže pridávať nové uzly. Odstráňte niekoľko kontaktov, aby ste uvoľnili miesto."
+  "contactsFullWarning": "Zoznam kontaktov tohto rádia je plný, takže nemôže pridávať nové uzly. Odstráňte niekoľko kontaktov, aby ste uvoľnili miesto.",
+  "cliOlderFirmware": "The command line needs firmware with version code 14 or later. This radio reports version code {code}.",
+  "cliDestructiveTitle": "Run this command?",
+  "cliDestructiveBody": "'{command}' can't be undone.",
+  "cliRunIt": "Run it"
 }
