@@ -20,6 +20,8 @@ import '../support/fake_radio_link.dart';
 import '../support/radio_frames.dart';
 import '../support/scripted_radio.dart';
 
+import 'package:notoryx_core/app/deep_link_handler.dart';
+
 class _Connector implements RadioConnector {
   _Connector(this.newLink);
 
@@ -86,6 +88,7 @@ void main() {
             () async => const LatLng(46.5, -121.25),
           ),
           safetyClockProvider.overrideWithValue(() => now),
+          deepLinkProvider.overrideWith((ref) => Stream.empty()),
         ],
         child: const NotoryxApp(),
       ),

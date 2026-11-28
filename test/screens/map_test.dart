@@ -7,6 +7,7 @@ import '../support/open_connect.dart';
 
 import 'package:latlong2/latlong.dart';
 import 'package:notoryx_core/app/connection.dart';
+import 'package:notoryx_core/app/deep_link_handler.dart';
 import 'package:notoryx_core/app/notifications.dart';
 import 'package:notoryx_core/app/radio_connector.dart';
 import 'package:notoryx_core/app/traffic.dart';
@@ -92,6 +93,7 @@ void main() {
           foregroundCheckProvider.overrideWithValue(() => true),
           mapTilesProvider.overrideWithValue(null),
           phonePositionProvider.overrideWithValue(() async => phone),
+          deepLinkProvider.overrideWith((ref) => Stream.empty()),
         ],
         child: const NotoryxApp(),
       ),
