@@ -1639,5 +1639,9 @@
   "coverageStopConfirm": "Przestać udostępniać i usunąć niewysłane pomiary? To, co już wysłano, zostaje na mapie, dopóki tego nie usuniesz.",
   "coverageOpenMap": "Otwórz mapę zasięgu",
   "coverageOpenFailed": "Nie można otworzyć {url}",
-  "contactsFullWarning": "Lista kontaktów tego radia jest pełna, więc nie może dodawać nowych węzłów. Usuń kilka kontaktów, aby zrobić miejsce."
+  "contactsFullWarning": "Lista kontaktów tego radia jest pełna, więc nie może dodawać nowych węzłów. Usuń kilka kontaktów, aby zrobić miejsce.",
+  "reachabilityLabel": "Reachability",
+  "reachabilityTwoWay": "Two-way",
+  "reachabilityTheyHeardYou": "They've heard you",
+  "reachabilityNoAnswerYet": "No answer yet"
 }

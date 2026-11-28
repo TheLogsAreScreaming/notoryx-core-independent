@@ -55,6 +55,18 @@ enum MessageKind { direct, channel }
 /// Where an outgoing message has got to. Incoming ones are [received].
 enum MessageStatus { pending, sent, delivered, failed, received }
 
+/// Inferred reachability for a direct-message contact based on local history.
+enum ContactReachability {
+  /// They've sent us at least one direct message: bi-directional link confirmed.
+  twoWay,
+
+  /// At least one message we sent was delivered, but none received from them.
+  theyHeardYou,
+
+  /// No confirmed delivery yet in either direction.
+  noAnswerYet,
+}
+
 /// Direct and channel messages, both directions.
 @TableIndex(name: 'messages_by_thread', columns: {#radioKey, #thread, #id})
 @TableIndex(name: 'messages_by_ack', columns: {#radioKey, #ackCode})

@@ -1639,5 +1639,9 @@
   "coverageStopConfirm": "Ustaviti deljenje in izbrisati še neposlane meritve? Kar je že poslano, ostane na zemljevidu, dokler tega ne izbrišeš.",
   "coverageOpenMap": "Odpri zemljevid pokritosti",
   "coverageOpenFailed": "Ni mogoče odpreti {url}",
-  "contactsFullWarning": "Seznam stikov tega radia je poln, zato ne more dodajati novih vozlišč. Odstranite nekaj stikov, da sprostite prostor."
+  "contactsFullWarning": "Seznam stikov tega radia je poln, zato ne more dodajati novih vozlišč. Odstranite nekaj stikov, da sprostite prostor.",
+  "reachabilityLabel": "Reachability",
+  "reachabilityTwoWay": "Two-way",
+  "reachabilityTheyHeardYou": "They've heard you",
+  "reachabilityNoAnswerYet": "No answer yet"
 }

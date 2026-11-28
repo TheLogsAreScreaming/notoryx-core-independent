@@ -1639,5 +1639,9 @@
   "coverageStopConfirm": "Leállítod a megosztást és törlöd a még el nem küldött méréseket? A már elküldöttek a térképen maradnak, amíg nem törlöd őket.",
   "coverageOpenMap": "Lefedettségi térkép megnyitása",
   "coverageOpenFailed": "Nem nyitható meg: {url}",
-  "contactsFullWarning": "A rádió névjegylistája megtelt, ezért nem tud új node-okat felvenni. Törölj néhány névjegyet, hogy legyen hely."
+  "contactsFullWarning": "A rádió névjegylistája megtelt, ezért nem tud új node-okat felvenni. Törölj néhány névjegyet, hogy legyen hely.",
+  "reachabilityLabel": "Reachability",
+  "reachabilityTwoWay": "Two-way",
+  "reachabilityTheyHeardYou": "They've heard you",
+  "reachabilityNoAnswerYet": "No answer yet"
 }

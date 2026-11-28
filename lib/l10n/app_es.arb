@@ -1639,5 +1639,9 @@
   "coverageStopConfirm": "¿Dejar de compartir y borrar las lecturas aún no enviadas? Lo ya enviado sigue en el mapa hasta que lo borres.",
   "coverageOpenMap": "Abrir el mapa de cobertura",
   "coverageOpenFailed": "No se pudo abrir {url}",
-  "contactsFullWarning": "La lista de contactos de esta radio está llena, así que no puede añadir nodos nuevos. Elimina algunos contactos para hacer espacio."
+  "contactsFullWarning": "La lista de contactos de esta radio está llena, así que no puede añadir nodos nuevos. Elimina algunos contactos para hacer espacio.",
+  "reachabilityLabel": "Reachability",
+  "reachabilityTwoWay": "Two-way",
+  "reachabilityTheyHeardYou": "They've heard you",
+  "reachabilityNoAnswerYet": "No answer yet"
 }

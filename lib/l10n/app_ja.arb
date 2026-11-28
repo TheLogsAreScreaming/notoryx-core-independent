@@ -1639,5 +1639,9 @@
   "coverageStopConfirm": "共有を停止し、未送信の記録を削除しますか？送信済みのものは削除するまでマップに残ります。",
   "coverageOpenMap": "カバレッジマップを開く",
   "coverageOpenFailed": "{url} を開けませんでした",
-  "contactsFullWarning": "この無線機の連絡先リストがいっぱいのため、新しいノードを追加できません。連絡先をいくつか削除して空きを作ってください。"
+  "contactsFullWarning": "この無線機の連絡先リストがいっぱいのため、新しいノードを追加できません。連絡先をいくつか削除して空きを作ってください。",
+  "reachabilityLabel": "Reachability",
+  "reachabilityTwoWay": "Two-way",
+  "reachabilityTheyHeardYou": "They've heard you",
+  "reachabilityNoAnswerYet": "No answer yet"
 }

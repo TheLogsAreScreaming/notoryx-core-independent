@@ -134,7 +134,25 @@ Future<void> showNodeDetails(
       );
     }
 
-    return SafeArea(
+    return Consumer(
+      builder: (ctx, sheetRef, _) {
+        final radioKey = sheetRef.watch(radioKeyProvider);
+        final ContactReachability? reachability =
+            (node.isContact &&
+                    node.type == NodeType.chat &&
+                    radioKey != null)
+                ? sheetRef
+                      .watch(
+                        reachabilityProvider((
+                          radioKey: radioKey,
+                          publicKey: node.publicKey,
+                        )),
+                      )
+                      .valueOrNull
+                : null;
+
+        final l10n = context.l10n;
+        return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
         child: Column(
@@ -151,23 +169,34 @@ Future<void> showNodeDetails(
               title: Text(node.name, style: theme.textTheme.titleLarge),
               subtitle: Text(
                 node.isContact
-                    ? nodeKind(node.type, context.l10n)
-                    : context.l10n.kindHeardNotAdded(
-                        nodeKind(node.type, context.l10n),
+                    ? nodeKind(node.type, l10n)
+                    : l10n.kindHeardNotAdded(
+                        nodeKind(node.type, l10n),
                       ),
               ),
               trailing: node.favourite
-                  ? Icon(Icons.star, semanticLabel: context.l10n.favourite2)
+                  ? Icon(Icons.star, semanticLabel: l10n.favourite2)
                   : null,
             ),
             _Row(
-              context.l10n.lastAdvertLabel,
-              timeAgo(node.lastAdvert, DateTime.now(), context.l10n),
+              l10n.lastAdvertLabel,
+              timeAgo(node.lastAdvert, DateTime.now(), l10n),
             ),
             if (node.isContact)
               _Row(
-                context.l10n.routeLabel,
-                routeText(node.outPathLength, context.l10n),
+                l10n.routeLabel,
+                routeText(node.outPathLength, l10n),
+              ),
+            if (reachability != null)
+              _Row(
+                l10n.reachabilityLabel,
+                switch (reachability) {
+                  ContactReachability.twoWay => l10n.reachabilityTwoWay,
+                  ContactReachability.theyHeardYou =>
+                    l10n.reachabilityTheyHeardYou,
+                  ContactReachability.noAnswerYet =>
+                    l10n.reachabilityNoAnswerYet,
+                },
               ),
             _Row(
               context.l10n.positionLabel,
@@ -405,6 +434,8 @@ Future<void> showNodeDetails(
           ],
         ),
       ),
+    );
+      },
     );
   },
 );

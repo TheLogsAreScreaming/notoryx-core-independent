@@ -1639,5 +1639,9 @@
   "coverageStopConfirm": "Arrêter le partage et supprimer les relevés pas encore envoyés ? Ce qui a déjà été envoyé reste sur la carte jusqu'à ce que vous l'effaciez.",
   "coverageOpenMap": "Ouvrir la carte de couverture",
   "coverageOpenFailed": "Impossible d'ouvrir {url}",
-  "contactsFullWarning": "La liste de contacts de cette radio est pleine : elle ne peut plus ajouter de nouveaux nœuds. Supprimez des contacts pour faire de la place."
+  "contactsFullWarning": "La liste de contacts de cette radio est pleine : elle ne peut plus ajouter de nouveaux nœuds. Supprimez des contacts pour faire de la place.",
+  "reachabilityLabel": "Reachability",
+  "reachabilityTwoWay": "Two-way",
+  "reachabilityTheyHeardYou": "They've heard you",
+  "reachabilityNoAnswerYet": "No answer yet"
 }
