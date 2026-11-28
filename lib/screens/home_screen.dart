@@ -272,13 +272,61 @@ void _openThread(
 }
 
 /// Channels first, then direct conversations, each with its newest message.
-class _ChatsTab extends ConsumerWidget {
+/// One row in the unified chats list.
+typedef _ChatEntry = ({
+  String thread,
+  bool isChannel,
+  Channel? channel,
+  Message? direct,
+});
+
+class _ChatsTab extends ConsumerStatefulWidget {
   const _ChatsTab({required this.radioKey});
 
   final String radioKey;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_ChatsTab> createState() => _ChatsTabState();
+}
+
+class _ChatsTabState extends ConsumerState<_ChatsTab> {
+  final _scroll = ScrollController();
+  // Key of the oldest unread tile; we scroll to it once per tab-open.
+  final _oldestUnreadKey = GlobalKey();
+  bool _scrolledToUnread = false;
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  /// Scrolls the oldest-unread tile into view on the first build that has
+  /// unread messages.
+  void _scrollToOldestUnread(
+    List<_ChatEntry> entries,
+    Map<String, int> unread,
+    int oldestUnreadIndex,
+  ) {
+    if (_scrolledToUnread || oldestUnreadIndex < 0) return;
+    _scrolledToUnread = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final ctx = _oldestUnreadKey.currentContext;
+      if (ctx != null) {
+        Scrollable.ensureVisible(
+          ctx,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+          alignment: 0.5,
+        );
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final radioKey = widget.radioKey;
     final channels = ref.watch(channelsProvider(radioKey)).value ?? const [];
     final latest = ref.watch(conversationsProvider(radioKey)).value ?? const [];
     final contacts = ref.watch(contactsProvider(radioKey)).value ?? const [];
@@ -294,51 +342,85 @@ class _ChatsTab extends ConsumerWidget {
     if (channels.isEmpty && direct.isEmpty && mismatches.isEmpty) {
       return _Empty(context.l10n.noChatsYet);
     }
+
+    // Build unified entry list: channels + directs, sorted newest-first.
+    // Channels without any message sort after all entries that have one.
+    final entries = <_ChatEntry>[
+      for (final ch in channels)
+        (
+          thread: Threads.channel(ch.slot),
+          isChannel: true,
+          channel: ch,
+          direct: null,
+        ),
+      for (final m in direct)
+        (thread: m.thread, isChannel: false, channel: null, direct: m),
+    ];
+    entries.sort((a, b) {
+      final ta = byThread[a.thread]?.sentAt ?? -1;
+      final tb = byThread[b.thread]?.sentAt ?? -1;
+      return tb.compareTo(ta); // newest first
+    });
+
+    // Find the oldest (last) entry that still has unread messages, so we
+    // can scroll to it once on first open.
+    int oldestUnreadIndex = -1;
+    for (int i = 0; i < entries.length; i++) {
+      if ((unread[entries[i].thread] ?? 0) > 0) oldestUnreadIndex = i;
+    }
+    _scrollToOldestUnread(entries, unread, oldestUnreadIndex);
+
+    Widget tile(_ChatEntry e, int index) {
+      final key = index == oldestUnreadIndex ? _oldestUnreadKey : null;
+      final u = unread[e.thread] ?? 0;
+      final draft = drafts[e.thread];
+      final isMuted = muted.contains(e.thread);
+      if (e.isChannel) {
+        final ch = e.channel!;
+        return _ThreadTile(
+          key: key,
+          icon: Icons.tag,
+          title: ch.name,
+          latest: byThread[e.thread],
+          unread: u,
+          draft: draft,
+          muted: isMuted,
+          onLongPress: () =>
+              showChannelActions(context, ref, radioKey: radioKey, channel: ch),
+          onTap: () => _openThread(
+            context,
+            thread: e.thread,
+            title: ch.name,
+            isChannel: true,
+          ),
+        );
+      } else {
+        final m = e.direct!;
+        final title = _directTitle(context.l10n, e.thread, names);
+        return _ThreadTile(
+          key: key,
+          icon: Icons.person_outline,
+          avatar: NodeAvatar(
+            publicKey: m.thread.substring(2),
+            name: title,
+            type: NodeType.chat,
+          ),
+          title: title,
+          latest: m,
+          unread: u,
+          draft: draft,
+          muted: isMuted,
+          onLongPress: () => _toggleMute(context, ref, e.thread),
+          onTap: () => _openThread(context, thread: e.thread, title: title),
+        );
+      }
+    }
+
     return ListView(
+      controller: _scroll,
       children: [
         ChannelMismatchBanner(radioKey: radioKey),
-        for (final channel in channels)
-          _ThreadTile(
-            icon: Icons.tag,
-            title: channel.name,
-            latest: byThread[Threads.channel(channel.slot)],
-            unread: unread[Threads.channel(channel.slot)] ?? 0,
-            draft: drafts[Threads.channel(channel.slot)],
-            muted: muted.contains(Threads.channel(channel.slot)),
-            onLongPress: () => showChannelActions(
-              context,
-              ref,
-              radioKey: radioKey,
-              channel: channel,
-            ),
-            onTap: () => _openThread(
-              context,
-              thread: Threads.channel(channel.slot),
-              title: channel.name,
-              isChannel: true,
-            ),
-          ),
-        if (channels.isNotEmpty && direct.isNotEmpty) const Divider(),
-        for (final message in direct)
-          _ThreadTile(
-            icon: Icons.person_outline,
-            avatar: NodeAvatar(
-              publicKey: message.thread.substring(2),
-              name: _directTitle(context.l10n, message.thread, names),
-              type: NodeType.chat,
-            ),
-            title: _directTitle(context.l10n, message.thread, names),
-            latest: message,
-            unread: unread[message.thread] ?? 0,
-            draft: drafts[message.thread],
-            muted: muted.contains(message.thread),
-            onLongPress: () => _toggleMute(context, ref, message.thread),
-            onTap: () => _openThread(
-              context,
-              thread: message.thread,
-              title: _directTitle(context.l10n, message.thread, names),
-            ),
-          ),
+        for (int i = 0; i < entries.length; i++) tile(entries[i], i),
       ],
     );
   }
@@ -349,7 +431,7 @@ class _ChatsTab extends ConsumerWidget {
     String thread,
   ) async {
     final store = ref.read(storeProvider);
-    final muted = await store.isMuted(radioKey, thread);
+    final muted = await store.isMuted(widget.radioKey, thread);
     if (!context.mounted) return;
     final change = await showModalBottomSheet<bool>(
       context: context,
@@ -367,7 +449,7 @@ class _ChatsTab extends ConsumerWidget {
         ),
       ),
     );
-    if (change == true) await store.setMuted(radioKey, thread, !muted);
+    if (change == true) await store.setMuted(widget.radioKey, thread, !muted);
   }
 
   static String _directTitle(
@@ -382,6 +464,7 @@ class _ChatsTab extends ConsumerWidget {
 
 class _ThreadTile extends StatelessWidget {
   const _ThreadTile({
+    super.key,
     required this.icon,
     required this.title,
     required this.latest,
